@@ -1,15 +1,60 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رفع الملفات إلى GitHub</title>
+    <title>Upload to GitHub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@octokit/core"></script>
 </head>
 <body>
-    <h2>رفع الملفات إلى GitHub</h2>
-    <input type="file" id="fileInput">
-    <button onclick="uploadFile()">رفع الملف</button>
+    <h2>Upload your file to GitHub</h2>
+    <input type="file" id="fileInput"><br>
+    <button onclick="uploadFile()">Upload</button>
 
-    <script src="upload.js"></script>
+    <script>
+        const TOKEN = "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"; // ضع التوكن الخاص بك هنا
+const OWNER = "AbdoAhmedElbanaa"; // ضع اسم المستخدم أو المنظمة الخاصة بك
+const REPO = "cdnelbanaanet"; // ضع اسم المستودع الخاص بك
+
+const octokit = new Octokit({ auth: TOKEN });
+
+async function uploadFile() {
+    const fileInput = document.getElementById("fileInput");
+    if (fileInput.files.length === 0) {
+        alert("يرجى اختيار ملف للرفع.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async function (event) {
+        const content = btoa(event.target.result); // تحويل الملف إلى Base64
+        const path = `uploads/${file.name}`; // حفظ الملف داخل مجلد 'uploads/'
+
+        try {
+            const response = await octokit.request(`PUT /repos/${OWNER}/${REPO}/contents/${path}`, {
+                owner: OWNER,
+                repo: REPO,
+                path: path,
+                message: `Upload ${file.name}`,
+                committer: {
+                    name: "GitHub Uploader",
+                    email: "uploader@github.com"
+                },
+                content: content,
+                headers: { "X-GitHub-Api-Version": "2022-11-28" }
+            });
+
+            if (response.status === 201) {
+                alert(`تم رفع الملف بنجاح: ${file.name}`);
+            }
+        } catch (error) {
+            alert("حدث خطأ أثناء الرفع: " + error.message);
+        }
+    };
+
+    reader.readAsBinaryString(file);
+}
+
+    </script>
 </body>
 </html>
