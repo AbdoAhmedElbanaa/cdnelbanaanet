@@ -255,7 +255,7 @@ section{
 	background-color: #ffffff;
 }
 .invoice-table td, .invoice-table th {
-	text-align: left;
+	text-align: right;
 }
 .invoice-table td {
 	color: #505050;
