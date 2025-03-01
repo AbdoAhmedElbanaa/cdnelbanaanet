@@ -372,7 +372,7 @@ td.invo-tb-data.third-color{
 .invo-buttons-wrap .invo-btns .print-btn {
 	background: #ed6622;
 	padding: 12px 24px;
-	border-radius: 24px 0px 0px 24px;
+	border-radius: 0px 24px 24px 0px;
 	display: -webkit-inline-box;
 	display: -ms-inline-flexbox;
 	display: inline-flex;
@@ -382,7 +382,7 @@ td.invo-tb-data.third-color{
 .invo-buttons-wrap .invo-btns .download-btn {
 	background: #00D061;
 	padding: 12px 24px;
-	border-radius: 0px 24px 24px 0px;
+	border-radius: 24px 0px 0px 24px;
 	display: -webkit-inline-box;
 	display: -ms-inline-flexbox;
 	display: inline-flex;
@@ -515,7 +515,8 @@ td.invo-tb-data.third-color{
 	display: inline-block;
 }
 .res-pay-table {
-	border-collapse: collapse;
+    border-collapse: collapse;
+    width: -webkit-fill-available;
 }
 .pay-data {
 	border-bottom: 1px solid #888888;
@@ -1047,9 +1048,9 @@ table.invo-payment-table.invo-payment-table {
 .hire-mt {
 	padding: 50px 0;
 }
-.payment-wrap.payment-wrap-car{
-	width: 360px;
-	margin-top: 30px;
+.payment-wrap.payment-wrap-car {
+    width: -webkit-fill-available;
+    margin-top: 30px;
 }
 .bus-conta-mail-wrap.car-conta-mail-wrap {
 	padding-top: 50px;
