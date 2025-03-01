@@ -15,7 +15,7 @@
     var canvasImageHeight = cHeight;
     var totalPDFPages = Math.ceil(cHeight / pdfHeight) - 1;
 
-    html2canvas(downloadSection[0], { allowTaint: true }).then(function (
+    html2canvas(downloadSection[0], { allowTaint: true ,useCORS: true}).then(function (
       canvas
     ) {
       canvas.getContext('2d');
