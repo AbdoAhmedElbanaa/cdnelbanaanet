@@ -235,10 +235,10 @@ section{
 	-webkit-box-pack: justify;
 }
 .invo-to-wrap {
-	text-align: left;
+	text-align: right;
 }
 .invo-pay-to-wrap {
-	text-align: right;
+	text-align: left;
 }
 .invo-owner-address {
 	color: #505050;
