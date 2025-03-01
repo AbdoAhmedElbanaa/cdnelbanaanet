@@ -15,12 +15,20 @@
     var canvasImageHeight = cHeight;
     var totalPDFPages = Math.ceil(cHeight / pdfHeight) - 1;
 
-    html2canvas(downloadSection[0], { allowTaint: false, useCORS: true }).then(function (canvas) {
+    html2canvas(downloadSection[0], { allowTaint: true }).then(function (
+      canvas
+    ) {
+      canvas.getContext('2d');
       var imgData = canvas.toDataURL('image/jpeg', 1.0);
       var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
-
-      pdf.addImage(imgData, 'JPG', topLeftMargin, topLeftMargin, canvasImageWidth, canvasImageHeight);
-
+      pdf.addImage(
+        imgData,
+        'JPG',
+        topLeftMargin,
+        topLeftMargin,
+        canvasImageWidth,
+        canvasImageHeight
+      );
       for (var i = 1; i <= totalPDFPages; i++) {
         pdf.addPage(pdfWidth, pdfHeight);
         pdf.addImage(
@@ -32,10 +40,7 @@
           canvasImageHeight
         );
       }
-
-      pdf.save('digital-invoice.pdf');
-    }).catch(function (error) {
-      console.error("Error generating PDF:", error);
+      pdf.save('Elbanaa-invoico.pdf');
     });
   });
-})(jQuery);
+})(jQuery); // End of use strict
