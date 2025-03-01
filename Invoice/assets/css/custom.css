@@ -39,7 +39,7 @@
 /*------------------------ [Color codes] ------------------------
 
 Background: #12151C 
-Content: #888888, #ffffff, #12151C, #00BAFF
+Content: #888888, #ffffff, #12151C, #ed6622
 
 a (visited): #000000
 a (standard): #000000   
@@ -59,7 +59,9 @@ body {
 	width: auto;
 	height: 100%;
 	color: #ffffff;
-	font-family: 'Inter', sans-serif;
+font-family: "Baloo Bhaijaan 2", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 	margin: 0;
 }
 
@@ -112,7 +114,7 @@ section{
 	color: #505050;
 }
 .primary-color {
-	color: #00BAFF;
+	color: #ed6622;
 }
 .third-color {
 	color: #A2A2A2;
@@ -224,7 +226,7 @@ section{
 	color: #12151C;
 }
 .invo-to-owner {
-	color: #00BAFF;
+	color: #ed6622;
 	margin: 10px 0;
 }
 .invoice-owner-conte-wrap {
@@ -368,7 +370,7 @@ td.invo-tb-data.third-color{
 	align-items: center;
 }
 .invo-buttons-wrap .invo-btns .print-btn {
-	background: #00BAFF;
+	background: #ed6622;
 	padding: 12px 24px;
 	border-radius: 24px 0px 0px 24px;
 	display: -webkit-inline-box;
@@ -563,7 +565,7 @@ td.invo-tb-data.third-color{
 	top: -9px;
 }
 .bus-invo-no-date-wrap {
-	background-color: #00BAFF;
+	background-color: #ed6622;
 	padding: 8px 50px;
 	display: flex;
 	justify-content: space-between;	
@@ -590,14 +592,14 @@ td.invo-tb-data.third-color{
 	width: 8px;
 	height: 8px;
 	border-radius: 50px;
-	background-color: #00BAFF;
+	background-color: #ed6622;
 	left: -16px;
 	top: 7px;
 }
 .booking-info:before {
 	content: '';
 	position: absolute;
-	border-left: 2px solid #00baff;
+	border-left: 2px solid #ed6622;
 	height: 39px;
 	top: 12px;
 	left: -13px;
@@ -1172,7 +1174,7 @@ td.ptb-10{
 }
 .photostudio-detail-wrap{
 	background: #F5F5F5;
-	border: 2px solid #00BAFF;
+	border: 2px solid #ed6622;
 }
 .invoice-table thead th.paddind-pt{
 	padding: 10px 20px;
