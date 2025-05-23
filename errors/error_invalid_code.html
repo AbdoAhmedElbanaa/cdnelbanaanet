@@ -3,28 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <title>رمز التفعيل غير معرف</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
+<link href='../misans-arabic-style.min.css' rel='stylesheet'/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
   <style>
     body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #fce4ec;
+      font-family: 'MiSans Arabic Medium', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
     }
-    .card {
-      direction: rtl;
-    }
+.card {
+  max-width: 620px;
+  border-width: 1px;
+  border-color: rgba(219, 234, 254, 1);
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 1rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: rgba(96, 165, 250, 1);
+    padding: 0.8rem;
+    color: rgba(255, 255, 255, 1);
+    position: absolute;
+    top: -25px;
+}
+
+.icon svg {
+  height: 2rem;
+  width: 10rem;
+}
+
+.alert {
+  font-weight: 900;
+  color: rgba(107, 114, 128, 1);
+  font-size: 22px;
+}
+
+.message {
+  margin-top: 1rem;
+  color: rgba(107, 114, 128, 1);
+}
+
+.actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+.actions a {
+  text-decoration: none;
+}
+
+.mark-as-read, .read {
+  display: inline-block;
+  border-radius: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+
+.read {
+  background-color: rgba(59, 130, 246, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.mark-as-read {
+  background-color: rgb(235 236 237);
+  color: rgba(107, 114, 128, 1);
+  transition: all .15s ease;
+}
+
+.mark-as-read:hover {
+  background-color: rgb(230, 231, 233);
+}
   </style>
 </head>
 <body>
-  <div class="card pink lighten-4 z-depth-3" style="max-width: 600px;">
-    <div class="card-content">
-      <span class="card-title red-text text-darken-3"><strong>خطأ في التفعيل</strong></span>
-      <p>رمز التفعيل غير معرف في ملف الإعدادات. الرجاء التأكد من إدخال الكود بشكل صحيح.</p>
-    </div>
+  
+<div class="card">
+  <div class="header">
+    <span class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="3"><path d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z"/><path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" opacity="0.5"/></g></svg>
+    </span>
+    <p class="alert">خطأ بكود التفعيل</p>
   </div>
+
+  <div class="message">
+    <span>عميلنا العزيز . يعمل هذا النظام على كود تفعيل خاص لكل منظمة خاصه,ربنا تم التعب بشئ ما من تلك الاشياء</span> :
+    <ol>
+    <li>تم التلاعب بكود التفعيل</li>
+    <li>تم استخدام النظام بإحدى الطرق غير الرسميه</li>
+    <li>كود التفعيل غير مطابق للموجود فى قاعدة التفعيل</li>
+    <li>عدم وجود كود تفعيل</li>
+    </ol>
+  </div>
+
+  <div class="actions">
+    <a class="read" href="https://www.facebook.com/Abdelmgeedahmedelbanaa.official">
+      تحقق من التراخيص
+    </a>
+
+    <a class="mark-as-read" href="https://www.facebook.com/Abdelmgeedahmedelbanaa.official">
+      تواصل معنا
+    </a>
+  </div>
+</div>
+
 </body>
 </html>
