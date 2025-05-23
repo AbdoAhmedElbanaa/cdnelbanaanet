@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'MiSans Arabic UI VF';
+    src: url('MiSansArabicUIVF.eot');
+    src: url('MiSansArabicUIVF.eot?#iefix') format('embedded-opentype'),
+        url('MiSansArabicUIVF.woff2') format('woff2'),
+        url('MiSansArabicUIVF.woff') format('woff'),
+        url('MiSansArabicUIVF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
