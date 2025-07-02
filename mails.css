@@ -1,0 +1,222 @@
+
+            /* arabic */ @font-face { font-family: 'Cairo'; font-style: normal; font-weight: 400; src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1biLD-H.woff2) format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EFD-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1; } /* latin-ext */ @font-face { font-family: 'Cairo'; font-style: normal; font-weight: 400; src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a13iLD-H.woff2) format('woff2'); unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; } /* latin */ @font-face { font-family: 'Cairo'; font-style: normal; font-weight: 400; src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiLA.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    padding: 10px 5px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width:-webkit-fill-available;
+  margin: auto;
+}
+
+
+.circle {
+    background-color: #f0f0f0; /* لون الدائرة */
+    border-radius: 50%; /* لجعلها دائرية */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px; /* عرض الدائرة */
+    height: 35px; /* ارتفاع الدائرة */
+}
+
+.google-btn svg {
+    width: 25px;
+    height: 25px;
+    background: #fafafa;
+    padding: 5px;
+    border-radius: 50px;
+    border: 1px #dcdcdc solid;
+}
+
+.ticon {
+    display: flex;
+    flex-direction: column; /* لجعل النصوص فوق بعض */
+  	align-items: center;
+  font-family: 'cairo';
+}	
+
+.text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+
+.subtext {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+    .google-btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .google-btn .text {
+        font-size: 12px;
+    }
+
+    .google-btn .subtext {
+        font-size: 10px;
+    }
+}
+
+  #toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 1000;
+    transform: translateY(20px); /* Start off-screen */
+        font-family: 'cairo';
+}
+#toast.show {
+    opacity: 1;
+    transform: translateY(0); /* Move into view */
+}
+#toast.hide {
+    opacity: 0;
+    transform: translateY(20px); /* Move out of view */
+}
+  
+
+          body {
+              font-family: 'cairo', sans-serif;
+          }
+
+.login-container {
+    max-width: 500px;
+    padding: 20px;
+    margin: 60px auto;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+  .login-form {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+  
+  .login-form input:focus-visible, .login-form input:focus-within {
+    outline-color: #d4ddd4;
+}
+
+.login-form input {
+    padding: 12px 10px;
+    background: #eee;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    transition: .3s;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+}
+
+.login-form .check-login {
+    all: unset;
+    text-align: center;
+    padding: 5px 14px;
+    background: #0056b3;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #fff;
+    cursor: pointer;
+    transition: .3s;
+}
+  
+  .login-options-line span {
+    position: relative;
+    z-index: 2;
+    background: #ffffff;
+    display: inline-block;
+    padding: 0 18px;
+    color: #717070;
+}
+.login-options-line {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+}
+  
+  .login-options-line::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: #ededed;
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    left: 50%;
+    transform: translate(-50%);
+}
+  
+  .login-form span {
+    font-size: 13px;
+    cursor: pointer;
+    width: max-content;
+    justify-self: left;
+    margin-left: 5px;
+    color: #434057;
+}
+  .foo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+  
+  .login-container h3 {
+background-color: #0056b3;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+  
+  .links a {
+    text-decoration: none;
+    font-size: 14px;
+    color: #717070;
+}
+
+.links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0 0;
+}
+  
+  .secured-by-google svg {
+    width: 13px;
+    height: 13px;
+    color: #319f43;
+}
+
+.secured-by-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #6b6b6b;
+}
+  
+  
