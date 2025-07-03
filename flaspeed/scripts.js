@@ -83,13 +83,20 @@ Element.prototype.appendElements = function (_0x3287dc, _0x42a511 = 'append') {
     });
 
     function _0x2bb35c() {
-        getScript('/js/cookienotice.js', function () {
-            function _0x17a5b4(_0x937998) {
-                return typeof CookieList !== 'undefined' && !!CookieList?.[_0x937998];
-            }
-            window.cookieChoices && cookieChoices.showCookieConsentBar && cookieChoices.showCookieConsentBar(window.cookieOptions && cookieOptions.msg || decodeEntities(Msg.euCookieNotice2018), window.cookieOptions && cookieOptions.close || decodeEntities(Msg.ok), window.cookieOptions && cookieOptions.learn || decodeEntities(Msg.learnMore), window.cookieOptions && cookieOptions.link || _0x17a5b4(0) ? CookieList[0] : 'https://policies.google.com/technologies/cookies');
-        }, 'defer');
-    };
+    getScript('/js/cookienotice.js', function () {
+        function _0x17a5b4(_0x937998) {
+            return typeof CookieList !== 'undefined' && !!CookieList?.[_0x937998];
+        }
+
+        window.cookieChoices && cookieChoices.showCookieConsentBar && cookieChoices.showCookieConsentBar(
+            (window.cookieOptions && cookieOptions.msg) || decodeEntities(Msg.euCookieNotice2018),
+            (window.cookieOptions && cookieOptions.close) || decodeEntities(Msg.ok),
+            (window.cookieOptions && cookieOptions.learn) || decodeEntities(Msg.learnMore),
+            (window.cookieOptions && cookieOptions.link) || (_0x17a5b4(0) ? CookieList[0] : 'https://policies.google.com/technologies/cookies')
+        );
+    }, 'defer');
+};
+
 
     function _0x519b10() {
         const _0x125c99 = document.querySelectorAll('a[href*="search/label/"]:not([href*="max-results"])');
