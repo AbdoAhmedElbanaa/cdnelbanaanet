@@ -189,7 +189,7 @@ Element.prototype.appendElements = function (_0x3287dc, _0x42a511 = 'append') {
     }
 
     function _0x123b94(_0x431a2b) {
-        getScript('https://host.iscodi.com/assets/js/splidejs@4.1.4.min.js?v=3', () => {
+        getScript('https://cdn.elbana.net/flaspeed/splidejs@4.1.4.min.js?v=3', () => {
             const
                 {
                     slider: _0x19a7bc,
@@ -759,7 +759,7 @@ Element.prototype.appendElements = function (_0x3287dc, _0x42a511 = 'append') {
                         }
                     }
                     if (_0x4c2daf && (_0x4c2daf.type === 'scroll' || _0x4c2daf.type === 'run') && document.querySelector('#HTML2') && _0x1e29e1.getAttribute('data-type') === 'tikcernews') {
-                        getScript('https://host.iscodi.com/assets/js/ticker.min.js?v=1', function () {
+                        getScript('https://cdn.elbana.net/flaspeed/ticker.min.js?v=1', function () {
                             _0x1e29e1.parentElement.innerHTML = _0x39a381(null, _0x50581e, _0x1e29e1, 0, _0x50581e.feed.entry.length, false, false).html;
                             const _0x2215b0 = {};
                             _0x2215b0.anim_duration = 0xfa, _0x2215b0.reverse_elm = true, new IsCodiTicker('.ticker-content', _0x2215b0);
@@ -1464,7 +1464,7 @@ Element.prototype.appendElements = function (_0x3287dc, _0x42a511 = 'append') {
             }
         }
         if (document.querySelectorAll('.post-body pre').length !== 0) {
-            getScript('https://host.iscodi.com/assets/js/prism.min.js', function () {
+            getScript('https://cdn.elbana.net/flaspeed/prism.min.js', function () {
                 const _0x59c368 = document.querySelectorAll('.iscodi-pre');
                 for (let _0x3ebbfe = 0; _0x3ebbfe < _0x59c368.length; _0x3ebbfe++) {
                     const _0x1432b1 = _0x59c368[_0x3ebbfe],
