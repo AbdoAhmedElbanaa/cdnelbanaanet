@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولد صناديق الأكواد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1' rel='preload'/>
+<style>
+/* ===== تعريف الخطوط ===== */
+@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:400;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:500;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:700;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}
+
+/*Icons*/
+@font-face{font-family:"Font Awesome 6 Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1) format("woff2");unicode-range:U+000D, U+0020, U+0022, U+26A0, U+E186, U+E2AE, U+E481, U+E900-E929, U+E92B, U+E95E, U+E968-E969, U+E97A, U+E97D, U+F05A, U+F06B, U+F06D-F06E, U+F0C1, U+F0C5, U+F0DA, U+F0ED, U+F1E0, U+F1EA, U+F2F0, U+F304, U+F336}
+.fa{font-family:"Font Awesome 6 Pro";-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto;pointer-events:none}
+.fa-info:before{content:'\f05a'}
+.fa-alert:before{content:'\26a0'}
+.fa-gift:before{content:'\f06b'}
+.fa-check:before{content:'\f336'}
+.fa-error:before{content:'\f2f0'}
+.fa-copy:before{content:'\f0c5'}
+
+/* ===== متغيرات CSS ===== */
+:root {
+--primary-color: #3f51b5;
+--primary-light: #757de8;
+--primary-dark: #002984;
+--text-on-light: #333333;
+--text-on-dark: #FFFFFF;
+--text-color: #333333;
+--background-color: #F5F5F5;
+--card-background: #FFFFFF;
+--border-radius: 8px;
+--shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+--shadow-2: 0 4px 10px rgba(0, 0, 0, 0.15);
+--transition: all 0.3s ease;
+--font-mono: Consolas, Monaco, 'Andale Mono', monospace;
+--shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+--shadow-2: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== إعادة تعيين عامة ===== */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+font-family: 'Tajawal', sans-serif;
+background-color: var(--background-color);
+color: var(--text-color);
+line-height: 1.6;
+direction: rtl;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+}
+
+/* ===== نمط الرأس ===== */
+header {
+text-align: center;
+margin-bottom: 30px;
+padding: 20px 0;
+border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+header h1 {
+color: var(--primary-color);
+margin-bottom: 10px;
+font-weight: 700;
+}
+
+header p {
+color: #666;
+font-size: 1.1rem;
+}
+
+/* ===== نمط القسم الرئيسي ===== */
+main {
+display: flex;
+flex-direction: column;
+gap: 30px;
+}
+
+.generator-section {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+margin-bottom: 30px;
+}
+
+.options-panel, .preview-panel {
+background-color: var(--card-background);
+border-radius: 5px;
+box-shadow: var(--shadow);
+padding: 20px;
+}
+
+.options-panel {
+flex: 1;
+min-width: 300px;
+}
+
+.preview-panel {
+flex: 2;
+min-width: 400px;
+}
+
+/* ===== نمط المجموعات ===== */
+.option-group {
+margin-bottom: 15px;
+}
+
+.option-group label {
+display: block;
+margin-bottom: 5px;
+font-weight: 500;
+}
+
+.option-group input[type="text"],
+.option-group select,
+.option-group textarea {
+width: 100%;
+padding: 8px 12px;
+border: 1px solid #ddd;
+border-radius: var(--border-radius);
+font-family: 'Tajawal', sans-serif;
+transition: var(--transition);
+}
+
+.option-group input[type="text"]:focus,
+.option-group select:focus,
+.option-group textarea:focus {
+outline: none;
+border-color: var(--primary-light);
+box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.option-group textarea {
+resize: vertical;
+min-height: 100px;
+direction: ltr;
+text-align: left;
+}
+
+.options-subtitle {
+color: var(--primary-color);
+font-size: 1.1rem;
+margin: 20px 0 10px 0;
+padding-bottom: 5px;
+border-bottom: 1px solid #eee;
+font-weight: 500;
+}
+
+.option-group input[type="range"] {
+width: 100%;
+margin-right: 0;
+appearance: none;
+height: 5px;
+background: #e0e0e0;
+border-radius: 5px;
+outline: none;
+}
+
+.option-group input[type="range"]::-webkit-slider-thumb {
+appearance: none;
+width: 15px;
+height: 15px;
+background: var(--primary-color);
+border-radius: 50%;
+cursor: pointer;
+}
+
+.option-group input[type="color"] {
+width: 100%;
+height: 40px;
+border: 1px solid #ddd;
+border-radius: var(--border-radius);
+cursor: pointer;
+}
+
+/* Checkbox styling */
+.checkbox-wrapper {
+display: flex;
+align-items: center;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+margin-left: 8px;
+width: 18px;
+height: 18px;
+accent-color: var(--primary-color);
+}
+
+/* ===== نمط المعاينة ===== */
+.preview-container {
+margin: 20px 0;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: var(--border-radius);
+border: 1px dashed #ddd;
+}
+
+.code-output {
+margin-top: 30px;
+}
+
+.code-output h3 {
+margin-top: 20px;
+margin-bottom: 10px;
+color: var(--primary-color);
+}
+
+pre {
+outline: none!important;
+}
+
+code {
+font-family: Consolas, Monaco, 'Andale Mono', monospace;
+font-size: 0.9rem;
+color: #333;
+}
+
+#copy-html {
+background-color: var(--primary-color);
+color: white;
+border: none;
+border-radius: var(--border-radius);
+padding: 8px 16px;
+cursor: pointer;
+font-family: 'Tajawal', sans-serif;
+font-weight: 500;
+transition: var(--transition);
+display: inline-flex;
+align-items: center;
+justify-content: center;
+}
+
+#copy-html:hover {
+background-color: var(--primary-dark);
+}
+
+#copy-html i {
+margin-left: 5px;
+}
+
+/* ===== تصميم صندوق الكود ===== */
+.iscodi-pre.code-box {
+margin: 20px 0;
+overflow: hidden;
+transition: all 0.2s ease;
+}
+
+.iscodi-pre.code-box:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.iscodi-pre .code-header {
+padding: 10px 15px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-weight: 500;
+}
+
+.iscodi-pre  .header-text {
+margin: 0;
+font-size: 0.95rem;
+}
+
+.iscodi-pre .copycode-btn {
+background-color: #ffffff;
+width: 50px;
+height: 30px;
+border-radius: 35px;
+display: inline-flex
+;
+align-items: center;
+justify-content: center;
+transition: all .3s ease;
+outline: none;
+border: none;
+cursor: pointer;
+font-size:17px;
+}
+
+.iscodi-pre .copycode-btn:hover {
+color: #fff;
+background-color: rgba(255, 255, 255, 0.2);
+}
+
+.iscodi-pre .code-content {
+position: relative;
+}
+
+.iscodi-pre .code-content pre {
+direction: ltr;
+scrollbar-width: thin;
+}
+
+.iscodi-pre .code-content pre::-webkit-scrollbar {
+width: 8px;
+height: 8px;
+}
+
+.iscodi-pre .code-content pre::-webkit-scrollbar-thumb {
+background-color: #aaa;
+border-radius: 4px;
+}
+
+.iscodi-pre .code-content pre::-webkit-scrollbar-thumb:hover {
+background-color: #888;
+}
+
+.iscodi-pre .code-content code {
+white-space: pre;
+word-break: normal;
+word-wrap: normal;
+}
+
+/* تنسيق الأسطر المحددة */
+.iscodi-pre.code-box .line-highlight {
+background: rgba(255, 220, 80, 0.2);
+border-left: 3px solid #ffc107;
+}
+
+/* ===== تعديلات التوافق ===== */
+/* تأكد من أن Prism.js يعمل بشكل صحيح مع هذه الأنماط */
+.iscodi-pre.code-box pre[data-line] {
+position: relative;
+}
+
+
+/* ===== تصميم داكن (يمكن تفعيله عبر إضافة الكلاس dark-theme للعنصر الأب) ===== */
+.dark-theme .iscodi-pre.code-box {
+background-color: #1e1e1e!important;
+}
+
+.dark-theme .iscodi-pre .code-header {
+background-color: #262626!important;
+}
+
+.dark-theme .iscodi-pre .code-content pre {
+background-color: #2d2d2d!important;
+color: #e0e0e0!important;
+}
+
+.dark-theme .iscodi-pre .code-content pre::-webkit-scrollbar-track {
+background: #2d2d2d!important;
+}
+
+.dark-theme .iscodi-pre .code-content pre::-webkit-scrollbar-thumb {
+background-color: #666!important;
+}
+
+.dark-theme .iscodi-pre .line-highlight {
+background: rgba(255, 255, 0, 0.1)!important;
+border-left-color: #b39d00!important;
+}
+
+
+
+/* تنسيق رسالة خطأ التظليل */
+.highlight-error {
+color: #d32f2f;
+font-size: 0.9rem;
+margin-top: 5px;
+padding: 5px 10px;
+background-color: rgba(211, 47, 47, 0.1);
+border-radius: 4px;
+border-right: 3px solid #d32f2f;
+animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+20%, 60% { transform: translateX(-5px); }
+40%, 80% { transform: translateX(5px); }
+}
+
+/* ===== رسالة نجاح ===== */
+.toast-msg {
+position: fixed;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%);
+background-color: #323232;
+color: white;
+padding: 16px 24px;
+border-radius: 4px;
+box-shadow: var(--shadow-2);
+display: none;
+z-index: 1000;
+animation: fadeIn 0.3s, fadeOut 0.3s 2.7s forwards;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translate(-50%, 20px); }
+to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+from { opacity: 1; transform: translate(-50%, 0); }
+to { opacity: 0; transform: translate(-50%, 20px); }
+}
+
+/* ===== تذييل الصفحة ===== */
+footer {
+text-align: center;
+padding: 20px 0;
+margin-top: 30px;
+border-top: 1px solid rgba(0,0,0,0.1);
+color: #666;
+}
+
+/* ===== ردود الفعل للأزرار ===== */
+button:active {
+transform: scale(0.98);
+}
+
+/* ===== تخصيص ردود الفعل للمدخلات ===== */
+input:focus, select:focus, textarea:focus {
+outline: none;
+border-color: var(--primary-color);
+}
+
+/* ===== وسائط متجاوبة ===== */
+@media (min-width: 769px) {
+.preview-panel {
+height: 100%;
+position: sticky;
+top: 20px;
+}
+}
+
+@media (max-width: 768px) {
+.generator-section {
+flex-direction: column;
+}
+
+.options-panel, .preview-panel {
+width: 100%;
+}
+
+.preview-container {
+padding: 10px;
+}
+
+.code-box {
+width: 100%;
+}
+}
+
+/* ===== مفتاح التبديل (Switch) ===== */
+.switch-wrapper {
+display: flex;
+align-items: center;
+margin: 5px 0;
+}
+
+.switch-input {
+height: 0;
+width: 0;
+opacity: 0;
+position: absolute;
+}
+
+.switch-label {
+position: relative;
+display: flex;
+align-items: center;
+cursor: pointer;
+padding-right: 55px; /* مساحة للمفتاح */
+user-select: none;
+font-weight: normal;
+}
+
+.switch-label::before {
+content: '';
+width: 45px;
+height: 24px;
+background-color: #ddd;
+border-radius: 12px;
+position: absolute;
+right: 0;
+transition: background-color 0.3s ease;
+}
+
+.switch-label::after {
+content: '';
+width: 18px;
+height: 18px;
+background-color: white;
+border-radius: 50%;
+position: absolute;
+right: 3px;
+top: 3px;
+transition: transform 0.3s ease, background-color 0.3s ease;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch-input:checked + .switch-label::before {
+background-color: #3f51b5;
+}
+
+.switch-input:checked + .switch-label::after {
+transform: translateX(-21px);
+}
+
+.switch-input:focus + .switch-label::before {
+box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+/* ===== أنماط قسم الأمثلة ===== */
+.code-examples-section {
+margin: 40px auto;
+padding: 30px;
+background-color: var(--card-background);
+border-radius: var(--border-radius);
+box-shadow: var(--shadow);
+max-width: 1200px;
+}
+
+.section-header {
+text-align: center;
+margin-bottom: 40px;
+position: relative;
+}
+
+.section-header h2 {
+color: var(--primary-color);
+margin-bottom: 15px;
+font-size: 2rem;
+font-weight: 700;
+}
+
+.section-header p {
+color: #666;
+font-size: 1.1rem;
+max-width: 700px;
+margin: 0 auto;
+}
+
+.section-header::after {
+content: '';
+display: block;
+width: 80px;
+height: 4px;
+background: var(--primary-color);
+margin: 20px auto 0;
+border-radius: 2px;
+}
+
+/* فلتر المعرض */
+.examples-filter {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 30px;
+}
+
+.filter-btn {
+background-color: #f5f5f5;
+color: #333;
+border: none;
+padding: 10px 18px;
+border-radius: 30px;
+cursor: pointer;
+transition: all 0.3s ease;
+font-family: 'Tajawal', sans-serif;
+font-weight: 500;
+border: 1px solid #e0e0e0;
+position: relative;
+overflow: hidden;
+z-index: 1;
+}
+
+.filter-btn::before {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 0;
+height: 0;
+background-color: rgba(0,0,0,0.05);
+border-radius: 50%;
+transform: translate(-50%, -50%);
+transition: width 0.5s ease, height 0.5s ease;
+z-index: -1;
+}
+
+.filter-btn:hover::before {
+width: 300px;
+height: 300px;
+}
+
+.filter-btn:hover {
+background-color: #e0e0e0;
+}
+
+.filter-btn.active {
+background-color: var(--primary-color);
+color: white;
+border-color: var(--primary-color);
+}
+
+.filter-btn.active::before {
+background-color: rgba(255,255,255,0.1);
+}
+
+.examples-filter {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 30px;
+position: relative;
+}
+
+.examples-filter::before {
+content: '';
+position: absolute;
+bottom: -15px;
+left: 50%;
+transform: translateX(-50%);
+width: 50px;
+height: 3px;
+background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+border-radius: 3px;
+}
+
+/* شبكة العرض */
+.examples-grid {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+justify-content: center;
+perspective: 1000px;
+direction: rtl;
+}
+
+.example-item {
+flex: 0 0 calc(50% - 20px); /* تعديل من 33.333% إلى 50% */
+background-color: var(--card-background);
+border-radius: var(--border-radius);
+box-shadow: var(--shadow);
+padding: 20px;
+transition: all 0.4s ease;
+position: relative;
+overflow: hidden;
+z-index: 1;
+border: 1px solid rgba(0,0,0,0.05);
+transform-style: preserve-3d;
+transform: translateZ(0);
+text-align: right;
+}
+
+.example-item:hover {
+transform: translateY(-5px) rotateX(2deg);
+box-shadow: var(--shadow-2);
+z-index: 2;
+}
+
+.example-item::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 100%);
+z-index: -1;
+opacity: 0;
+transition: opacity 0.4s ease;
+}
+
+.example-item:hover::before {
+opacity: 1;
+}
+
+.example-details {
+margin-bottom: 15px;
+border-bottom: 1px solid rgba(0,0,0,0.05);
+padding-bottom: 12px;
+position: relative;
+text-align: right;
+}
+
+.example-details h3 {
+color: var(--primary-color);
+margin-bottom: 8px;
+font-size: 1.2rem;
+font-weight: 700;
+position: relative;
+display: inline-block;
+}
+
+.example-details h3::after {
+content: '';
+position: absolute;
+bottom: -4px;
+right: 0;
+width: 0;
+height: 2px;
+background-color: var(--primary-color);
+transition: width 0.3s ease;
+}
+
+.example-item:hover .example-details h3::after {
+width: 100%;
+right: auto;
+left: 0;
+}
+
+.example-desc {
+color: #666;
+font-size: 0.9rem;
+margin-bottom: 15px;
+line-height: 1.5;
+text-align: right;
+}
+
+/* متجاوب */
+@media (max-width: 1200px) {
+.example-item {
+flex: 0 0 calc(50% - 20px); /* لا تغيير (بقاء عنصرين في الصف) */
+}
+}
+
+@media (max-width: 900px) { /* إضافة نقطة تجاوب جديدة لشاشات متوسطة */
+.example-item {
+flex: 0 0 calc(100% - 20px);
+}
+}
+
+@media (max-width: 768px) {
+.example-item {
+flex: 0 0 calc(100% - 20px);
+}
+
+.code-examples-section {
+padding: 20px;
+}
+
+.section-header h2 {
+font-size: 1.7rem;
+}
+
+.example-details h3 {
+font-size: 1.1rem;
+}
+
+.code-content pre {
+font-size: 14px;
+line-height: 1.4;
+}
+}
+
+@media (max-width: 576px) {
+.filter-btn {
+padding: 8px 14px;
+font-size: 0.9rem;
+}
+
+.code-content pre {
+font-size: 13px !important;
+line-height: 1.3 !important;
+}
+
+.example-item {
+padding: 12px;
+}
+}
+
+/* تأثيرات الفلترة */
+.example-item {
+opacity: 1;
+transform: translateY(0) rotateX(0);
+transition: transform 0.5s ease, opacity 0.4s ease, box-shadow 0.3s ease;
+}
+
+.example-item.hidden {
+opacity: 0;
+transform: translateY(20px) rotateX(-5deg);
+pointer-events: none;
+}
+
+.example-item.visible {
+animation: card-appear 0.5s forwards;
+}
+
+@keyframes card-appear {
+0% {
+opacity: 0;
+transform: translateY(20px) rotateX(-5deg);
+}
+100% {
+opacity: 1;
+transform: translateY(0) rotateX(0);
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+<h1>مولد صناديق الأكواد</h1>
+<p>قم بتخصيص صناديق الأكواد بأنماط وألوان مختلفة للاستخدام في تدويناتك</p>
+</header>
+
+<main>
+<div class="generator-section">
+<div class="options-panel">
+<h2>خيارات التخصيص</h2>
+
+<div class="options-subtitle">المظهر الأساسي</div>
+
+<div class="option-group">
+<label for="code-language">لغة البرمجة</label>
+<select id="code-language">
+<option value="javascript">JavaScript</option>
+<option value="markup">HTML</option>
+<option value="css">CSS</option>
+<option value="text">نص عادي</option>
+</select>
+</div>
+
+<div class="option-group">
+<label for="code-content">محتوى الكود</label>
+<textarea id="code-content" rows="5" placeholder="أدخل الكود هنا..."></textarea>
+</div>
+
+<div class="option-group">
+<label for="highlighted-lines">تظليل أسطر محددة (مثال: 1,3-5)</label>
+<input type="text" id="highlighted-lines" placeholder="1,3-5">
+</div>
+
+<div class="option-group">
+<label for="header-text">نص عنوان الصندوق</label>
+<input type="text" id="header-text" value="مثال كود">
+</div>
+
+<div class="options-subtitle">تخصيص المظهر</div>
+
+<div class="option-group">
+<label for="font-size">حجم الخط (بكسل) <span id="font-size-value">14</span></label>
+<input type="range" id="font-size" min="10" max="24" value="14">
+</div>
+
+
+<div class="option-group">
+<label for="line-height">ارتفاع السطر <span id="line-height-value">1.5</span></label>
+<input type="range" id="line-height" min="1" max="2.5" step="0.1" value="1.5">
+</div>
+
+<div class="option-group">
+<label for="max-height">الارتفاع الأقصى (بكسل) <span id="max-height-value">400</span></label>
+<input type="range" id="max-height" min="100" max="800" step="10" value="400">
+</div>
+
+<div class="option-group">
+<label for="border-radius">استدارة الحواف (بكسل) <span id="border-radius-value">5</span></label>
+<input type="range" id="border-radius" min="0" max="16" value="5">
+</div>
+
+<div class="options-subtitle">الألوان</div>
+
+<div class="option-group">
+<label for="header-color">لون خلفية العنوان:</label>
+<input type="color" id="header-color" value="#3f51b5">
+</div>
+
+<div class="option-group">
+<label for="header-text-color">لون نص العنوان:</label>
+<input type="color" id="header-text-color" value="#ffffff">
+</div>
+
+<div class="option-group">
+<label for="background-color">لون الخلفية</label>
+<input type="color" id="background-color" value="#f5f5f5">
+</div>
+
+<div class="option-group">
+<div class="switch-wrapper">
+<input type="checkbox" id="enable-colored-border" class="switch-input">
+<label for="enable-colored-border" class="switch-label">حافة ملونة</label>
+</div>
+</div>
+
+<div class="option-group colored-border-options" style="display: none;">
+<label for="border-color">لون الحافة:</label>
+<input type="color" id="border-color" value="#ff5722">
+</div>
+
+<div class="option-group colored-border-options" style="display: none;">
+<label for="border-width">سمك الحافة (بكسل) <span id="border-width-value">2</span></label>
+<input type="range" id="border-width" min="1" max="10" value="2">
+</div>
+
+<div class="option-group">
+<div class="switch-wrapper">
+<input type="checkbox" id="enable-shadow" class="switch-input" checked>
+<label for="enable-shadow" class="switch-label">تظليل الصندوق</label>
+</div>
+</div>
+</div>
+
+<div class="preview-panel">
+<h2>معاينة صندوق الكود</h2>
+<div class="preview-container">
+<div id="code-box-preview" class="code-box iscodi-pre">
+<div class="code-header">
+<span class="header-text">مثال كود</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers">
+<code class="language-javascript">// مثال Javascript
+function مرحبا() {
+let رسالة = "مرحباً بالعالم!";
+console.log(رسالة);
+return رسالة;
+}
+
+مرحبا();</code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #3f51b5;">
+<span class="header-text" style="color: #ffffff;">كود HTML</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;"><code id="html-code" class="language-markup"></code></pre>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</main>
+
+<!-- قسم أمثلة معاينة صناديق الأكواد -->
+<section class="code-examples-section">
+<div class="section-header">
+<h2>معرض أمثلة صناديق الأكواد</h2>
+<p>استكشف مجموعة من الأنماط المتنوعة والتنسيقات المختلفة لصناديق الأكواد</p>
+</div>
+
+<div class="examples-filter">
+<button class="filter-btn active" data-filter="all">جميع الأمثلة</button>
+<button class="filter-btn" data-filter="light">أنماط فاتحة</button>
+<button class="filter-btn" data-filter="dark">أنماط داكنة</button>
+<button class="filter-btn" data-filter="special">تنسيقات خاصة</button>
+</div>
+
+<div class="examples-grid">
+<!-- مثال 1: الشكل الافتراضي -->
+<div class="example-item" data-category="light">
+<div class="example-details">
+<h3>الشكل الافتراضي</h3>
+<p class="example-desc">النمط القياسي مع الألوان الافتراضية</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #3f51b5;">
+<span class="header-text" style="color: #ffffff;">JavaScript</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;">
+<code class="language-javascript">function sayHello() {
+console.log("مرحبا بالعالم!");
+return true;
+}
+</code></pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 2: مع خلفية داكنة -->
+<div class="example-item" data-category="dark">
+<div class="example-details">
+<h3>خلفية داكنة</h3>
+<p class="example-desc">نمط داكن لراحة العين في الإضاءة المنخفضة</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);">
+<div class="code-header" style="background-color: #262626;">
+<span class="header-text" style="color: #e0e0e0;">CSS</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #2d2d2d; color: #e0e0e0; overflow-wrap: break-word;">
+<code class="language-css">.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+background-color: #f5f5f5;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+</code></pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 3: مع رقم سطر وتظليل -->
+<div class="example-item" data-category="special">
+<div class="example-details">
+<h3>أرقام الأسطر مع تظليل</h3>
+<p class="example-desc">مثالي لتوضيح جزء معين من الكود</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #7957d5; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+<span class="header-text" style="color: #ffffff;">Python</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" data-line="1,3-4" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f8f8f8; overflow-wrap: break-word;">
+<code class="language-python">def calculate_area(radius):
+"""حساب مساحة الدائرة"""
+pi = 3.14159
+area = pi * (radius ** 2)
+return area
+
+print(calculate_area(5))</code>
+</pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 4: مع رأس ملون -->
+<div class="example-item" data-category="light">
+<div class="example-details">
+<h3>رأس ملون</h3>
+<p class="example-desc">ترويسة بلون مخصص لتمييز الكود</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #4a6bff; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+<span class="header-text" style="color: #ffffff;">HTML</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;">
+<code class="language-markup">&lt;div class="container"&gt;
+&lt;h1&gt;عنوان رئيسي&lt;/h1&gt;
+&lt;p&gt;هذا نص تجريبي للعرض فقط&lt;/p&gt;
+&lt;/div&gt;</code>
+</pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 5: مع حدود منحنية -->
+<div class="example-item" data-category="light">
+<div class="example-details">
+<h3>حدود منحنية</h3>
+<p class="example-desc">حواف دائرية تمنح مظهرًا عصريًا</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #3f51b5; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+<span class="header-text" style="color: #ffffff;">PHP</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;">
+<code class="language-php">&lt;?php
+function connectDatabase() {
+$host = 'localhost';
+$user = 'root';
+$pass = 'password';
+$db = 'example_db';
+
+$conn = new mysqli($host, $user, $pass, $db);
+return $conn;
+}
+?&gt;</code>
+</pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 6: مع خط أكبر وارتفاع سطر مخصص -->
+<div class="example-item" data-category="special">
+<div class="example-details">
+<h3>خط أكبر وارتفاع سطر مخصص</h3>
+<p class="example-desc">سهولة القراءة مع خط كبير ومريح</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-header" style="background-color: #2c974b; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+<span class="header-text" style="color: #ffffff;">Java</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 18px; line-height: 2; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;">
+<code class="language-java">public class HelloWorld {
+public static void main(String[] args) {
+System.out.println("مرحبا بالعالم من جافا!");
+}
+}</code>
+</pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 7: بدون ظل والتركيز على سطر محدد -->
+<div class="example-item" data-category="special">
+<div class="example-details">
+<h3>تظليل أسطر محددة</h3>
+<p class="example-desc">التركيز على الأسطر المهمة في الكود</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: 5px; ">
+<div class="code-header" style="background-color: #408eb5;">
+<span class="header-text" style="color: #ffffff;">CSS</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #f5f5f5; overflow-wrap: break-word;" data-line="3,5"><code class="language-css">.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+background-color: #f5f5f5;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}</code></pre>
+</div>
+</div>
+</div>
+
+<!-- مثال 8: تصميم بحواف ملونة -->
+<div class="example-item" data-category="dark">
+<div class="example-details">
+<h3>تصميم بحواف ملونة</h3>
+<p class="example-desc">إطار ملون يعطي مظهرًا جذابًا</p>
+</div>
+<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); border: 2px solid #ff5722;">
+<div class="code-header" style="background-color: #1e1e1e;">
+<span class="header-text" style="color: #ff5722;">JavaScript</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: 14px; line-height: 1.5; max-height: 400px; background-color: #2d2d2d; color: #e0e0e0; overflow-wrap: break-word;">
+<code class="language-javascript">const createComponent = (name, props) => {
+return {
+name,
+props,
+render() {
+return `<${name}>${props.children}</${name}>`;
+}
+};
+}</code>
+</pre>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+// إضافة وظائف فلترة الأمثلة
+document.addEventListener('DOMContentLoaded', function() {
+const filterButtons = document.querySelectorAll('.filter-btn');
+const exampleItems = document.querySelectorAll('.example-item');
+
+// إضافة مستمعي الأحداث لأزرار الفلترة
+filterButtons.forEach(button => {
+button.addEventListener('click', function() {
+// إزالة الكلاس النشط من جميع الأزرار
+filterButtons.forEach(btn => btn.classList.remove('active'));
+
+// إضافة الكلاس النشط للزر المضغوط
+this.classList.add('active');
+
+// الحصول على فئة الفلترة
+const filterValue = this.getAttribute('data-filter');
+
+// فلترة العناصر
+exampleItems.forEach(item => {
+if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+item.style.display = 'block';
+// تطبيق تأثير الظهور التدريجي
+setTimeout(() => {
+item.style.opacity = '1';
+item.style.transform = 'translateY(0)';
+}, 50);
+} else {
+item.style.opacity = '0';
+item.style.transform = 'translateY(20px)';
+setTimeout(() => {
+item.style.display = 'none';
+}, 300);
+}
+});
+});
+});
+
+// تهيئة الفلترة الافتراضية (عرض الكل)
+filterButtons[0].click();
+});
+</script>
+</section>
+
+<footer>
+<p>جميع الحقوق محفوظة &copy; 2025</p>
+</footer>
+</div>
+
+<div id="toast" class="toast-msg"></div>
+
+<script>
+function getScript(src, callback, customAttrKey, crossVal) {
+// كاش للسكربتات
+getScript.cache = getScript.cache || {};
+
+// إذا تم تحميل السكربت مسبقًا
+if (getScript.cache[src]) {
+callback && setTimeout(callback, 0);
+return;
+}
+
+// البحث عن السكربت الحالي
+const existing = document.querySelector(`script[src="${src}"]`);
+
+if (existing) {
+if (existing.hasAttribute('data-loaded')) {
+// إذا كان محملًا
+getScript.cache[src] = true;
+callback && setTimeout(callback, 0);
+} else {
+// إذا كان قيد التحميل
+existing.addEventListener('load', () => {
+getScript.cache[src] = true;
+callback && callback();
+});
+}
+return;
+}
+
+// إنشاء سكربت جديد
+const script = document.createElement('script');
+script.src = src;
+if(customAttrKey){
+if (customAttrKey === 'crossOrigin') {
+script[customAttrKey] = crossVal ? 'use-credentials' : 'anonymous';
+} else {
+script[customAttrKey] = true;
+}
+}
+
+script.addEventListener('load', () => {
+script.setAttribute('data-loaded', 'true');
+getScript.cache[src] = true;
+callback && callback();
+});
+
+// إضافة السكربت للصفحة
+document.head.appendChild(script);
+}
+
+getScript("https://host.iscodi.com/assets/js/prism.min.js", function () {
+const blocks = document.querySelectorAll('.iscodi-pre');
+for (let i = 0; i < blocks.length; i++) {
+const p = blocks[i];
+const header = p.querySelector('.code-header');
+const code = p.querySelector('code');
+if (!header || !code) continue;
+
+const btnId = `copycode-${i}`;
+if (!header.querySelector('.copycode-btn')) {
+code.dataset.id = btnId;
+header.insertAdjacentHTML('beforeend', `
+<button class="copycode-btn waves-effect" type="button" aria-label="Copy Code" data-target="${btnId}">
+<i class="fa fa-copy"></i>
+</button>
+`);
+}
+
+const btn = p.querySelector('.copycode-btn');
+
+function selectCode(el) {
+const range = document.createRange();
+range.selectNodeContents(el);
+const sel = window.getSelection();
+sel.removeAllRanges();
+sel.addRange(range);
+}
+
+function copyCode(el) {
+navigator.clipboard.writeText(el.textContent).catch(console.error);
+}
+
+// عند الضغط على الزر: يحدد ثم ينسخ
+btn?.addEventListener('click', () => {
+selectCode(code);
+copyCode(code);
+showToast('✅ تم نسخ الكود بنجاح!');
+});
+
+// عند الضغط على <code>: الضغط الأول ينسخ، الضغط الثاني يحدد
+let lastClick = 0;
+code.addEventListener('click', () => {
+const now = Date.now();
+if (now - lastClick < 300) {
+selectCode(code);
+} else {
+copyCode(code);
+}
+lastClick = now;
+});
+}
+
+
+// استدعاء العناصر من DOM
+const codeLanguage = document.getElementById('code-language');
+const codeContent = document.getElementById('code-content');
+const headerText = document.getElementById('header-text');
+const fontSize = document.getElementById('font-size');
+const lineHeight = document.getElementById('line-height');
+const maxHeight = document.getElementById('max-height');
+const borderRadius = document.getElementById('border-radius');
+const headerColor = document.getElementById('header-color');
+const headerTextColor = document.getElementById('header-text-color'); // إضافة مرجع للون نص العنوان
+const backgroundColor = document.getElementById('background-color');
+const enableShadow = document.getElementById('enable-shadow');
+const highlightedLines = document.getElementById('highlighted-lines');
+
+// إضافة مراجع لعناصر الحواف الملونة
+const enableColoredBorder = document.getElementById('enable-colored-border');
+const borderColor = document.getElementById('border-color');
+const borderWidth = document.getElementById('border-width');
+const borderWidthValue = document.getElementById('border-width-value');
+const coloredBorderOptions = document.querySelectorAll('.colored-border-options');
+
+// عناصر إظهار قيم النطاقات
+const fontSizeValue = document.getElementById('font-size-value');
+const lineHeightValue = document.getElementById('line-height-value');
+const maxHeightValue = document.getElementById('max-height-value');
+const borderRadiusValue = document.getElementById('border-radius-value');
+
+// عناصر المعاينة
+const codeBoxPreview = document.getElementById('code-box-preview');
+const htmlCode = document.getElementById('html-code');
+const copyHtmlBtn = document.getElementById('copy-html');
+
+// تحديث قيم النطاقات عند تغييرها
+fontSize.addEventListener('input', function() {
+fontSizeValue.textContent = this.value;
+updatePreview(); // تطبيق التغييرات فوراً
+});
+
+lineHeight.addEventListener('input', function() {
+lineHeightValue.textContent = this.value;
+updatePreview(); // تطبيق التغييرات فوراً
+});
+
+maxHeight.addEventListener('input', function() {
+maxHeightValue.textContent = this.value;
+updatePreview(); // تطبيق التغييرات فوراً
+});
+
+borderRadius.addEventListener('input', function() {
+borderRadiusValue.textContent = this.value;
+updatePreview(); // تطبيق التغييرات فوراً
+});
+
+// مستمعات أحداث لعناصر الألوان
+headerColor.addEventListener('input', function() {
+updatePreview(); // تطبيق تغيير اللون فوراً
+});
+
+headerTextColor.addEventListener('input', function() {
+updatePreview(); // تطبيق تغيير لون نص العنوان فوراً
+});
+
+backgroundColor.addEventListener('input', function() {
+updatePreview(); // تطبيق تغيير اللون فوراً
+});
+
+// إضافة مستمعات أحداث للحواف الملونة
+enableColoredBorder.addEventListener('change', function() {
+coloredBorderOptions.forEach(option => {
+    option.style.display = this.checked ? 'block' : 'none';
+});
+updatePreview();
+});
+
+borderColor.addEventListener('input', updatePreview);
+
+borderWidth.addEventListener('input', function() {
+borderWidthValue.textContent = this.value;
+updatePreview();
+});
+
+// مستمع حدث لخانة تظليل الصندوق
+enableShadow.addEventListener('change', updatePreview);
+
+// مستمعات أحداث لعناصر اختيار اللغة والمحتوى
+codeLanguage.addEventListener('change', updatePreview);
+codeContent.addEventListener('input', debounce(updatePreview, 300));
+headerText.addEventListener('input', updatePreview);
+
+// تأخير استدعاء التحديث عند كتابة أسطر التظليل وتحديث كود HTML في نفس الوقت
+highlightedLines.addEventListener('input', debounce(function() {
+// تحديث تظليل الأسطر في المعاينة
+updateLineHighlighting();
+// تحديث كود HTML المُولّد أيضاً
+generateCode();
+}, 300));
+
+// دالة لإنشاء تأخير لتحسين الأداء
+function debounce(func, wait) {
+let timeout;
+return function() {
+const context = this;
+const args = arguments;
+clearTimeout(timeout);
+timeout = setTimeout(function() {
+func.apply(context, args);
+}, wait);
+};
+}
+
+// دالة تحديث المعاينة
+function updatePreview() {
+// تطبيق النص والمحتوى
+const headerElement = codeBoxPreview.querySelector('.header-text');
+if (headerElement) {
+headerElement.textContent = headerText.value;
+}
+
+if (codeContent.value) {
+const codeElement = codeBoxPreview.querySelector('code');
+if (codeElement) {
+codeElement.textContent = codeContent.value;
+codeElement.className = 'language-' + codeLanguage.value;
+Prism.highlightElement(codeElement);
+}
+}
+
+// تطبيق التظليل للأسطر إذا كان مطلوباً
+updateLineHighlighting();
+
+// تطبيق الأنماط CSS
+applyStyles();
+
+// تحديث كود HTML المُولّد
+generateCode();
+}
+
+// دالة منفصلة لتحديث التظليل للاستجابة الفورية
+function updateLineHighlighting() {
+const preElement = codeBoxPreview.querySelector('pre');
+const codeBlock = codeBoxPreview.querySelector('code');
+const highlightLinesData = highlightedLines.value.trim();
+
+// إزالة كل التظليلات والرسائل السابقة
+clearAllHighlights(preElement);
+
+// إذا كان حقل التظليل فارغاً، نخرج من الدالة
+if (!highlightLinesData) {
+return;
+}
+
+// التحقق من صحة صيغة تظليل الأسطر
+const formatResult = validateHighlightFormat(highlightLinesData);
+if (!formatResult.isValid) {
+showErrorMessage('صيغة غير صحيحة. يجب استخدام الصيغة: 1,3-5');
+return;
+}
+
+// التحقق من صحة أرقام الأسطر المدخلة
+const totalLines = codeBlock ? codeBlock.textContent.split('\n').length : 0;
+const lineRanges = validateLineRanges(highlightLinesData, totalLines);
+
+// معالجة الأسطر غير الصالحة
+handleInvalidLines(lineRanges);
+
+// تطبيق التظليل على الأسطر الصالحة
+applyHighlighting(preElement, lineRanges);
+}
+
+// دالة مساعدة لإزالة كل التظليلات والرسائل
+function clearAllHighlights(preElement) {
+// إزالة خاصية data-line
+preElement.removeAttribute('data-line');
+
+// إزالة عناصر التظليل بناءً على الخصائص
+const highlightDivs = preElement.querySelectorAll('div[style*="background-color: rgba(255, 255, 0, 0.2)"]');
+highlightDivs.forEach(div => div.remove());
+
+// إزالة عناصر التظليل التي تضيفها مكتبة Prism
+const lineHighlights = preElement.querySelectorAll('.line-highlight');
+lineHighlights.forEach(highlight => highlight.remove());
+
+// إزالة رسائل الخطأ
+const errorElements = preElement.querySelectorAll('.highlight-error');
+errorElements.forEach(msg => msg.remove());
+
+// إزالة عناصر التظليل الأخرى التي تضيفها مكتبة Prism
+const prismHighlights = Array.from(preElement.children).filter(el => {
+const style = window.getComputedStyle(el);
+return style.position === 'absolute' && 
+(style.backgroundColor.includes('255, 255, 0') || 
+style.backgroundColor.includes('255, 255, 100'));
+});
+prismHighlights.forEach(el => el.remove());
+}
+
+// دالة مساعدة لعرض رسائل الخطأ
+function showErrorMessage(message) {
+const errorMsg = document.createElement('div');
+errorMsg.className = 'highlight-error';
+errorMsg.textContent = message;
+highlightedLines.insertAdjacentElement('afterend', errorMsg);
+}
+
+// دالة مساعدة لمعالجة الأسطر غير الصالحة
+function handleInvalidLines(lineRanges) {
+const errorList = [];
+
+if (lineRanges.invalid.length > 0) {
+errorList.push('سطر غير موجود: ' + lineRanges.invalid.join(', '));
+}
+
+if (lineRanges.duplicates.length > 0) {
+errorList.push('سطر مكرر: ' + lineRanges.duplicates.join(', '));
+}
+
+if (errorList.length > 0) {
+const errorMsg = document.createElement('div');
+errorMsg.className = 'highlight-error';
+errorMsg.innerHTML = errorList.join('<br>');
+highlightedLines.insertAdjacentElement('afterend', errorMsg);
+}
+}
+
+// دالة مساعدة لتطبيق التظليل
+function applyHighlighting(preElement, lineRanges) {
+if (lineRanges.valid.length > 0) {
+// تطبيق التظليل على الأسطر الصالحة فقط
+preElement.setAttribute('data-line', lineRanges.valid.join(','));
+
+// تطبيق التظليل بشكل فوري
+setTimeout(function() {
+if (Prism.plugins.lineHighlight && Prism.plugins.lineHighlight.highlightLines) {
+Prism.plugins.lineHighlight.highlightLines(preElement)();
+} else {
+// إعادة تطبيق تنسيق الكود كاملاً إذا لم تكن الإضافة متاحة
+const codeEl = codeBoxPreview.querySelector('code');
+if (codeEl) {
+Prism.highlightElement(codeEl);
+}
+}
+}, 10);
+}
+}
+
+// دالة للتحقق من صحة صيغة تظليل الأسطر
+function validateHighlightFormat(input) {
+if (!input || input.trim() === '') {
+return { isValid: true };
+}
+
+// إزالة المسافات الزائدة
+const cleanedInput = input.replace(/\s+/g, '');
+
+// فحص صيغة التظليل باستخدام تعبير منتظم
+// يسمح بالصيغ التالية: 1 أو 1,2,3 أو 1-3 أو 1,3-5,7-9
+const regex = /^(\d+(-\d+)?)(,\d+(-\d+)?)*$/;
+
+if (!regex.test(cleanedInput)) {
+return { isValid: false };
+}
+
+// التأكد من أن النطاقات صحيحة (الرقم الأول أصغر من الثاني)
+const parts = cleanedInput.split(',');
+for (const part of parts) {
+if (part.includes('-')) {
+const [start, end] = part.split('-').map(Number);
+if (start >= end) {
+return { isValid: false, message: 'في النطاق ' + part + ' الرقم الأول يجب أن يكون أصغر من الثاني' };
+}
+} else {
+// التأكد من أن الرقم المفرد صحيح
+const num = Number(part);
+if (isNaN(num) || num < 1) {
+return { isValid: false, message: 'يجب أن تكون الأرقام أكبر من الصفر' };
+}
+}
+}
+
+return { isValid: true };
+}
+
+// دالة للتحقق من صحة نطاقات الأسطر المدخلة
+function validateLineRanges(input, totalLines) {
+// تهيئة كائن النتائج
+const result = {
+valid: [],
+invalid: [],
+duplicates: []
+};
+
+// إذا كان الإدخال فارغًا، نعيد الكائن الفارغ
+if (!input || input.trim() === '') {
+return result;
+}
+
+// تتبع الأسطر التي تم تحديدها بالفعل
+const lineTracker = new Set();
+
+// تقسيم الإدخال إلى نطاقات
+const ranges = input.split(',').map(r => r.trim()).filter(r => r !== '');
+
+// معالجة كل نطاق
+ranges.forEach(range => {
+if (range.includes('-')) {
+// نطاق من الأسطر
+const [startStr, endStr] = range.split('-').map(s => s.trim());
+const start = parseInt(startStr, 10);
+const end = parseInt(endStr, 10);
+
+// التحقق من صحة النطاق
+if (isNaN(start) || isNaN(end) || start < 1 || end < 1) {
+result.invalid.push(range);
+return;
+}
+
+// إضافة كل سطر في النطاق
+for (let i = start; i <= end; i++) {
+if (i > totalLines) {
+result.invalid.push(i);
+} else if (lineTracker.has(i)) {
+result.duplicates.push(i);
+} else {
+result.valid.push(i);
+lineTracker.add(i);
+}
+}
+} else {
+// سطر واحد فقط
+const lineNum = parseInt(range, 10);
+
+// التحقق من صحة رقم السطر
+if (isNaN(lineNum) || lineNum < 1) {
+result.invalid.push(range);
+} else if (lineNum > totalLines) {
+result.invalid.push(lineNum);
+} else if (lineTracker.has(lineNum)) {
+result.duplicates.push(lineNum);
+} else {
+result.valid.push(lineNum);
+lineTracker.add(lineNum);
+}
+}
+});
+
+return result;
+}
+
+// دالة تطبيق الأنماط CSS
+function applyStyles() {
+const customStyles = {
+fontSize: fontSize.value + 'px',
+lineHeight: lineHeight.value,
+maxHeight: maxHeight.value + 'px',
+borderRadius: borderRadius.value + 'px',
+headerColor: headerColor.value,
+headerTextColor: headerTextColor.value, // إضافة لون نص العنوان
+backgroundColor: backgroundColor.value,
+shadow: enableShadow.checked,
+// إضافة خصائص الحواف الملونة
+coloredBorder: enableColoredBorder.checked,
+borderColor: borderColor.value,
+borderWidth: borderWidth.value + 'px'
+};
+
+// تطبيق الأنماط على صندوق الكود
+codeBoxPreview.style.borderRadius = customStyles.borderRadius;
+codeBoxPreview.style.boxShadow = customStyles.shadow ? 'var(--shadow-2)' : 'none';
+
+// تطبيق الحواف الملونة إذا كانت مفعلة
+if (customStyles.coloredBorder) {
+    codeBoxPreview.style.border = `${customStyles.borderWidth} solid ${customStyles.borderColor}`;
+} else {
+    codeBoxPreview.style.border = 'none';
+}
+
+const codeHeader = codeBoxPreview.querySelector('.code-header');
+if (codeHeader) {
+codeHeader.style.backgroundColor = customStyles.headerColor;
+codeHeader.style.borderTopLeftRadius = customStyles.borderRadius;
+codeHeader.style.borderTopRightRadius = customStyles.borderRadius;
+}
+
+const codeHeaderText = codeBoxPreview.querySelector('.header-text');
+if (codeHeaderText) {
+codeHeaderText.style.color = customStyles.headerTextColor; // تطبيق لون نص العنوان
+}
+
+const codeContent = codeBoxPreview.querySelector('.code-content');
+if (codeContent) {
+codeContent.style.backgroundColor = customStyles.backgroundColor;
+}
+
+const preAndCode = codeBoxPreview.querySelectorAll('pre, code');
+preAndCode.forEach(element => {
+element.style.maxHeight = customStyles.maxHeight;
+element.style.fontSize = customStyles.fontSize;
+element.style.lineHeight = customStyles.lineHeight;
+element.style.backgroundColor = customStyles.backgroundColor;
+});
+}
+
+// دالة توليد الأكواد الناتجة
+function generateCode() {
+// الحصول على القيم الحالية
+const language = codeLanguage.value;
+const header = headerText.value;
+const code = codeContent.value || (codeBoxPreview.querySelector('code') ? codeBoxPreview.querySelector('code').textContent : '');
+const highlightLines = highlightedLines.value.trim();
+const showShadow = enableShadow.checked;
+const fontSizeVal = fontSize.value;
+const lineHeightVal = lineHeight.value;
+const maxHeightVal = maxHeight.value;
+const borderRadiusVal = borderRadius.value;
+const headerColorVal = headerColor.value;
+const headerTextColorVal = headerTextColor.value; // إضافة لون نص العنوان
+const backgroundColorVal = backgroundColor.value;
+// إضافة متغيرات الحواف الملونة
+const hasColoredBorder = enableColoredBorder.checked;
+const borderColorVal = borderColor.value;
+const borderWidthVal = borderWidth.value;
+
+// التحقق من صحة أرقام الأسطر المدخلة
+const totalLines = code.split('\n').length;
+const lineRanges = validateLineRanges(highlightLines, totalLines);
+
+// إنشاء العناصر HTML
+const container = document.createElement('div');
+container.innerHTML = `<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
+<div class="code-box iscodi-pre" style="border-radius: ${borderRadiusVal}px; ${showShadow ? 'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);' : ''} ${hasColoredBorder ? `border: ${borderWidthVal}px solid ${borderColorVal};` : ''}">
+<div class="code-header" style="background-color: ${headerColorVal};">
+<span class="header-text" style="color: ${headerTextColorVal};">${escapeHtml(header)}</span>
+</div>
+<div class="code-content">
+<pre class="line-numbers" style="font-size: ${fontSizeVal}px; line-height: ${lineHeightVal}; max-height: ${maxHeightVal}px; background-color: ${backgroundColorVal}; overflow-wrap: break-word;">
+<code class="language-${language}">${escapeHtml(code)}</code></pre>
+</div>
+</div>`;
+
+// إضافة سمة data-line إذا كانت هناك أسطر صالحة
+if (lineRanges.valid && lineRanges.valid.length > 0) {
+const preElement = container.querySelector('pre');
+if (preElement) {
+preElement.setAttribute('data-line', lineRanges.valid.join(','));
+}
+}
+
+// تحويل HTML إلى نص
+const htmlOutput = container.innerHTML;
+
+// عرض الكود المُولّد
+htmlCode.textContent = htmlOutput;
+Prism.highlightElement(htmlCode);
+}
+
+// دالة التهرب من الرموز الخاصة في HTML
+function escapeHtml(text) {
+if (text === undefined || text === null) {
+return '';
+}
+return String(text)
+.replace(/&/g, "&amp;")
+.replace(/</g, "&lt;")
+.replace(/>/g, "&gt;")
+.replace(/"/g, "&quot;")
+.replace(/'/g, "&#039;");
+}
+
+// إظهار رسالة منبثقة
+function showToast(message) {
+const toast = document.getElementById('toast');
+toast.textContent = message;
+toast.style.display = 'block';
+setTimeout(function() {
+toast.style.display = 'none';
+}, 3000);
+}
+
+// إضافة استدعاء للتنظيف الدوري لتجنب تراكم عناصر التظليل
+setInterval(function() {
+const preElement = codeBoxPreview.querySelector('pre');
+if (!preElement) return;
+
+const highlightLinesData = highlightedLines.value.trim();
+
+// إذا كان حقل التظليل فارغاً، نتأكد من إزالة جميع عناصر التظليل
+if (!highlightLinesData) {
+preElement.removeAttribute('data-line');
+
+const highlightDivs = preElement.querySelectorAll('div[style*="background-color: rgba(255, 255, 0, 0.2)"]');
+highlightDivs.forEach(div => div.remove());
+
+const lineHighlights = preElement.querySelectorAll('.line-highlight');
+lineHighlights.forEach(highlight => highlight.remove());
+
+// إزالة جميع عناصر التظليل التي تضيفها مكتبة Prism
+Array.from(preElement.children).forEach(el => {
+const style = window.getComputedStyle(el);
+if (style.position === 'absolute' && 
+(style.backgroundColor.includes('255, 255, 0') || 
+style.backgroundColor.includes('255, 255, 100'))) {
+el.remove();
+}
+});
+}
+}, 500);
+
+// حفظ الإعدادات في التخزين المحلي
+function saveSettings() {
+const settings = {
+language: codeLanguage.value,
+header: headerText.value,
+headerColor: headerColor.value,
+headerTextColor: headerTextColor.value, // حفظ لون نص العنوان
+backgroundColor: backgroundColor.value,
+fontSize: fontSize.value,
+lineHeight: lineHeight.value,
+maxHeight: maxHeight.value,
+borderRadius: borderRadius.value,
+shadow: enableShadow.checked
+};
+localStorage.setItem('codeBoxSettings', JSON.stringify(settings));
+}
+
+// استعادة الإعدادات من التخزين المحلي
+function loadSettings() {
+const savedSettings = localStorage.getItem('codeBoxSettings');
+if (savedSettings) {
+const settings = JSON.parse(savedSettings);
+codeLanguage.value = settings.language || 'javascript';
+headerText.value = settings.header || 'مثال كود';
+headerColor.value = settings.headerColor || '#3f51b5';
+headerTextColor.value = settings.headerTextColor || '#ffffff'; // استعادة لون نص العنوان
+backgroundColor.value = settings.backgroundColor || '#f5f5f5';
+fontSize.value = settings.fontSize || '14';
+lineHeight.value = settings.lineHeight || '1.5';
+maxHeight.value = settings.maxHeight || '400';
+borderRadius.value = settings.borderRadius || '5';
+enableShadow.checked = settings.shadow || false;
+updatePreview();
+}
+}
+
+// تنفيذ التهيئة الأولية
+updatePreview();
+},'anysc');
+</script>
+</body>
+</html>

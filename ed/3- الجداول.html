@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولد الجداول الاحترافي - Material Design 3</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_en_500.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2' rel='preload'/>
+<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_en_700.woff2' rel='preload'/>
+<style>
+@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:400;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:400;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_en_400.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:500;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:500;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_en_500.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:700;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:700;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_en_700.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root {
+--md-primary: #006782;
+--md-on-primary: #ffffff;
+--md-primary-container: #c1e8ff;
+--md-on-primary-container: #001f2a;
+--md-secondary: #4f616e;
+--md-on-secondary: #ffffff;
+--md-secondary-container: #d2e5f4;
+--md-on-secondary-container: #0b1c29;
+--md-surface: #f8fdff;
+--md-surface-variant: #dce4eb;
+--md-outline: #71787e;
+--md-outline-variant: #c1c7ce;
+--md-radius-small: 6px;
+--md-radius-medium: 12px;
+--md-radius-large: 16px;
+--shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+--shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+--shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translate(-50%, 20px); }
+to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+from { opacity: 1; transform: translate(-50%, 0); }
+to { opacity: 0; transform: translate(-50%, 20px); }
+}
+
+
+body {
+font-family: 'Tajawal Pro','Segoe UI', Tahoma, Verdana, sans-serif;
+background-color: var(--md-surface);
+color: #333;
+direction: rtl;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+}
+
+.card {
+border-radius: var(--md-radius-medium);
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+margin-bottom: 20px;
+padding: 16px;
+}
+
+.card-title {
+color: var(--md-primary);
+font-weight: 500;
+margin-bottom: 16px;
+font-size: 1.5rem;
+}
+
+.btn {
+background-color: var(--md-primary);
+color: var(--md-on-primary);
+border-radius: var(--md-radius-small);
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+margin-right: 8px;
+margin-bottom: 8px;
+text-transform: none;
+font-weight: 500;
+}
+
+.btn:hover {
+background-color: #004b5f;
+}
+
+.btn-flat {
+color: var(--md-primary);
+border-radius: var(--md-radius-small);
+}
+
+.btn i {
+line-height: inherit;
+vertical-align: middle;
+margin-left: 4px;
+}
+
+.btn-40 {
+height: 40px;
+line-height: 40px;
+padding: 0 16px;
+}
+
+select.browser-default {
+border: 1px solid var(--md-outline-variant);
+border-radius: var(--md-radius-small);
+padding: 8px 12px;
+background-color: white;
+height: 40px;
+}
+
+input[type="text"] {
+border: 1px solid var(--md-outline-variant);
+border-radius: var(--md-radius-small);
+padding: 8px 12px;
+height: 40px;
+box-sizing: border-box;
+}
+
+.input-field {
+margin-top: 12px;
+margin-bottom: 12px;
+}
+
+h5, h6 {
+font-weight: 500;
+color: #333;
+margin-bottom: 12px;
+margin-top: 24px;
+}
+
+.header-section {
+background-color: var(--md-primary);
+color: var(--md-on-primary);
+padding: 24px 0;
+margin-bottom: 24px;
+border-radius: var(--md-radius-large);
+}
+
+.header-section h3 {
+margin: 0;
+font-weight: 500;
+}
+
+hr {
+border: 0;
+height: 1px;
+background-color: var(--md-outline-variant);
+margin: 16px 0;
+}
+
+.textarea {
+width: 100%;
+min-height: 150px;
+border: 1px solid var(--md-outline-variant);
+border-radius: var(--md-radius-small);
+padding: 12px;
+font-family: monospace;
+direction: ltr;
+resize: vertical;
+}
+
+/* سيزر الجدول */
+.table_size_chooser {
+margin-bottom: 24px;
+border: 1px solid var(--md-outline-variant);
+border-radius: var(--md-radius-small);
+padding: 12px;
+background-color: white;
+}
+
+.table_size_chooser form {
+text-align: center;
+margin-bottom: 8px;
+font-size: 1.2rem;
+font-weight: 500;
+color: var(--md-primary);
+}
+
+.table_size_chooser table {
+border-collapse: collapse;
+width: 100%;
+}
+
+.table_size_chooser td {
+border: 1px solid #ddd;
+width: 24px;
+height: 24px;
+padding: 0;
+cursor: pointer;
+}
+
+.table_size_chooser td.selected {
+background-color: var(--md-primary-container);
+}
+
+.table_size_chooser td.hover {
+background-color: var(--md-surface-variant);
+}
+
+.clear {
+clear: both;
+}
+
+/* تصميم الجدول */
+.table-responsive{position:relative;overflow:auto;margin:20px 0;-webkit-border-radius:6px;border-radius:6px;    font-size: 18px;
+line-height: 2em;}
+.table-responsive table{display:table;width:100%;max-width:100%;border-collapse:collapse;border-spacing:0}
+.table-responsive  .heading{text-align:center;background:#3c4c54;color:#ffffff;padding:8px 20px;border-bottom:1px solid rgb(0 0 0 / 14%)}
+table *{-webkit-user-select:text!important;-khtml-user-select:text!important;-moz-user-select:text!important;-ms-user-select:text!important;user-select:text!important}
+.table-responsive tr:nth-of-type(odd){background-color:#fff}
+.table-responsive th{font-weight:500;border-radius:0;padding:10px 5px;overflow:hidden;word-break:normal;background:#3c4c54;color:#ffffff;text-align:center}
+.table-responsive tr,.table-responsive tr:nth-child(n+1):hover{background-color:#f8f8f8}
+.table-responsive td{padding:10px 5px;border:1px solid rgba(0,0,0,.05);text-align:center;font-weight:400;color:#222}
+.table-responsive tr {
+border-bottom: 0;
+}
+/* اتجاهات النص */
+.text-right {
+text-align: right!important;
+}
+
+.text-left {
+text-align: left!important;
+}
+
+.text-center {
+text-align: center!important;
+}
+
+/* Hover effect */
+.table tbody tr:hover {
+background-color: var(--md-surface-variant);
+}
+
+/* Focus for editable cells */
+.table [contenteditable=true]:focus {
+outline: 2px solid var(--md-primary);
+outline-offset: -2px;
+}
+
+/* توافق الجوال */
+@media screen and (max-width: 600px) {
+.card {
+padding: 12px;
+}
+}
+
+/* تنسيق تأثير النسخ */
+.copied {
+position: fixed;
+top: 20px;
+left: 50%;
+transform: translateX(-50%);
+padding: 10px 20px;
+background-color: var(--md-primary);
+color: white;
+border-radius: var(--md-radius-small);
+z-index: 1000;
+animation: fadeOut 2s forwards;
+}
+
+
+.toast-msg {
+position: fixed;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%);
+background-color: #323232;
+color: white;
+padding: 16px 24px;
+border-radius: 4px;
+box-shadow: var(--shadow-2);
+display: none;
+z-index: 1000;
+animation: fadeIn 0.3s, fadeOut 0.3s 2.7s forwards;
+}
+
+/* تنسيق زر النسخ */
+.btn-copy {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0 12px;
+}
+
+.btn-copy i {
+font-size: 20px;
+}
+
+.bk-file {
+display: block;
+position: relative;
+overflow: hidden;
+width: 100%;
+clear: both;
+background: #fcfcfc;
+line-height: normal;
+margin: 0 auto;
+padding: 4em 1.2em;
+background-color: #d8d8d8;
+background-image: -webkit-linear-gradient(#efefef 2px, transparent 2px), linear-gradient(90deg, #efefef 2px, transparent 2px), linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .3) 1px, transparent 1px);
+background-image: linear-gradient(#efefef 2px, transparent 2px), linear-gradient(90deg, #efefef 2px, transparent 2px), linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .3) 1px, transparent 1px);
+background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header-section center-align">
+<h3>مولد الجداول الاحترافي - لقالب فلاسبيد</h3>
+<p>أنشئ جداول احترافية بسهولة وبدون كتابة أكواد</p>
+</div>
+
+<div class="card">
+<div class="card-title">إنشاء الجدول</div>
+
+<div class="row">
+<!-- اختيار حجم الجدول -->
+<div class="col s12 m6">
+<h6>اختر حجم الجدول</h6>
+<div id="sizer" class="table_size_chooser">
+<div class="SizeChooser">
+<form><span id="colcount">0</span>×<span id="rowcount">0</span></form>
+<div class="clear"></div>
+<table>
+<tbody>
+<!-- سيتم إنشاء الخلايا بواسطة JavaScript -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- تكوين إعدادات الجدول -->
+<div class="col s12 m6">
+<!-- عنوان الجدول -->
+<div id="captioner">
+<div class="row">
+<div class="col s12 m6">
+<h6>اتجاه نص العنوان</h6>
+<select class="add-Direction-caption browser-default">
+<option value="text-center" selected="selected">وسط</option>
+<option value="text-right">يمين</option>
+<option value="text-left">يسار</option>
+</select>
+</div>
+<div class="col s12 m6">
+<h6>عنوان الجدول</h6>
+<div class="input-field">
+<input placeholder="أدخل عنوان الجدول هنا" type="text" id="table-caption" class="captioner-val">
+</div>
+</div>
+</div>
+</div>
+
+<!-- إعدادات العناوين -->
+<div id="headerer">
+<div class="row">
+<div class="col s12 m6">
+<h6>اتجاه النص (العناوين الأفقية)</h6>
+<select class="add-Direction-col browser-default">
+<option value="text-center" selected="selected">وسط</option>
+<option value="text-right">يمين</option>
+<option value="text-left">يسار</option>
+</select>
+</div>
+<div class="col s12 m6">
+<h6>صف العناوين الأفقي</h6>
+<select class="add-tabindex-col browser-default">
+<option value="colx" selected="selected">نعم</option>
+<option value="tabindex-remove-col">بدون</option>
+</select>
+</div>
+</div>
+
+<hr>
+
+<div class="row">
+<div class="col s12 m6">
+<h6>اتجاه النص (العناوين الرأسية)</h6>
+<select class="add-Direction-row browser-default">
+<option value="text-center" selected="selected">وسط</option>
+<option value="text-right">يمين</option>
+<option value="text-left">يسار</option>
+</select>
+</div>
+<div class="col s12 m6">
+<h6>عمود العناوين الرأسي</h6>
+<select class="add-tabindex-row browser-default">
+<option value="tabindex-remove-row" selected="selected">بدون</option>
+<option value="rowx">نعم</option>
+</select>
+</div>
+
+</div>
+
+<hr>
+
+<div class="row">
+<div class="col s12">
+<h6>اتجاه النص (البيانات)</h6>
+<select class="add-Direction-td browser-default">
+<option value="text-center" selected="selected">وسط</option>
+<option value="text-right">يمين</option>
+<option value="text-left">يسار</option>
+</select>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- حقل معاينة وإدخال البيانات -->
+<div class="card">
+<div class="card-title">حقل المعاينة و إدخال البيانات:</div>
+<div id="tabledisplay">
+<div id="attrtable" class="bk-file display-block-simple">
+<div class="table-responsive">
+<table class="table table-bordered">
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- حقل إستخراج كود HTML -->
+<div class="card">
+<div class="card-title">استخراج الكود</div>
+<div class="row">
+<div class="col s12">
+<button class="btn btn-40 waves-effect waves-light" id="table_ok">
+<i class="material-icons">code</i> استخراج الكود
+</button>
+<button class="btn-flat btn-40 btn-copy waves-effect" data-copy="tablecode" title="نسخ">
+<i class="material-icons">content_copy</i> نسخ
+</button>
+
+<textarea class="textarea" id="tablecode" placeholder="سيظهر هنا كود HTML للجدول الذي قمت بإنشائه..." spellcheck="false"></textarea>
+</div>
+</div>
+</div>
+</div>
+<div id="toast" class="toast-msg"></div>
+<script>
+function showToast(message) {
+const toast = document.getElementById("toast");
+toast.textContent = message;
+toast.style.display = "block";
+setTimeout(function() {
+toast.style.display = "none"
+}, 3e3)
+}
+const maxRows = 15;
+const maxCols = 15;
+const sizerTable = document.querySelector(".table_size_chooser table tbody");
+sizerTable.innerHTML = "";
+for (let i = 0; i < maxRows; i++) {
+const row = document.createElement("tr");
+for (let j = 0; j < maxCols; j++) {
+const cell = document.createElement("td");
+cell.setAttribute("data-row", i + 1);
+cell.setAttribute("data-col", j + 1);
+row.appendChild(cell)
+}
+sizerTable.appendChild(row)
+}
+let currentRows = 0;
+let currentCols = 0;
+const updateTablePreview = () => {
+const hasHeaderRow = document.querySelector(".add-tabindex-col").value === "colx";
+const hasHeaderCol = document.querySelector(".add-tabindex-row").value === "rowx";
+const headerRowAlign = document.querySelector(".add-Direction-col").value;
+const headerColAlign = document.querySelector(".add-Direction-row").value;
+const dataCellAlign = document.querySelector(".add-Direction-td").value;
+const tableCaption = document.getElementById("table-caption").value;
+const captionAlign = document.querySelector(".add-Direction-caption").value;
+let tableHtml = "";
+if (tableCaption) {
+tableHtml += `<caption class="heading ${captionAlign}">${tableCaption}</caption>`
+}
+for (let i = 0; i < currentRows; i++) {
+tableHtml += "<tr>";
+for (let j = 0; j < currentCols; j++) {
+let cellType = "td";
+let cellClass = "";
+let cellContent = "البيانات";
+let cellAttrs = "";
+if (i === 0 && hasHeaderRow) {
+cellType = "th";
+cellClass = `th-col ${headerRowAlign}`;
+cellContent = `عنوان ${j+1}`;
+cellAttrs = 'scope="col"'
+} else if (j === 0 && hasHeaderCol) {
+cellType = "th";
+cellClass = `th-row ${headerColAlign}`;
+cellContent = `صف ${i}`;
+cellAttrs = 'scope="row"'
+} else {
+cellClass = dataCellAlign
+}
+tableHtml += `<${cellType} class="${cellClass}" ${cellAttrs} contenteditable="true">${cellContent}</${cellType}>`
+}
+tableHtml += "</tr>"
+}
+document.querySelector("#attrtable .table-responsive table").innerHTML = tableHtml
+};
+const updateCounters = () => {
+const selectedCells = document.querySelectorAll(".table_size_chooser td.selected");
+if (selectedCells.length > 0) {
+let maxRow = 0;
+let maxCol = 0;
+selectedCells.forEach(cell => {
+const row = parseInt(cell.getAttribute("data-row"));
+const col = parseInt(cell.getAttribute("data-col"));
+if (row > maxRow) maxRow = row;
+if (col > maxCol) maxCol = col
+});
+document.getElementById("colcount").textContent = maxCol;
+document.getElementById("rowcount").textContent = maxRow
+} else {
+document.getElementById("colcount").textContent = "0";
+document.getElementById("rowcount").textContent = "0"
+}
+};
+let isMouseDown = false;
+let lastHoveredRow = 0;
+let lastHoveredCol = 0;
+const tableCells = document.querySelectorAll(".table_size_chooser td");
+tableCells.forEach(cell => {
+cell.addEventListener("pointerenter", function() {
+const row = parseInt(this.getAttribute("data-row"));
+const col = parseInt(this.getAttribute("data-col"));
+lastHoveredRow = row;
+lastHoveredCol = col;
+document.querySelectorAll(".table_size_chooser td").forEach(c => {
+c.classList.remove("hover")
+});
+for (let i = 1; i <= row; i++) {
+for (let j = 1; j <= col; j++) {
+const targetCell = document.querySelector(`.table_size_chooser td[data-row="${i}"][data-col="${j}"]`);
+if (targetCell) {
+targetCell.classList.add("hover")
+}
+}
+}
+document.getElementById("colcount").textContent = col;
+document.getElementById("rowcount").textContent = row
+});
+cell.addEventListener("pointerdown", function(e) {
+isMouseDown = true;
+e.preventDefault()
+})
+});
+const tableChooser = document.querySelector(".table_size_chooser");
+tableChooser.addEventListener("pointerleave", function() {
+document.querySelectorAll(".table_size_chooser td").forEach(cell => {
+cell.classList.remove("hover")
+});
+updateCounters()
+});
+document.addEventListener("pointerup", function() {
+if (isMouseDown) {
+const row = lastHoveredRow;
+const col = lastHoveredCol;
+currentRows = row;
+currentCols = col;
+document.querySelectorAll(".table_size_chooser td").forEach(cell => {
+cell.classList.remove("selected")
+});
+for (let i = 1; i <= row; i++) {
+for (let j = 1; j <= col; j++) {
+const targetCell = document.querySelector(`.table_size_chooser td[data-row="${i}"][data-col="${j}"]`);
+if (targetCell) {
+targetCell.classList.add("selected")
+}
+}
+}
+updateTablePreview();
+updateCounters();
+isMouseDown = false
+}
+});
+const updateOnChange = ["add-tabindex-col", "add-tabindex-row", "add-Direction-col", "add-Direction-row", "add-Direction-td", "add-Direction-caption", "table-style"];
+updateOnChange.forEach(className => {
+const elements = document.querySelectorAll(`.${className}`);
+elements.forEach(element => {
+element.addEventListener("change", updateTablePreview)
+})
+});
+document.getElementById("table-caption").addEventListener("input", updateTablePreview);
+document.getElementById("table_ok").addEventListener("click", function() {
+const tableCaption = document.getElementById("table-caption").value;
+const captionAlign = document.querySelector(".add-Direction-caption").value;
+const tableClasses = "table";
+const rawTbody = document.querySelector("#attrtable .table-responsive table tbody").outerHTML;
+const cleanTbody = rawTbody.replace(/ contenteditable="[^"]*"/g, "");
+let finalCode = '<div class="table-responsive">\n';
+finalCode += `  <table class="${tableClasses}">\n`;
+if (tableCaption) {
+finalCode += `    <caption class="heading ${captionAlign}">${tableCaption}</caption>\n`
+}
+finalCode += `    ${cleanTbody}\n`;
+finalCode += "  </table>\n";
+finalCode += "</div>";
+document.getElementById("tablecode").value = finalCode
+});
+const copyButtons = document.querySelectorAll(".btn-copy");
+copyButtons.forEach(button => {
+button.addEventListener("click", function() {
+const targetId = this.getAttribute("data-copy");
+const textarea = document.getElementById(targetId);
+textarea.select();
+textarea.setSelectionRange(0, 99999);
+document.execCommand("copy");
+showToast("✅ تم نسخ الكود بنجاح!")
+})
+});
+updateTablePreview();
+updateCounters();
+</script>
+</body>
+</html>
