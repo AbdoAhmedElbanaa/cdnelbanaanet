@@ -1,1 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأدوات</title>
+    <!-- Preload Fonts - Consistent with user's provided files -->
+    <link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2' rel='preload'/>
+    <link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2' rel='preload'/>
+    <link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2' rel='preload'/>
+    <link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1' rel='preload'/>
+    <style>
+        /* ===== Font Definitions - Consistent with user's provided files ===== */
+        @font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:400;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:500;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:700;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}
+        /*Icons - Font Awesome 6 Pro subset from user's files*/
+        @font-face{font-family:"Font Awesome 6 Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1) format("woff2");unicode-range:U+000D, U+0020, U+0022, U+26A0, U+E186, U+E2AE, U+E481, U+E900-E929, U+E92B, U+E95E, U+E968-E969, U+E97A, U+E97D, U+F05A, U+F06B, U+F06D-F06E, U+F0C1, U+F0C5, U+F0DA, U+F0ED, U+F1E0, U+F1EA, U+F2F0, U+F304, U+F336}
+        .fa{font-family:"Font Awesome 6 Pro";-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto;pointer-events:none}
+        /* Edition Icons */
+        .fa-badge-check:before{content:'\f336'} /* Used for Button Generator */
+        .fa-alert:before{content:'\26a0'}     /* Used for Alert Generator */
+        .fa-info:before{content:'\f05a'}       /* Alternative for Alert Generator */
+        .fa-menu-grid:before{content:'\e925'}  /* Used for Table Generator */
+        .fa-newspaper:before{content:'\f1ea'}  /* Used for Product Table Generator */
+        .fa-cloud-download:before{content:'\f0ed'} /* Used for Download Code Generator */
+        .fa-copy:before{content:'\f0c5'}       /* Used for Code Box Generator */
+        
+        /* ===== CSS Variables - Consistent with user's provided files ===== */
+        :root {
+            --primary-color: #303f9f;
+            --primary-light: #666ad1;
+            --primary-dark: #001970;
+            --text-on-primary: #FFFFFF;
+            --text-color: #333333;
+            --background-color: #F5F5F5;
+            --card-background: #FFFFFF;
+            --border-radius: 8px; /* Slightly larger for a modern look */
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            --shadow-2: 0 4px 10px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
 
+        /* ===== General Reset ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal Pro', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            direction: rtl;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* ===== Header Style ===== */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background-color: var(--primary-color);
+            color: var(--text-on-primary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* ===== Main Content (Tools Grid) ===== */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .tool-card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px; /* Ensure cards have a consistent minimum height */
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-2);
+        }
+
+        .tool-card .tool-icon {
+            font-size: 3.5rem; /* Larger icons */
+            color: var(--primary-light);
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-card:hover .tool-icon {
+            color: var(--primary-dark);
+        }
+
+        .tool-card .tool-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .tool-card .tool-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-on-primary);
+            padding: 10px 20px;
+            border-radius: 50px; /* Pill-shaped button */
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        .tool-card .tool-link:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===== Footer Style ===== */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            color: #666;
+            background-color: var(--card-background);
+            box-shadow: var(--shadow);
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        /* ===== Responsive Adjustments ===== */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            .tools-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            .tool-card {
+                padding: 20px;
+            }
+            .tool-card .tool-icon {
+                font-size: 3rem;
+            }
+            .tool-card .tool-title {
+                font-size: 1.2rem;
+            }
+            .tool-card .tool-link {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            header {
+                padding: 20px 0;
+                margin-bottom: 30px;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>مجموعة أدوات ISCODI</h1>
+            <p>اختر الأداة التي ترغب في استخدامها</p>
+        </header>
+
+        <main class="tools-grid">
+            <!-- Button Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-badge-check"></i></div>
+                <h2 class="tool-title">مولد الأزرار</h2>
+                <a href="1- الأزرار.html" class="tool-link">ابدأ الآن</a>
+            </div>
+
+            <!-- Alert Message Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-alert"></i></div>
+                <h2 class="tool-title">مولد التنبيهات</h2>
+                <a href="2- التنبيهات.html" class="tool-link">ابدأ الآن</a>
+            </div>
+
+            <!-- Table Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-menu-grid"></i></div>
+                <h2 class="tool-title">مولد الجداول</h2>
+                <a href="3- الجداول.html" class="tool-link">ابدأ الآن</a>
+            </div>
+
+            <!-- Product Specification Table Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-newspaper"></i></div>
+                <h2 class="tool-title">مولد جداول المنتجات</h2>
+                <a href="4- جدول وصف منتج.html" class="tool-link">ابدأ الآن</a>
+            </div>
+
+            <!-- Download Code Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-cloud-download"></i></div>
+                <h2 class="tool-title">مولد كود التحميل</h2>
+                <a href="التحميل.html" class="tool-link">ابدأ الآن</a>
+            </div>
+
+            <!-- Code Box Generator -->
+            <div class="tool-card">
+                <div class="tool-icon"><i class="fa fa-copy"></i></div>
+                <h2 class="tool-title">مولد صناديق الأكواد</h2>
+                <a href="5- صناديق الأكواد.html" class="tool-link">ابدأ الآن</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2025</p>
+    </footer>
+</body>
+</html>
