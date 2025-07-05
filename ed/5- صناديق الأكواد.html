@@ -6,16 +6,13 @@
 <title>مولد صناديق الأكواد</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2' rel='preload'/>
-<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2' rel='preload'/>
-<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2' rel='preload'/>
-<link as='font' crossorigin='anonymous' href='https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1' rel='preload'/>
+<link href='https://cdn.elbana.net/misans-arabic/misansarabic-semibold/result.min.css' rel='stylesheet'/>
+
+<link as='font' crossorigin='anonymous' href='https://cdn.elbana.net/flaspeed/elbana-Icons.woff2?v=1' rel='preload'/>
 <style>
-/* ===== تعريف الخطوط ===== */
-@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:400;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_400.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:500;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_500.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}@font-face{font-family:'Tajawal Pro';font-style:normal;font-weight:700;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/Tajawal_Enhanced_ar_700.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1}
 
 /*Icons*/
-@font-face{font-family:"Font Awesome 6 Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://host.iscodi.com/assets/fonts/IsCodi-Icons.woff2?v=1) format("woff2");unicode-range:U+000D, U+0020, U+0022, U+26A0, U+E186, U+E2AE, U+E481, U+E900-E929, U+E92B, U+E95E, U+E968-E969, U+E97A, U+E97D, U+F05A, U+F06B, U+F06D-F06E, U+F0C1, U+F0C5, U+F0DA, U+F0ED, U+F1E0, U+F1EA, U+F2F0, U+F304, U+F336}
+@font-face{font-family:"Font Awesome 6 Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://cdn.elbana.net/flaspeed/elbana-Icons.woff2?v=1) format("woff2");unicode-range:U+000D, U+0020, U+0022, U+26A0, U+E186, U+E2AE, U+E481, U+E900-E929, U+E92B, U+E95E, U+E968-E969, U+E97A, U+E97D, U+F05A, U+F06B, U+F06D-F06E, U+F0C1, U+F0C5, U+F0DA, U+F0ED, U+F1E0, U+F1EA, U+F2F0, U+F304, U+F336}
 .fa{font-family:"Font Awesome 6 Pro";-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto;pointer-events:none}
 .fa-info:before{content:'\f05a'}
 .fa-alert:before{content:'\26a0'}
@@ -51,7 +48,7 @@ box-sizing: border-box;
 }
 
 body {
-font-family: 'Tajawal', sans-serif;
+font-family: 'MiSans Arabic Semibold', sans-serif;
 background-color: var(--background-color);
 color: var(--text-color);
 line-height: 1.6;
@@ -253,18 +250,18 @@ margin-left: 5px;
 }
 
 /* ===== تصميم صندوق الكود ===== */
-.iscodi-pre.code-box {
+.elbananet-pre.code-box {
 margin: 20px 0;
 overflow: hidden;
 transition: all 0.2s ease;
 }
 
-.iscodi-pre.code-box:hover {
+.elbananet-pre.code-box:hover {
 transform: translateY(-2px);
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.iscodi-pre .code-header {
+.elbananet-pre .code-header {
 padding: 10px 15px;
 display: flex;
 justify-content: space-between;
@@ -272,12 +269,12 @@ align-items: center;
 font-weight: 500;
 }
 
-.iscodi-pre  .header-text {
+.elbananet-pre  .header-text {
 margin: 0;
 font-size: 0.95rem;
 }
 
-.iscodi-pre .copycode-btn {
+.elbananet-pre .copycode-btn {
 background-color: #ffffff;
 width: 50px;
 height: 30px;
@@ -293,76 +290,76 @@ cursor: pointer;
 font-size:17px;
 }
 
-.iscodi-pre .copycode-btn:hover {
+.elbananet-pre .copycode-btn:hover {
 color: #fff;
 background-color: rgba(255, 255, 255, 0.2);
 }
 
-.iscodi-pre .code-content {
+.elbananet-pre .code-content {
 position: relative;
 }
 
-.iscodi-pre .code-content pre {
+.elbananet-pre .code-content pre {
 direction: ltr;
 scrollbar-width: thin;
 }
 
-.iscodi-pre .code-content pre::-webkit-scrollbar {
+.elbananet-pre .code-content pre::-webkit-scrollbar {
 width: 8px;
 height: 8px;
 }
 
-.iscodi-pre .code-content pre::-webkit-scrollbar-thumb {
+.elbananet-pre .code-content pre::-webkit-scrollbar-thumb {
 background-color: #aaa;
 border-radius: 4px;
 }
 
-.iscodi-pre .code-content pre::-webkit-scrollbar-thumb:hover {
+.elbananet-pre .code-content pre::-webkit-scrollbar-thumb:hover {
 background-color: #888;
 }
 
-.iscodi-pre .code-content code {
+.elbananet-pre .code-content code {
 white-space: pre;
 word-break: normal;
 word-wrap: normal;
 }
 
 /* تنسيق الأسطر المحددة */
-.iscodi-pre.code-box .line-highlight {
+.elbananet-pre.code-box .line-highlight {
 background: rgba(255, 220, 80, 0.2);
 border-left: 3px solid #ffc107;
 }
 
 /* ===== تعديلات التوافق ===== */
 /* تأكد من أن Prism.js يعمل بشكل صحيح مع هذه الأنماط */
-.iscodi-pre.code-box pre[data-line] {
+.elbananet-pre.code-box pre[data-line] {
 position: relative;
 }
 
 
 /* ===== تصميم داكن (يمكن تفعيله عبر إضافة الكلاس dark-theme للعنصر الأب) ===== */
-.dark-theme .iscodi-pre.code-box {
+.dark-theme .elbananet-pre.code-box {
 background-color: #1e1e1e!important;
 }
 
-.dark-theme .iscodi-pre .code-header {
+.dark-theme .elbananet-pre .code-header {
 background-color: #262626!important;
 }
 
-.dark-theme .iscodi-pre .code-content pre {
+.dark-theme .elbananet-pre .code-content pre {
 background-color: #2d2d2d!important;
 color: #e0e0e0!important;
 }
 
-.dark-theme .iscodi-pre .code-content pre::-webkit-scrollbar-track {
+.dark-theme .elbananet-pre .code-content pre::-webkit-scrollbar-track {
 background: #2d2d2d!important;
 }
 
-.dark-theme .iscodi-pre .code-content pre::-webkit-scrollbar-thumb {
+.dark-theme .elbananet-pre .code-content pre::-webkit-scrollbar-thumb {
 background-color: #666!important;
 }
 
-.dark-theme .iscodi-pre .line-highlight {
+.dark-theme .elbananet-pre .line-highlight {
 background: rgba(255, 255, 0, 0.1)!important;
 border-left-color: #b39d00!important;
 }
@@ -919,7 +916,7 @@ transform: translateY(0) rotateX(0);
 <div class="preview-panel">
 <h2>معاينة صندوق الكود</h2>
 <div class="preview-container">
-<div id="code-box-preview" class="code-box iscodi-pre">
+<div id="code-box-preview" class="code-box elbananet-pre">
 <div class="code-header">
 <span class="header-text">مثال كود</span>
 </div>
@@ -939,7 +936,7 @@ return رسالة;
 
 
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #3f51b5;">
 <span class="header-text" style="color: #ffffff;">كود HTML</span>
 </div>
@@ -975,7 +972,7 @@ return رسالة;
 <p class="example-desc">النمط القياسي مع الألوان الافتراضية</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #3f51b5;">
 <span class="header-text" style="color: #ffffff;">JavaScript</span>
 </div>
@@ -997,7 +994,7 @@ return true;
 <p class="example-desc">نمط داكن لراحة العين في الإضاءة المنخفضة</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);">
+<div class="code-box elbananet-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);">
 <div class="code-header" style="background-color: #262626;">
 <span class="header-text" style="color: #e0e0e0;">CSS</span>
 </div>
@@ -1022,7 +1019,7 @@ box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 <p class="example-desc">مثالي لتوضيح جزء معين من الكود</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #7957d5; border-top-left-radius: 8px; border-top-right-radius: 8px;">
 <span class="header-text" style="color: #ffffff;">Python</span>
 </div>
@@ -1047,7 +1044,7 @@ print(calculate_area(5))</code>
 <p class="example-desc">ترويسة بلون مخصص لتمييز الكود</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #4a6bff; border-top-left-radius: 8px; border-top-right-radius: 8px;">
 <span class="header-text" style="color: #ffffff;">HTML</span>
 </div>
@@ -1069,7 +1066,7 @@ print(calculate_area(5))</code>
 <p class="example-desc">حواف دائرية تمنح مظهرًا عصريًا</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #3f51b5; border-top-left-radius: 16px; border-top-right-radius: 16px;">
 <span class="header-text" style="color: #ffffff;">PHP</span>
 </div>
@@ -1098,7 +1095,7 @@ return $conn;
 <p class="example-desc">سهولة القراءة مع خط كبير ومريح</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+<div class="code-box elbananet-pre" style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
 <div class="code-header" style="background-color: #2c974b; border-top-left-radius: 8px; border-top-right-radius: 8px;">
 <span class="header-text" style="color: #ffffff;">Java</span>
 </div>
@@ -1121,7 +1118,7 @@ System.out.println("مرحبا بالعالم من جافا!");
 <p class="example-desc">التركيز على الأسطر المهمة في الكود</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: 5px; ">
+<div class="code-box elbananet-pre" style="border-radius: 5px; ">
 <div class="code-header" style="background-color: #408eb5;">
 <span class="header-text" style="color: #ffffff;">CSS</span>
 </div>
@@ -1144,7 +1141,7 @@ box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 <p class="example-desc">إطار ملون يعطي مظهرًا جذابًا</p>
 </div>
 <!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); border: 2px solid #ff5722;">
+<div class="code-box elbananet-pre dark-theme" style="border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); border: 2px solid #ff5722;">
 <div class="code-header" style="background-color: #1e1e1e;">
 <span class="header-text" style="color: #ff5722;">JavaScript</span>
 </div>
@@ -1267,8 +1264,8 @@ callback && callback();
 document.head.appendChild(script);
 }
 
-getScript("https://host.iscodi.com/assets/js/prism.min.js", function () {
-const blocks = document.querySelectorAll('.iscodi-pre');
+getScript("https://host.elbananet.com/assets/js/prism.min.js", function () {
+const blocks = document.querySelectorAll('.elbananet-pre');
 for (let i = 0; i < blocks.length; i++) {
 const p = blocks[i];
 const header = p.querySelector('.code-header');
@@ -1749,7 +1746,7 @@ const lineRanges = validateLineRanges(highlightLines, totalLines);
 // إنشاء العناصر HTML
 const container = document.createElement('div');
 container.innerHTML = `<!-- صندوق كود مولد بواسطة مولد صناديق الأكواد -->
-<div class="code-box iscodi-pre" style="border-radius: ${borderRadiusVal}px; ${showShadow ? 'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);' : ''} ${hasColoredBorder ? `border: ${borderWidthVal}px solid ${borderColorVal};` : ''}">
+<div class="code-box elbananet-pre" style="border-radius: ${borderRadiusVal}px; ${showShadow ? 'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);' : ''} ${hasColoredBorder ? `border: ${borderWidthVal}px solid ${borderColorVal};` : ''}">
 <div class="code-header" style="background-color: ${headerColorVal};">
 <span class="header-text" style="color: ${headerTextColorVal};">${escapeHtml(header)}</span>
 </div>
