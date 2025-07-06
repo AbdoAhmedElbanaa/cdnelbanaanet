@@ -1,0 +1,115 @@
+{
+  "downloads": {
+    "test_user_uid_1": {
+      "download_001": {
+        "downloadDate": "2024-06-20T10:00:00Z",
+        "name": "دليل البدء السريع للمنتجات الرقمية",
+        "url": "https://www.africau.edu/images/default/sample.pdf"
+      },
+      "download_002": {
+        "downloadDate": "2024-06-25T14:30:00Z",
+        "name": "مقطع فيديو: نصائح للتسويق الرقمي",
+        "url": "http://techslides.com/demos/sample-videos/small.mp4"
+      }
+    },
+    "test_user_uid_2": {
+      "download_003": {
+        "downloadDate": "2024-07-01T09:00:00Z",
+        "name": "كتاب إلكتروني: مقدمة في البرمجة",
+        "url": "https://www.africau.edu/images/default/sample.pdf"
+      }
+    }
+  },
+  "orders": {
+    "order_abc_001": {
+      "adminNotes": "في انتظار تأكيد الدفع من العميل.",
+      "orderDate": "2024-07-01T15:00:00Z",
+      "paymentMethod": "فودافون كاش",
+      "price": 350,
+      "productId": "prod_001",
+      "productName": "كاميرا ويب عالية الدقة",
+      "status": "pending",
+      "userId": "test_user_uid_1"
+    },
+    "order_abc_002": {
+      "adminNotes": "الطلب قيد التجهيز للشحن.",
+      "orderDate": "2024-07-02T10:00:00Z",
+      "paymentMethod": "فيزا",
+      "price": 600,
+      "productId": "prod_002",
+      "productName": "سماعات رأس لاسلكية",
+      "status": "processing",
+      "userId": "test_user_uid_2"
+    },
+    "order_abc_003": {
+      "adminNotes": "تم تسليم المنتج بنجاح.",
+      "orderDate": "2024-07-03T11:45:00Z",
+      "paymentMethod": "فودافون كاش",
+      "price": 200,
+      "productId": "prod_003",
+      "productName": "ماوس ألعاب ضوئي",
+      "status": "completed",
+      "userId": "test_user_uid_1"
+    }
+  },
+  "products": {
+    "prod_001": {
+      "description": "كاميرا ويب 1080p مثالية للمكالمات المرئية والبث المباشر.",
+      "imageUrl": "https://via.placeholder.com/200/FF5733/FFFFFF?text=Webcam",
+      "name": "كاميرا ويب عالية الدقة",
+      "price": 350
+    },
+    "prod_002": {
+      "description": "صوت نقي وباس عميق، مريحة للاستخدام طويل الأمد.",
+      "imageUrl": "https://via.placeholder.com/200/4CAF50/FFFFFF?text=Headphones",
+      "name": "سماعات رأس لاسلكية",
+      "price": 600
+    },
+    "prod_003": {
+      "description": "ماوس احترافي للألعاب مع إضاءة RGB قابلة للتخصيص.",
+      "imageUrl": "https://via.placeholder.com/200/2196F3/FFFFFF?text=Gaming+Mouse",
+      "name": "ماوس ألعاب ضوئي",
+      "price": 200
+    },
+    "prod_004": {
+      "description": "لوحة مفاتيح ميكانيكية بإضاءة خلفية، مثالية للعمل والألعاب.",
+      "imageUrl": "https://via.placeholder.com/200/FFC107/333333?text=Keyboard",
+      "name": "لوحة مفاتيح ميكانيكية",
+      "price": 450
+    }
+  },
+  "users": {
+    "admin_uid_example": {
+      "address": "مقر الإدارة، وسط البلد، القاهرة",
+      "createdAt": "2023-12-01T09:00:00Z",
+      "email": "admin@example.com",
+      "firstName": "مدير",
+      "isAdmin": true,
+      "lastName": "الموقع",
+      "lastUpdatedAt": "2024-07-05T13:00:00Z",
+      "phone": "01200000000",
+      "profilePic": "https://via.placeholder.com/100/FFC107/333333?text=ADM",
+      "registrationMethod": "email_password",
+      "username": "المسؤول العام"
+    },
+    "kE7PjVBbqXWAX3fyHObYTU3iMWH2": {
+      "createdAt": "2025-07-05T09:49:45.429Z",
+      "email": "abdelmgeedelbanaa@gmail.com",
+      "profilePic": "https://lh3.googleusercontent.com/a/ACg8ocK0ApYLeIFhzU5wczAW0T201HvLe9LzVmgvAQn2GFqEiLgbIif5=s96-c",
+      "registrationMethod": "google",
+      "username": "عبدالمجيد البنا"
+    },
+    "test_user_uid_2": {
+      "address": "طريق الإسكندرية الصحراوي، برج العرب، الإسكندرية",
+      "createdAt": "2024-03-01T14:00:00Z",
+      "email": "laila.mahmoud@example.com",
+      "firstName": "ليلى",
+      "lastName": "محمود",
+      "lastUpdatedAt": "2024-07-05T11:00:00Z",
+      "phone": "01198765432",
+      "profilePic": "https://via.placeholder.com/100/2196F3/FFFFFF?text=LM",
+      "registrationMethod": "google",
+      "username": "ليلى محمود"
+    }
+  }
+}
