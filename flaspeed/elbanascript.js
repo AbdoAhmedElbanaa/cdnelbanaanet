@@ -82,20 +82,43 @@ Element.prototype.appendElements = function (_0x3287dc, _0x42a511 = 'append') {
         window.scrollY === 0 ? _0x42e1d7?.['classList']['remove']('show') : _0x42e1d7?.['classList']['add']('show');
     });
 
-    function _0x2bb35c() {
-    getScript('/js/cookienotice.js', function () {
-        function _0x17a5b4(_0x937998) {
-            return typeof CookieList !== 'undefined' && !!CookieList?.[_0x937998];
-        }
+function _0x2bb35c() {
+  const cssUrl = 'https://cdn.elbana.net/flaspeed/cookieconsent.min.css';
+  const cssLink = document.createElement('link');
+  cssLink.rel = 'stylesheet';
+  cssLink.href = cssUrl;
+  cssLink.onload = function () {
+    getScript('https://cdn.elbana.net/flaspeed/cookieconsent.min.js', function () {
+      function _0x17a5b4(_0x937998) {
+        return typeof CookieList !== 'undefined' && !!CookieList?.[_0x937998];
+      }
 
-        window.cookieChoices && cookieChoices.showCookieConsentBar && cookieChoices.showCookieConsentBar(
-            (window.cookieOptions && cookieOptions.msg) || decodeEntities(Msg.euCookieNotice2018),
-            (window.cookieOptions && cookieOptions.close) || decodeEntities(Msg.ok),
-            (window.cookieOptions && cookieOptions.learn) || decodeEntities(Msg.learnMore),
-            (window.cookieOptions && cookieOptions.link) || (_0x17a5b4(0) ? CookieList[0] : 'https://policies.google.com/technologies/cookies')
-        );
+      const msg = (window.cookieOptions && cookieOptions.msg) || decodeEntities(Msg.euCookieNotice2018);
+      const ok  = (window.cookieOptions && cookieOptions.close) || decodeEntities(Msg.ok);
+      const learn = (window.cookieOptions && cookieOptions.learn) || decodeEntities(Msg.learnMore);
+      const link = (window.cookieOptions && cookieOptions.link) ||
+                  (_0x17a5b4(0) ? CookieList[0] : 'https://policies.google.com/technologies/cookies');
+
+      window.cookieconsent.initialise({
+        palette: {
+          popup: { background: "#000" },
+          button: { background: "#f1d600", text: "#000" }
+        },
+        theme: "classic",
+        content: {
+          message: msg,
+          dismiss: ok,
+          link: learn,
+          href: link
+        }
+      });
     }, 'defer');
-};
+  };
+
+  document.head.appendChild(cssLink);
+}
+
+
 
 
     function _0x519b10() {
