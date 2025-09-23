@@ -1,89 +1,10 @@
-/* Thin */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-thin/result.woff2") format("woff2");
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ExtraLight */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-extralight/result.woff2") format("woff2");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Light */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-light/result.woff2") format("woff2");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Regular (الأساسي) */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-regular/result.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Normal */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-normal/result.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Medium */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-medium/result.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* SemiBold */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-semibold/result.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* DemiBold */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-demibold/result.woff2") format("woff2");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Bold */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-bold/result.woff2") format("woff2");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Heavy */
-@font-face {
-  font-family: "MiSansArabic";
-  src: url("./misans-arabic/misansarabic-heavy/result.woff2") format("woff2");
-  font-weight: 950;
-  font-style: normal;
-  font-display: swap;
-}
+@import "./misans-arabic/misansarabic-bold/result.css";
+@import "./misans-arabic/misansarabic-demibold/result.css";
+@import "./misans-arabic/misansarabic-extralight/result.css";
+@import "./misans-arabic/misansarabic-heavy/result.css";
+@import "./misans-arabic/misansarabic-light/result.css";
+@import "./misans-arabic/misansarabic-medium/result.css";
+@import "./misans-arabic/misansarabic-normal/result.css";
+@import "./misans-arabic/misansarabic-regular/result.css";
+@import "./misans-arabic/misansarabic-semibold/result.css";
+@import "./misans-arabic/misansarabic-thin/result.css";
