@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة جلب عناوين الـ Commits</title>
+    <!-- استخدام Tailwind CSS للتصميم السريع والجميل -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* خط مخصص لتحسين الشكل العربي */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f0f4f8;
+        }
+        /* تصميم مخصص للمؤشر الدوار (Loader) */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-3xl">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 transform transition-all hover:shadow-2xl relative">
+            
+            <!-- زر تبديل اللغة -->
+            <div class="absolute top-5 right-5" id="lang-switcher-container">
+                <button id="lang-switcher" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold">EN</button>
+            </div>
+
+            <!-- رأس الصفحة -->
+            <div class="text-center mb-8">
+                <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-gray-800">أداة جلب عناوين الـ Commits</h1>
+                <p id="main-description" class="text-gray-500 mt-2">أدخل رابط صفحة الـ Commits من GitHub لعرض العناوين</p>
+            </div>
+
+            <!-- حقل الإدخال والزر -->
+            <div class="space-y-4 mb-6">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="githubUrl" class="flex-grow p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value="https://github.com/RisingOS-Revived/android_frameworks_base-new/commits/sixteen/">
+                </div>
+                 <!-- حقول تحديد التاريخ -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label id="since-label" for="sinceDate" class="block text-sm font-medium text-gray-700 mb-1">من تاريخ:</label>
+                        <input type="date" id="sinceDate" class="w-full p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label id="until-label" for="untilDate" class="block text-sm font-medium text-gray-700 mb-1">إلى تاريخ:</label>
+                        <input type="date" id="untilDate" class="w-full p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                 <button id="fetchBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all shadow-md hover:shadow-lg">
+                    <span id="btn-text">جلب الـ Commits</span>
+                </button>
+            </div>
+            
+            <!-- منطقة عرض النتائج والرسائل -->
+            <div id="result-container" class="mt-6">
+                <!-- مؤشر التحميل -->
+                <div id="loader" class="hidden mx-auto loader"></div>
+                <!-- رسالة الخطأ -->
+                <div id="error-message" class="hidden text-center p-4 bg-red-100 text-red-700 rounded-lg"></div>
+                <!-- قائمة النتائج -->
+                <div id="results" class="bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-96 overflow-y-auto">
+                    <!-- سيتم إضافة العناوين هنا -->
+                </div>
+            </div>
+
+            <!-- أزرار التنقل بين الصفحات -->
+            <div id="pagination-container" class="hidden flex justify-between items-center mt-4">
+                <button id="nextBtn" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
+                    الأقدم ←
+                </button>
+                <span id="page-info" class="text-gray-600 font-medium"></span>
+                <button id="prevBtn" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
+                    → الأحدث
+                </button>
+            </div>
+
+             <!-- زر نسخ النتائج -->
+            <div id="copy-container" class="text-center mt-6 hidden">
+                <button id="copyBtn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">
+                    نسخ جميع العناوين
+                </button>
+                <p id="copy-feedback" class="text-green-700 mt-2 text-sm h-4"></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // عناصر الواجهة
+        const fetchBtn = document.getElementById('fetchBtn');
+        const githubUrlInput = document.getElementById('githubUrl');
+        const sinceDateInput = document.getElementById('sinceDate');
+        const untilDateInput = document.getElementById('untilDate');
+        const resultsDiv = document.getElementById('results');
+        const loader = document.getElementById('loader');
+        const errorMessageDiv = document.getElementById('error-message');
+        const btnText = document.getElementById('btn-text');
+        const copyContainer = document.getElementById('copy-container');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyFeedback = document.getElementById('copy-feedback');
+        const paginationContainer = document.getElementById('pagination-container');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('page-info');
+        const langSwitcher = document.getElementById('lang-switcher');
+        const langSwitcherContainer = document.getElementById('lang-switcher-container');
+
+        // متغيرات الحالة
+        let currentPage = 1;
+        const perPage = 30;
+        let currentLang = 'ar';
+
+        // قاموس الترجمة
+        const translations = {
+            ar: {
+                title: 'أداة جلب عناوين الـ Commits',
+                description: 'أدخل رابط صفحة الـ Commits من GitHub لعرض العناوين',
+                urlPlaceholder: 'https://github.com/owner/repo/commits/branch',
+                sinceLabel: 'من تاريخ:',
+                untilLabel: 'إلى تاريخ:',
+                fetchButton: 'جلب الـ Commits',
+                fetchingButton: 'جاري الجلب...',
+                olderButton: 'الأقدم ←',
+                newerButton: '→ الأحدث',
+                page: 'صفحة',
+                copyButton: 'نسخ جميع العناوين',
+                copySuccess: 'تم النسخ بنجاح!',
+                copyFail: 'فشل النسخ!',
+                noCommits: 'لم يتم العثور على commits في هذا الفرع أو ضمن النطاق الزمني المحدد.',
+                invalidUrlError: 'الرابط غير صالح. يرجى استخدام رابط بصيغة: github.com/owner/repo/commits/branch',
+                emptyUrlError: 'الرجاء إدخال رابط صالح.',
+                fetchError: 'حدث خطأ: {message}. قد يكون المستودع خاصًا أو أنك تجاوزت حد الطلبات من GitHub.',
+                langButton: 'EN'
+            },
+            en: {
+                title: 'GitHub Commit Fetcher',
+                description: 'Enter a GitHub commits page URL to display the commit titles.',
+                urlPlaceholder: 'https://github.com/owner/repo/commits/branch',
+                sinceLabel: 'From date:',
+                untilLabel: 'To date:',
+                fetchButton: 'Fetch Commits',
+                fetchingButton: 'Fetching...',
+                olderButton: '← Older',
+                newerButton: 'Newer →',
+                page: 'Page',
+                copyButton: 'Copy All Titles',
+                copySuccess: 'Copied successfully!',
+                copyFail: 'Copy failed!',
+                noCommits: 'No commits found in this branch or within the specified date range.',
+                invalidUrlError: 'Invalid URL format. Please use the format: github.com/owner/repo/commits/branch',
+                emptyUrlError: 'Please enter a valid URL.',
+                fetchError: 'An error occurred: {message}. The repository might be private or you have exceeded the GitHub API rate limit.',
+                langButton: 'ع'
+            }
+        };
+        
+        // تطبيق اللغة
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            const isRTL = lang === 'ar';
+
+            document.documentElement.lang = lang;
+            document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+            
+            // تحديث النصوص
+            document.title = t.title;
+            document.getElementById('main-title').textContent = t.title;
+            document.getElementById('main-description').textContent = t.description;
+            githubUrlInput.placeholder = t.urlPlaceholder;
+            document.getElementById('since-label').textContent = t.sinceLabel;
+            document.getElementById('until-label').textContent = t.untilLabel;
+            btnText.textContent = t.fetchButton;
+            nextBtn.textContent = t.olderButton;
+            prevBtn.textContent = t.newerButton;
+            copyBtn.textContent = t.copyButton;
+            langSwitcher.textContent = t.langButton;
+            
+            // تحديث موقع زر اللغة
+            langSwitcherContainer.classList.toggle('right-5', isRTL);
+            langSwitcherContainer.classList.toggle('left-5', !isRTL);
+
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        // تبديل اللغة
+        langSwitcher.addEventListener('click', () => {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(newLang);
+        });
+        
+        // عند تحميل الصفحة، تحقق من اللغة المحفوظة
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLang') || 'ar';
+            setLanguage(savedLang);
+        });
+
+        // جلب البيانات عند الضغط على الزر الرئيسي
+        fetchBtn.addEventListener('click', () => {
+            currentPage = 1; 
+            fetchCommits();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentPage++;
+            fetchCommits();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchCommits();
+            }
+        });
+
+        async function fetchCommits() {
+            const url = githubUrlInput.value.trim();
+            if (!url) {
+                showError('emptyUrlError');
+                return;
+            }
+
+            const match = url.match(/github\.com\/([^/]+)\/([^/]+)\/commits\/([^/]+)/);
+            if (!match) {
+                showError('invalidUrlError');
+                return;
+            }
+
+            const [, owner, repo, branch] = match;
+            let apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?sha=${branch}&page=${currentPage}&per_page=${perPage}`;
+            
+            const sinceDate = sinceDateInput.value;
+            const untilDate = untilDateInput.value;
+
+            if (sinceDate) apiUrl += `&since=${sinceDate}T00:00:00Z`;
+            if (untilDate) apiUrl += `&until=${untilDate}T23:59:59Z`;
+
+            setLoading(true);
+            clearResults();
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                const commits = await response.json();
+                displayCommits(commits);
+            } catch (error) {
+                console.error("Error fetching commits:", error);
+                showError('fetchError', { message: error.message });
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const commitTitles = Array.from(resultsDiv.querySelectorAll('li'))
+                                    .map(li => {
+                                        const title = li.querySelector('.commit-title').textContent;
+                                        const date = li.querySelector('.commit-date').textContent;
+                                        return `${title} - ${date}`;
+                                    })
+                                    .join('\n');
+            
+            navigator.clipboard.writeText(commitTitles).then(() => {
+                copyFeedback.textContent = translations[currentLang].copySuccess;
+                setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                copyFeedback.textContent = translations[currentLang].copyFail;
+                setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
+            });
+        });
+
+        function setLoading(isLoading) {
+            loader.classList.toggle('hidden', !isLoading);
+            fetchBtn.disabled = isLoading;
+            prevBtn.disabled = isLoading;
+            nextBtn.disabled = isLoading;
+            btnText.textContent = isLoading ? translations[currentLang].fetchingButton : translations[currentLang].fetchButton;
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            resultsDiv.classList.add('hidden');
+            errorMessageDiv.classList.add('hidden');
+            errorMessageDiv.textContent = '';
+            copyContainer.classList.add('hidden');
+            paginationContainer.classList.add('hidden');
+        }
+
+        function showError(key, replacements = {}) {
+            clearResults();
+            let message = translations[currentLang][key] || key;
+            for(const placeholder in replacements) {
+                message = message.replace(`{${placeholder}}`, replacements[placeholder]);
+            }
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+        }
+
+        function displayCommits(commits) {
+            resultsDiv.innerHTML = ''; 
+            if (commits.length === 0) {
+                resultsDiv.innerHTML = `<p class="text-gray-500 text-center">${translations[currentLang].noCommits}</p>`;
+                if (currentPage > 1) {
+                    paginationContainer.classList.remove('hidden');
+                }
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-3 text-gray-800';
+
+                commits.forEach(commitData => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col sm:flex-row justify-between sm:items-center gap-2 p-2 rounded-md hover:bg-gray-100';
+
+                    const commitTitle = commitData.commit.message.split('\n')[0];
+                    // إنشاء عنصر رابط بدلاً من نص عادي
+                    const titleLink = document.createElement('a');
+                    titleLink.href = commitData.html_url; // الرابط الخاص بالـ commit
+                    titleLink.target = '_blank'; // لفتح الرابط في نافذة جديدة
+                    titleLink.rel = 'noopener noreferrer';
+                    titleLink.className = 'commit-title font-medium text-blue-600 hover:underline';
+                    titleLink.textContent = commitTitle;
+
+                    const commitDate = new Date(commitData.commit.committer.date);
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'commit-date text-xs text-gray-500 whitespace-nowrap self-end sm:self-center';
+                    
+                    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+                    dateSpan.textContent = commitDate.toLocaleString(locale, { 
+                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    });
+                    
+                    li.appendChild(titleLink);
+                    li.appendChild(dateSpan);
+                    ul.appendChild(li);
+                });
+                resultsDiv.appendChild(ul);
+                copyContainer.classList.remove('hidden');
+                paginationContainer.classList.remove('hidden');
+            }
+            
+            resultsDiv.classList.remove('hidden');
+
+            pageInfo.textContent = `${translations[currentLang].page} ${currentPage}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = commits.length < perPage;
+        }
+    </script>
+</body>
+</html>
+
