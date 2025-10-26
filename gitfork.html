@@ -55,14 +55,13 @@
 </head>
 <body class="bg-gray-100 py-10">
     <div class="container mx-auto p-4 max-w-4xl">
-        
-        <!-- Header -->
+                <!-- Header -->
         <div class="text-center mb-8 relative">
             <div class="absolute top-0 right-0" id="lang-switcher-container">
                 <button id="lang-switcher" class="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-200 transition-colors font-semibold shadow">EN</button>
             </div>
             <h1 id="main-title" class="text-4xl font-bold text-gray-800">أداة Fork لمستودعات GitHub</h1>
-            <p id="main-description" class="text-gray-500 mt-2">قم بعمل Fork لجميع مستودعات مؤسسة ما دفعة واحدة.</p>
+            <p id="main-description" class="text-gray-500 mt-2">قم بعمل Fork لجميع مستودعات مؤسسة أو مستخدم دفعة واحدة.</p>
         </div>
 
         <!-- Step 1: Authentication -->
@@ -88,8 +87,24 @@
                 <h2 id="step2-title" class="text-2xl font-bold text-gray-700">جلب المستودعات</h2>
             </div>
             <p id="step2-desc" class="text-gray-600 mb-3"></p>
+            
+            <!-- NEW: Radio buttons for source type -->
+            <div class="mb-4">
+                <label id="step2-type-label" class="block text-sm font-medium text-gray-700 mb-2"></label>
+                <div class="flex gap-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="repoType" value="org" class="h-5 w-5 text-blue-600" checked>
+                        <span id="step2-type-org" class="mx-2 text-gray-700"></span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="repoType" value="user" class="h-5 w-5 text-blue-600">
+                        <span id="step2-type-user" class="mx-2 text-gray-700"></span>
+                    </label>
+                </div>
+            </div>
+
             <div class="flex flex-col sm:flex-row gap-2">
-                 <input type="text" id="orgUrlInput" class="flex-grow p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://github.com/orgs/RisingOS-Revived/repositories">
+                 <input type="text" id="sourceUrlInput" class="flex-grow p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="">
                  <button id="fetchReposBtn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all">
                     <span id="fetch-repos-btn-text">جلب</span>
                  </button>
@@ -149,7 +164,7 @@
     // --- ELEMENTS ---
     const patInput = document.getElementById('patInput');
     const savePatBtn = document.getElementById('savePatBtn');
-    const orgUrlInput = document.getElementById('orgUrlInput');
+    const sourceUrlInput = document.getElementById('sourceUrlInput'); // Renamed from orgUrlInput
     const fetchReposBtn = document.getElementById('fetchReposBtn');
     const fetchOrgsBtn = document.getElementById('fetchOrgsBtn');
     const targetOrgSelect = document.getElementById('targetOrgSelect');
@@ -169,14 +184,18 @@
     const translations = {
         ar: {
             title: "أداة Fork لمستودعات GitHub",
-            description: "قم بعمل Fork لجميع مستودعات مؤسسة ما دفعة واحدة.",
+            description: "قم بعمل Fork لجميع مستودعات مؤسسة أو مستخدم دفعة واحدة.",
             step1Title: "المصادقة",
-            step1Desc: `للوصول لبياناتك وعمل Fork، تحتاج الأداة لصلاحيات. يرجى إنشاء <a href="https://github.com/settings/tokens/new?scopes=public_repo,read:org" target="_blank" class="text-blue-600 hover:underline">Personal Access Token (Classic)</a> مع تفعيل صلاحيات <code>public_repo</code> و <code>read:org</code> ثم قم بلصقه أدناه.`,
+            step1Desc: `للوصول لبياناتك وعمل Fork، تحتاج الأداة لصلاحيات. يرجى إنشاء <a href="https://github.com/settings/tokens/new?scopes=public_repo,read:org" target="_blank" class="text-blue-600 hover:underline">Personal Access Token (Classic)</a> مع تفعيل صلاحيات <code>public_repo</code> (لعمل Fork) و <code>read:org</code> (لقراءة المؤسسات) ثم قم بلصقه أدناه.`,
             savePatBtn: "حفظ التوكن",
             patSaved: "تم حفظ التوكن بنجاح!",
             patMissing: "الرجاء إدخال التوكن أولاً.",
             step2Title: "جلب المستودعات",
-            step2Desc: "أدخل رابط صفحة المستودعات الخاصة بالمؤسسة (e.g., https://github.com/orgs/YourOrg/repositories).",
+            step2Desc: "اختر نوع المصدر (مؤسسة أو مستخدم) وأدخل الرابط الخاص بصفحة المستودعات.",
+            step2InputPlaceholder: "https://github.com/YourNameOrOrg",
+            step2TypeLabel: "نوع المصدر:",
+            step2TypeOrg: "مؤسسة",
+            step2TypeUser: "مستخدم",
             fetchReposBtn: "جلب",
             fetchingRepos: "جاري جلب المستودعات...",
             repoListTitle: "قائمة المستودعات:",
@@ -197,19 +216,23 @@
             forkFail: "فشل: {repo} - {error}",
             forkCancelled: "تم إلغاء العملية من قبل المستخدم.",
             forkComplete: "اكتملت العملية!",
-            invalidOrgUrl: "رابط المؤسسة غير صالح.",
+            invalidUrl: "الرابط غير صالح. أدخل رابط مستخدم أو مؤسسة صحيح (مثل: https://github.com/username).",
             langButton: "EN"
         },
         en: {
             title: "GitHub Bulk Fork Tool",
-            description: "Fork all repositories from an organization at once.",
+            description: "Fork all repositories from an organization or user at once.",
             step1Title: "Authentication",
-            step1Desc: `To access your data and perform forks, the tool needs permissions. Please create a <a href="https://github.com/settings/tokens/new?scopes=public_repo,read:org" target="_blank" class="text-blue-600 hover:underline">Personal Access Token (Classic)</a> with <code>public_repo</code> and <code>read:org</code> scopes enabled, then paste it below.`,
+            step1Desc: `To access your data and perform forks, the tool needs permissions. Please create a <a href="https://github.com/settings/tokens/new?scopes=public_repo,read:org" target="_blank" class="text-blue-600 hover:underline">Personal Access Token (Classic)</a> with <code>public_repo</code> (for forking) and <code>read:org</code> (for reading orgs) scopes enabled, then paste it below.`,
             savePatBtn: "Save Token",
             patSaved: "Token saved successfully!",
             patMissing: "Please enter your token first.",
             step2Title: "Fetch Repositories",
-            step2Desc: "Enter the organization's repositories page URL (e.g., https://github.com/orgs/YourOrg/repositories).",
+            step2Desc: "Select the source type (Organization or User) and enter the URL for their repositories page.",
+            step2InputPlaceholder: "https://github.com/YourNameOrOrg",
+            step2TypeLabel: "Source Type:",
+            step2TypeOrg: "Organization",
+            step2TypeUser: "User",
             fetchReposBtn: "Fetch",
             fetchingRepos: "Fetching repositories...",
             repoListTitle: "Repository List:",
@@ -230,11 +253,11 @@
             forkFail: "Fail: {repo} - {error}",
             forkCancelled: "Operation cancelled by user.",
             forkComplete: "Forking process completed!",
-            invalidOrgUrl: "Invalid organization URL.",
+            invalidUrl: "Invalid URL. Please enter a valid user or organization URL (e.g., https://github.com/username).",
             langButton: "ع"
         }
     };
-    
+
     // --- FUNCTIONS ---
     function setLanguage(lang) {
         currentLang = lang;
@@ -252,6 +275,10 @@
         document.getElementById('save-pat-btn-text').textContent = t.savePatBtn;
         document.getElementById('step2-title').textContent = t.step2Title;
         document.getElementById('step2-desc').textContent = t.step2Desc;
+        document.getElementById('sourceUrlInput').placeholder = t.step2InputPlaceholder;
+        document.getElementById('step2-type-label').textContent = t.step2TypeLabel;
+        document.getElementById('step2-type-org').textContent = t.step2TypeOrg;
+        document.getElementById('step2-type-user').textContent = t.step2TypeUser;
         document.getElementById('fetch-repos-btn-text').textContent = t.fetchReposBtn;
         document.getElementById('repo-list-title').textContent = t.repoListTitle;
         document.getElementById('step3-title').textContent = t.step3Title;
@@ -277,7 +304,7 @@
     function setLoading(isLoading) {
         loader.classList.toggle('hidden', !isLoading);
     }
-    
+
     function showError(message) {
         errorMessage.textContent = message;
         errorMessage.classList.remove('hidden');
@@ -339,14 +366,21 @@
 
     fetchReposBtn.addEventListener('click', async () => {
         clearError();
-        const orgUrl = orgUrlInput.value.trim();
-        const match = orgUrl.match(/github\.com\/(?:orgs\/)?([^/]+)/);
-        if (!match) {
-            showError(translations[currentLang].invalidOrgUrl);
+        
+        const url = sourceUrlInput.value.trim();
+        // Updated regex to capture name from org or user URL
+        const match = url.match(/github\.com\/(?:orgs\/)?([^/?]+)/);
+        
+        if (!match || match[1] === 'orgs') {
+            showError(translations[currentLang].invalidUrl);
             return;
         }
-        const org = match[1];
-        const apiUrl = `https://api.github.com/orgs/${org}/repos?type=public&per_page=100`;
+        
+        const name = match[1];
+        const repoType = document.querySelector('input[name="repoType"]:checked').value;
+        const apiEndpoint = (repoType === 'org') ? 'orgs' : 'users';
+        
+        const apiUrl = `https://api.github.com/${apiEndpoint}/${name}/repos?type=public&per_page=100`;
 
         setLoading(true);
         fetchReposBtn.disabled = true;
@@ -438,7 +472,7 @@
         stopForkBtn.classList.add('hidden');
         forkAllBtn.classList.remove('hidden');
     });
-    
+
     stopForkBtn.addEventListener('click', () => {
         isForkingCancelled = true;
         document.getElementById('stop-fork-btn-text').textContent = translations[currentLang].stopping;
@@ -449,7 +483,7 @@
         const newLang = currentLang === 'ar' ? 'en' : 'ar';
         setLanguage(newLang);
     });
-        
+    
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem('preferredLang') || 'ar';
@@ -459,4 +493,3 @@
     </script>
 </body>
 </html>
-
