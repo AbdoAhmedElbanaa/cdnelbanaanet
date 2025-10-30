@@ -32,7 +32,7 @@
 
     <div class="container mx-auto p-4 md:p-8 max-w-3xl">
         <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 transform transition-all hover:shadow-2xl relative">
-            
+
             <!-- زر تبديل اللغة -->
             <div class="absolute top-5 right-5" id="lang-switcher-container">
                 <button id="lang-switcher" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold">EN</button>
@@ -49,7 +49,7 @@
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input type="text" id="githubUrl" class="flex-grow p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value="https://github.com/RisingOS-Revived/android_frameworks_base-new/commits/sixteen/">
                 </div>
-                 <!-- حقول تحديد التاريخ -->
+                <!-- حقول تحديد التاريخ -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label id="since-label" for="sinceDate" class="block text-sm font-medium text-gray-700 mb-1">من تاريخ:</label>
@@ -60,11 +60,11 @@
                         <input type="date" id="untilDate" class="w-full p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
-                 <button id="fetchBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all shadow-md hover:shadow-lg">
+                <button id="fetchBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all shadow-md hover:shadow-lg">
                     <span id="btn-text">جلب الـ Commits</span>
                 </button>
             </div>
-            
+
             <!-- منطقة عرض النتائج والرسائل -->
             <div id="result-container" class="mt-6">
                 <!-- مؤشر التحميل -->
@@ -88,11 +88,16 @@
                 </button>
             </div>
 
-             <!-- زر نسخ النتائج -->
-            <div id="copy-container" class="text-center mt-6 hidden">
-                <button id="copyBtn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">
-                    نسخ جميع العناوين
-                </button>
+             <!-- أزرار النسخ والتحميل -->
+            <div id="actions-container" class="text-center mt-6 hidden">
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                     <button id="copyBtn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">
+                        نسخ الـ Changelog
+                    </button>
+                    <button id="downloadBtn" class="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all">
+                        تحميل كـ .txt
+                    </button>
+                </div>
                 <p id="copy-feedback" class="text-green-700 mt-2 text-sm h-4"></p>
             </div>
 
@@ -109,8 +114,9 @@
         const loader = document.getElementById('loader');
         const errorMessageDiv = document.getElementById('error-message');
         const btnText = document.getElementById('btn-text');
-        const copyContainer = document.getElementById('copy-container');
+        const actionsContainer = document.getElementById('actions-container');
         const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
         const copyFeedback = document.getElementById('copy-feedback');
         const paginationContainer = document.getElementById('pagination-container');
         const prevBtn = document.getElementById('prevBtn');
@@ -121,8 +127,9 @@
 
         // متغيرات الحالة
         let currentPage = 1;
-        const perPage = 30;
+        const perPage = 30; // GitHub API default and max for commits is 30 per page (up to 100 with per_page, but let's stick to 30)
         let currentLang = 'ar';
+        let lastGroupedCommits = {}; // لتخزين الكوميتات المجمعة للنسخ والتحميل
 
         // قاموس الترجمة
         const translations = {
@@ -137,7 +144,9 @@
                 olderButton: 'الأقدم ←',
                 newerButton: '→ الأحدث',
                 page: 'صفحة',
-                copyButton: 'نسخ جميع العناوين',
+                copyButton: 'نسخ الـ Changelog',
+                downloadButton: 'تحميل كـ .txt',
+                changelogHeader: 'سجل التغييرات',
                 copySuccess: 'تم النسخ بنجاح!',
                 copyFail: 'فشل النسخ!',
                 noCommits: 'لم يتم العثور على commits في هذا الفرع أو ضمن النطاق الزمني المحدد.',
@@ -157,7 +166,9 @@
                 olderButton: '← Older',
                 newerButton: 'Newer →',
                 page: 'Page',
-                copyButton: 'Copy All Titles',
+                copyButton: 'Copy Changelog',
+                downloadButton: 'Download as .txt',
+                changelogHeader: 'Changelog',
                 copySuccess: 'Copied successfully!',
                 copyFail: 'Copy failed!',
                 noCommits: 'No commits found in this branch or within the specified date range.',
@@ -167,7 +178,7 @@
                 langButton: 'ع'
             }
         };
-        
+
         // تطبيق اللغة
         function setLanguage(lang) {
             currentLang = lang;
@@ -176,7 +187,7 @@
 
             document.documentElement.lang = lang;
             document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-            
+
             // تحديث النصوص
             document.title = t.title;
             document.getElementById('main-title').textContent = t.title;
@@ -188,8 +199,9 @@
             nextBtn.textContent = t.olderButton;
             prevBtn.textContent = t.newerButton;
             copyBtn.textContent = t.copyButton;
+            downloadBtn.textContent = t.downloadButton;
             langSwitcher.textContent = t.langButton;
-            
+
             // تحديث موقع زر اللغة
             langSwitcherContainer.classList.toggle('right-5', isRTL);
             langSwitcherContainer.classList.toggle('left-5', !isRTL);
@@ -202,7 +214,7 @@
             const newLang = currentLang === 'ar' ? 'en' : 'ar';
             setLanguage(newLang);
         });
-        
+
         // عند تحميل الصفحة، تحقق من اللغة المحفوظة
         document.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('preferredLang') || 'ar';
@@ -211,7 +223,7 @@
 
         // جلب البيانات عند الضغط على الزر الرئيسي
         fetchBtn.addEventListener('click', () => {
-            currentPage = 1; 
+            currentPage = 1;
             fetchCommits();
         });
 
@@ -239,10 +251,12 @@
                 showError('invalidUrlError');
                 return;
             }
-
-            const [, owner, repo, branch] = match;
-            let apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?sha=${branch}&page=${currentPage}&per_page=${perPage}`;
             
+            // إزالة / من نهاية الفرع إذا وجدت
+            const [, owner, repo, branch] = match.map(item => item.endsWith('/') ? item.slice(0, -1) : item);
+
+            let apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?sha=${branch}&page=${currentPage}&per_page=${perPage}`;
+
             const sinceDate = sinceDateInput.value;
             const untilDate = untilDateInput.value;
 
@@ -266,17 +280,32 @@
                 setLoading(false);
             }
         }
-        
+
+        // --- دالة جديدة لإنشاء نص الـ Changelog ---
+        function generateChangelogText() {
+            const t = translations[currentLang];
+            const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+            let changelogText = `${t.changelogHeader}\n====================\n\n`;
+
+            // المرور على التواريخ بالترتيب
+            for (const dateKey of Object.keys(lastGroupedCommits)) {
+                changelogText += `[ ${dateKey} ]\n`; // تنسيق التاريخ كعنوان
+                
+                // إضافة الكوميتات تحته
+                for (const commitData of lastGroupedCommits[dateKey]) {
+                    const commitTitle = commitData.commit.message.split('\n')[0];
+                    changelogText += `- ${commitTitle}\n`;
+                }
+                changelogText += "\n"; // سطر فاضي بين الأيام
+            }
+            return changelogText;
+        }
+
+        // --- زر النسخ المحدث ---
         copyBtn.addEventListener('click', () => {
-            const commitTitles = Array.from(resultsDiv.querySelectorAll('li'))
-                                    .map(li => {
-                                        const title = li.querySelector('.commit-title').textContent;
-                                        const date = li.querySelector('.commit-date').textContent;
-                                        return `${title} - ${date}`;
-                                    })
-                                    .join('\n');
+            const changelogText = generateChangelogText();
             
-            navigator.clipboard.writeText(commitTitles).then(() => {
+            navigator.clipboard.writeText(changelogText).then(() => {
                 copyFeedback.textContent = translations[currentLang].copySuccess;
                 setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
             }).catch(err => {
@@ -285,6 +314,31 @@
                 setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
             });
         });
+
+        // --- زر التحميل الجديد ---
+        downloadBtn.addEventListener('click', () => {
+            const changelogText = generateChangelogText();
+            const blob = new Blob([changelogText], { type: 'text/plain;charset=utf-8' });
+
+            // استخراج اسم المستودع للملف
+            let repoName = 'changelog';
+            const match = githubUrlInput.value.match(/github\.com\/([^/]+)\/([^/]+)/);
+            if (match && match[2]) repoName = match[2];
+
+            const since = sinceDateInput.value || 'start';
+            const until = untilDateInput.value || 'today';
+            const filename = `${repoName}_${since}_to_${until}.txt`;
+
+            // إنشاء رابط تحميل وهمي
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href); // تحرير الذاكرة
+        });
+
 
         function setLoading(isLoading) {
             loader.classList.toggle('hidden', !isLoading);
@@ -299,8 +353,9 @@
             resultsDiv.classList.add('hidden');
             errorMessageDiv.classList.add('hidden');
             errorMessageDiv.textContent = '';
-            copyContainer.classList.add('hidden');
+            actionsContainer.classList.add('hidden');
             paginationContainer.classList.add('hidden');
+            lastGroupedCommits = {}; // مسح البيانات القديمة
         }
 
         function showError(key, replacements = {}) {
@@ -313,50 +368,78 @@
             errorMessageDiv.classList.remove('hidden');
         }
 
+        // --- دالة العرض المحدثة بنظام Changelog ---
         function displayCommits(commits) {
             resultsDiv.innerHTML = ''; 
+            lastGroupedCommits = {}; // إعادة تعيين
+            const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+
             if (commits.length === 0) {
                 resultsDiv.innerHTML = `<p class="text-gray-500 text-center">${translations[currentLang].noCommits}</p>`;
                 if (currentPage > 1) {
                     paginationContainer.classList.remove('hidden');
                 }
             } else {
-                const ul = document.createElement('ul');
-                ul.className = 'space-y-3 text-gray-800';
-
+                
+                // 1. تجميع الكوميتات حسب التاريخ
                 commits.forEach(commitData => {
-                    const li = document.createElement('li');
-                    li.className = 'flex flex-col sm:flex-row justify-between sm:items-center gap-2 p-2 rounded-md hover:bg-gray-100';
-
-                    const commitTitle = commitData.commit.message.split('\n')[0];
-                    // إنشاء عنصر رابط بدلاً من نص عادي
-                    const titleLink = document.createElement('a');
-                    titleLink.href = commitData.html_url; // الرابط الخاص بالـ commit
-                    titleLink.target = '_blank'; // لفتح الرابط في نافذة جديدة
-                    titleLink.rel = 'noopener noreferrer';
-                    titleLink.className = 'commit-title font-medium text-blue-600 hover:underline';
-                    titleLink.textContent = commitTitle;
-
                     const commitDate = new Date(commitData.commit.committer.date);
-                    const dateSpan = document.createElement('span');
-                    dateSpan.className = 'commit-date text-xs text-gray-500 whitespace-nowrap self-end sm:self-center';
-                    
-                    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-                    dateSpan.textContent = commitDate.toLocaleString(locale, { 
-                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    const dateKey = commitDate.toLocaleDateString(locale, { 
+                        year: 'numeric', month: 'long', day: 'numeric' 
                     });
-                    
-                    li.appendChild(titleLink);
-                    li.appendChild(dateSpan);
-                    ul.appendChild(li);
+
+                    if (!lastGroupedCommits[dateKey]) {
+                        lastGroupedCommits[dateKey] = [];
+                    }
+                    lastGroupedCommits[dateKey].push(commitData);
                 });
-                resultsDiv.appendChild(ul);
-                copyContainer.classList.remove('hidden');
+
+                // 2. عرض الكوميتات المجمعة
+                for (const dateKey of Object.keys(lastGroupedCommits)) {
+                    // إضافة عنوان التاريخ
+                    const dateHeader = document.createElement('h3');
+                    dateHeader.className = 'text-lg font-bold text-gray-800 mt-4 mb-2 pb-1 border-b border-gray-200 first:mt-0';
+                    dateHeader.textContent = dateKey;
+                    resultsDiv.appendChild(dateHeader);
+
+                    // إضافة قائمة الكوميتات لهذا التاريخ
+                    const ul = document.createElement('ul');
+                    ul.className = 'space-y-3 text-gray-800 mb-4';
+                    
+                    lastGroupedCommits[dateKey].forEach(commitData => {
+                        const li = document.createElement('li');
+                        li.className = 'flex flex-col sm:flex-row justify-between sm:items-center gap-2 p-2 rounded-md hover:bg-gray-100';
+
+                        const commitTitle = commitData.commit.message.split('\n')[0];
+                        const titleLink = document.createElement('a');
+                        titleLink.href = commitData.html_url;
+                        titleLink.target = '_blank';
+                        titleLink.rel = 'noopener noreferrer';
+                        titleLink.className = 'commit-title font-medium text-blue-600 hover:underline flex-1';
+                        titleLink.textContent = commitTitle;
+
+                        // عرض الوقت فقط بجانب الكوميت
+                        const commitDate = new Date(commitData.commit.committer.date);
+                        const timeSpan = document.createElement('span');
+                        timeSpan.className = 'commit-date text-xs text-gray-500 whitespace-nowrap self-end sm:self-center';
+                        timeSpan.textContent = commitDate.toLocaleString(locale, { 
+                            hour: '2-digit', minute: '2-digit' 
+                        });
+
+                        li.appendChild(titleLink);
+                        li.appendChild(timeSpan);
+                        ul.appendChild(li);
+                    });
+                    resultsDiv.appendChild(ul);
+                }
+                
+                actionsContainer.classList.remove('hidden');
                 paginationContainer.classList.remove('hidden');
             }
-            
+
             resultsDiv.classList.remove('hidden');
 
+            // تحديث معلومات الصفحة
             pageInfo.textContent = `${translations[currentLang].page} ${currentPage}`;
             prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = commits.length < perPage;
@@ -364,4 +447,3 @@
     </script>
 </body>
 </html>
-
