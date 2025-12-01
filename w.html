@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Weather - Smart Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Tajawal', sans-serif; transition: background-image 0.8s ease-in-out; }
+        
+        /* Core Animations */
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.3); } 50% { text-shadow: 0 0 25px rgba(255,255,255,0.6); } }
+
+        .anim-float { animation: float 5s ease-in-out infinite; }
+        .anim-fade { animation: fade-in 0.5s ease-out forwards; }
+        .anim-glow { animation: glow 3s infinite; }
+
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        /* Glass Effect */
+        .glass-container {
+            background: rgba(18, 18, 25, 0.65);
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.01);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+        }
+
+        /* Active Day Styling */
+        .day-active {
+            background: rgba(59, 130, 246, 0.25) !important;
+            border: 1px solid rgba(147, 197, 253, 0.5) !important;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Expand Animation */
+        #more-days {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.7s ease, opacity 0.5s ease;
+            opacity: 0;
+        }
+        #more-days.open { max-height: 1200px; opacity: 1; }
+    </style>
+</head>
+
+<body id="dynamic-bg" class="min-h-screen bg-cover bg-center flex items-center justify-center p-4 bg-gray-900">
+
+    <div class="absolute inset-0 bg-black/30 z-0"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 z-0"></div>
+
+    <div class="glass-container w-full max-w-[500px] rounded-[32px] overflow-hidden text-white relative z-10">
+        
+        <div id="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-900/90 backdrop-blur-xl transition-opacity duration-500">
+            <div class="w-12 h-12 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <p id="loading-text" class="mt-4 text-sm font-light text-blue-200 animate-pulse">تحليل بيانات الطقس...</p>
+        </div>
+
+        <div id="weather-content" class="opacity-0 transition-opacity duration-700 h-full max-h-[90vh] overflow-y-auto custom-scroll">
+            
+            <div class="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/5 px-6 py-4 flex justify-between items-center">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-red-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                        <h2 id="location-text" class="text-lg font-bold tracking-wide text-white drop-shadow-md leading-tight">--</h2>
+                    </div>
+                    <p id="view-mode" class="text-[10px] text-blue-300 mt-1 mr-6 tracking-wide">مباشر</p>
+                </div>
+                <button onclick="getLocation()" class="group bg-white/5 hover:bg-white/10 p-2 rounded-full border border-white/10 transition-colors">
+                    <svg class="w-5 h-5 text-blue-400 group-hover:rotate-180 transition-transform duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            </div>
+
+            <div id="hero-section" class="flex flex-col items-center pt-8 pb-6 relative transition-all duration-500">
+                <div class="text-center mb-4">
+                    <div id="main-title" class="text-6xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-blue-200 anim-glow" style="font-feature-settings: 'tnum' on;">--:--</div>
+                    <div id="sub-title" class="text-sm font-medium text-blue-100/80 mt-1 px-4 py-1 rounded-full bg-white/5 border border-white/5 inline-block backdrop-blur-sm">--</div>
+                </div>
+
+                <div class="w-36 h-36 relative z-10 anim-float filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
+                    <img id="main-icon-img" src="" alt="Weather" class="w-full h-full object-contain">
+                </div>
+                
+                <div class="flex items-baseline justify-center gap-2 mt-[-15px] z-20">
+                    <h1 id="current-temp" class="text-8xl font-bold tracking-tighter text-white drop-shadow-lg leading-none">--°</h1>
+                    <span id="min-temp-display" class="text-3xl text-white/50 font-light tracking-wide">--°</span>
+                </div>
+                
+                <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 mt-2 backdrop-blur-sm shadow-sm">
+                    <span id="weather-desc" class="text-sm font-medium text-blue-50">--</span>
+                </div>
+            </div>
+
+            <div class="px-5 pb-6">
+                <h3 class="text-[10px] font-bold text-white/40 mb-3 uppercase tracking-widest px-1">التحليل البيئي</h3>
+                <div class="grid grid-cols-3 gap-2.5">
+                    
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/thermometer.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الشعور</span>
+                        <span id="app-temp-val" class="text-base font-bold text-white">--°</span>
+                        <span id="app-temp-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/humidity.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الرطوبة</span>
+                        <span id="humidity-val" class="text-base font-bold text-white">--%</span>
+                        <span id="humidity-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/wind.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الرياح</span>
+                        <span id="wind-val" class="text-base font-bold text-white">--</span>
+                        <span id="wind-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/barometer.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الضغط</span>
+                        <span id="press-val" class="text-base font-bold text-white">--</span>
+                        <span id="press-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/overcast.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الغيوم</span>
+                        <span id="cloud-val" class="text-base font-bold text-white">--%</span>
+                        <span id="cloud-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/uv-index.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">UV</span>
+                        <span id="uv-val" class="text-base font-bold text-white">--</span>
+                        <span id="uv-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/mist.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الرؤية</span>
+                        <span id="vis-val" class="text-base font-bold text-white">--</span>
+                        <span id="vis-status" class="text-[10px] text-blue-200 mt-0.5">--</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/sunrise.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الشروق</span>
+                        <span id="sunrise-val" class="text-base font-bold text-white">--</span>
+                        <span class="text-[10px] text-blue-200 mt-0.5">صباحاً</span>
+                    </div>
+
+                    <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
+                        <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/sunset.svg" class="w-6 h-6 mb-1 opacity-90">
+                        <span class="text-[9px] text-gray-400">الغروب</span>
+                        <span id="sunset-val" class="text-base font-bold text-white">--</span>
+                        <span class="text-[10px] text-blue-200 mt-0.5">مساءً</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-black/30 px-5 py-6 rounded-t-[32px] border-t border-white/5 backdrop-blur-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-bold text-white flex items-center gap-2 opacity-90">
+                        <svg class="w-5 h-5" width="36" height="36" viewBox="0 0 36 36"><path fill="#e0e7ec" d="M36 32a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4z"/><path fill="#66757f" d="M23.657 19.12H17.87c-1.22 0-1.673-.791-1.673-1.56c0-.791.429-1.56 1.673-1.56h8.184c1.154 0 1.628 1.04 1.628 1.628c0 .452-.249.927-.52 1.492l-5.607 11.395c-.633 1.266-.882 1.717-1.899 1.717c-1.244 0-1.877-.949-1.877-1.605c0-.271.068-.474.226-.791zM10.889 19h-.5c-1.085 0-1.538-.731-1.538-1.5c0-.792.565-1.5 1.538-1.5h2.015c.972 0 1.515.701 1.515 1.605V30.47c0 1.13-.558 1.763-1.53 1.763s-1.5-.633-1.5-1.763z"/><path fill="#dd2f45" d="M34 0h-3.277c.172.295.277.634.277 1a2 2 0 0 1-4 0c0-.366.105-.705.277-1H8.723C8.895.295 9 .634 9 1a2 2 0 0 1-4 0c0-.366.105-.705.277-1H2a2 2 0 0 0-2 2v11h36V2a2 2 0 0 0-2-2"/><path fill="#f5f8fa" d="M13.182 4.604c0-.5.32-.78.75-.78c.429 0 .749.28.749.78v5.017h1.779c.51 0 .73.38.72.72a.7.7 0 0 1-.72.659h-2.498c-.49 0-.78-.319-.78-.819zm-6.91 0c0-.5.32-.78.75-.78s.75.28.75.78v3.488c0 .92.589 1.649 1.539 1.649c.909 0 1.529-.769 1.529-1.649V4.604c0-.5.319-.78.749-.78s.75.28.75.78v3.568c0 1.679-1.38 2.949-3.028 2.949c-1.669 0-3.039-1.25-3.039-2.949zM5.49 9.001c0 1.679-1.069 2.119-1.979 2.119c-.689 0-1.839-.27-1.839-1.14c0-.269.23-.609.56-.609c.4 0 .75.37 1.199.37c.56 0 .56-.52.56-.84V4.604c0-.5.32-.78.749-.78c.431 0 .75.28.75.78z"/><path fill="#f4abba" d="M32 10a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 0a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0"/></svg>
+                        اضغط على اليوم لعرض التفاصيل
+                    </h3>
+                </div>
+                
+                <div id="forecast-list" class="flex flex-col gap-2.5"></div>
+                <div id="more-days" class="flex flex-col gap-2.5 mt-2.5"></div>
+
+                <button id="toggle-btn" class="w-full mt-4 py-3 text-xs font-bold text-white/70 bg-white/5 hover:bg-white/10 hover:text-white rounded-xl transition-all border border-white/5 flex items-center justify-center gap-2 group">
+                    <span>عرض باقي الأسبوع</span>
+                    <svg class="w-3 h-3 transition-transform duration-300 group-hover:translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global State ---
+        let GLOBAL_DATA = null;
+        let CURRENT_VIEW_INDEX = 0; // 0 = Today
+        const ICON_BASE = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
+
+        // --- Backgrounds ---
+        const bgs = {
+            clear: "url('https://images.unsplash.com/photo-1601297183305-6df142704ea2?q=80&w=2574&auto=format&fit=crop')",
+            cloudy: "url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=2851&auto=format&fit=crop')",
+            rain: "url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2574&auto=format&fit=crop')",
+            snow: "url('https://images.unsplash.com/photo-1491002052546-bf38f186af56?q=80&w=2708&auto=format&fit=crop')",
+            thunder: "url('https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?q=80&w=2671&auto=format&fit=crop')",
+            fog: "url('https://images.unsplash.com/photo-1487621167305-5d248087c724?q=80&w=2664&auto=format&fit=crop')"
+        };
+
+        // --- Helpers ---
+        function getIconSrc(code, isDay = 1) {
+            const suffix = isDay ? 'day' : 'night';
+            if (code === 0) return { src: `${ICON_BASE}clear-${suffix}.svg`, bg: bgs.clear };
+            if (code <= 3) return { src: `${ICON_BASE}partly-cloudy-${suffix}.svg`, bg: bgs.cloudy };
+            if (code <= 48) return { src: `${ICON_BASE}fog-${suffix}.svg`, bg: bgs.fog };
+            if (code <= 67) return { src: `${ICON_BASE}rain.svg`, bg: bgs.rain };
+            if (code <= 77) return { src: `${ICON_BASE}snow.svg`, bg: bgs.snow };
+            if (code <= 82) return { src: `${ICON_BASE}rain.svg`, bg: bgs.rain };
+            if (code >= 95) return { src: `${ICON_BASE}thunderstorm.svg`, bg: bgs.thunder };
+            return { src: `${ICON_BASE}not-available.svg`, bg: bgs.clear };
+        }
+
+        function getWeatherDesc(code) {
+            const codes = { 0:'صافي',1:'غائم قليلاً',2:'غائم جزئياً',3:'غائم',45:'ضباب',51:'رذاذ',61:'مطر خفيف',63:'مطر',65:'مطر غزير',71:'ثلوج',95:'رعد' };
+            return codes[code] || 'متقلب';
+        }
+
+        // --- INSIGHT LOGIC (تحليل البيانات) ---
+        function getHumStatus(val) {
+            if(val < 30) return 'جاف';
+            if(val >= 30 && val <= 60) return 'مريح';
+            if(val > 60 && val <= 80) return 'رطب';
+            return 'خانق';
+        }
+
+        function getWindStatus(val) {
+            if(val < 10) return 'هادئة';
+            if(val >= 10 && val <= 30) return 'نسيم';
+            if(val > 30 && val <= 50) return 'نشطة';
+            return 'عاصفة';
+        }
+
+        function getUvStatus(val) {
+            if(val < 3) return 'آمن';
+            if(val >= 3 && val <= 6) return 'متوسط';
+            if(val > 6 && val <= 8) return 'مرتفع';
+            return 'خطر';
+        }
+
+        function getVisStatus(valKm) {
+            if(valKm > 10) return 'ممتازة';
+            if(valKm > 5) return 'جيدة';
+            if(valKm > 2) return 'متوسطة';
+            return 'ضبابية';
+        }
+
+        function getPressStatus(val) {
+            if(val < 1000) return 'منخفض';
+            if(val >= 1000 && val <= 1020) return 'مستقر';
+            return 'مرتفع';
+        }
+
+        function getCloudStatus(val) {
+            if(val < 10) return 'سماء صافية';
+            if(val < 50) return 'متناثرة';
+            return 'ملبدة';
+        }
+
+        function getAppTempStatus(temp, appTemp) {
+            const diff = appTemp - temp;
+            if(diff > 2) return 'أحر من الواقع';
+            if(diff < -2) return 'أبرد من الواقع';
+            return 'مطابق للواقع';
+        }
+
+        // --- Clock ---
+        function updateClock() {
+            if(CURRENT_VIEW_INDEX !== 0) return; 
+            const now = new Date();
+            document.getElementById('main-title').innerText = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('sub-title').innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+        }
+        setInterval(updateClock, 1000);
+
+        // --- Init ---
+        function getLocation() {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('weather-content');
+            loading.style.display = 'flex'; loading.style.opacity = '1'; content.style.opacity = '0';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(fetchData, () => {
+                    document.getElementById('loading-text').innerText = "الرجاء تفعيل GPS";
+                    alert("يرجى السماح بالوصول للموقع");
+                });
+            } else { alert("Not Supported"); }
+        }
+
+        async function fetchData(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            try {
+                // Location
+                const locRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`);
+                const locData = await locRes.json();
+                let locationString = locData.city || "موقعك";
+                if (locData.locality && locData.locality !== locData.city) locationString = `${locData.locality}، ${locData.city}`;
+                else if (locData.principalSubdivision) locationString = `${locData.city}، ${locData.principalSubdivision}`;
+                
+                document.getElementById('location-text').innerText = locationString;
+
+                // Weather
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,apparent_temperature,uv_index,visibility,surface_pressure,cloudcover,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+                const res = await fetch(url);
+                GLOBAL_DATA = await res.json();
+
+                renderView(0); 
+                renderForecastList();
+
+                const loader = document.getElementById('loading');
+                const content = document.getElementById('weather-content');
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; content.style.opacity = '1'; }, 500);
+
+            } catch (e) { console.error(e); }
+        }
+
+        // --- Rendering ---
+        function renderView(dayIndex) {
+            CURRENT_VIEW_INDEX = dayIndex;
+            const data = GLOBAL_DATA;
+            const daily = data.daily;
+            const hourly = data.hourly;
+            const current = data.current_weather;
+
+            renderForecastList();
+
+            let dispTemp, dispCode, isDay = 1, hIdx, minTemp;
+            minTemp = Math.round(daily.temperature_2m_min[dayIndex]);
+
+            if (dayIndex === 0) {
+                // TODAY
+                dispTemp = current.temperature;
+                dispCode = current.weathercode;
+                isDay = current.is_day;
+                hIdx = new Date().getHours();
+                document.getElementById('view-mode').innerText = "مباشر";
+                updateClock();
+            } else {
+                // FUTURE
+                dispTemp = daily.temperature_2m_max[dayIndex];
+                dispCode = daily.weathercode[dayIndex];
+                isDay = 1; 
+                hIdx = (dayIndex * 24) + 13;
+                
+                const d = new Date(daily.time[dayIndex]);
+                document.getElementById('view-mode').innerText = "توقعات مستقبلية";
+                document.getElementById('main-title').innerText = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+                document.getElementById('sub-title').innerText = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
+            // Update Header
+            const iconInfo = getIconSrc(dispCode, isDay);
+            document.getElementById('dynamic-bg').style.backgroundImage = iconInfo.bg;
+            document.getElementById('main-icon-img').src = iconInfo.src;
+            
+            document.getElementById('current-temp').innerText = Math.round(dispTemp) + '°';
+            document.getElementById('min-temp-display').innerText = minTemp + '°'; // New Styling
+            document.getElementById('weather-desc').innerText = getWeatherDesc(dispCode);
+
+            // Update Grid & Status
+            if (hIdx >= hourly.temperature_2m.length) hIdx = hourly.temperature_2m.length - 1;
+
+            const updateMetric = (idPrefix, val, status) => {
+                document.getElementById(idPrefix + '-val').innerText = val;
+                document.getElementById(idPrefix + '-status').innerText = status;
+            };
+
+            const appTemp = hourly.apparent_temperature[hIdx];
+            const hum = hourly.relativehumidity_2m[hIdx];
+            const wind = dayIndex === 0 ? current.windspeed : (hourly.windspeed_10m ? hourly.windspeed_10m[hIdx] : 15);
+            const press = Math.round(hourly.surface_pressure[hIdx]);
+            const clouds = hourly.cloudcover[hIdx];
+            const uv = hourly.uv_index[hIdx];
+            const visKm = (hourly.visibility[hIdx] / 1000).toFixed(1);
+
+            updateMetric('app-temp', Math.round(appTemp) + '°', getAppTempStatus(dispTemp, appTemp));
+            updateMetric('humidity', hum + '%', getHumStatus(hum));
+            updateMetric('wind', wind + ' كم', getWindStatus(wind));
+            updateMetric('press', press + ' hPa', getPressStatus(press));
+            updateMetric('cloud', clouds + '%', getCloudStatus(clouds));
+            updateMetric('uv', uv, getUvStatus(uv));
+            updateMetric('vis', visKm + ' كم', getVisStatus(visKm));
+
+            document.getElementById('sunrise-val').innerText = new Date(daily.sunrise[dayIndex]).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('sunset-val').innerText = new Date(daily.sunset[dayIndex]).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+
+            // Animation
+            const hero = document.getElementById('hero-section');
+            hero.classList.remove('anim-fade');
+            void hero.offsetWidth;
+            hero.classList.add('anim-fade');
+        }
+
+        function renderForecastList() {
+            const daily = GLOBAL_DATA.daily;
+            const list = document.getElementById('forecast-list');
+            const more = document.getElementById('more-days');
+            list.innerHTML = ''; more.innerHTML = '';
+
+            for(let i = 0; i < daily.time.length; i++) {
+                const date = new Date(daily.time[i]);
+                const dayName = i === 0 ? 'اليوم' : date.toLocaleDateString('ar-EG', { weekday: 'long' });
+                const max = Math.round(daily.temperature_2m_max[i]);
+                const min = Math.round(daily.temperature_2m_min[i]);
+                const fIcon = getIconSrc(daily.weathercode[i], 1).src;
+                
+                const activeClass = (i === CURRENT_VIEW_INDEX) ? 'day-active' : '';
+
+                const itemHTML = `
+                <div onclick="renderView(${i})" class="glass-item p-3 rounded-xl flex items-center justify-between cursor-pointer anim-fade ${activeClass}" style="animation-delay: ${i * 0.05}s">
+                    <div class="flex items-center gap-3 w-1/3">
+                        <img src="${fIcon}" class="w-9 h-9 drop-shadow-sm">
+                        <span class="font-medium text-sm text-gray-100">${dayName}</span>
+                    </div>
+                    <div class="flex items-center justify-end gap-4 w-2/3 ml-auto">
+                        <span class="font-bold text-base text-white">${max}°</span>
+                        <span class="text-white/40 text-xs font-light">${min}°</span>
+                    </div>
+                </div>`;
+
+                if(i < 4) list.innerHTML += itemHTML;
+                else more.innerHTML += itemHTML;
+            }
+        }
+
+        const btn = document.getElementById('toggle-btn');
+        const moreDiv = document.getElementById('more-days');
+        let expanded = false;
+        btn.addEventListener('click', () => {
+            expanded = !expanded;
+            if(expanded) {
+                moreDiv.classList.add('open');
+                btn.querySelector('span').innerText = 'عرض أقل';
+                btn.querySelector('svg').style.transform = 'rotate(180deg)';
+            } else {
+                moreDiv.classList.remove('open');
+                btn.querySelector('span').innerText = 'عرض باقي الأسبوع';
+                btn.querySelector('svg').style.transform = 'rotate(0deg)';
+            }
+        });
+
+        getLocation();
+    </script>
+</body>
+</html>
