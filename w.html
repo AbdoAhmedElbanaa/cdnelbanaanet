@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Weather - Smart Insights</title>
+    <title>تصميم UUTL - القالب الرئيسي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
+        /* --- UUTL Design System Styles --- */
         body { font-family: 'Tajawal', sans-serif; transition: background-image 0.8s ease-in-out; }
         
         /* Core Animations */
@@ -24,7 +25,11 @@
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         
-        /* Glass Effect */
+        /* Hide Horizontal Scrollbar for Hourly Strip but allow functionality */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Glass Effect - The Core of UUTL Design */
         .glass-container {
             background: rgba(18, 18, 25, 0.65);
             backdrop-filter: blur(40px) saturate(160%);
@@ -46,11 +51,12 @@
             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
         }
 
-        /* Active Day Styling */
-        .day-active {
-            background: rgba(59, 130, 246, 0.25) !important;
-            border: 1px solid rgba(147, 197, 253, 0.5) !important;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        /* Active State Styling (For Days and Hours) */
+        .active-state {
+            background: rgba(59, 130, 246, 0.35) !important;
+            border: 1px solid rgba(147, 197, 253, 0.6) !important;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+            transform: scale(1.05);
         }
 
         /* Expand Animation */
@@ -60,6 +66,19 @@
             opacity: 0;
         }
         #more-days.open { max-height: 1200px; opacity: 1; }
+
+        /* Grabbing Cursor Classes */
+        .cursor-grab { cursor: grab; }
+        .cursor-grabbing { cursor: grabbing; }
+
+        /* Badge for "Now" */
+        .now-badge {
+            font-size: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 99px;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
 
@@ -72,11 +91,12 @@
         
         <div id="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-900/90 backdrop-blur-xl transition-opacity duration-500">
             <div class="w-12 h-12 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p id="loading-text" class="mt-4 text-sm font-light text-blue-200 animate-pulse">تحليل بيانات الطقس...</p>
+            <p id="loading-text" class="mt-4 text-sm font-light text-blue-200 animate-pulse">جاري التحميل...</p>
         </div>
 
         <div id="weather-content" class="opacity-0 transition-opacity duration-700 h-full max-h-[90vh] overflow-y-auto custom-scroll">
             
+            <!-- Header Section -->
             <div class="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/5 px-6 py-4 flex justify-between items-center">
                 <div>
                     <div class="flex items-center gap-2">
@@ -90,10 +110,13 @@
                 </button>
             </div>
 
+            <!-- Hero Section -->
             <div id="hero-section" class="flex flex-col items-center pt-8 pb-6 relative transition-all duration-500">
                 <div class="text-center mb-4">
                     <div id="main-title" class="text-6xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-blue-200 anim-glow" style="font-feature-settings: 'tnum' on;">--:--</div>
                     <div id="sub-title" class="text-sm font-medium text-blue-100/80 mt-1 px-4 py-1 rounded-full bg-white/5 border border-white/5 inline-block backdrop-blur-sm">--</div>
+                    <!-- Added Time Indicator for selected hour -->
+                    <div id="selected-time-indicator" class="text-[10px] text-yellow-300 mt-2 font-bold opacity-0 transition-opacity">بيانات الساعة: --</div>
                 </div>
 
                 <div class="w-36 h-36 relative z-10 anim-float filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
@@ -110,8 +133,17 @@
                 </div>
             </div>
 
+            <!-- Horizontal Scroll Section (Drag-to-Scroll) -->
+            <div class="px-5 mb-2 transition-all duration-500 delay-100 anim-fade">
+                <h3 id="hourly-title" class="text-[10px] font-bold text-white/40 mb-3 uppercase tracking-widest px-1">خلال اليوم</h3>
+                <div id="hourly-container" class="flex overflow-x-auto gap-3 pb-4 hide-scroll cursor-grab select-none p-2">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <!-- Grid Details Section -->
             <div class="px-5 pb-6">
-                <h3 class="text-[10px] font-bold text-white/40 mb-3 uppercase tracking-widest px-1">التحليل البيئي</h3>
+                <h3 class="text-[10px] font-bold text-white/40 mb-3 uppercase tracking-widest px-1">التفاصيل</h3>
                 <div class="grid grid-cols-3 gap-2.5">
                     
                     <div class="glass-item rounded-2xl p-3 flex flex-col items-center text-center">
@@ -179,6 +211,7 @@
                 </div>
             </div>
 
+            <!-- Bottom List Section -->
             <div class="bg-black/30 px-5 py-6 rounded-t-[32px] border-t border-white/5 backdrop-blur-md">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xs font-bold text-white flex items-center gap-2 opacity-90">
@@ -202,6 +235,8 @@
         // --- Global State ---
         let GLOBAL_DATA = null;
         let CURRENT_VIEW_INDEX = 0; // 0 = Today
+        let SELECTED_HOUR_INDEX = -1; // -1 means default/current logic
+
         const ICON_BASE = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
 
         // --- Backgrounds ---
@@ -282,12 +317,48 @@
 
         // --- Clock ---
         function updateClock() {
-            if(CURRENT_VIEW_INDEX !== 0) return; 
+            if(CURRENT_VIEW_INDEX !== 0 || SELECTED_HOUR_INDEX !== -1) return; 
             const now = new Date();
             document.getElementById('main-title').innerText = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('sub-title').innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
         }
         setInterval(updateClock, 1000);
+
+        // --- Drag to Scroll Logic ---
+        function initDragScroll() {
+            const slider = document.getElementById('hourly-container');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('cursor-grabbing');
+                slider.classList.remove('cursor-grab');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+            });
+
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll-fast
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        }
 
         // --- Init ---
         function getLocation() {
@@ -317,13 +388,14 @@
                 
                 document.getElementById('location-text').innerText = locationString;
 
-                // Weather
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,apparent_temperature,uv_index,visibility,surface_pressure,cloudcover,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+                // Weather (UPDATED API URL to include weathercode & is_day in hourly)
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,apparent_temperature,uv_index,visibility,surface_pressure,cloudcover,windspeed_10m,weathercode,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
                 const res = await fetch(url);
                 GLOBAL_DATA = await res.json();
 
                 renderView(0); 
                 renderForecastList();
+                initDragScroll(); // Initialize the drag logic
 
                 const loader = document.getElementById('loading');
                 const content = document.getElementById('weather-content');
@@ -333,52 +405,48 @@
             } catch (e) { console.error(e); }
         }
 
-        // --- Rendering ---
-        function renderView(dayIndex) {
-            CURRENT_VIEW_INDEX = dayIndex;
-            const data = GLOBAL_DATA;
-            const daily = data.daily;
-            const hourly = data.hourly;
-            const current = data.current_weather;
+        // --- Interaction: Update Main Display from Hourly Click ---
+        function selectHour(hourlyIndex) {
+            SELECTED_HOUR_INDEX = hourlyIndex;
+            
+            // Re-render only the list to update "active" styles
+            renderHourlyStrip();
+            
+            // Update the big Hero display and grid
+            updateMainDisplay(hourlyIndex);
+        }
 
-            renderForecastList();
+        function updateMainDisplay(hIdx) {
+            const hourly = GLOBAL_DATA.hourly;
+            
+            // Data at specific index
+            const hTemp = Math.round(hourly.temperature_2m[hIdx]);
+            const hCode = hourly.weathercode[hIdx];
+            const hIsDay = hourly.is_day[hIdx];
+            const hTime = new Date(hourly.time[hIdx]);
 
-            let dispTemp, dispCode, isDay = 1, hIdx, minTemp;
-            minTemp = Math.round(daily.temperature_2m_min[dayIndex]);
-
-            if (dayIndex === 0) {
-                // TODAY
-                dispTemp = current.temperature;
-                dispCode = current.weathercode;
-                isDay = current.is_day;
-                hIdx = new Date().getHours();
-                document.getElementById('view-mode').innerText = "مباشر";
-                updateClock();
-            } else {
-                // FUTURE
-                dispTemp = daily.temperature_2m_max[dayIndex];
-                dispCode = daily.weathercode[dayIndex];
-                isDay = 1; 
-                hIdx = (dayIndex * 24) + 13;
-                
-                const d = new Date(daily.time[dayIndex]);
-                document.getElementById('view-mode').innerText = "توقعات مستقبلية";
-                document.getElementById('main-title').innerText = d.toLocaleDateString('ar-EG', { weekday: 'long' });
-                document.getElementById('sub-title').innerText = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
-            }
-
-            // Update Header
-            const iconInfo = getIconSrc(dispCode, isDay);
+            // Update Header BG and Icon
+            const iconInfo = getIconSrc(hCode, hIsDay);
             document.getElementById('dynamic-bg').style.backgroundImage = iconInfo.bg;
             document.getElementById('main-icon-img').src = iconInfo.src;
             
-            document.getElementById('current-temp').innerText = Math.round(dispTemp) + '°';
-            document.getElementById('min-temp-display').innerText = minTemp + '°'; // New Styling
-            document.getElementById('weather-desc').innerText = getWeatherDesc(dispCode);
+            // Update Temp and Desc
+            document.getElementById('current-temp').innerText = hTemp + '°';
+            document.getElementById('weather-desc').innerText = getWeatherDesc(hCode);
+            
+            // If showing specific hour, update title to time
+            if (SELECTED_HOUR_INDEX !== -1) {
+                document.getElementById('main-title').innerText = hTime.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('sub-title').innerText = hTime.toLocaleDateString('ar-EG', {weekday: 'long', day: 'numeric'});
+                
+                const indicator = document.getElementById('selected-time-indicator');
+                indicator.style.opacity = '1';
+                indicator.innerText = `بيانات الساعة: ${hTime.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})}`;
+            } else {
+                document.getElementById('selected-time-indicator').style.opacity = '0';
+            }
 
-            // Update Grid & Status
-            if (hIdx >= hourly.temperature_2m.length) hIdx = hourly.temperature_2m.length - 1;
-
+            // Update Grid Stats
             const updateMetric = (idPrefix, val, status) => {
                 document.getElementById(idPrefix + '-val').innerText = val;
                 document.getElementById(idPrefix + '-status').innerText = status;
@@ -386,20 +454,69 @@
 
             const appTemp = hourly.apparent_temperature[hIdx];
             const hum = hourly.relativehumidity_2m[hIdx];
-            const wind = dayIndex === 0 ? current.windspeed : (hourly.windspeed_10m ? hourly.windspeed_10m[hIdx] : 15);
+            const wind = hourly.windspeed_10m[hIdx];
             const press = Math.round(hourly.surface_pressure[hIdx]);
             const clouds = hourly.cloudcover[hIdx];
             const uv = hourly.uv_index[hIdx];
             const visKm = (hourly.visibility[hIdx] / 1000).toFixed(1);
 
-            updateMetric('app-temp', Math.round(appTemp) + '°', getAppTempStatus(dispTemp, appTemp));
+            updateMetric('app-temp', Math.round(appTemp) + '°', getAppTempStatus(hTemp, appTemp));
             updateMetric('humidity', hum + '%', getHumStatus(hum));
             updateMetric('wind', wind + ' كم', getWindStatus(wind));
             updateMetric('press', press + ' hPa', getPressStatus(press));
             updateMetric('cloud', clouds + '%', getCloudStatus(clouds));
             updateMetric('uv', uv, getUvStatus(uv));
             updateMetric('vis', visKm + ' كم', getVisStatus(visKm));
+        }
 
+        // --- Rendering ---
+        function renderView(dayIndex) {
+            CURRENT_VIEW_INDEX = dayIndex;
+            SELECTED_HOUR_INDEX = -1; // Reset selection on day change
+            
+            const data = GLOBAL_DATA;
+            const daily = data.daily;
+            const hourly = data.hourly;
+            const current = data.current_weather;
+
+            renderForecastList();
+
+            let hIdx; // Index for Grid Data
+
+            if (dayIndex === 0) {
+                // TODAY: Default to current time logic
+                hIdx = new Date().getHours();
+                document.getElementById('view-mode').innerText = "مباشر";
+                document.getElementById('hourly-title').innerText = "خلال اليوم";
+                updateClock();
+                
+                // Set default main display for Today
+                // Note: We use hourly array for grid details even for "Now" to get more stats than current_weather provides
+                updateMainDisplay(hIdx);
+                // Override Temp with 'Current' API reading for accuracy
+                document.getElementById('current-temp').innerText = Math.round(current.temperature) + '°';
+                document.getElementById('selected-time-indicator').style.opacity = '0';
+
+            } else {
+                // FUTURE
+                hIdx = (dayIndex * 24) + 13; // Mid-day approx
+                
+                const d = new Date(daily.time[dayIndex]);
+                document.getElementById('view-mode').innerText = "توقعات مستقبلية";
+                document.getElementById('main-title').innerText = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+                document.getElementById('sub-title').innerText = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+                document.getElementById('hourly-title').innerText = "توقعات " + d.toLocaleDateString('ar-EG', { weekday: 'long' });
+                document.getElementById('selected-time-indicator').style.opacity = '0';
+
+                updateMainDisplay(hIdx);
+            }
+            
+            // Set Min Temp Display (Always daily min)
+            document.getElementById('min-temp-display').innerText = Math.round(daily.temperature_2m_min[dayIndex]) + '°';
+            
+            renderHourlyStrip();
+
+            // Sunrise/Sunset (Daily)
             document.getElementById('sunrise-val').innerText = new Date(daily.sunrise[dayIndex]).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
             document.getElementById('sunset-val').innerText = new Date(daily.sunset[dayIndex]).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
 
@@ -408,6 +525,61 @@
             hero.classList.remove('anim-fade');
             void hero.offsetWidth;
             hero.classList.add('anim-fade');
+        }
+
+        function renderHourlyStrip() {
+            const hourlyContainer = document.getElementById('hourly-container');
+            const dayIndex = CURRENT_VIEW_INDEX;
+            const hourly = GLOBAL_DATA.hourly;
+            
+            hourlyContainer.innerHTML = '';
+            
+            // Calculate start index: if today, start from now. If future day, start from 00:00 of that day
+            let startHour = (dayIndex === 0) ? new Date().getHours() : (dayIndex * 24);
+            const currentRealHour = new Date().getHours();
+            
+            // Loop for next 24 hours relative to start time
+            for(let i = startHour; i < startHour + 24; i++) {
+                if(i >= hourly.time.length) break;
+
+                const hTime = new Date(hourly.time[i]);
+                const hTemp = Math.round(hourly.temperature_2m[i]);
+                const hCode = hourly.weathercode[i];
+                const hIsDay = hourly.is_day[i]; 
+                
+                let timeString = hTime.toLocaleTimeString('ar-EG', {hour: 'numeric'});
+                let isNow = false;
+
+                // Check if this specific index is the "Real Time" hour
+                if (i === currentRealHour && dayIndex === 0) {
+                    timeString = "الآن";
+                    isNow = true;
+                }
+
+                const hIcon = getIconSrc(hCode, hIsDay).src;
+
+                // Determine Active State CSS
+                // If user selected this hour OR if no selection and it is "Now"
+                let activeClass = '';
+                
+                if (SELECTED_HOUR_INDEX !== -1) {
+                    if (SELECTED_HOUR_INDEX === i) activeClass = 'active-state';
+                } else if (isNow) {
+                     activeClass = 'active-state';
+                }
+
+                // Badge for 'Now' label styling
+                const labelClass = isNow ? 'now-badge text-white font-bold' : 'text-blue-200 mb-2 font-medium';
+
+                const hourHTML = `
+                <div onclick="selectHour(${i})" class="glass-item min-w-[70px] flex flex-col items-center justify-center p-3 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-transform select-none cursor-pointer ${activeClass}">
+                    <span class="text-[11px] whitespace-nowrap ${labelClass}">${timeString}</span>
+                    <img src="${hIcon}" class="w-8 h-8 mb-2 drop-shadow-md object-contain select-none" draggable="false">
+                    <span class="text-base font-bold text-white">${hTemp}°</span>
+                </div>
+                `;
+                hourlyContainer.innerHTML += hourHTML;
+            }
         }
 
         function renderForecastList() {
@@ -423,7 +595,7 @@
                 const min = Math.round(daily.temperature_2m_min[i]);
                 const fIcon = getIconSrc(daily.weathercode[i], 1).src;
                 
-                const activeClass = (i === CURRENT_VIEW_INDEX) ? 'day-active' : '';
+                const activeClass = (i === CURRENT_VIEW_INDEX) ? 'active-state' : '';
 
                 const itemHTML = `
                 <div onclick="renderView(${i})" class="glass-item p-3 rounded-xl flex items-center justify-between cursor-pointer anim-fade ${activeClass}" style="animation-delay: ${i * 0.05}s">
