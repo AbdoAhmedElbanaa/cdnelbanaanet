@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UUTL Weather - Gemini Powered</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link href='https://cdn.elbana.net/arfontmi.css' rel='stylesheet'/>
     
     <style>
         /* --- UUTL Design System Styles --- */
-        body { font-family: 'Tajawal', sans-serif; transition: background-image 0.8s ease-in-out; background-color: #1a202c; }
+        body { font-family: 'MiSans Arabic', sans-serif; transition: background-image 0.8s ease-in-out; background-color: #1a202c; }
         
         /* Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 5px; }
@@ -665,7 +665,7 @@
             let aiReply = "";
             try {
                 const fetchGemini = async (retries = 3, delay = 1000) => {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
                     try {
                         const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
                         if (!response.ok) throw new Error(response.statusText);
@@ -744,7 +744,7 @@
             if (apiKey && apiKey !== "") {
                 const prompt = `اكتب نصيحة قصيرة جداً جداً (سطر واحد فقط، حد أقصى 10 كلمات) ومرحة باللهجة المصرية أو العربية اللطيفة لمستخدم يواجه طقس درجة حرارته ${temp} وحالته ${desc}.`;
                 try {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
                     const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
                     const data = await response.json();
                     const aiTip = data.candidates?.[0]?.content?.parts?.[0]?.text;
