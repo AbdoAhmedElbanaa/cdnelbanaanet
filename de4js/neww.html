@@ -1,0 +1,1395 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Deobfuscator Pro & AI - Elbana.net</title>
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Intro.js (The new stable tour library) -->
+<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Cairo', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace'],
+                },
+                colors: {
+                    glass: {
+                        100: 'rgba(255, 255, 255, 0.1)',
+                        200: 'rgba(255, 255, 255, 0.2)',
+                        300: 'rgba(255, 255, 255, 0.3)',
+                        border: 'rgba(255, 255, 255, 0.15)',
+                    }
+                },
+                animation: {
+                    'spin-slow': 'spin 3s linear infinite',
+                    'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    'float': 'float 6s ease-in-out infinite',
+                    'slide-in': 'slideIn 0.3s ease-out forwards',
+                    'scale-up': 'scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    'slide-up-fade': 'slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    'fade-out-down': 'fadeOutDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                },
+                keyframes: {
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0)' },
+                        '50%': { transform: 'translateY(-10px)' },
+                    },
+                    slideIn: {
+                        '0%': { opacity: '0', transform: 'translateX(20px)' },
+                        '100%': { opacity: '1', transform: 'translateX(0)' },
+                    },
+                    scaleUp: {
+                        '0%': { transform: 'scale(0.9)', opacity: '0' },
+                        '100%': { transform: 'scale(1)', opacity: '1' },
+                    },
+                    slideUpFade: {
+                        '0%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
+                        '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                    },
+                    fadeOutDown: {
+                        '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        '100%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style type="text/css">
+    /* Global Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+    /* Glass Morphism Base */
+    .glass-panel {
+        background: rgba(20, 20, 35, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    
+    .glass-input {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+        background: rgba(0, 0, 0, 0.5);
+        border-color: rgba(100, 200, 255, 0.5);
+        outline: none;
+        box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+    }
+
+    /* Animated Background */
+    body {
+        background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Modal Animation - Fixed Centering Logic */
+    .modal-center {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes popIn {
+        0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    /* --- INTRO.JS GLASS THEME OVERRIDES (CRITICAL) --- */
+    /* Tooltip Container */
+    .introjs-tooltip {
+        background: rgba(20, 20, 35, 0.95) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #e2e8f0 !important;
+        border-radius: 16px !important;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.5) !important;
+        font-family: 'Cairo', sans-serif !important;
+        min-width: 300px;
+    }
+
+    /* Header/Title */
+    .introjs-tooltip-header {
+        padding-right: 0 !important;
+        margin-bottom: 8px;
+    }
+    .introjs-tooltip-title {
+        color: #60a5fa !important; /* Blue-400 */
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    }
+
+    /* Text */
+    .introjs-tooltip-text {
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+        color: #cbd5e1 !important;
+    }
+
+    /* Buttons */
+    .introjs-button {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        border-radius: 8px !important;
+        text-shadow: none !important;
+        transition: all 0.3s !important;
+        font-weight: 600 !important;
+    }
+    .introjs-button:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-1px);
+    }
+    .introjs-button:focus, .introjs-button:active {
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    /* Next/Done Button specific style */
+    .introjs-nextbutton, .introjs-donebutton {
+        background: linear-gradient(to right, #2563eb, #4f46e5) !important;
+        border: none !important;
+    }
+
+    /* Arrows */
+    .introjs-arrow.top { border-bottom-color: rgba(20, 20, 35, 0.95) !important; }
+    .introjs-arrow.bottom { border-top-color: rgba(20, 20, 35, 0.95) !important; }
+    .introjs-arrow.left { border-right-color: rgba(20, 20, 35, 0.95) !important; }
+    .introjs-arrow.right { border-left-color: rgba(20, 20, 35, 0.95) !important; }
+
+    /* Highlight Layer */
+    .introjs-helperLayer {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(59, 130, 246, 0.5) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2) !important;
+    }
+    .introjs-overlay {
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)) !important;
+    }
+    
+    /* Progress/Bullets */
+    .introjs-bullets ul li a {
+        background: #334155 !important; 
+    }
+    .introjs-bullets ul li a.active {
+        background: #60a5fa !important;
+    }
+    
+    /* Custom Checkbox */
+    .custom-checkbox:checked + div { background-color: #3b82f6; border-color: #3b82f6; }
+    .custom-checkbox:checked + div svg { display: block; }
+    
+    /* Loader Circle */
+    .circle-progress {
+        transition: stroke-dashoffset 0.3s ease-out;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    /* Toast Styles */
+    .toast-enter-active { animation: slideUpFade 0.4s ease forwards; }
+    .toast-exit-active { animation: fadeOutDown 0.4s ease forwards; }
+</style>
+
+<!-- ORIGINAL SCRIPTS -->
+<script src="./jsdfe.modules.bundle.min.js"></script>
+<script src="./jsdfe.bundle.min.ob.js"></script>
+
+</head>
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white relative">
+
+    <!-- LOGIN SCREEN (Fixed Center Flexbox) -->
+    <div id="login-screen" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-xl"></div>
+        
+        <div class="glass-panel w-full max-w-md p-8 rounded-3xl relative z-10 text-center border border-white/20 shadow-2xl flex flex-col items-center gap-6 animate-scale-up">
+            <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-2 animate-float">
+                <i class="fa-solid fa-shield-cat text-5xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-2">JS <span class="text-blue-400">DFE</span> Pro</h1>
+                <p class="text-gray-400 text-sm" data-translate="loginSubtitle">Please sign in to access the toolkit</p>
+            </div>
+            <button id="google-login-btn" class="w-full py-4 px-6 rounded-xl bg-white text-gray-900 font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-xl hover:bg-gray-100 group">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                <span class="group-hover:text-blue-600 transition-colors" data-translate="signInGoogle">Sign in with Google</span>
+            </button>
+            <div class="text-xs text-gray-500 mt-4"><p>&copy; 2025 Elbana.net Security Tools</p></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER (Hidden Initially) -->
+    <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 items-center pointer-events-none w-max"></div>
+
+        <!-- Confirmation Modal (Absolute Center) -->
+        <div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] hidden transition-opacity duration-300"></div>
+        <div id="confirm-modal" class="modal-center w-[90%] max-w-md glass-panel rounded-2xl z-[125] hidden flex-col border border-white/20 shadow-2xl p-6 text-center">
+            <div class="mb-4 flex justify-center">
+                <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse border border-blue-500/30">
+                    <i class="fa-solid fa-clock-rotate-left text-3xl text-blue-400"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2" data-translate="historyFoundTitle">History Found</h3>
+            <p class="text-sm text-gray-300 mb-6" data-translate="historyFoundMsg">This code was processed before. Do you want to restore the result instantly?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="btn-confirm-restore" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> <span data-translate="btnRestore">Restore</span>
+                </button>
+                <button id="btn-confirm-ignore" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-300 rounded-xl transition-all hover:scale-105 active:scale-95">
+                    <span data-translate="btnProcess">Process Again</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Minimized Status Widget -->
+        <div id="minimized-status" class="fixed bottom-6 left-6 z-[100] glass-panel px-4 py-3 rounded-2xl flex items-center gap-4 cursor-pointer hidden animate-slide-up-fade hover:scale-105 active:scale-95 transition-transform border border-green-500/30 group">
+            <div class="relative w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full border border-green-500/50 group-hover:bg-green-500/30 transition-colors">
+                <i class="fa-solid fa-check text-green-400"></i>
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-400 uppercase tracking-widest" data-translate="status">STATUS</span>
+                <span id="min-status-text" class="text-sm font-bold text-green-300" data-translate="finishedMinimize">Finished (100%)</span>
+            </div>
+            <i class="fa-solid fa-up-right-and-down-left-from-center text-gray-500 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center transition-opacity duration-300">
+            <div class="relative w-32 h-32 mb-6">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                    <circle id="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" class="circle-progress" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span id="progress-text" class="text-2xl font-bold font-mono text-blue-400">0%</span>
+                </div>
+            </div>
+            <h2 id="loading-title" class="text-2xl font-semibold animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300" data-translate="processing">Processing JS...</h2>
+            <p id="loading-subtitle" class="text-sm text-gray-400 mt-2" data-translate="checkConsole">Please wait, analyzing code structure...</p>
+            <div id="visual-progress" class="mt-6 w-11/12 max-w-4xl h-64 bg-black/50 rounded-xl p-4 overflow-y-auto font-mono text-sm text-green-400 border border-white/10 shadow-inner custom-scrollbar"></div>
+            <div id="overlay-actions" class="mt-8 flex gap-4 hidden opacity-0 transition-opacity duration-500">
+                <button id="btn-minimize-overlay" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-compress text-gray-400"></i> <span data-translate="minimize">Minimize</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Chat Modal (Absolute Center) -->
+        <div id="ai-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden transition-opacity duration-300"></div>
+        <div id="ai-modal" class="modal-center w-[95%] md:w-[600px] h-[650px] max-h-[90vh] glass-panel rounded-2xl z-[95] hidden flex-col border border-white/20 shadow-2xl">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-t-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-fast shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">AI Assistant</h3>
+                        <p class="text-xs text-purple-300">Powered by Gemini - Elbana.net</p>
+                    </div>
+                </div>
+                <button id="close-ai" class="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 hover:scale-110 active:scale-95 duration-200"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-sm">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-500/20 flex-shrink-0 flex items-center justify-center border border-purple-500/30">
+                        <i class="fa-solid fa-robot text-purple-300 text-xs"></i>
+                    </div>
+                    <div class="glass-panel rounded-2xl rounded-tl-none p-3 max-w-[85%] text-gray-200">
+                        <p data-translate="aiIntro">Hello! I am your JS-DFE Assistant. I can help explain obfuscated code, detect vulnerabilities, or suggest improvements. Paste some code or use the buttons below!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-2 overflow-x-auto flex gap-2 border-t border-white/5 scrollbar-hide">
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-blue-300 transition-all hover:scale-105 active:scale-95" data-prompt="Explain this JavaScript code in detail.">
+                    <i class="fa-solid fa-magnifying-glass mr-1"></i> <span data-translate="btnExplain">Explain Code</span>
+                </button>
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-red-300 transition-all hover:scale-105 active:scale-95" data-prompt="Analyze this code for security vulnerabilities and malicious patterns.">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> <span data-translate="btnScan">Security Scan</span>
+                </button>
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-green-300 transition-all hover:scale-105 active:scale-95" data-prompt="How can I refactor or clean up this code?">
+                    <i class="fa-solid fa-broom mr-1"></i> <span data-translate="btnRefactor">Refactor</span>
+                </button>
+            </div>
+
+            <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+                <div class="relative">
+                    <textarea id="chat-input" rows="1" class="w-full glass-input rounded-xl pl-4 pr-12 py-3 text-sm resize-none" placeholder="Ask Gemini..." data-translate-ph-key="ph-askAi"></textarea>
+                    <button id="send-chat" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+                <div class="text-[10px] text-center text-gray-500 mt-2">Gemini 2.5 Flash Preview</div>
+            </div>
+        </div>
+
+        <!-- AI Toggle Button -->
+        <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-purple-500/30 flex items-center justify-center z-[80] hover:scale-110 active:scale-90 transition-transform animate-float group" data-aos="zoom-in" data-aos-delay="1000">
+            <i class="fa-solid fa-sparkles text-white text-xl group-hover:rotate-12 transition-transform"></i>
+        </button>
+
+        <div class="container mx-auto px-4 py-8 max-w-7xl transition-all duration-300" id="main-content">
+            
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel rounded-2xl p-6 relative overflow-hidden" data-aos="fade-down" data-aos-duration="1000">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
+                
+                <div class="flex items-center space-x-4 rtl:space-x-reverse z-10">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-code text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                            JS <span class="text-blue-400">DFE</span> <span class="text-purple-400 text-sm align-top">+ AI</span>
+                        </h1>
+                        <div class="flex items-center gap-2 text-sm text-gray-400">
+                            <span id="version" class="bg-white/10 px-2 py-0.5 rounded text-xs">v3.4 (Stable Tour)</span>
+                            <span class="opacity-50">|</span>
+                            <span data-translate="subtitle">Deobfuscator Full of Excuses</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 mt-4 md:mt-0 z-10">
+                    <div id="user-info" class="hidden items-center gap-3 bg-white/5 rounded-full px-4 py-1.5 border border-white/10">
+                        <img id="user-avatar" src="" class="w-6 h-6 rounded-full border border-white/30" alt="Avatar">
+                        <span id="user-name" class="text-xs text-gray-300 hidden md:block"></span>
+                        <button id="btn-logout" class="text-red-400 hover:text-red-300 ml-2" title="Logout">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>
+
+                    <!-- TOUR BUTTON -->
+                    <button id="btn-start-tour" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 hover:scale-105 hover:shadow-lg text-yellow-400" title="Start Tour">
+                        <i class="fa-solid fa-circle-question text-lg"></i>
+                    </button>
+
+                    <button id="lang-toggle" class="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95">
+                        <i class="fa-solid fa-language text-blue-400 group-hover:rotate-12 transition-transform"></i>
+                        <span class="font-medium">English / العربية</span>
+                    </button>
+                    <a href="https://github.com/avotoko/javascript-deobfuscator" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 hover:scale-105 hover:shadow-lg">
+                        <i class="fa-brands fa-github text-xl"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Sidebar -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Info Card -->
+                    <div id="tour-info" class="glass-panel rounded-2xl p-5 relative group overflow-hidden" data-aos="fade-right" data-aos-delay="100">
+                        <div class="flex justify-between items-center mb-3 cursor-pointer" id="toggle-excuses">
+                            <h3 class="font-bold text-lg flex items-center gap-2 text-yellow-400">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span data-translate="importantInfo">Important Info</span>
+                            </h3>
+                            <i class="fa-solid fa-chevron-down transition-transform duration-300" id="excuse-arrow"></i>
+                        </div>
+                        <div id="excuses-content" class="text-sm text-gray-300 space-y-2 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+                            <ul class="list-disc list-inside space-y-1 opacity-80 pl-2 rtl:pr-2 rtl:pl-0">
+                                <li data-translate="info1">Goal: Make code readable, not perfectly executable.</li>
+                                <li data-translate="info2">Built on Node.js & Babel.</li>
+                                <li><span class="text-purple-400 font-bold">NEW:</span> Gemini AI integrated for analysis.</li>
+                                <li><span class="text-green-400 font-bold">NEW:</span> Persistent History & Quick Tools.</li>
+                                <li><span class="text-red-400 font-bold">*1</span> <span data-translate="sac1">Sacrifice accuracy very much.</span></li>
+                                <li><span class="text-orange-400 font-bold">*2</span> <span data-translate="sac2">Sacrifice accuracy.</span></li>
+                                <li><span class="text-blue-400 font-bold">*3</span> <span data-translate="sac3">Rename collision risk.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Config Panel -->
+                    <div id="tour-options" class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="200">
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+                            <i class="fa-solid fa-sliders text-blue-400"></i>
+                            <span data-translate="options">Configuration</span>
+                        </h3>
+                        <div id="options-container" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Extra Tools & History Panel -->
+                    <div id="tour-tools" class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="300">
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+                            <i class="fa-solid fa-toolbox text-green-400"></i>
+                            <span data-translate="tools">Extra Tools</span>
+                        </h3>
+                        
+                        <!-- Quick Decoder Tabs -->
+                        <div class="mb-4">
+                            <div class="flex space-x-2 rtl:space-x-reverse mb-2 overflow-x-auto pb-1">
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all tab-active hover:scale-105" data-tool="hex" data-translate="tabHex">Hex/Unicode</button>
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="base64">Base64</button>
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="url">URL</button>
+                            </div>
+
+                            <div class="flex gap-2 relative">
+                                <input type="text" id="decode-input" class="glass-input w-full p-2 rounded-lg text-xs font-mono pr-8" placeholder="\x68\x65\x6c\x6c\x6f">
+                                <button id="btn-quick-decode" class="absolute right-1 top-1 bottom-1 w-8 rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all hover:scale-110 flex items-center justify-center active:scale-95">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                            </div>
+                            <div id="decode-result" class="mt-2 text-xs text-green-300 font-mono hidden min-h-[1.5em] break-all bg-black/20 p-2 rounded border border-white/5"></div>
+                        </div>
+
+                        <!-- History -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs text-gray-400" data-translate="history">History (LocalStorage)</label>
+                                <button id="clear-history" class="text-[10px] text-red-400 hover:text-red-300 transition-colors hover:scale-105" title="Clear History">
+                                    <i class="fa-solid fa-trash"></i> <span data-translate="clearHistory">Clear</span>
+                                </button>
+                            </div>
+                            <ul id="history-list" class="space-y-1 text-xs text-gray-300 max-h-48 overflow-y-auto pr-1">
+                                <li class="p-2 bg-white/5 rounded text-center italic opacity-50" data-translate="noHistory">No history yet</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <!-- Input Area -->
+                    <div id="tour-input" class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="100">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-t-2xl opacity-50"></div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="inputCode">Input Code</span>
+                                <div class="flex gap-2">
+                                    <button id="ai-analyze-input" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                                        <i class="fa-solid fa-robot"></i> <span data-translate="askAi">Ask AI</span>
+                                    </button>
+                                    <span class="text-xs text-gray-500 italic hidden md:inline" data-translate="dragDrop">Paste or Drag & Drop File</span>
+                                </div>
+                            </div>
+                            <textarea id="input" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm resize-y" placeholder="// Paste obfuscated code here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div id="tour-actions" class="flex flex-wrap gap-3 items-center justify-between glass-panel rounded-xl p-3" data-aos="fade-up" data-aos-delay="200">
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button id="run" class="flex-1 md:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span data-translate="deobfuscate">Deobfuscate</span>
+                            </button>
+                            <button id="clear" class="w-12 h-12 rounded-xl bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Clear All">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                            <button id="copy" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                                <i class="fa-regular fa-copy"></i> <span data-translate="copy">Copy</span>
+                            </button>
+                            <a id="download" download="output.js" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer text-white no-underline">
+                                <i class="fa-solid fa-download"></i> <span data-translate="download">Download</span>
+                            </a>
+                            <button id="runCode" class="hidden whitespace-nowrap px-4 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-green-400 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> <span data-translate="runVm">Run in VM</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Output Area -->
+                    <div id="tour-output" class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="300">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 rounded-t-2xl opacity-50"></div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="outputCode">Output Code</span>
+                                <div class="flex gap-2 items-center">
+                                    <button id="ai-analyze-output" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                                        <i class="fa-solid fa-magnifying-glass-chart"></i> <span data-translate="analyzeResult">Analyze Result</span>
+                                    </button>
+                                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                    <span class="text-xs text-gray-500" data-translate="ready">Ready</span>
+                                </div>
+                            </div>
+                            <textarea id="output" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm text-green-300 resize-y" readonly placeholder="// Deobfuscated result will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer class="mt-12 text-center text-gray-500 text-sm pb-8" data-aos="fade-up" data-aos-offset="10">
+                <p>&copy; 2025 JS Deobfuscator Pro. <span data-translate="footer">Designed with Tailwind CSS & Glassmorphism.</span></p>
+                <p class="text-xs mt-2 opacity-60">
+                    Developed by <a href="https://www.elbana.net" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">Elbana.net</a>. All Rights Reserved.
+                </p>
+            </footer>
+        </div>
+    </div>
+
+<!-- External Libraries JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- Intro.js JS (Stable Tour) -->
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+
+<!-- Firebase Module -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const d = document;
+    const loginScreen = d.getElementById('login-screen');
+    const appContent = d.getElementById('app-content');
+    const googleBtn = d.getElementById('google-login-btn');
+    const userInfo = d.getElementById('user-info');
+    const userAvatar = d.getElementById('user-avatar');
+    const userName = d.getElementById('user-name');
+    const btnLogout = d.getElementById('btn-logout');
+
+    const _0x9f = "eyJhcGlLZXkiOiJBSXphU3lEQWRubE9fUkZMQmJsMHZWMngwUUVFclliUFptQ2dMdTgiLCJhdXRoRG9tYWluIjoidGVzc3MyNC5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vdGVzc3MyNC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJ0ZXNzczI0Iiwic3RvcmFnZUJ1Y2tldCI6InRlc3NzMjQuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNTYxNDM3MjU3MTc4IiwiYXBwSWQiOiIxOjU2MTQzNzI1NzE3ODp3ZWI6MjQ5OTY4NTVjMWRkZjAzMGEyZTRlMyIsIm1lYXN1cmVtZW50SWQiOiJHLUpHOERLRZG4MVg1In0=";
+    
+    let firebaseConfig;
+    try {
+        firebaseConfig = JSON.parse(atob(_0x9f));
+    } catch(e){ console.error("Config Decryption Error", e); }
+
+    if (firebaseConfig && firebaseConfig.apiKey) {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        googleBtn.addEventListener('click', () => {
+            const originalContent = googleBtn.innerHTML;
+            googleBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-gray-500"></i>';
+            googleBtn.classList.add('opacity-75', 'cursor-wait');
+            
+            signInWithPopup(auth, provider).then(() => {
+                // Success
+            }).catch((error) => {
+                googleBtn.innerHTML = originalContent;
+                googleBtn.classList.remove('opacity-75', 'cursor-wait');
+                console.error("Login Failed:", error);
+                alert("Login Failed: " + error.message);
+            });
+        });
+
+        btnLogout.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if(googleBtn.innerHTML.includes('fa-spin')) {
+                 googleBtn.innerHTML = `
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                    <span class="group-hover:text-blue-600 transition-colors">${document.documentElement.lang === 'ar' ? 'الدخول بحساب Google' : 'Sign in with Google'}</span>
+                 `;
+                 googleBtn.classList.remove('opacity-75', 'cursor-wait');
+            }
+
+            if (user) {
+                loginScreen.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                setTimeout(() => appContent.classList.remove('opacity-0'), 10);
+                
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                userAvatar.src = user.photoURL || 'https://via.placeholder.com/30';
+                userName.textContent = user.displayName || user.email;
+            } else {
+                appContent.classList.add('opacity-0');
+                setTimeout(() => {
+                    appContent.classList.add('hidden');
+                    loginScreen.classList.remove('hidden');
+                }, 500);
+                
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+            }
+        });
+    } else {
+        console.error("Fatal Error: Firebase Configuration Failed.");
+        googleBtn.addEventListener('click', () => {
+            alert("System Error: Configuration missing.");
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        AOS.init({
+            once: true, 
+            mirror: false,
+            duration: 800, 
+            offset: 50,
+            easing: 'ease-out-cubic',
+        });
+    });
+
+    const _0x1a = "QUl6YVN5Q3NKWHdtWmpWcnFIdGRMdjB5V3d0aU1KZ3A1dm9KRjBr";
+    const apiKey = atob(_0x1a); 
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    const translations = {
+        en: {
+            subtitle: "Deobfuscator Full of Excuses",
+            importantInfo: "Important Info",
+            info1: "Goal: Make code readable, not perfectly executable.",
+            info2: "Built on Node.js & Babel.",
+            sac1: "Sacrifice accuracy very much.",
+            sac2: "Sacrifice accuracy.",
+            sac3: "Rename collision risk.",
+            options: "Configuration",
+            tools: "Extra Tools",
+            history: "History (Input & Output)",
+            clearHistory: "Clear",
+            noHistory: "No history yet",
+            inputCode: "Input Code",
+            askAi: "Ask AI",
+            dragDrop: "Paste or Drag & Drop File",
+            deobfuscate: "Deobfuscate",
+            copy: "Copy Output",
+            download: "Download",
+            runVm: "Run in VM",
+            outputCode: "Output Code",
+            analyzeResult: "Analyze Result",
+            ready: "Ready",
+            processing: "Processing...",
+            checkConsole: "Analyzing structure...",
+            status: "STATUS",
+            finishedMinimize: "Finished (100%)",
+            minimize: "Minimize",
+            footer: "Designed with Tailwind CSS & Glassmorphism.",
+            aiIntro: "Hello! I am your JS-DFE Assistant. I can help explain obfuscated code, detect vulnerabilities, or suggest improvements. Paste some code or use the buttons below!",
+            btnExplain: "Explain Code",
+            btnScan: "Security Scan",
+            btnRefactor: "Refactor",
+            "ph-askAi": "Ask Gemini something about the code...",
+            tabHex: "Hex/Unicode",
+            msgDecoded: "Decoded Successfully",
+            msgCopied: "Copied to Clipboard",
+            msgCleared: "Cleared Successfully",
+            msgError: "Error Occurred",
+            msgHistoryCleared: "History Cleared",
+            historyFoundTitle: "Found in History",
+            historyFoundMsg: "This code was processed before. Do you want to restore the result instantly?",
+            btnRestore: "Restore",
+            btnProcess: "Process Again",
+            loginSubtitle: "Please sign in to access the toolkit",
+            signInGoogle: "Sign in with Google",
+            
+            // Tour Steps (English)
+            tourWelcomeTitle: "Welcome to JS-DFE Pro",
+            tourWelcomeDesc: "Let the AI guide you through this advanced deobfuscation toolkit. Ready to decode the matrix?",
+            tourInputTitle: "Input Zone",
+            tourInputDesc: "Paste your obfuscated JavaScript here. The AI will analyze the AST structure.",
+            tourOptionsTitle: "Smart Configuration",
+            tourOptionsDesc: "Fine-tune the engine. Enable specific de-obfuscation techniques like dead code removal.",
+            tourRunTitle: "Execute Magic",
+            tourRunDesc: "Click 'Deobfuscate' to start the process. Watch the real-time logs in the console overlay.",
+            tourAiTitle: "Gemini AI Assistant",
+            tourAiDesc: "Your personal expert. Ask it to explain the code, find bugs, or check for security threats.",
+            tourOutputTitle: "Clean Code",
+            tourOutputDesc: "The readable result appears here. You can copy, download, or analyze it further.",
+            
+            // Tour Buttons
+            tourNext: "Next",
+            tourPrev: "Previous",
+            tourDone: "Finish Tour",
+            
+            "eval-atob": "Evaluate atob(...) as string",
+            "eval-assign": "Evaluate assignment expression [*1]",
+            "remove-extra": "Remove extra (obfuscator.io) [*2]",
+            "remove-unref": "Remove unreferenced vars [*2]",
+            "rename-pattern": "Rename [*3] id matching:",
+            "exclude-obfuscator-io": "Don't detect obfuscator.io",
+            "ignore-uri": "Ignore URI malformed error",
+            "allow-return": "allowReturnOutsideFunction",
+            "allow-await": "allowAwaitOutsideFunction",
+            "error-recovery": "errorRecovery",
+            "source-module": "sourceType=module",
+            "define-global": "define 'global' in VM",
+            "ph-rename": "^_0x (regex placeholder)"
+        },
+        ar: {
+            subtitle: "مزيل التشويش البرمجي",
+            importantInfo: "معلومات هامة",
+            info1: "الهدف: جعل الكود مقروءًا وليس تنفيذه بدقة.",
+            info2: "مبني على Node.js و Babel.",
+            sac1: "تضحي بالدقة بشكل كبير.",
+            sac2: "تضحي بالدقة.",
+            sac3: "خطر تكرار الأسماء.",
+            options: "الإعدادات",
+            tools: "أدوات إضافية",
+            history: "سجل العمليات (المدخلات والمخرجات)",
+            clearHistory: "مسح السجل",
+            noHistory: "لا يوجد سجل حتى الآن",
+            inputCode: "الكود المدخل",
+            askAi: "سؤال الذكاء الاصطناعي",
+            dragDrop: "الصق أو اسحب الملف هنا",
+            deobfuscate: "فك التشويش",
+            copy: "نسخ الكود",
+            download: "تحميل",
+            runVm: "تشغيل (VM)",
+            outputCode: "النتيجة",
+            analyzeResult: "تحليل النتيجة",
+            ready: "جاهز",
+            processing: "جاري المعالجة...",
+            checkConsole: "جاري التحليل...",
+            status: "الحالة",
+            finishedMinimize: "مكتمل (100%)",
+            minimize: "تصغير النافذة",
+            footer: "صمم بـ Tailwind CSS وتأثير الزجاج.",
+            aiIntro: "مرحباً! أنا مساعد JS-DFE الذكي. يمكنني شرح الكود المشفر، اكتشاف الثغرات، أو اقتراح تحسينات. استخدم الأزرار أدناه للبدء!",
+            btnExplain: "اشرح الكود",
+            btnScan: "فحص أمني",
+            btnRefactor: "تحسين الكود",
+            "ph-askAi": "اسأل Gemini شيئاً عن الكود...",
+            tabHex: "Hex/Unicode",
+            msgDecoded: "تم فك التشفير بنجاح",
+            msgCopied: "تم النسخ للحافظة",
+            msgCleared: "تم المسح بنجاح",
+            msgError: "حدث خطأ ما",
+            msgHistoryCleared: "تم مسح السجل",
+            historyFoundTitle: "موجود في السجل",
+            historyFoundMsg: "تمت معالجة هذا الكود من قبل. هل تريد استعادة النتيجة فوراً؟",
+            btnRestore: "استعادة",
+            btnProcess: "معالجة مجدداً",
+            loginSubtitle: "يرجى تسجيل الدخول للوصول للأداة",
+            signInGoogle: "الدخول بحساب Google",
+            
+            tourWelcomeTitle: "مرحباً في JS-DFE Pro",
+            tourWelcomeDesc: "دع الذكاء الاصطناعي يرشدك عبر أدوات فك التشفير المتقدمة. هل أنت مستعد؟",
+            tourInputTitle: "منطقة الإدخال",
+            tourInputDesc: "قم بلصق الكود المشفر هنا. سيقوم المحرك بتحليل بنية الكود.",
+            tourOptionsTitle: "الإعدادات الذكية",
+            tourOptionsDesc: "ضبط المحرك بدقة. يمكنك تفعيل تقنيات محددة مثل إزالة الكود الميت.",
+            tourRunTitle: "تنفيذ السحر",
+            tourRunDesc: "اضغط 'فك التشويش' للبدء. راقب السجلات الحية في النافذة المنبثقة.",
+            tourAiTitle: "مساعد Gemini الذكي",
+            tourAiDesc: "خبيرك الشخصي. اطلب منه شرح الكود، اكتشاف الأخطاء، أو فحص الثغرات الأمنية.",
+            tourOutputTitle: "الكود النظيف",
+            tourOutputDesc: "تظهر النتيجة المقروءة هنا. يمكنك نسخها، تحميلها، أو تحليلها.",
+            
+            tourNext: "التالي",
+            tourPrev: "السابق",
+            tourDone: "إنهاء الجولة",
+
+            "eval-atob": "تقييم atob(...) كسلسلة نصية",
+            "eval-assign": "تقييم تعبيرات التعيين [*1]",
+            "remove-extra": "إزالة الأكواد الزائدة [*2]",
+            "remove-unref": "إزالة المتغيرات غير المستخدمة [*2]",
+            "rename-pattern": "إعادة تسمية [*3] المعرفات:",
+            "exclude-obfuscator-io": "تجاهل كشف obfuscator.io",
+            "ignore-uri": "تجاهل أخطاء URI malformed",
+            "allow-return": "السماح بـ Return خارج الدوال",
+            "allow-await": "السماح بـ Await خارج الدوال",
+            "error-recovery": "استعادة الأخطاء (Error Recovery)",
+            "source-module": "نوع المصدر = Module",
+            "define-global": "تعريف 'global' في VM",
+            "ph-rename": "^_0x (تعبير نمطي)"
+        }
+    };
+
+    let currentLang = 'en';
+    let currentToolMode = 'hex';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const d = document;
+        const toastContainer = d.getElementById("toast-container");
+        
+        function showToast(message, type = "success") {
+            const toast = d.createElement("div");
+            let colors = type === "success" ? "bg-green-500/20 border-green-500/50 text-green-100" 
+                       : type === "error" ? "bg-red-500/20 border-red-500/50 text-red-100" 
+                       : "bg-blue-500/20 border-blue-500/50 text-blue-100";
+            
+            toast.className = `glass-panel px-4 py-2 rounded-full border shadow-lg text-sm font-medium flex items-center gap-2 pointer-events-auto toast-enter-active ${colors}`;
+            let icon = type === "success" ? '<i class="fa-solid fa-check-circle"></i>' 
+                     : type === "error" ? '<i class="fa-solid fa-circle-exclamation"></i>' 
+                     : '<i class="fa-solid fa-info-circle"></i>';
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.replace("toast-enter-active", "toast-exit-active");
+                setTimeout(() => toast.remove(), 400); 
+            }, 3000);
+        }
+
+        try {
+            let { version } = window["sd-decoder"];
+            d.getElementById("version").textContent = "v" + version;
+        } catch(e) {
+            d.getElementById("version").textContent = "v3.4";
+        }
+
+        const optsData = [
+            { name: "eval-atob", titleKey: "eval-atob" },
+            { name: "eval-assign", labelKey: "eval-assign", titleKey: "eval-assign" },
+            { name: "remove-extra", labelKey: "remove-extra", titleKey: "remove-extra" },
+            { name: "remove", arg: "unref", labelKey: "remove-unref", titleKey: "remove-unref" },
+            { name: "rename", type: "text", width: "100%", labelKey: "rename-pattern", placeholderKey: "ph-rename", titleKey: "rename-pattern"},
+            { name: "exclude", arg: "obfuscator-io", labelKey: "exclude-obfuscator-io", titleKey: "exclude-obfuscator-io" },
+            { name: "obfuscator-io-ignore-uri-malformed-error", labelKey: "ignore-uri", titleKey: "ignore-uri" },
+            { name: "parser-option", arg: "allowReturnOutsideFunction", labelKey: "allow-return", titleKey: "allow-return" },
+            { name: "parser-option", arg: "allowAwaitOutsideFunction", labelKey: "allow-await", titleKey: "allow-await" },
+            { name: "parser-option", arg: "errorRecovery", labelKey: "error-recovery", titleKey: "error-recovery" },
+            { name: "parser-option", arg: "sourceType=module", labelKey: "source-module", titleKey: "source-module" },
+            { name: "define-global-in-vm", labelKey: "define-global", titleKey: "define-global" },
+        ];
+        
+        const container = d.getElementById("options-container");
+        optsData.forEach(opt => {
+            const id = opt.arg ? opt.name + "-" + opt.arg : opt.name;
+            const labelKey = opt.labelKey || opt.titleKey;
+            
+            const wrapper = d.createElement("div");
+            wrapper.className = "group flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5 tooltip-trigger relative";
+
+            const tooltip = d.createElement("div");
+            tooltip.className = "tooltip-content absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap pointer-events-none border border-white/20";
+            tooltip.setAttribute('data-translate-key', opt.titleKey || labelKey);
+            tooltip.textContent = translations[currentLang][opt.titleKey || labelKey] || "Option";
+            wrapper.appendChild(tooltip);
+
+            if (opt.type === "text") {
+                wrapper.classList.remove("justify-between");
+                wrapper.classList.add("flex-col", "items-start", "gap-2");
+                const label = d.createElement("label");
+                label.htmlFor = id;
+                label.className = "text-sm text-gray-300 font-medium";
+                label.setAttribute('data-translate-key', labelKey);
+                label.textContent = translations[currentLang][labelKey];
+                const input = d.createElement("input");
+                input.type = "text"; input.id = id; input.opt = opt;
+                input.className = "glass-input w-full p-2 rounded-md text-sm transition-all focus:scale-[1.01]";
+                input.setAttribute('data-translate-ph-key', opt.placeholderKey);
+                input.placeholder = translations[currentLang][opt.placeholderKey];
+                wrapper.append(label, input);
+            } else {
+                const label = d.createElement("label");
+                label.htmlFor = id;
+                label.className = "text-sm text-gray-300 cursor-pointer select-none flex-1";
+                label.setAttribute('data-translate-key', labelKey);
+                label.textContent = translations[currentLang][labelKey];
+                const checkWrapper = d.createElement("div");
+                checkWrapper.className = "relative";
+                const input = d.createElement("input");
+                input.type = "checkbox"; input.id = id; input.opt = opt;
+                input.className = "custom-checkbox sr-only";
+                input.checked = !!opt.checked;
+                const styledCheck = d.createElement("div");
+                styledCheck.className = "w-5 h-5 border-2 border-gray-500 rounded bg-white/5 transition-all flex items-center justify-center cursor-pointer hover:border-blue-400";
+                styledCheck.innerHTML = `<svg class="hidden w-3 h-3 text-white fill-current" viewBox="0 0 20 20"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>`;
+                styledCheck.addEventListener('click', () => input.click());
+                checkWrapper.append(input, styledCheck);
+                wrapper.append(label, checkWrapper);
+            }
+            container.appendChild(wrapper);
+        });
+
+        d.getElementById("toggle-excuses").addEventListener("click", () => {
+            const content = d.getElementById("excuses-content");
+            const arrow = d.getElementById("excuse-arrow");
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null; content.style.opacity = "0"; arrow.style.transform = "rotate(0deg)";
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px"; content.style.opacity = "1"; arrow.style.transform = "rotate(180deg)";
+            }
+        });
+
+        d.querySelectorAll('.tool-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                d.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('tab-active', 'border-white/30'));
+                e.target.classList.add('tab-active');
+                currentToolMode = e.target.dataset.tool;
+                const input = d.getElementById("decode-input");
+                if(currentToolMode === 'hex') input.placeholder = "\\x68\\x65\\x6c\\x6c\\x6f";
+                else if(currentToolMode === 'base64') input.placeholder = "aGVsbG8=";
+                else if(currentToolMode === 'url') input.placeholder = "%20Hello%20World";
+                d.getElementById("decode-result").classList.add("hidden");
+            });
+        });
+
+        d.getElementById("btn-quick-decode").addEventListener("click", () => {
+            const val = d.getElementById("decode-input").value;
+            const resBox = d.getElementById("decode-result");
+            let decoded = "";
+            let error = false;
+            try {
+                if (currentToolMode === 'hex') {
+                     decoded = val.replace(/\\x([0-9A-Fa-f]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16)))
+                                  .replace(/\\u([0-9A-Fa-f]{4})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16)));
+                } else if (currentToolMode === 'base64') {
+                    decoded = atob(val);
+                } else if (currentToolMode === 'url') {
+                    decoded = decodeURIComponent(val);
+                }
+            } catch(e) {
+                decoded = "Error: " + e.message;
+                error = true;
+            }
+            resBox.textContent = decoded || (error ? "" : "Empty/No match");
+            resBox.classList.remove("hidden", "text-green-300", "text-red-300");
+            resBox.classList.add(error ? "text-red-300" : "text-green-300");
+            if(!error && decoded) showToast(translations[currentLang].msgDecoded);
+        });
+
+        const HISTORY_KEY = 'jsdfe_history_v2'; 
+        
+        function loadHistory() {
+            const list = d.getElementById("history-list");
+            list.innerHTML = "";
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            
+            if (history.length === 0) {
+                const li = d.createElement("li");
+                li.className = "p-2 bg-white/5 rounded text-center italic opacity-50";
+                li.setAttribute("data-translate", "noHistory");
+                li.textContent = translations[currentLang].noHistory;
+                list.appendChild(li);
+                return;
+            }
+
+            history.forEach(item => {
+                renderHistoryItem(list, item);
+            });
+        }
+
+        function renderHistoryItem(list, item) {
+            const li = d.createElement("li");
+            li.className = "p-2 bg-white/5 rounded hover:bg-white/10 cursor-pointer flex justify-between group text-xs animate-slide-in hover:scale-[1.02] transition-transform";
+            const textSpan = d.createElement("span");
+            textSpan.className = "truncate w-3/4";
+            textSpan.textContent = (item.input || "").substring(0, 30) + "...";
+            const metaDiv = d.createElement("div");
+            metaDiv.className = "flex flex-col items-end text-[10px] text-gray-500";
+            const timeSpan = d.createElement("span");
+            timeSpan.textContent = new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            metaDiv.appendChild(timeSpan);
+            li.append(textSpan, metaDiv);
+            li.addEventListener("click", () => {
+                d.getElementById("input").value = item.input || "";
+                d.getElementById("output").value = item.output || "// No output saved";
+                showToast(currentLang === 'en' ? "Loaded from History" : "تم التحميل من السجل", "info");
+            });
+            list.prepend(li);
+        }
+
+        function saveToHistory(inputCode, outputCode) {
+            if(!inputCode || inputCode.length < 5) return;
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            if(history.length > 0 && history[0].input === inputCode) return;
+            const newItem = {
+                input: inputCode,
+                output: outputCode,
+                timestamp: Date.now()
+            };
+            history.unshift(newItem);
+            if(history.length > 20) history = history.slice(0, 20); 
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            loadHistory();
+        }
+        
+        d.getElementById("clear-history").addEventListener("click", () => {
+            if(confirm(currentLang === 'en' ? "Clear all history?" : "هل أنت متأكد من مسح السجل؟")) {
+                localStorage.removeItem(HISTORY_KEY);
+                loadHistory();
+                showToast(translations[currentLang].msgHistoryCleared);
+            }
+        });
+
+        loadHistory();
+
+        // --- Custom Intro.js Logic ---
+        function startTour() {
+            introJs().setOptions({
+                steps: [
+                    { 
+                        element: document.querySelector('#main-content'), 
+                        intro: translations[currentLang].tourWelcomeDesc,
+                        title: translations[currentLang].tourWelcomeTitle
+                    },
+                    { 
+                        element: document.querySelector('#tour-input'), 
+                        intro: translations[currentLang].tourInputDesc,
+                        title: translations[currentLang].tourInputTitle
+                    },
+                    { 
+                        element: document.querySelector('#tour-options'), 
+                        intro: translations[currentLang].tourOptionsDesc,
+                        title: translations[currentLang].tourOptionsTitle
+                    },
+                    { 
+                        element: document.querySelector('#tour-actions'), 
+                        intro: translations[currentLang].tourRunDesc,
+                        title: translations[currentLang].tourRunTitle
+                    },
+                    { 
+                        element: document.querySelector('#toggle-ai'), 
+                        intro: translations[currentLang].tourAiDesc,
+                        title: translations[currentLang].tourAiTitle
+                    },
+                    { 
+                        element: document.querySelector('#tour-output'), 
+                        intro: translations[currentLang].tourOutputDesc,
+                        title: translations[currentLang].tourOutputTitle
+                    }
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                nextLabel: translations[currentLang].tourNext,
+                prevLabel: translations[currentLang].tourPrev,
+                doneLabel: translations[currentLang].tourDone
+            }).start();
+        }
+
+        d.getElementById('btn-start-tour').addEventListener('click', startTour);
+
+        const inputArea = d.getElementById("input");
+        const output = d.getElementById("output");
+        const loadingOverlay = d.getElementById("loading-overlay");
+        const overlayActions = d.getElementById("overlay-actions");
+        const btnMinimizeOverlay = d.getElementById("btn-minimize-overlay");
+        const minimizedStatus = d.getElementById("minimized-status");
+        
+        const visualLog = d.getElementById("visual-progress");
+        const progressCircle = d.getElementById("progress-circle");
+        const progressText = d.getElementById("progress-text");
+
+        let progressVal = 0;
+        function updateProgress(value) {
+            const circumference = 283; 
+            const offset = circumference - (value / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+            progressText.textContent = Math.round(value) + "%";
+        }
+
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+            
+            const line = d.createElement("div");
+            line.className = "py-1 border-b border-white/5 animate-fade-in";
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            line.innerHTML = `<span class="text-blue-400 text-[10px] mr-2">[${time}]</span> ${msg.substring(0, 200)}${msg.length > 200 ? "..." : ""}`;
+            
+            visualLog.appendChild(line);
+            visualLog.scrollTop = visualLog.scrollHeight;
+
+            if (progressVal < 95) {
+                progressVal += (95 - progressVal) * 0.05; 
+                updateProgress(progressVal);
+            }
+        };
+
+        inputArea.value = `var a = atob("aGVsbG8="); \na = "Hey", a += " gays!"; \nconsole.log(a); \n(function(_0x7f3edf,_0x62db19){var _0x3ea4da=_0x4913,_0x2b5775=_0x7f3edf();while(!![]){try{var _0x25475e=parseInt(_0x3ea4da(0x100))/0x1*(-parseInt(_0x3ea4da(0x103))/0x2)+parseInt(_0x3ea4da(0x107))/0x3*(-parseInt(_0x3ea4da(0x106))/0x4)+-parseInt(_0x3ea4da(0x10a))/0x5*(parseInt(_0x3ea4da(0x109))/0x6)+parseInt(_0x3ea4da(0x104))/0x7*(parseInt(_0x3ea4da(0x10b))/0x8)+-parseInt(_0x3ea4da(0x102))/0x9+parseInt(_0x3ea4da(0x105))/0xa*(-parseInt(_0x3ea4da(0x101))/0xb)+-parseInt(_0x3ea4da(0x108))/0xc*(-parseInt(_0x3ea4da(0x10c))/0xd);if(_0x25475e===_0x62db19)break;else _0x2b5775['push'](_0x2b5775['shift']());}catch(_0x11878b){_0x2b5775['push'](_0x2b5775['shift']());}}}(_0x1f46,0xce4d4));function hi(){var _0x44d8d2=_0x4913;console['log'](_0x44d8d2(0x10d));}function _0x4913(_0x42a11e,_0x28997d){var _0x1f46da=_0x1f46();return _0x4913=function(_0x491324,_0x5d00ae){_0x491324=_0x491324-0x100;var _0x3b893a=_0x1f46da[_0x491324];return _0x3b893a;},_0x4913(_0x42a11e,_0x28997d);}hi();function _0x1f46(){var _0x10a357=['249025SGjcqe','24OVDaZa','13229021IDBuND','Hello\x20World!','307kbyHvP','55mToEHJ','12390849AzERbI','1062ZWnvKY','3285268vpUaeV','2257250cenXBc','4zdkifI','2692809xIonWD','36scJefO','6jLhlFK'];_0x1f46=function(){return _0x10a357;};return _0x1f46();}`;
+
+        const confirmModal = d.getElementById("confirm-modal");
+        const confirmBackdrop = d.getElementById("confirm-modal-backdrop");
+        const btnRestore = d.getElementById("btn-confirm-restore");
+        const btnIgnore = d.getElementById("btn-confirm-ignore");
+        
+        let pendingCode = "";
+        let pendingResult = "";
+
+        function toggleConfirmModal(show) {
+            if(show) {
+                confirmModal.classList.remove("hidden");
+                confirmModal.classList.add("flex");
+                confirmBackdrop.classList.remove("hidden");
+            } else {
+                confirmModal.classList.add("hidden");
+                confirmModal.classList.remove("flex");
+                confirmBackdrop.classList.add("hidden");
+            }
+        }
+
+        function executeDeobfuscation(code) {
+            let defaultOpts = { "remove-intermediate": true, "property-to-identifier": true, "unflatten": true, "strict": true };
+            let opts = Object.assign({}, defaultOpts, window.jsdfeOpts || {});
+            d.querySelectorAll('#options-container input').forEach(e => {
+                const opt = e.opt;
+                if (e.type === "checkbox" && e.checked) {
+                    if (opt.arg) { opts[opt.name] = (opts[opt.name] || "") + "," + opt.arg; }
+                    else if (/^no-/.test(opt.name)) { opts[opt.name.substring(3)] = false; }
+                    else { opts[opt.name] = true; }
+                } else if (e.type === "text" && e.value) { opts[opt.name] = e.value; }
+            });
+
+            progressVal = 0;
+            updateProgress(0);
+            
+            overlayActions.classList.add("hidden");
+            overlayActions.classList.remove("opacity-100");
+            overlayActions.classList.add("opacity-0");
+            d.getElementById("loading-title").textContent = translations[currentLang].processing || "Processing...";
+            d.getElementById("loading-subtitle").textContent = translations[currentLang].checkConsole || "Analyzing...";
+            
+            loadingOverlay.classList.remove("hidden"); 
+            loadingOverlay.classList.add("flex");
+            minimizedStatus.classList.add("hidden"); 
+            
+            visualLog.innerHTML = "";
+            console.log("Starting Deobfuscation...");
+
+            setTimeout(function() {
+                try {
+                    let { decode } = window["sd-decoder"];
+                    let res = decode(code, opts);
+                    let result = res.modified > 0 ? res.code : "// No changes made.";
+                    output.value = result;
+                    
+                    saveToHistory(code, result);
+                    showToast(translations[currentLang].msgDecoded);
+                    d.querySelectorAll(".jsdfe-vm").forEach(e => e.remove());
+                    
+                    updateProgress(100);
+                    d.getElementById("loading-title").textContent = currentLang === 'en' ? "Deobfuscation Complete!" : "اكتملت العملية!";
+                    d.getElementById("loading-subtitle").textContent = currentLang === 'en' ? "Success" : "نجاح";
+                    
+                    overlayActions.classList.remove("hidden");
+                    setTimeout(() => overlayActions.classList.remove("opacity-0"), 50);
+                    
+                } catch (e) {
+                    output.value = "// Error: " + e.message;
+                    showToast(translations[currentLang].msgError, "error");
+                    overlayActions.classList.remove("hidden");
+                    setTimeout(() => overlayActions.classList.remove("opacity-0"), 50);
+                } 
+            }, 500);
+        }
+
+        d.getElementById("run").addEventListener("click", function() {
+            let code = inputArea.value;
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const existingEntry = history.find(item => item.input === code);
+            
+            if (existingEntry) {
+                pendingCode = code;
+                pendingResult = existingEntry.output;
+                toggleConfirmModal(true);
+            } else {
+                executeDeobfuscation(code);
+            }
+        });
+
+        btnRestore.addEventListener("click", () => {
+            output.value = pendingResult || "// No output saved";
+            showToast(currentLang === 'en' ? "Restored from History" : "تم الاستعادة من السجل", "info");
+            toggleConfirmModal(false);
+        });
+
+        btnIgnore.addEventListener("click", () => {
+            toggleConfirmModal(false);
+            executeDeobfuscation(pendingCode);
+        });
+
+        btnMinimizeOverlay.addEventListener("click", () => {
+            loadingOverlay.classList.add("hidden");
+            loadingOverlay.classList.remove("flex");
+            minimizedStatus.classList.remove("hidden");
+            minimizedStatus.classList.add("flex");
+        });
+
+        minimizedStatus.addEventListener("click", () => {
+            minimizedStatus.classList.add("hidden");
+            minimizedStatus.classList.remove("flex");
+            loadingOverlay.classList.remove("hidden");
+            loadingOverlay.classList.add("flex");
+        });
+
+        d.getElementById("clear").addEventListener("click", () => { 
+            output.value = ""; 
+            visualLog.innerHTML = ""; 
+            inputArea.value = ""; 
+            showToast(translations[currentLang].msgCleared);
+        });
+        
+        d.getElementById("copy").addEventListener("click", function() {
+            output.select(); document.execCommand("copy");
+            showToast(translations[currentLang].msgCopied);
+        });
+        
+        d.getElementById("download").addEventListener("click", (ev) => ev.target.href = URL.createObjectURL(new Blob([output.value], {type: "text/javascript"})));
+
+        if (location.protocol === "file:") {
+            d.getElementById("runCode").classList.remove("hidden");
+            d.getElementById("runCode").addEventListener("click", () => {
+                 console.log("Running in VM...");
+                 try { window["sd-decoder"].decode(inputArea.value, {run: "run-in-vm"}); } catch(e){ console.error("VM Error", e); }
+            });
+        }
+
+        const modal = d.getElementById("ai-modal");
+        const backdrop = d.getElementById("ai-modal-backdrop");
+        const toggleBtn = d.getElementById("toggle-ai");
+        const closeBtn = d.getElementById("close-ai");
+        const chatContainer = d.getElementById("chat-messages");
+        const chatInput = d.getElementById("chat-input");
+        const sendBtn = d.getElementById("send-chat");
+
+        function toggleAiModal(show) {
+            if(show) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                backdrop.classList.remove("hidden");
+            } else {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+                backdrop.classList.add("hidden");
+            }
+        }
+        
+        toggleBtn.addEventListener("click", () => toggleAiModal(true));
+        closeBtn.addEventListener("click", () => toggleAiModal(false));
+        backdrop.addEventListener("click", () => toggleAiModal(false));
+
+        function appendMessage(text, isUser = false) {
+            const div = d.createElement("div");
+            div.className = `flex gap-3 animate-slide-in ${isUser ? 'flex-row-reverse' : ''}`;
+            const icon = d.createElement("div");
+            icon.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center border ${isUser ? 'bg-blue-500/20 border-blue-500/30' : 'bg-purple-500/20 border-purple-500/30'}`;
+            icon.innerHTML = isUser ? `<i class="fa-solid fa-user text-blue-300 text-xs"></i>` : `<i class="fa-solid fa-robot text-purple-300 text-xs"></i>`;
+            const bubble = d.createElement("div");
+            bubble.className = `glass-panel rounded-2xl p-3 max-w-[85%] text-gray-200 prose prose-invert prose-sm ${isUser ? 'rounded-tr-none bg-blue-900/30' : 'rounded-tl-none'}`;
+            if(isUser) bubble.textContent = text;
+            else bubble.innerHTML = marked.parse(text);
+            div.append(icon, bubble);
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function callGemini(prompt, codeContext = "") {
+            const userMsg = prompt + (codeContext ? "\n\n[Code Context Provided]" : "");
+            appendMessage(userMsg, true);
+            chatInput.value = "";
+            const loadingId = "loading-" + Date.now();
+            const loadingDiv = d.createElement("div");
+            loadingDiv.id = loadingId;
+            loadingDiv.className = "flex gap-3 animate-pulse";
+            loadingDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-purple-500/20"></div><div class="glass-panel rounded-2xl p-3"><i class="fa-solid fa-circle-notch fa-spin"></i> Thinking...</div>`;
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const systemInstruction = `You are JS-DFE AI, a JavaScript Deobfuscation Expert...`;
+                const fullPrompt = codeContext ? `Context Code:\n\`\`\`javascript\n${codeContext.substring(0, 10000)}\n\`\`\`\n\nQuestion: ${prompt}` : prompt;
+                const response = await fetch(GEMINI_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], systemInstruction: { parts: [{ text: systemInstruction }] } })
+                });
+                const data = await response.json();
+                d.getElementById(loadingId).remove();
+                if (data.error) appendMessage("⚠️ Error: " + data.error.message);
+                else appendMessage(data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.");
+            } catch (err) {
+                d.getElementById(loadingId).remove();
+                appendMessage("⚠️ Network Error: " + err.message);
+            }
+        }
+
+        sendBtn.addEventListener("click", () => {
+            const txt = chatInput.value.trim();
+            if(!txt) return;
+            callGemini(txt);
+        });
+        chatInput.addEventListener("keypress", (e) => {
+            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); }
+        });
+
+        d.querySelectorAll(".quick-prompt").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const prompt = btn.dataset.prompt;
+                const code = output.value.length > 20 ? output.value : inputArea.value;
+                if(code.length < 5) { showToast(currentLang === 'en' ? "Please input code first." : "الرجاء إدخال كود أولاً", "info"); return; }
+                toggleAiModal(true);
+                callGemini(prompt, code);
+            });
+        });
+
+        d.getElementById("ai-analyze-input").addEventListener("click", () => {
+            toggleAiModal(true);
+            callGemini(currentLang === 'en' ? "Analyze this input code." : "حلل هذا الكود المدخل.", inputArea.value);
+        });
+
+        d.getElementById("ai-analyze-output").addEventListener("click", () => {
+            if(output.value.length < 10) return;
+            toggleAiModal(true);
+            callGemini(currentLang === 'en' ? "Explain this deobfuscated result." : "اشرح هذه النتيجة.", output.value);
+        });
+
+        const langToggle = d.getElementById("lang-toggle");
+        
+        function updateText() {
+            d.querySelectorAll("[data-translate]").forEach(el => {
+                const key = el.getAttribute("data-translate");
+                if (translations[currentLang][key]) el.textContent = translations[currentLang][key];
+            });
+            d.querySelectorAll("[data-translate-key]").forEach(el => {
+                const key = el.getAttribute("data-translate-key");
+                if (translations[currentLang][key]) el.textContent = translations[currentLang][key];
+            });
+            d.querySelectorAll("[data-translate-ph-key]").forEach(el => {
+                const key = el.getAttribute("data-translate-ph-key");
+                if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
+            });
+
+            const html = d.documentElement;
+            html.setAttribute("dir", currentLang === 'ar' ? 'rtl' : 'ltr');
+            html.lang = currentLang === 'ar' ? 'ar' : 'en';
+        }
+
+        langToggle.addEventListener("click", () => {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            updateText();
+        });
+
+    });
+</script>
+</body>
+</html>
