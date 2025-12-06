@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JS Deobfuscator Pro & AI</title>
+<title>JS Deobfuscator Pro & AI - Elbana.net</title>
 <!-- Tailwind CSS via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Fonts: Cairo for Arabic/English blend -->
@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Markdown Parser for AI Responses -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- AOS Animation Library CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 <script>
     tailwind.config = {
@@ -79,13 +81,14 @@
     ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
 
-    /* Glass Morphism */
+    /* Glass Morphism Base */
     .glass-panel {
         background: rgba(20, 20, 35, 0.7);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        /* Transform style removed as Tilt is gone */
     }
     
     .glass-input {
@@ -108,6 +111,7 @@
         animation: gradientBG 15s ease infinite;
         color: white;
         min-height: 100vh;
+        overflow-x: hidden;
     }
 
     @keyframes gradientBG {
@@ -140,10 +144,23 @@
     /* Modal Animation */
     .modal-enter { animation: scaleUp 0.3s ease forwards; }
     
+    @keyframes scaleUp {
+        0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    
     /* Toast Animation Classes */
     .toast-enter-active { animation: slideUpFade 0.4s ease forwards; }
     .toast-exit-active { animation: fadeOutDown 0.4s ease forwards; }
-    
+
+    @keyframes slideUpFade {
+        0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fadeOutDown {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+    }
 </style>
 
 <!-- ORIGINAL SCRIPTS -->
@@ -151,19 +168,53 @@
 <script src="./jsdfe.bundle.min.ob.js"></script>
 
 </head>
-<body class="font-sans antialiased overflow-x-hidden selection:bg-blue-500 selection:text-white">
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 items-center pointer-events-none w-max"></div>
+
+    <!-- Confirmation Modal (Popup) -->
+    <div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] hidden transition-opacity duration-300"></div>
+    <div id="confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md glass-panel rounded-2xl z-[125] hidden flex-col border border-white/20 shadow-2xl modal-enter p-6 text-center">
+        <div class="mb-4 flex justify-center">
+            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse border border-blue-500/30">
+                <i class="fa-solid fa-clock-rotate-left text-3xl text-blue-400"></i>
+            </div>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2" data-translate="historyFoundTitle">History Found</h3>
+        <p class="text-sm text-gray-300 mb-6" data-translate="historyFoundMsg">This code was processed before. Do you want to restore the result instantly?</p>
+        <div class="flex gap-3 justify-center">
+            <button id="btn-confirm-restore" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i> <span data-translate="btnRestore">Restore</span>
+            </button>
+            <button id="btn-confirm-ignore" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-300 rounded-xl transition-all hover:scale-105 active:scale-95">
+                <span data-translate="btnProcess">Process Again</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Minimized Status Widget (Floating) -->
+    <div id="minimized-status" class="fixed bottom-6 left-6 z-[100] glass-panel px-4 py-3 rounded-2xl flex items-center gap-4 cursor-pointer hidden animate-slide-up-fade hover:scale-105 active:scale-95 transition-transform border border-green-500/30 group">
+        <div class="relative w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full border border-green-500/50 group-hover:bg-green-500/30 transition-colors">
+            <i class="fa-solid fa-check text-green-400"></i>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+        </div>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gray-400 uppercase tracking-widest" data-translate="status">STATUS</span>
+            <span id="min-status-text" class="text-sm font-bold text-green-300" data-translate="finishedMinimize">Finished (100%)</span>
+        </div>
+        <i class="fa-solid fa-up-right-and-down-left-from-center text-gray-500 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+    </div>
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center transition-opacity duration-300">
         <!-- Circular Progress -->
         <div class="relative w-32 h-32 mb-6">
             <svg class="w-full h-full" viewBox="0 0 100 100">
-                <!-- Background Circle -->
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-                <!-- Progress Circle -->
                 <circle id="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" class="circle-progress" />
             </svg>
             <div class="absolute inset-0 flex items-center justify-center">
@@ -171,11 +222,19 @@
             </div>
         </div>
 
-        <h2 class="text-2xl font-semibold animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300" data-translate="processing">Processing JS...</h2>
-        <p class="text-sm text-gray-400 mt-2" data-translate="checkConsole">Please wait, analyzing code structure...</p>
+        <h2 id="loading-title" class="text-2xl font-semibold animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300" data-translate="processing">Processing JS...</h2>
+        <p id="loading-subtitle" class="text-sm text-gray-400 mt-2" data-translate="checkConsole">Please wait, analyzing code structure...</p>
         
-        <div id="visual-progress" class="mt-6 w-3/4 max-w-lg h-32 bg-black/50 rounded-xl p-3 overflow-y-auto font-mono text-xs text-green-400 border border-white/10 shadow-inner custom-scrollbar">
+        <!-- INCREASED SIZE OF VISUAL PROGRESS -->
+        <div id="visual-progress" class="mt-6 w-11/12 max-w-4xl h-64 bg-black/50 rounded-xl p-4 overflow-y-auto font-mono text-sm text-green-400 border border-white/10 shadow-inner custom-scrollbar">
             <!-- Logs will appear here -->
+        </div>
+
+        <!-- Action Buttons (Hidden by default) -->
+        <div id="overlay-actions" class="mt-8 flex gap-4 hidden opacity-0 transition-opacity duration-500">
+            <button id="btn-minimize-overlay" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-compress text-gray-400"></i> <span data-translate="minimize">Minimize</span>
+            </button>
         </div>
     </div>
 
@@ -198,7 +257,7 @@
         
         <!-- Chat Messages -->
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-sm">
-            <div class="flex gap-3 animate-slide-in">
+            <div class="flex gap-3">
                 <div class="w-8 h-8 rounded-full bg-purple-500/20 flex-shrink-0 flex items-center justify-center border border-purple-500/30">
                     <i class="fa-solid fa-robot text-purple-300 text-xs"></i>
                 </div>
@@ -234,14 +293,14 @@
     </div>
 
     <!-- AI Toggle Button (Floating) -->
-    <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-purple-500/30 flex items-center justify-center z-[80] hover:scale-110 active:scale-90 transition-transform animate-float group">
+    <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-purple-500/30 flex items-center justify-center z-[80] hover:scale-110 active:scale-90 transition-transform animate-float group" data-aos="zoom-in" data-aos-delay="1000">
         <i class="fa-solid fa-sparkles text-white text-xl group-hover:rotate-12 transition-transform"></i>
     </button>
 
     <div class="container mx-auto px-4 py-8 max-w-7xl transition-all duration-300" id="main-content">
         
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel rounded-2xl p-6 relative overflow-hidden">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel rounded-2xl p-6 relative overflow-hidden" data-aos="fade-down" data-aos-duration="1000">
             <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
             
             <div class="flex items-center space-x-4 rtl:space-x-reverse z-10">
@@ -253,8 +312,7 @@
                         JS <span class="text-blue-400">DFE</span> <span class="text-purple-400 text-sm align-top">+ AI</span>
                     </h1>
                     <div class="flex items-center gap-2 text-sm text-gray-400">
-                        <span id="version" class="bg-white/10 px-2 py-0.5 rounded text-xs">v2.3 (Dec 2025)</span>
-						<span id="version2" class="bg-white/10 px-2 py-0.5 rounded text-xs">v2.3 (Dec 2025)</span>
+                        <span id="version" class="bg-white/10 px-2 py-0.5 rounded text-xs">v2.8 (Custom Modal)</span>
                         <span class="opacity-50">|</span>
                         <span data-translate="subtitle">Deobfuscator Full of Excuses</span>
                     </div>
@@ -279,7 +337,7 @@
             <div class="lg:col-span-4 space-y-6">
                 
                 <!-- Info Card -->
-                <div class="glass-panel rounded-2xl p-5 relative group overflow-hidden">
+                <div class="glass-panel rounded-2xl p-5 relative group overflow-hidden" data-aos="fade-right" data-aos-delay="100">
                     <div class="flex justify-between items-center mb-3 cursor-pointer" id="toggle-excuses">
                         <h3 class="font-bold text-lg flex items-center gap-2 text-yellow-400">
                             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -301,7 +359,7 @@
                 </div>
 
                 <!-- Config Panel -->
-                <div class="glass-panel rounded-2xl p-6">
+                <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="200">
                     <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
                         <i class="fa-solid fa-sliders text-blue-400"></i>
                         <span data-translate="options">Configuration</span>
@@ -310,7 +368,7 @@
                 </div>
 
                 <!-- Extra Tools & History Panel (Expanded) -->
-                <div class="glass-panel rounded-2xl p-6">
+                <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="300">
                     <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
                         <i class="fa-solid fa-toolbox text-green-400"></i>
                         <span data-translate="tools">Extra Tools</span>
@@ -352,7 +410,7 @@
             <div class="lg:col-span-8 space-y-6">
                 
                 <!-- Input Area -->
-                <div class="glass-panel rounded-2xl p-1 relative">
+                <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="100">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-t-2xl opacity-50"></div>
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-2">
@@ -369,7 +427,7 @@
                 </div>
 
                 <!-- Action Bar -->
-                <div class="flex flex-wrap gap-3 items-center justify-between glass-panel rounded-xl p-3">
+                <div class="flex flex-wrap gap-3 items-center justify-between glass-panel rounded-xl p-3" data-aos="fade-up" data-aos-delay="200">
                     <div class="flex gap-3 w-full md:w-auto">
                         <button id="run" class="flex-1 md:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -394,7 +452,7 @@
                 </div>
 
                 <!-- Output Area -->
-                <div class="glass-panel rounded-2xl p-1 relative">
+                <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="300">
                      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 rounded-t-2xl opacity-50"></div>
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-2">
@@ -414,15 +472,30 @@
             </div>
         </div>
 
-        <footer class="mt-12 text-center text-gray-500 text-sm pb-8">
-            <p>&copy; 2025 JS Deobfuscator Pro. <span data-translate="footer"></span></p>
+        <footer class="mt-12 text-center text-gray-500 text-sm pb-8" data-aos="fade-up" data-aos-offset="10">
+            <p>&copy; 2025 JS Deobfuscator Pro. <span data-translate="footer">Designed with Tailwind CSS & Glassmorphism.</span></p>
             <p class="text-xs mt-2 opacity-60">
                 Developed by <a href="https://www.elbana.net" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">Elbana.net</a>. All Rights Reserved.
             </p>
         </footer>
     </div>
 
+<!-- External Libraries JS (AOS Only) -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
+    // --- Initialize Animation Libraries ---
+    document.addEventListener("DOMContentLoaded", () => {
+        // Init AOS
+        AOS.init({
+            once: true, 
+            mirror: false,
+            duration: 800, 
+            offset: 50,
+            easing: 'ease-out-cubic',
+        });
+    });
+
     // --- Gemini API Configuration ---
     const _0x1a = "QUl6YVN5Q3NKWHdtWmpWcnFIdGRMdjB5V3d0aU1KZ3A1dm9KRjBr";
     const apiKey = atob(_0x1a); 
@@ -455,6 +528,9 @@
             ready: "Ready",
             processing: "Processing...",
             checkConsole: "Analyzing structure...",
+            status: "STATUS",
+            finishedMinimize: "Finished (100%)",
+            minimize: "Minimize",
             footer: "Designed with Tailwind CSS & Glassmorphism.",
             aiIntro: "Hello! I am your JS-DFE Assistant. I can help explain obfuscated code, detect vulnerabilities, or suggest improvements. Paste some code or use the buttons below!",
             btnExplain: "Explain Code",
@@ -467,6 +543,11 @@
             msgCleared: "Cleared Successfully",
             msgError: "Error Occurred",
             msgHistoryCleared: "History Cleared",
+            historyFoundTitle: "Found in History",
+            historyFoundMsg: "This code was processed before. Do you want to restore the result instantly?",
+            btnRestore: "Restore",
+            btnProcess: "Process Again",
+            
             "eval-atob": "Evaluate atob(...) as string",
             "eval-assign": "Evaluate assignment expression [*1]",
             "remove-extra": "Remove extra (obfuscator.io) [*2]",
@@ -506,6 +587,9 @@
             ready: "جاهز",
             processing: "جاري المعالجة...",
             checkConsole: "جاري التحليل...",
+            status: "الحالة",
+            finishedMinimize: "مكتمل (100%)",
+            minimize: "تصغير النافذة",
             footer: "صمم بـ Tailwind CSS وتأثير الزجاج.",
             aiIntro: "مرحباً! أنا مساعد JS-DFE الذكي. يمكنني شرح الكود المشفر، اكتشاف الثغرات، أو اقتراح تحسينات. استخدم الأزرار أدناه للبدء!",
             btnExplain: "اشرح الكود",
@@ -518,6 +602,11 @@
             msgCleared: "تم المسح بنجاح",
             msgError: "حدث خطأ ما",
             msgHistoryCleared: "تم مسح السجل",
+            historyFoundTitle: "موجود في السجل",
+            historyFoundMsg: "تمت معالجة هذا الكود من قبل. هل تريد استعادة النتيجة فوراً؟",
+            btnRestore: "استعادة",
+            btnProcess: "معالجة مجدداً",
+
             "eval-atob": "تقييم atob(...) كسلسلة نصية",
             "eval-assign": "تقييم تعبيرات التعيين [*1]",
             "remove-extra": "إزالة الأكواد الزائدة [*2]",
@@ -535,7 +624,7 @@
     };
 
     let currentLang = 'en';
-    let currentToolMode = 'hex'; // hex, base64, url
+    let currentToolMode = 'hex';
 
     document.addEventListener("DOMContentLoaded", () => {
         const d = document;
@@ -545,7 +634,6 @@
         
         function showToast(message, type = "success") {
             const toast = d.createElement("div");
-            // Base styles
             let colors = type === "success" ? "bg-green-500/20 border-green-500/50 text-green-100" 
                        : type === "error" ? "bg-red-500/20 border-red-500/50 text-red-100" 
                        : "bg-blue-500/20 border-blue-500/50 text-blue-100";
@@ -560,10 +648,9 @@
             
             toastContainer.appendChild(toast);
             
-            // Remove after 3 seconds
             setTimeout(() => {
                 toast.classList.replace("toast-enter-active", "toast-exit-active");
-                setTimeout(() => toast.remove(), 400); // Match animation duration
+                setTimeout(() => toast.remove(), 400); 
             }, 3000);
         }
 
@@ -572,7 +659,7 @@
             let { version } = window["sd-decoder"];
             d.getElementById("version").textContent = "v" + version;
         } catch(e) {
-            d.getElementById("version").textContent = "v2.3 (Dec 2025)";
+            d.getElementById("version").textContent = "v2.8";
         }
 
         // 2. Build Options (Original Logic Preserved)
@@ -690,8 +777,8 @@
             if(!error && decoded) showToast(translations[currentLang].msgDecoded);
         });
 
-        // 5. Persistent History Manager (LocalStorage - Input AND Output)
-        const HISTORY_KEY = 'jsdfe_history_v2'; // Changed key version
+        // 5. Persistent History Manager
+        const HISTORY_KEY = 'jsdfe_history_v2'; 
         
         function loadHistory() {
             const list = d.getElementById("history-list");
@@ -774,14 +861,20 @@
         const inputArea = d.getElementById("input");
         const output = d.getElementById("output");
         const loadingOverlay = d.getElementById("loading-overlay");
+        const overlayActions = d.getElementById("overlay-actions");
+        const btnMinimizeOverlay = d.getElementById("btn-minimize-overlay");
+        const minimizedStatus = d.getElementById("minimized-status");
+        
         const visualLog = d.getElementById("visual-progress");
         const progressCircle = d.getElementById("progress-circle");
         const progressText = d.getElementById("progress-text");
 
         // Helper to update progress
         let progressVal = 0;
+        // Removed statusInterval variable as it's no longer needed for fake logs
+
         function updateProgress(value) {
-            const circumference = 283; // 2 * PI * 45
+            const circumference = 283; 
             const offset = circumference - (value / 100) * circumference;
             progressCircle.style.strokeDashoffset = offset;
             progressText.textContent = Math.round(value) + "%";
@@ -790,16 +883,23 @@
         const originalLog = console.log;
         console.log = function(...args) {
             originalLog.apply(console, args);
+            // Capture real logs from the library
             const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+            
+            // Append to visual progress window
             const line = d.createElement("div");
-            line.textContent = "> " + msg.substring(0, 100) + (msg.length > 100 ? "..." : "");
+            line.className = "py-1 border-b border-white/5 animate-fade-in"; // Added subtle style
+            
+            // Add timestamp for "every second" feel or just precision
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            line.innerHTML = `<span class="text-blue-400 text-[10px] mr-2">[${time}]</span> ${msg.substring(0, 200)}${msg.length > 200 ? "..." : ""}`;
+            
             visualLog.appendChild(line);
             visualLog.scrollTop = visualLog.scrollHeight;
 
-            // Heuristic Progress Simulation
-            // We increase progress by a small amount for every log, capping at 95%
+            // Update progress circle based on REAL activity
             if (progressVal < 95) {
-                progressVal += (95 - progressVal) * 0.1; // Zeno's progress
+                progressVal += (95 - progressVal) * 0.05; // Slower increment to accommodate more logs
                 updateProgress(progressVal);
             }
         };
@@ -807,9 +907,29 @@
         // Initialize default input
         inputArea.value = `var a = atob("aGVsbG8="); \na = "Hey", a += " gays!"; \nconsole.log(a); \n(function(_0x7f3edf,_0x62db19){var _0x3ea4da=_0x4913,_0x2b5775=_0x7f3edf();while(!![]){try{var _0x25475e=parseInt(_0x3ea4da(0x100))/0x1*(-parseInt(_0x3ea4da(0x103))/0x2)+parseInt(_0x3ea4da(0x107))/0x3*(-parseInt(_0x3ea4da(0x106))/0x4)+-parseInt(_0x3ea4da(0x10a))/0x5*(parseInt(_0x3ea4da(0x109))/0x6)+parseInt(_0x3ea4da(0x104))/0x7*(parseInt(_0x3ea4da(0x10b))/0x8)+-parseInt(_0x3ea4da(0x102))/0x9+parseInt(_0x3ea4da(0x105))/0xa*(-parseInt(_0x3ea4da(0x101))/0xb)+-parseInt(_0x3ea4da(0x108))/0xc*(-parseInt(_0x3ea4da(0x10c))/0xd);if(_0x25475e===_0x62db19)break;else _0x2b5775['push'](_0x2b5775['shift']());}catch(_0x11878b){_0x2b5775['push'](_0x2b5775['shift']());}}}(_0x1f46,0xce4d4));function hi(){var _0x44d8d2=_0x4913;console['log'](_0x44d8d2(0x10d));}function _0x4913(_0x42a11e,_0x28997d){var _0x1f46da=_0x1f46();return _0x4913=function(_0x491324,_0x5d00ae){_0x491324=_0x491324-0x100;var _0x3b893a=_0x1f46da[_0x491324];return _0x3b893a;},_0x4913(_0x42a11e,_0x28997d);}hi();function _0x1f46(){var _0x10a357=['249025SGjcqe','24OVDaZa','13229021IDBuND','Hello\x20World!','307kbyHvP','55mToEHJ','12390849AzERbI','1062ZWnvKY','3285268vpUaeV','2257250cenXBc','4zdkifI','2692809xIonWD','36scJefO','6jLhlFK'];_0x1f46=function(){return _0x10a357;};return _0x1f46();}`;
 
-        d.getElementById("run").addEventListener("click", function() {
-            let code = inputArea.value;
-            
+        // --- CUSTOM CONFIRM MODAL LOGIC ---
+        const confirmModal = d.getElementById("confirm-modal");
+        const confirmBackdrop = d.getElementById("confirm-modal-backdrop");
+        const btnRestore = d.getElementById("btn-confirm-restore");
+        const btnIgnore = d.getElementById("btn-confirm-ignore");
+        
+        let pendingCode = "";
+        let pendingResult = "";
+
+        function toggleConfirmModal(show) {
+            if(show) {
+                confirmModal.classList.remove("hidden");
+                confirmModal.classList.add("flex");
+                confirmBackdrop.classList.remove("hidden");
+            } else {
+                confirmModal.classList.add("hidden");
+                confirmModal.classList.remove("flex");
+                confirmBackdrop.classList.add("hidden");
+            }
+        }
+
+        // Core processing function
+        function executeDeobfuscation(code) {
             let defaultOpts = { "remove-intermediate": true, "property-to-identifier": true, "unflatten": true, "strict": true };
             let opts = Object.assign({}, defaultOpts, window.jsdfeOpts || {});
             d.querySelectorAll('#options-container input').forEach(e => {
@@ -824,7 +944,18 @@
             // Start loading state
             progressVal = 0;
             updateProgress(0);
-            loadingOverlay.classList.remove("hidden"); loadingOverlay.classList.add("flex");
+            
+            // Reset Overlay UI
+            overlayActions.classList.add("hidden");
+            overlayActions.classList.remove("opacity-100");
+            overlayActions.classList.add("opacity-0");
+            d.getElementById("loading-title").textContent = translations[currentLang].processing || "Processing...";
+            d.getElementById("loading-subtitle").textContent = translations[currentLang].checkConsole || "Analyzing...";
+            
+            loadingOverlay.classList.remove("hidden"); 
+            loadingOverlay.classList.add("flex");
+            minimizedStatus.classList.add("hidden"); // Hide minimized widget if open
+            
             visualLog.innerHTML = "";
             console.log("Starting Deobfuscation...");
 
@@ -835,21 +966,71 @@
                     let result = res.modified > 0 ? res.code : "// No changes made.";
                     output.value = result;
                     
-                    // SAVE BOTH INPUT AND OUTPUT TO HISTORY
                     saveToHistory(code, result);
-                    
                     showToast(translations[currentLang].msgDecoded);
                     d.querySelectorAll(".jsdfe-vm").forEach(e => e.remove());
                     
                     // Finish progress
                     updateProgress(100);
+                    d.getElementById("loading-title").textContent = currentLang === 'en' ? "Deobfuscation Complete!" : "اكتملت العملية!";
+                    d.getElementById("loading-subtitle").textContent = currentLang === 'en' ? "Success" : "نجاح";
+                    
+                    // SHOW Minimize Button instead of hiding overlay
+                    overlayActions.classList.remove("hidden");
+                    setTimeout(() => overlayActions.classList.remove("opacity-0"), 50);
+                    
                 } catch (e) {
                     output.value = "// Error: " + e.message;
                     showToast(translations[currentLang].msgError, "error");
-                } finally {
-                    setTimeout(() => { loadingOverlay.classList.add("hidden"); loadingOverlay.classList.remove("flex"); }, 500);
-                }
+                    // Still allow minimize on error so they can see logs
+                    overlayActions.classList.remove("hidden");
+                    setTimeout(() => overlayActions.classList.remove("opacity-0"), 50);
+                } 
             }, 500);
+        }
+
+        d.getElementById("run").addEventListener("click", function() {
+            let code = inputArea.value;
+            
+            // Check History First
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const existingEntry = history.find(item => item.input === code);
+            
+            if (existingEntry) {
+                pendingCode = code;
+                pendingResult = existingEntry.output;
+                toggleConfirmModal(true);
+            } else {
+                executeDeobfuscation(code);
+            }
+        });
+
+        // Modal Action Listeners
+        btnRestore.addEventListener("click", () => {
+            output.value = pendingResult || "// No output saved";
+            showToast(currentLang === 'en' ? "Restored from History" : "تم الاستعادة من السجل", "info");
+            toggleConfirmModal(false);
+        });
+
+        btnIgnore.addEventListener("click", () => {
+            toggleConfirmModal(false);
+            executeDeobfuscation(pendingCode);
+        });
+
+        // Overlay Minimize Logic
+        btnMinimizeOverlay.addEventListener("click", () => {
+            loadingOverlay.classList.add("hidden");
+            loadingOverlay.classList.remove("flex");
+            minimizedStatus.classList.remove("hidden");
+            minimizedStatus.classList.add("flex");
+        });
+
+        // Minimized Status Click Logic
+        minimizedStatus.addEventListener("click", () => {
+            minimizedStatus.classList.add("hidden");
+            minimizedStatus.classList.remove("flex");
+            loadingOverlay.classList.remove("hidden");
+            loadingOverlay.classList.add("flex");
         });
 
         d.getElementById("clear").addEventListener("click", () => { 
