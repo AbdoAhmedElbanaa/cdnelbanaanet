@@ -7,8 +7,7 @@
 <!-- Tailwind CSS via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Fonts: Cairo for Arabic/English blend -->
-<link href='https://cdn.elbana.net/arfontmi.css' rel='stylesheet'/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Markdown Parser for AI Responses -->
@@ -22,7 +21,7 @@
         theme: {
             extend: {
                 fontFamily: {
-                    sans: ['MiSans Arabic', 'sans-serif'],
+                    sans: ['Cairo', 'sans-serif'],
                     mono: ['JetBrains Mono', 'monospace'],
                 },
                 colors: {
@@ -39,7 +38,7 @@
                     'float': 'float 6s ease-in-out infinite',
                     'slide-in': 'slideIn 0.3s ease-out forwards',
                     'fade-in': 'fadeIn 0.2s ease-out forwards',
-                    'scale-up': 'scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    'scale-up': 'scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards', // Pure Scale (For Flex items)
                     'slide-up-fade': 'slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     'fade-out-down': 'fadeOutDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                 },
@@ -56,6 +55,7 @@
                         '0%': { opacity: '0' },
                         '100%': { opacity: '1' },
                     },
+                    /* Pure Scale for Flexbox centered items (Login Screen) */
                     scaleUp: {
                         '0%': { transform: 'scale(0.9)', opacity: '0' },
                         '100%': { transform: 'scale(1)', opacity: '1' },
@@ -88,7 +88,6 @@
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        /* Transform style removed as Tilt is gone */
     }
     
     .glass-input {
@@ -141,12 +140,19 @@
     /* Tab Active State */
     .tab-active { background-color: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); color: #60a5fa; }
 
-    /* Modal Animation */
-    .modal-enter { animation: scaleUp 0.3s ease forwards; }
+    /* Modal Animation: Specifically for Fixed Centered Modals */
+    .modal-enter { animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     
-    @keyframes scaleUp {
+    @keyframes modalPop {
         0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
         100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    
+    /* Pure Scale Animation: For Flexbox Centered Items (Login) */
+    /* This overrides the tailwind config's keyframes if needed in CSS context */
+    @keyframes scaleUp {
+        0% { transform: scale(0.9); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
     }
     
     /* Toast Animation Classes */
@@ -168,320 +174,439 @@
 <script src="./jsdfe.bundle.min.ob.js"></script>
 
 </head>
-<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white relative">
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 items-center pointer-events-none w-max"></div>
-
-    <!-- Confirmation Modal (Popup) -->
-    <div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] hidden transition-opacity duration-300"></div>
-    <div id="confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md glass-panel rounded-2xl z-[125] hidden flex-col border border-white/20 shadow-2xl modal-enter p-6 text-center">
-        <div class="mb-4 flex justify-center">
-            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse border border-blue-500/30">
-                <i class="fa-solid fa-clock-rotate-left text-3xl text-blue-400"></i>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-[200] flex flex-col items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-xl"></div>
+        <!-- Using animate-scale-up (Pure Scale) for flex centering -->
+        <div class="glass-panel w-full max-w-md p-8 rounded-3xl relative z-10 text-center border border-white/20 shadow-2xl flex flex-col items-center gap-6 animate-scale-up">
+            
+            <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-2 animate-float">
+                <i class="fa-solid fa-shield-cat text-5xl text-white"></i>
             </div>
-        </div>
-        <h3 class="text-xl font-bold text-white mb-2" data-translate="historyFoundTitle">History Found</h3>
-        <p class="text-sm text-gray-300 mb-6" data-translate="historyFoundMsg">This code was processed before. Do you want to restore the result instantly?</p>
-        <div class="flex gap-3 justify-center">
-            <button id="btn-confirm-restore" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/30 flex items-center gap-2">
-                <i class="fa-solid fa-rotate-left"></i> <span data-translate="btnRestore">Restore</span>
+
+            <div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-2">JS <span class="text-blue-400">DFE</span> Pro</h1>
+                <p class="text-gray-400 text-sm" data-translate="loginSubtitle">Please sign in to access the toolkit</p>
+            </div>
+
+            <button id="google-login-btn" class="w-full py-4 px-6 rounded-xl bg-white text-gray-900 font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-xl hover:bg-gray-100 group">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                <span class="group-hover:text-blue-600 transition-colors" data-translate="signInGoogle">Sign in with Google</span>
             </button>
-            <button id="btn-confirm-ignore" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-300 rounded-xl transition-all hover:scale-105 active:scale-95">
-                <span data-translate="btnProcess">Process Again</span>
-            </button>
+
+            <div class="text-xs text-gray-500 mt-4">
+                <p>&copy; 2025 Elbana.net Security Tools</p>
+            </div>
         </div>
     </div>
 
-    <!-- Minimized Status Widget (Floating) -->
-    <div id="minimized-status" class="fixed bottom-6 left-6 z-[100] glass-panel px-4 py-3 rounded-2xl flex items-center gap-4 cursor-pointer hidden animate-slide-up-fade hover:scale-105 active:scale-95 transition-transform border border-green-500/30 group">
-        <div class="relative w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full border border-green-500/50 group-hover:bg-green-500/30 transition-colors">
-            <i class="fa-solid fa-check text-green-400"></i>
-            <span class="absolute -top-1 -right-1 flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-            </span>
-        </div>
-        <div class="flex flex-col">
-            <span class="text-[10px] text-gray-400 uppercase tracking-widest" data-translate="status">STATUS</span>
-            <span id="min-status-text" class="text-sm font-bold text-green-300" data-translate="finishedMinimize">Finished (100%)</span>
-        </div>
-        <i class="fa-solid fa-up-right-and-down-left-from-center text-gray-500 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-    </div>
+    <!-- MAIN APP WRAPPER (Hidden Initially) -->
+    <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center transition-opacity duration-300">
-        <!-- Circular Progress -->
-        <div class="relative w-32 h-32 mb-6">
-            <svg class="w-full h-full" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-                <circle id="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" class="circle-progress" />
-            </svg>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <span id="progress-text" class="text-2xl font-bold font-mono text-blue-400">0%</span>
-            </div>
-        </div>
+        <!-- Toast Container (Fixed Bottom Center) -->
+        <div id="toast-container" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] flex flex-col gap-2 items-center pointer-events-none w-max"></div>
 
-        <h2 id="loading-title" class="text-2xl font-semibold animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300" data-translate="processing">Processing JS...</h2>
-        <p id="loading-subtitle" class="text-sm text-gray-400 mt-2" data-translate="checkConsole">Please wait, analyzing code structure...</p>
-        
-        <!-- INCREASED SIZE OF VISUAL PROGRESS -->
-        <div id="visual-progress" class="mt-6 w-11/12 max-w-4xl h-64 bg-black/50 rounded-xl p-4 overflow-y-auto font-mono text-sm text-green-400 border border-white/10 shadow-inner custom-scrollbar">
-            <!-- Logs will appear here -->
-        </div>
-
-        <!-- Action Buttons (Hidden by default) -->
-        <div id="overlay-actions" class="mt-8 flex gap-4 hidden opacity-0 transition-opacity duration-500">
-            <button id="btn-minimize-overlay" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                <i class="fa-solid fa-compress text-gray-400"></i> <span data-translate="minimize">Minimize</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- AI Chat Modal (Popup) -->
-    <div id="ai-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden transition-opacity duration-300"></div>
-    <div id="ai-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[600px] h-[650px] max-h-[90vh] glass-panel rounded-2xl z-[95] hidden flex-col border border-white/20 shadow-2xl modal-enter">
-        <!-- Chat Header -->
-        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-t-2xl">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-fast shadow-lg shadow-purple-500/30">
-                    <i class="fa-solid fa-robot text-white"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">AI Assistant</h3>
-                    <p class="text-xs text-purple-300">Powered by Gemini - Elbana.net</p>
+        <!-- Confirmation Modal -->
+        <div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] hidden transition-opacity duration-300"></div>
+        <!-- Using modal-enter (Includes Translate) for absolute centering -->
+        <div id="confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md glass-panel rounded-2xl z-[125] hidden flex-col border border-white/20 shadow-2xl modal-enter p-6 text-center">
+            <div class="mb-4 flex justify-center">
+                <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse border border-blue-500/30">
+                    <i class="fa-solid fa-clock-rotate-left text-3xl text-blue-400"></i>
                 </div>
             </div>
-            <button id="close-ai" class="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 hover:scale-110 active:scale-95 duration-200"><i class="fa-solid fa-times text-xl"></i></button>
-        </div>
-        
-        <!-- Chat Messages -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-sm">
-            <div class="flex gap-3">
-                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex-shrink-0 flex items-center justify-center border border-purple-500/30">
-                    <i class="fa-solid fa-robot text-purple-300 text-xs"></i>
-                </div>
-                <div class="glass-panel rounded-2xl rounded-tl-none p-3 max-w-[85%] text-gray-200">
-                    <p data-translate="aiIntro">Hello! I am your JS-DFE Assistant. I can help explain obfuscated code, detect vulnerabilities, or suggest improvements. Paste some code or use the buttons below!</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="p-2 overflow-x-auto flex gap-2 border-t border-white/5 scrollbar-hide">
-            <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-blue-300 transition-all hover:scale-105 active:scale-95" data-prompt="Explain this JavaScript code in detail.">
-                <i class="fa-solid fa-magnifying-glass mr-1"></i> <span data-translate="btnExplain">Explain Code</span>
-            </button>
-            <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-red-300 transition-all hover:scale-105 active:scale-95" data-prompt="Analyze this code for security vulnerabilities and malicious patterns.">
-                <i class="fa-solid fa-shield-halved mr-1"></i> <span data-translate="btnScan">Security Scan</span>
-            </button>
-            <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-green-300 transition-all hover:scale-105 active:scale-95" data-prompt="How can I refactor or clean up this code?">
-                <i class="fa-solid fa-broom mr-1"></i> <span data-translate="btnRefactor">Refactor</span>
-            </button>
-        </div>
-
-        <!-- Chat Input -->
-        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
-            <div class="relative">
-                <textarea id="chat-input" rows="1" class="w-full glass-input rounded-xl pl-4 pr-12 py-3 text-sm resize-none" placeholder="Ask Gemini..." data-translate-ph-key="ph-askAi"></textarea>
-                <button id="send-chat" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-paper-plane text-xs"></i>
+            <h3 class="text-xl font-bold text-white mb-2" data-translate="historyFoundTitle">History Found</h3>
+            <p class="text-sm text-gray-300 mb-6" data-translate="historyFoundMsg">This code was processed before. Do you want to restore the result instantly?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="btn-confirm-restore" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> <span data-translate="btnRestore">Restore</span>
+                </button>
+                <button id="btn-confirm-ignore" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-300 rounded-xl transition-all hover:scale-105 active:scale-95">
+                    <span data-translate="btnProcess">Process Again</span>
                 </button>
             </div>
-            <div class="text-[10px] text-center text-gray-500 mt-2">Gemini 2.5 Flash Preview</div>
         </div>
-    </div>
 
-    <!-- AI Toggle Button (Floating) -->
-    <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-purple-500/30 flex items-center justify-center z-[80] hover:scale-110 active:scale-90 transition-transform animate-float group" data-aos="zoom-in" data-aos-delay="1000">
-        <i class="fa-solid fa-sparkles text-white text-xl group-hover:rotate-12 transition-transform"></i>
-    </button>
+        <!-- Minimized Status Widget -->
+        <div id="minimized-status" class="fixed bottom-6 left-6 z-[100] glass-panel px-4 py-3 rounded-2xl flex items-center gap-4 cursor-pointer hidden animate-slide-up-fade hover:scale-105 active:scale-95 transition-transform border border-green-500/30 group">
+            <div class="relative w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full border border-green-500/50 group-hover:bg-green-500/30 transition-colors">
+                <i class="fa-solid fa-check text-green-400"></i>
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-400 uppercase tracking-widest" data-translate="status">STATUS</span>
+                <span id="min-status-text" class="text-sm font-bold text-green-300" data-translate="finishedMinimize">Finished (100%)</span>
+            </div>
+            <i class="fa-solid fa-up-right-and-down-left-from-center text-gray-500 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+        </div>
 
-    <div class="container mx-auto px-4 py-8 max-w-7xl transition-all duration-300" id="main-content">
-        
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel rounded-2xl p-6 relative overflow-hidden" data-aos="fade-down" data-aos-duration="1000">
-            <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
-            
-            <div class="flex items-center space-x-4 rtl:space-x-reverse z-10">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 hover:scale-105 transition-transform duration-300">
-                    <i class="fa-solid fa-code text-2xl text-white"></i>
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center transition-opacity duration-300">
+            <div class="relative w-32 h-32 mb-6">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                    <circle id="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" class="circle-progress" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span id="progress-text" class="text-2xl font-bold font-mono text-blue-400">0%</span>
                 </div>
-                <div>
-                    <h1 class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                        JS <span class="text-blue-400">DFE</span> <span class="text-purple-400 text-sm align-top">+ AI</span>
-                    </h1>
-                    <div class="flex items-center gap-2 text-sm text-gray-400">
-                        <span id="version" class="bg-white/10 px-2 py-0.5 rounded text-xs">v2.8 (Custom Modal)</span>
-                        <span class="opacity-50">|</span>
-                        <span data-translate="subtitle">Deobfuscator Full of Excuses</span>
+            </div>
+
+            <h2 id="loading-title" class="text-2xl font-semibold animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300" data-translate="processing">Processing JS...</h2>
+            <p id="loading-subtitle" class="text-sm text-gray-400 mt-2" data-translate="checkConsole">Please wait, analyzing code structure...</p>
+            
+            <div id="visual-progress" class="mt-6 w-11/12 max-w-4xl h-64 bg-black/50 rounded-xl p-4 overflow-y-auto font-mono text-sm text-green-400 border border-white/10 shadow-inner custom-scrollbar"></div>
+
+            <div id="overlay-actions" class="mt-8 flex gap-4 hidden opacity-0 transition-opacity duration-500">
+                <button id="btn-minimize-overlay" class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-compress text-gray-400"></i> <span data-translate="minimize">Minimize</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Chat Modal -->
+        <div id="ai-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden transition-opacity duration-300"></div>
+        <div id="ai-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[600px] h-[650px] max-h-[90vh] glass-panel rounded-2xl z-[95] hidden flex-col border border-white/20 shadow-2xl modal-enter">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-t-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-fast shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">AI Assistant</h3>
+                        <p class="text-xs text-purple-300">Powered by Gemini - Elbana.net</p>
+                    </div>
+                </div>
+                <button id="close-ai" class="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 hover:scale-110 active:scale-95 duration-200"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-sm">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-500/20 flex-shrink-0 flex items-center justify-center border border-purple-500/30">
+                        <i class="fa-solid fa-robot text-purple-300 text-xs"></i>
+                    </div>
+                    <div class="glass-panel rounded-2xl rounded-tl-none p-3 max-w-[85%] text-gray-200">
+                        <p data-translate="aiIntro">Hello! I am your JS-DFE Assistant. I can help explain obfuscated code, detect vulnerabilities, or suggest improvements. Paste some code or use the buttons below!</p>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 mt-4 md:mt-0 z-10">
-                <button id="lang-toggle" class="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95">
-                    <i class="fa-solid fa-language text-blue-400 group-hover:rotate-12 transition-transform"></i>
-                    <span class="font-medium">English / العربية</span>
+            <div class="p-2 overflow-x-auto flex gap-2 border-t border-white/5 scrollbar-hide">
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-blue-300 transition-all hover:scale-105 active:scale-95" data-prompt="Explain this JavaScript code in detail.">
+                    <i class="fa-solid fa-magnifying-glass mr-1"></i> <span data-translate="btnExplain">Explain Code</span>
                 </button>
-                <a href="https://github.com/avotoko/javascript-deobfuscator" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 hover:scale-105 hover:shadow-lg">
-                    <i class="fa-brands fa-github text-xl"></i>
-                </a>
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-red-300 transition-all hover:scale-105 active:scale-95" data-prompt="Analyze this code for security vulnerabilities and malicious patterns.">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> <span data-translate="btnScan">Security Scan</span>
+                </button>
+                <button class="quick-prompt whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-green-300 transition-all hover:scale-105 active:scale-95" data-prompt="How can I refactor or clean up this code?">
+                    <i class="fa-solid fa-broom mr-1"></i> <span data-translate="btnRefactor">Refactor</span>
+                </button>
             </div>
-        </header>
 
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+                <div class="relative">
+                    <textarea id="chat-input" rows="1" class="w-full glass-input rounded-xl pl-4 pr-12 py-3 text-sm resize-none" placeholder="Ask Gemini..." data-translate-ph-key="ph-askAi"></textarea>
+                    <button id="send-chat" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+                <div class="text-[10px] text-center text-gray-500 mt-2">Gemini 2.5 Flash Preview</div>
+            </div>
+        </div>
+
+        <!-- AI Toggle Button -->
+        <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-purple-500/30 flex items-center justify-center z-[80] hover:scale-110 active:scale-90 transition-transform animate-float group" data-aos="zoom-in" data-aos-delay="1000">
+            <i class="fa-solid fa-sparkles text-white text-xl group-hover:rotate-12 transition-transform"></i>
+        </button>
+
+        <div class="container mx-auto px-4 py-8 max-w-7xl transition-all duration-300" id="main-content">
             
-            <!-- Left Sidebar -->
-            <div class="lg:col-span-4 space-y-6">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel rounded-2xl p-6 relative overflow-hidden" data-aos="fade-down" data-aos-duration="1000">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
                 
-                <!-- Info Card -->
-                <div class="glass-panel rounded-2xl p-5 relative group overflow-hidden" data-aos="fade-right" data-aos-delay="100">
-                    <div class="flex justify-between items-center mb-3 cursor-pointer" id="toggle-excuses">
-                        <h3 class="font-bold text-lg flex items-center gap-2 text-yellow-400">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                            <span data-translate="importantInfo">Important Info</span>
+                <div class="flex items-center space-x-4 rtl:space-x-reverse z-10">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-code text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                            JS <span class="text-blue-400">DFE</span> <span class="text-purple-400 text-sm align-top">+ AI</span>
+                        </h1>
+                        <div class="flex items-center gap-2 text-sm text-gray-400">
+                            <span id="version" class="bg-white/10 px-2 py-0.5 rounded text-xs">v3.3 (Fixed Center)</span>
+                            <span class="opacity-50">|</span>
+                            <span data-translate="subtitle">Deobfuscator Full of Excuses</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 mt-4 md:mt-0 z-10">
+                    <!-- User Info (Hidden until logged in) -->
+                    <div id="user-info" class="hidden items-center gap-3 bg-white/5 rounded-full px-4 py-1.5 border border-white/10">
+                        <img id="user-avatar" src="" class="w-6 h-6 rounded-full border border-white/30" alt="Avatar">
+                        <span id="user-name" class="text-xs text-gray-300 hidden md:block"></span>
+                        <button id="btn-logout" class="text-red-400 hover:text-red-300 ml-2" title="Logout">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>
+
+                    <button id="lang-toggle" class="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95">
+                        <i class="fa-solid fa-language text-blue-400 group-hover:rotate-12 transition-transform"></i>
+                        <span class="font-medium">English / العربية</span>
+                    </button>
+                    <a href="https://github.com/avotoko/javascript-deobfuscator" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 hover:scale-105 hover:shadow-lg">
+                        <i class="fa-brands fa-github text-xl"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Sidebar -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Info Card -->
+                    <div class="glass-panel rounded-2xl p-5 relative group overflow-hidden" data-aos="fade-right" data-aos-delay="100">
+                        <div class="flex justify-between items-center mb-3 cursor-pointer" id="toggle-excuses">
+                            <h3 class="font-bold text-lg flex items-center gap-2 text-yellow-400">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span data-translate="importantInfo">Important Info</span>
+                            </h3>
+                            <i class="fa-solid fa-chevron-down transition-transform duration-300" id="excuse-arrow"></i>
+                        </div>
+                        <div id="excuses-content" class="text-sm text-gray-300 space-y-2 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+                            <ul class="list-disc list-inside space-y-1 opacity-80 pl-2 rtl:pr-2 rtl:pl-0">
+                                <li data-translate="info1">Goal: Make code readable, not perfectly executable.</li>
+                                <li data-translate="info2">Built on Node.js & Babel.</li>
+                                <li><span class="text-purple-400 font-bold">NEW:</span> Gemini AI integrated for analysis.</li>
+                                <li><span class="text-green-400 font-bold">NEW:</span> Persistent History & Quick Tools.</li>
+                                <li><span class="text-red-400 font-bold">*1</span> <span data-translate="sac1">Sacrifice accuracy very much.</span></li>
+                                <li><span class="text-orange-400 font-bold">*2</span> <span data-translate="sac2">Sacrifice accuracy.</span></li>
+                                <li><span class="text-blue-400 font-bold">*3</span> <span data-translate="sac3">Rename collision risk.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Config Panel -->
+                    <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="200">
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+                            <i class="fa-solid fa-sliders text-blue-400"></i>
+                            <span data-translate="options">Configuration</span>
                         </h3>
-                        <i class="fa-solid fa-chevron-down transition-transform duration-300" id="excuse-arrow"></i>
+                        <div id="options-container" class="space-y-3"></div>
                     </div>
-                    <div id="excuses-content" class="text-sm text-gray-300 space-y-2 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
-                        <ul class="list-disc list-inside space-y-1 opacity-80 pl-2 rtl:pr-2 rtl:pl-0">
-                            <li data-translate="info1">Goal: Make code readable, not perfectly executable.</li>
-                            <li data-translate="info2">Built on Node.js & Babel.</li>
-                            <li><span class="text-purple-400 font-bold">NEW:</span> Gemini AI integrated for analysis.</li>
-                            <li><span class="text-green-400 font-bold">NEW:</span> Persistent History & Quick Tools.</li>
-                            <li><span class="text-red-400 font-bold">*1</span> <span data-translate="sac1">Sacrifice accuracy very much.</span></li>
-                            <li><span class="text-orange-400 font-bold">*2</span> <span data-translate="sac2">Sacrifice accuracy.</span></li>
-                            <li><span class="text-blue-400 font-bold">*3</span> <span data-translate="sac3">Rename collision risk.</span></li>
-                        </ul>
-                    </div>
-                </div>
 
-                <!-- Config Panel -->
-                <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="200">
-                    <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
-                        <i class="fa-solid fa-sliders text-blue-400"></i>
-                        <span data-translate="options">Configuration</span>
-                    </h3>
-                    <div id="options-container" class="space-y-3"></div>
-                </div>
+                    <!-- Extra Tools & History Panel -->
+                    <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="300">
+                        <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+                            <i class="fa-solid fa-toolbox text-green-400"></i>
+                            <span data-translate="tools">Extra Tools</span>
+                        </h3>
+                        
+                        <!-- Quick Decoder Tabs -->
+                        <div class="mb-4">
+                            <div class="flex space-x-2 rtl:space-x-reverse mb-2 overflow-x-auto pb-1">
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all tab-active hover:scale-105" data-tool="hex" data-translate="tabHex">Hex/Unicode</button>
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="base64">Base64</button>
+                                <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="url">URL</button>
+                            </div>
 
-                <!-- Extra Tools & History Panel (Expanded) -->
-                <div class="glass-panel rounded-2xl p-6" data-aos="fade-right" data-aos-delay="300">
-                    <h3 class="font-bold text-xl mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
-                        <i class="fa-solid fa-toolbox text-green-400"></i>
-                        <span data-translate="tools">Extra Tools</span>
-                    </h3>
-                    
-                    <!-- Quick Decoder Tabs -->
-                    <div class="mb-4">
-                        <div class="flex space-x-2 rtl:space-x-reverse mb-2 overflow-x-auto pb-1">
-                            <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all tab-active hover:scale-105" data-tool="hex" data-translate="tabHex">Hex/Unicode</button>
-                            <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="base64">Base64</button>
-                            <button class="tool-tab px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 border border-transparent transition-all hover:scale-105" data-tool="url">URL</button>
+                            <div class="flex gap-2 relative">
+                                <input type="text" id="decode-input" class="glass-input w-full p-2 rounded-lg text-xs font-mono pr-8" placeholder="\x68\x65\x6c\x6c\x6f">
+                                <button id="btn-quick-decode" class="absolute right-1 top-1 bottom-1 w-8 rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all hover:scale-110 flex items-center justify-center active:scale-95">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                            </div>
+                            <div id="decode-result" class="mt-2 text-xs text-green-300 font-mono hidden min-h-[1.5em] break-all bg-black/20 p-2 rounded border border-white/5"></div>
                         </div>
 
-                        <div class="flex gap-2 relative">
-                            <input type="text" id="decode-input" class="glass-input w-full p-2 rounded-lg text-xs font-mono pr-8" placeholder="\x68\x65\x6c\x6c\x6f">
-                            <button id="btn-quick-decode" class="absolute right-1 top-1 bottom-1 w-8 rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all hover:scale-110 flex items-center justify-center active:scale-95">
-                                <i class="fa-solid fa-bolt"></i>
+                        <!-- History -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs text-gray-400" data-translate="history">History (LocalStorage)</label>
+                                <button id="clear-history" class="text-[10px] text-red-400 hover:text-red-300 transition-colors hover:scale-105" title="Clear History">
+                                    <i class="fa-solid fa-trash"></i> <span data-translate="clearHistory">Clear</span>
+                                </button>
+                            </div>
+                            <ul id="history-list" class="space-y-1 text-xs text-gray-300 max-h-48 overflow-y-auto pr-1">
+                                <li class="p-2 bg-white/5 rounded text-center italic opacity-50" data-translate="noHistory">No history yet</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <!-- Input Area -->
+                    <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="100">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-t-2xl opacity-50"></div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="inputCode">Input Code</span>
+                                <div class="flex gap-2">
+                                    <button id="ai-analyze-input" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                                        <i class="fa-solid fa-robot"></i> <span data-translate="askAi">Ask AI</span>
+                                    </button>
+                                    <span class="text-xs text-gray-500 italic hidden md:inline" data-translate="dragDrop">Paste or Drag & Drop File</span>
+                                </div>
+                            </div>
+                            <textarea id="input" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm resize-y" placeholder="// Paste obfuscated code here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-wrap gap-3 items-center justify-between glass-panel rounded-xl p-3" data-aos="fade-up" data-aos-delay="200">
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button id="run" class="flex-1 md:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span data-translate="deobfuscate">Deobfuscate</span>
+                            </button>
+                            <button id="clear" class="w-12 h-12 rounded-xl bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Clear All">
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
-                        <div id="decode-result" class="mt-2 text-xs text-green-300 font-mono hidden min-h-[1.5em] break-all bg-black/20 p-2 rounded border border-white/5"></div>
+
+                        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                            <button id="copy" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                                <i class="fa-regular fa-copy"></i> <span data-translate="copy">Copy</span>
+                            </button>
+                            <a id="download" download="output.js" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer text-white no-underline">
+                                <i class="fa-solid fa-download"></i> <span data-translate="download">Download</span>
+                            </a>
+                            <button id="runCode" class="hidden whitespace-nowrap px-4 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-green-400 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> <span data-translate="runVm">Run in VM</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- History -->
-                    <div>
-                         <div class="flex justify-between items-center mb-2">
-                             <label class="text-xs text-gray-400" data-translate="history">History (LocalStorage)</label>
-                             <button id="clear-history" class="text-[10px] text-red-400 hover:text-red-300 transition-colors hover:scale-105" title="Clear History">
-                                 <i class="fa-solid fa-trash"></i> <span data-translate="clearHistory">Clear</span>
-                             </button>
-                         </div>
-                         <ul id="history-list" class="space-y-1 text-xs text-gray-300 max-h-48 overflow-y-auto pr-1">
-                             <li class="p-2 bg-white/5 rounded text-center italic opacity-50" data-translate="noHistory">No history yet</li>
-                         </ul>
+                    <!-- Output Area -->
+                    <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="300">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 rounded-t-2xl opacity-50"></div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="outputCode">Output Code</span>
+                                <div class="flex gap-2 items-center">
+                                    <button id="ai-analyze-output" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                                        <i class="fa-solid fa-magnifying-glass-chart"></i> <span data-translate="analyzeResult">Analyze Result</span>
+                                    </button>
+                                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                    <span class="text-xs text-gray-500" data-translate="ready">Ready</span>
+                                </div>
+                            </div>
+                            <textarea id="output" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm text-green-300 resize-y" readonly placeholder="// Deobfuscated result will appear here..."></textarea>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <!-- Right Content -->
-            <div class="lg:col-span-8 space-y-6">
-                
-                <!-- Input Area -->
-                <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="100">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-t-2xl opacity-50"></div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="inputCode">Input Code</span>
-                            <div class="flex gap-2">
-                                <button id="ai-analyze-input" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
-                                    <i class="fa-solid fa-robot"></i> <span data-translate="askAi">Ask AI</span>
-                                </button>
-                                <span class="text-xs text-gray-500 italic hidden md:inline" data-translate="dragDrop">Paste or Drag & Drop File</span>
-                            </div>
-                        </div>
-                        <textarea id="input" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm resize-y" placeholder="// Paste obfuscated code here..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Action Bar -->
-                <div class="flex flex-wrap gap-3 items-center justify-between glass-panel rounded-xl p-3" data-aos="fade-up" data-aos-delay="200">
-                    <div class="flex gap-3 w-full md:w-auto">
-                        <button id="run" class="flex-1 md:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span data-translate="deobfuscate">Deobfuscate</span>
-                        </button>
-                        <button id="clear" class="w-12 h-12 rounded-xl bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Clear All">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                        <button id="copy" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                            <i class="fa-regular fa-copy"></i> <span data-translate="copy">Copy</span>
-                        </button>
-                        <a id="download" download="output.js" class="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer text-white no-underline">
-                            <i class="fa-solid fa-download"></i> <span data-translate="download">Download</span>
-                        </a>
-                        <button id="runCode" class="hidden whitespace-nowrap px-4 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-green-400 text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                            <i class="fa-solid fa-play"></i> <span data-translate="runVm">Run in VM</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Output Area -->
-                <div class="glass-panel rounded-2xl p-1 relative" data-aos="fade-left" data-aos-delay="300">
-                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-teal-500 to-blue-500 rounded-t-2xl opacity-50"></div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-300 uppercase tracking-wider" data-translate="outputCode">Output Code</span>
-                             <div class="flex gap-2 items-center">
-                                <button id="ai-analyze-output" class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-500/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
-                                    <i class="fa-solid fa-magnifying-glass-chart"></i> <span data-translate="analyzeResult">Analyze Result</span>
-                                </button>
-                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <span class="text-xs text-gray-500" data-translate="ready">Ready</span>
-                            </div>
-                        </div>
-                        <textarea id="output" rows="12" spellcheck="false" class="glass-input w-full rounded-xl p-4 font-mono text-xs md:text-sm text-green-300 resize-y" readonly placeholder="// Deobfuscated result will appear here..."></textarea>
-                    </div>
-                </div>
-
-            </div>
+            <footer class="mt-12 text-center text-gray-500 text-sm pb-8" data-aos="fade-up" data-aos-offset="10">
+                <p>&copy; 2025 JS Deobfuscator Pro. <span data-translate="footer">Designed with Tailwind CSS & Glassmorphism.</span></p>
+                <p class="text-xs mt-2 opacity-60">
+                    Developed by <a href="https://www.elbana.net" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">Elbana.net</a>. All Rights Reserved.
+                </p>
+            </footer>
         </div>
-
-        <footer class="mt-12 text-center text-gray-500 text-sm pb-8" data-aos="fade-up" data-aos-offset="10">
-            <p>&copy; 2025 JS Deobfuscator Pro. <span data-translate="footer">Designed with Tailwind CSS & Glassmorphism.</span></p>
-            <p class="text-xs mt-2 opacity-60">
-                Developed by <a href="https://www.elbana.net" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">Elbana.net</a>. All Rights Reserved.
-            </p>
-        </footer>
     </div>
 
-<!-- External Libraries JS (AOS Only) -->
+<!-- External Libraries JS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<!-- Firebase Module -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const d = document;
+    const loginScreen = d.getElementById('login-screen');
+    const appContent = d.getElementById('app-content');
+    const googleBtn = d.getElementById('google-login-btn');
+    const userInfo = d.getElementById('user-info');
+    const userAvatar = d.getElementById('user-avatar');
+    const userName = d.getElementById('user-name');
+    const btnLogout = d.getElementById('btn-logout');
+
+    // --- PROTECTED CONFIGURATION (OBFUSCATED) ---
+    // Decodes the base64 encoded config string at runtime.
+    // This prevents casual reading of the source code.
+    const _0x9f = "eyJhcGlLZXkiOiJBSXphU3lEQWRubE9fUkZMQmJsMHZWMngwUUVFclliUFptQ2dMdTgiLCJhdXRoRG9tYWluIjoidGVzc3MyNC5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vdGVzc3MyNC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJ0ZXNzczI0Iiwic3RvcmFnZUJ1Y2tldCI6InRlc3NzMjQuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNTYxNDM3MjU3MTc4IiwiYXBwSWQiOiIxOjU2MTQzNzI1NzE3ODp3ZWI6MjQ5OTY4NTVjMWRkZjAzMGEyZTRlMyIsIm1lYXN1cmVtZW50SWQiOiJHLUpHOERLRZG4MVg1In0=";
+    
+    let firebaseConfig;
+    try {
+        firebaseConfig = JSON.parse(atob(_0x9f));
+    } catch(e){ console.error("Config Decryption Error", e); }
+
+    if (firebaseConfig && firebaseConfig.apiKey) {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        googleBtn.addEventListener('click', () => {
+            // Add loading state
+            const originalContent = googleBtn.innerHTML;
+            googleBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-gray-500"></i>';
+            googleBtn.classList.add('opacity-75', 'cursor-wait');
+            
+            signInWithPopup(auth, provider).then(() => {
+                // Success handled by listener
+            }).catch((error) => {
+                googleBtn.innerHTML = originalContent;
+                googleBtn.classList.remove('opacity-75', 'cursor-wait');
+                console.error("Login Failed:", error);
+                alert("Login Failed: " + error.message);
+            });
+        });
+
+        btnLogout.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            // Reset button state if needed
+            if(googleBtn.innerHTML.includes('fa-spin')) {
+                 googleBtn.innerHTML = `
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                    <span class="group-hover:text-blue-600 transition-colors">${document.documentElement.lang === 'ar' ? 'الدخول بحساب Google' : 'Sign in with Google'}</span>
+                 `;
+                 googleBtn.classList.remove('opacity-75', 'cursor-wait');
+            }
+
+            if (user) {
+                // Logged In
+                loginScreen.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                setTimeout(() => appContent.classList.remove('opacity-0'), 10);
+                
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                userAvatar.src = user.photoURL || 'https://via.placeholder.com/30';
+                userName.textContent = user.displayName || user.email;
+            } else {
+                // Logged Out
+                appContent.classList.add('opacity-0');
+                setTimeout(() => {
+                    appContent.classList.add('hidden');
+                    loginScreen.classList.remove('hidden');
+                }, 500);
+                
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+            }
+        });
+    } else {
+        console.error("Fatal Error: Firebase Configuration Failed.");
+        googleBtn.addEventListener('click', () => {
+            alert("System Error: Configuration missing.");
+        });
+    }
+</script>
 
 <script>
     // --- Initialize Animation Libraries ---
@@ -515,7 +640,7 @@
             tools: "Extra Tools",
             history: "History (Input & Output)",
             clearHistory: "Clear",
-            noHistory: "No history yet",
+            "no history yet": "No history yet",
             inputCode: "Input Code",
             askAi: "Ask AI",
             dragDrop: "Paste or Drag & Drop File",
@@ -547,6 +672,8 @@
             historyFoundMsg: "This code was processed before. Do you want to restore the result instantly?",
             btnRestore: "Restore",
             btnProcess: "Process Again",
+            loginSubtitle: "Please sign in to access the toolkit",
+            signInGoogle: "Sign in with Google",
             
             "eval-atob": "Evaluate atob(...) as string",
             "eval-assign": "Evaluate assignment expression [*1]",
@@ -574,7 +701,7 @@
             tools: "أدوات إضافية",
             history: "سجل العمليات (المدخلات والمخرجات)",
             clearHistory: "مسح السجل",
-            noHistory: "لا يوجد سجل حتى الآن",
+            "no history yet": "لا يوجد سجل حتى الآن",
             inputCode: "الكود المدخل",
             askAi: "سؤال الذكاء الاصطناعي",
             dragDrop: "الصق أو اسحب الملف هنا",
@@ -606,6 +733,8 @@
             historyFoundMsg: "تمت معالجة هذا الكود من قبل. هل تريد استعادة النتيجة فوراً؟",
             btnRestore: "استعادة",
             btnProcess: "معالجة مجدداً",
+            loginSubtitle: "يرجى تسجيل الدخول للوصول للأداة",
+            signInGoogle: "الدخول بحساب Google",
 
             "eval-atob": "تقييم atob(...) كسلسلة نصية",
             "eval-assign": "تقييم تعبيرات التعيين [*1]",
@@ -659,7 +788,7 @@
             let { version } = window["sd-decoder"];
             d.getElementById("version").textContent = "v" + version;
         } catch(e) {
-            d.getElementById("version").textContent = "v2.8";
+            d.getElementById("version").textContent = "v3.2";
         }
 
         // 2. Build Options (Original Logic Preserved)
@@ -788,8 +917,8 @@
             if (history.length === 0) {
                 const li = d.createElement("li");
                 li.className = "p-2 bg-white/5 rounded text-center italic opacity-50";
-                li.setAttribute("data-translate", "noHistory");
-                li.textContent = translations[currentLang].noHistory;
+                li.setAttribute("data-translate", "no history yet");
+                li.textContent = translations[currentLang]["no history yet"];
                 list.appendChild(li);
                 return;
             }
