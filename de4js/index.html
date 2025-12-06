@@ -534,16 +534,15 @@
     const btnLogout = d.getElementById('btn-logout');
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDAdnlO_RFLBbl0vV2x0QEErYbPZmCgLu8",
-  authDomain: "tesss24.firebaseapp.com",
-  databaseURL: "https://tesss24-default-rtdb.firebaseio.com",
-  projectId: "tesss24",
-  storageBucket: "tesss24.firebasestorage.app",
-  messagingSenderId: "561437257178",
-  appId: "1:561437257178:web:24996855c1ddf030a2e4e3",
-  measurementId: "G-JG8DKG81X5"
-};
+// --- PROTECTED CONFIGURATION (OBFUSCATED) ---
+    // Decodes the base64 encoded config string at runtime.
+    // This prevents casual reading of the source code.
+    const _0x9f = "eyJhcGlLZXkiOiJBSXphU3lEQWRubE9fUkZMQmJsMHZWMngwUUVFclliUFptQ2dMdTgiLCJhdXRoRG9tYWluIjoidGVzc3MyNC5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vdGVzc3MyNC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJ0ZXNzczI0Iiwic3RvcmFnZUJ1Y2tldCI6InRlc3NzMjQuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNTYxNDM3MjU3MTc4IiwiYXBwSWQiOiIxOjU2MTQzNzI1NzE3ODp3ZWI6MjQ5OTY4NTVjMWRkZjAzMGEyZTRlMyIsIm1lYXN1cmVtZW50SWQiOiJHLUpHOERLRZG4MVg1In0=";
+    
+    let firebaseConfig;
+    try {
+        firebaseConfig = JSON.parse(atob(_0x9f));
+    } catch(e){ console.error("Config Decryption Error", e); }
 
     if (firebaseConfig && firebaseConfig.apiKey) {
         const app = initializeApp(firebaseConfig);
