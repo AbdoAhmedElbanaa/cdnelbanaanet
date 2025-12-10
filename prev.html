@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قالب Alpha Blog - قالب بلوجر عصري للمجلات - تصميم Ultra Professional</title>
+    <!-- تضمين Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تضمين الخط العربي: Cairo -->
+<link href='https://cdn.elbana.net/arfontmi.css' rel='stylesheet'/>
+    <!-- Lucide Icons for aesthetic enhancement -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CodeMirror V5 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    
+    <style>
+        /* التكوين الأولي لـ Tailwind والمظهر الاحترافي */
+        :root {
+            /* تعميق الألوان للخلفية والزجاج */
+            --glass-bg: rgba(255, 255, 255, 0.08); 
+            --glass-border: rgba(255, 255, 255, 0.3); 
+            --primary-color: #5b21b6; 
+            --secondary-color: #8b5cf6; 
+            --highlight-color: #06b6d4; 
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'MiSans Arabic', sans-serif;
+            /* تدرج لوني عميق واحترافي */
+            background: linear-gradient(135deg, #1f013d 0%, #0d012e 50%, #000000 100%);
+            min-height: 100vh;
+            color: #f3f4f6; 
+            overflow-x: hidden;
+        }
+
+        /* تخصيص تأثير Glassmorphism الأقوى */
+        .glass-card {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5); 
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px); 
+            box-shadow: 0 18px 50px 0 rgba(0, 0, 0, 0.6);
+        }
+        
+        /* تحسين الهيدر ليكون أكثر وضوحًا وجاذبية - FULL WIDTH & DYNAMIC */
+        #header {
+             /* إلغاء الهامش وجعله بكامل العرض */
+             margin: 0 !important;
+             border-radius: 0 !important;
+             padding: 1rem 0; /* padding عمودي فقط */
+             background-color: rgba(255, 255, 255, 0.05); /* شفاف جداً في الأعلى */
+             backdrop-filter: blur(5px);
+             -webkit-backdrop-filter: blur(5px);
+             box-shadow: none;
+             border: none;
+             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+             transition: all 0.3s ease-in-out;
+             position: fixed; /* تثبيت الهيدر */
+             width: 100%;
+             top: 0;
+             z-index: 50;
+        }
+        
+        /* حالة الهيدر عند التمرير للأسفل */
+        #header.scrolled {
+             padding: 0.75rem 0;
+             background-color: rgba(31, 1, 61, 0.8); /* خلفية معتمة عند التمرير */
+             backdrop-filter: blur(20px);
+             -webkit-backdrop-filter: blur(20px);
+             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* محتوى الهيدر الداخلي لضمان بقائه في المنتصف */
+        #header .header-content {
+             max-width: 88rem; /* نفس عرض الـ container الرئيسي */
+             margin: 0 auto;
+             padding: 0 1.5rem; /* حماية من الحواف */
+        }
+        
+        /* تخصيص تصميم اللوجو */
+        .logo-container {
+             display: flex;
+             align-items: center;
+             cursor: pointer;
+        }
+        .logo-icon {
+             background: linear-gradient(135deg, var(--highlight-color), var(--secondary-color));
+             box-shadow: 0 0 15px var(--highlight-color), inset 0 0 5px white; /* توهج وضوء داخلي */
+             transition: all 0.3s ease-in-out;
+             transform: scale(1);
+        }
+        .logo-container:hover .logo-icon {
+             transform: scale(1.05); /* تأثير تكبير بسيط عند التحويم */
+             box-shadow: 0 0 20px var(--highlight-color), inset 0 0 8px white;
+        }
+        
+        /* تأثير الأزرار المحسّن (3D effect) */
+        .glass-button {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .glass-button:hover {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.7);
+        }
+
+        /* تأثيرات الأيقونات في قسم المميزات */
+        .feature-item:hover .feature-icon {
+            color: var(--highlight-color); 
+            transform: scale(1.15) rotate(3deg);
+        }
+
+        .feature-icon {
+            transition: color 0.4s ease, transform 0.4s ease;
+        }
+        
+        /* شريط تقدم دائري للأداء - CSS Placeholder */
+        .score-circle {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle closest-side, #0d012e 0%, #0d012e 60%, transparent 60%), conic-gradient(var(--highlight-color) 0%, var(--highlight-color) var(--score-percent), #374151 var(--score-percent), #374151 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--highlight-color);
+        }
+
+        /* تخصيص الخلفية الزخرفية (Blobs) */
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -60px) scale(1.2); }
+            66% { transform: translate(-30px, 30px) scale(0.95); }
+        }
+        /* حركة الفقاعات الإضافية لزيادة الفخامة والعمق */
+        .animate-blob-2 {
+            animation: blob 9s infinite cubic-bezier(0.5, 0.5, 0.5, 1);
+            animation-delay: 4s;
+        }
+        .animate-blob-3 {
+            animation: blob 6s infinite cubic-bezier(0.2, 0.8, 0.8, 0.2);
+            animation-delay: 1s;
+        }
+        .animate-blob-4 {
+            animation: blob 10s infinite linear;
+            animation-delay: 5s;
+        }
+        
+
+        /* تمييز الروابط النشطة في القائمة */
+        .nav-link {
+            transition: all 0.3s ease-in-out;
+            border-bottom: 2px solid transparent; /* قاعدة لتجنب CLS */
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--highlight-color);
+            border-bottom: 2px solid var(--highlight-color);
+            padding-bottom: 6px;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.5); /* تأثير توهج بسيط */
+        }
+
+        /* إخفاء/إظهار تفاصيل الأسئلة الشائعة */
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        .faq-item.active .faq-content {
+            max-height: 500px; 
+            transition: max-height 0.5s ease-in;
+        }
+
+        /* تصميم الـ Sidebar الخاص بالشرح والأسئلة الشائعة */
+        #docs-sidebar a, #faq-sidebar a {
+            padding: 0.75rem;
+            display: flex; /* لدمج الأيقونات */
+            align-items: center;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, color 0.2s;
+            color: #ccc;
+        }
+        #docs-sidebar a:hover, #docs-sidebar a.active,
+        #faq-sidebar a:hover, #faq-sidebar a.active {
+            background-color: rgba(6, 182, 212, 0.1); 
+            color: var(--highlight-color);
+        }
+        #docs-sidebar h3, #faq-sidebar h3 {
+            color: var(--secondary-color);
+            padding: 0.5rem 0.75rem;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+        
+        /* تنسيق بطاقات التحديثات */
+        .update-card {
+            border-right: 4px solid var(--highlight-color);
+            position: relative;
+            padding-right: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .update-card::before {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 1rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--highlight-color);
+            border: 3px solid #1f013d; 
+        }
+        
+        /* تنسيق منطقة العملاء */
+        .client-stats > div {
+            @apply flex flex-col items-center p-4 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-purple-400/50;
+        }
+        .client-stats span {
+            @apply text-sm font-medium text-gray-400;
+        }
+        .client-stats b {
+            @apply text-3xl font-extrabold mt-1 text-cyan-300;
+        }
+        .blog-item {
+            @apply flex justify-between items-center p-3 rounded-lg bg-gray-800/60 border border-gray-700 hover:bg-gray-700/60 transition-colors duration-200 cursor-pointer;
+        }
+        
+        /* تخصيص قسم العملاء */
+        #clients-view .client-container {
+            @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+        }
+        #clients-view .client-right {
+            @apply lg:col-span-1 space-y-6;
+        }
+        #clients-view .client-left {
+            @apply lg:col-span-2 space-y-6;
+        }
+        
+        /* تنسيق أداة الدمج */
+        .merger-form textarea {
+            @apply w-full h-64 p-4 text-sm font-mono bg-black/30 border border-purple-400/50 rounded-lg text-white resize-none;
+        }
+        .merger-form .merge-button {
+            @apply bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-3 rounded-full mt-4 flex items-center justify-center transition-all;
+            writing-mode: horizontal-tb; 
+        }
+
+        .code-label {
+            @apply block text-sm font-semibold text-purple-400 mb-2 mt-4;
+        }
+
+        /* CodeMirror custom styling */
+        .CodeMirror {
+            height: 256px !important; /* Fixed height for text areas */
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 0.5rem;
+        }
+        .CodeMirror-vscrollbar {
+            width: 8px; 
+            background: #2a2c3a;
+        }
+        .CodeMirror-vscrollbar div {
+            background-color: #8b5cf6 !important; 
+        }
+        
+        /* Transition effect class for views */
+        .view-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            /* يتم إخفاؤها في CSS عند البدء */
+            opacity: 1; /* حالة الظهور الافتراضية */
+        }
+        .view-transition.fade-out {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            /* يتم التحكم في display/hidden بالجافاسكريبت */
+        }
+        .view-transition.hidden {
+             display: none !important;
+        }
+        
+
+        /* Loading Screen Style */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1f013d 0%, #0d012e 100%);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+        }
+        .loader {
+            border: 8px solid rgba(255, 255, 255, 0.2);
+            border-top: 8px solid var(--highlight-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Scroll Reveal Styles */
+        .scroll-reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .scroll-reveal-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+    </style>
+</head>
+<body class="antialiased">
+    <!-- خلفية زخرفية لتعزيز تأثير Glassmorphism و العمق -->
+    <div class="absolute inset-0 z-0 overflow-hidden">
+        <!-- فقاعة بنفسجية حادة (1) -->
+        <div class="absolute top-0 right-1/4 w-[28rem] h-[28rem] bg-purple-700/30 rounded-full mix-blend-lighten filter blur-[70px] opacity-40 animate-blob"></div>
+        <!-- فقاعة سماوية هادئة (2) -->
+        <div class="absolute bottom-1/4 left-1/4 w-[24rem] h-[24rem] bg-cyan-500/30 rounded-full mix-blend-lighten filter blur-[70px] opacity-40 animate-blob animation-delay-2000"></div>
+        <!-- فقاعة ثالثة (3) - بنفسجي فاتح -->
+        <div class="absolute top-1/2 left-1/2 w-[32rem] h-[32rem] bg-purple-400/20 rounded-full mix-blend-lighten filter blur-[80px] opacity-30 animate-blob animate-blob-3"></div>
+        <!-- فقاعة رابعة (4) - أخضر/أزرق -->
+        <div class="absolute bottom-0 right-0 w-[20rem] h-[20rem] bg-green-500/10 rounded-full mix-blend-lighten filter blur-[90px] opacity-20 animate-blob animate-blob-4"></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="flex flex-col space-y-4">
+        <div class="loader"></div>
+        <p class="text-white text-xl font-bold">جارِ تحميل واجهة Alpha Blog...</p>
+    </div>
+    
+    <!-- CodeMirror V5 Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <!-- Typewriter Library -->
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    <!-- Scroll Reveal Library (Simple Polyfill/Implementation) -->
+    <script>
+        // Simple Scroll Reveal Implementation
+        const scrollReveal = (selector) => {
+            const elements = document.querySelectorAll(selector);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            elements.forEach(el => {
+                el.classList.add('scroll-reveal-item');
+                observer.observe(el);
+            });
+        };
+    </script>
+
+    <!-- Main Content Container -->
+    <div class="main-contenthome relative z-10 min-h-screen pt-24 ">
+        
+        <!-- ==================== Header & Navigation ==================== -->
+        <header id="header" class="sticky top-0 z-50">
+            <div class="header-content flex flex-col md:flex-row justify-between items-center">
+                <!-- الشعار -->
+                <div class="logo-container flex items-center space-x-3 space-x-reverse mb-4 md:mb-0" onclick="switchView('home', '#intro')">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJR3IzL0RRotc0J39jOd3SwNmLo_rcy6UowZIfLxsxT1KAErKdS2GmveGXqu8h-5OezAY_ULjUpiEPQ7h7az7IcImhFo6IWEgfJ9REflM-aC7q6bb9fzs80h8WVGasIqaxDzMTfukkOoU/s1600/S-SHORT.png" alt="ALPHA BLOG Logo" class="logo-icon h-12 w-12 rounded-full border border-white/40 p-1">
+                    <span class="text-3xl font-black text-white tracking-widest bg-clip-text text-transparent bg-gradient-to-l from-purple-300 to-cyan-300">ALPHA BLOG</span>
+                </div>
+
+                <!-- قائمة التنقل -->
+                <nav class="w-full md:w-auto">
+                    <ul class="flex flex-wrap justify-center md:justify-end space-x-6 space-x-reverse text-base font-semibold">
+                        <!-- تم إضافة data-view لتحديد طريقة العرض -->
+                        <li><a href="#intro" class="nav-link px-3 py-2 transition-all active flex items-center" data-view="home"><i data-lucide="home" class="w-5 h-5 ml-2"></i>الرئيسية</a></li>
+                        <li><a href="#Documentation-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="docs"><i data-lucide="book-open" class="w-5 h-5 ml-2"></i>ملف الشرح</a></li>
+                        <li><a href="#FAQ-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="faq"><i data-lucide="help-circle" class="w-5 h-5 ml-2"></i>الأسئلة الشائعة</a></li>
+                        <li><a href="#Updates-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="updates"><i data-lucide="git-branch" class="w-5 h-5 ml-2"></i>التحديثات</a></li>
+                        <li><a href="#Clients-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="clients"><i data-lucide="crown" class="w-5 h-5 ml-2"></i>العملاء</a></li> <!-- الرابط الجديد -->
+                        <li><a href="#Merger-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="merger"><i data-lucide="layers-3" class="w-5 h-5 ml-2"></i>دمج الإصدارات</a></li> <!-- الرابط الجديد: دمج الإصدارات -->
+                        <li><a href="#Purchase" class="nav-link px-3 py-2 transition-all flex items-center" data-view="home-section"><i data-lucide="shopping-bag" class="w-5 h-5 ml-2"></i>الشراء</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+
+        <!-- ==================== LANDING PAGE VIEW (الرئيسية) ==================== -->
+        <div id="landing-view" class="view-transition">
+            <!-- Hero Section (Intro) -->
+            <section id="intro" class="max-w-7xl mx-auto text-center py-20 px-4 mb-16">
+                <h1 id="typewriter-text" class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-snug">
+                   <!-- Typewriter will render here -->
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-10 font-medium scroll-reveal-item">
+                    تصميم احترافي متكامل، سيو فائق السرعة، ونظام متطور لإدارة المؤلفين ومشاركة الأرباح، مصمم خصيصاً للمحتوى العربي الراقي.
+                </p>
+
+                <div class="flex justify-center space-x-8 space-x-reverse font-bold scroll-reveal-item">
+                    <a href="https://ALPHA BLOG-demo.blogspot.com/" target="_blank" class="glass-button px-10 py-3.5 rounded-full text-white shadow-2xl flex items-center text-lg">
+                        <i data-lucide="eye" class="w-6 h-6 ml-3"></i>
+                        عرض القالب المباشر
+                    </a>
+                    <a href="#Purchase" class="glass-button bg-gray-800/50 border border-white/20 px-10 py-3.5 rounded-full text-white hover:bg-gray-700/60 shadow-xl flex items-center text-lg">
+                        <i data-lucide="shopping-bag" class="w-6 h-6 ml-3"></i>
+                        احصل على نسختك الآن
+                    </a>
+                </div>
+            </section>
+
+            <!-- Video Demo Section -->
+            <section id="VideoDemo" class="max-w-7xl mx-auto mb-20 px-4 scroll-reveal-item">
+                <div class="glass-card p-10 rounded-2xl text-center">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 pb-3 text-center flex items-center justify-center">
+                        <i data-lucide="monitor-play" class="w-8 h-8 ml-3"></i>
+                        شاهد القالب في عمل: عرض مرئي مفصل
+                    </h2>
+                    <div class="aspect-video w-full max-w-5xl mx-auto rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl">
+                        <!-- Placeholder for YouTube/Vimeo Embed -->
+                        <iframe 
+                            class="w-full h-full" 
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=0" 
+                            title="Template Video Demo Placeholder" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="text-gray-400 mt-4 text-sm">
+                        (ملحوظة: هذا الفيديو هو مثال توضيحي. يمكن وضع شرح كامل للقالب هنا.)
+                    </p>
+                </div>
+            </section>
+
+            <!-- Mockup Images with subtle gradient border -->
+            <section id="Mockups" class="max-w-7xl mx-auto mb-20 px-4 scroll-reveal-item">
+                <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 pb-3 text-center">معرض التصميمات والأشكال (Mockups)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Mockup 1: Desktop View -->
+                    <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Desktop+Home+Page+View" alt="نموذج عرض سطح المكتب" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <p class="text-center text-gray-400 mt-3 font-medium text-sm">شكل الصفحة الرئيسية على الحاسوب</p>
+                    </div>
+
+                    <!-- Mockup 2: Post Page View -->
+                    <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Single+Post+Page+Layout" alt="نموذج صفحة المقال الفردي" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <p class="text-center text-gray-400 mt-3 font-medium text-sm">تصميم صفحة التدوينة الفردية</p>
+                    </div>
+
+                    <!-- Mockup 3: Mobile View -->
+                    <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Fully+Responsive+Mobile+View" alt="نموذج العرض المتجاوب للهاتف" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <p class="text-center text-gray-400 mt-3 font-medium text-sm">التجاوب الكامل على أجهزة الموبايل</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics Section -->
+            <section id="Performance" class="max-w-7xl mx-auto mb-20 px-4 scroll-reveal-item">
+                <div class="glass-card p-10 rounded-2xl text-center">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 pb-3 text-center flex items-center justify-center">
+                        <i data-lucide="gauge" class="w-8 h-8 ml-3"></i>
+                        مقاييس الأداء: السرعة وجودة السيو
+                    </h2>
+                    <p class="text-gray-300 text-lg max-w-3xl mx-auto mb-10">
+                        قالب Alpha Blog مصمم لأعلى مستويات الأداء، مما يضمن لك أفضل ترتيب في محركات البحث وتجربة مستخدم لا مثيل لها.
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        
+                        <!-- Score 1: Performance -->
+                        <div class="flex flex-col items-center">
+                            <div class="score-circle" style="--score-percent: 96%;"><span class="drop-shadow-lg">96</span></div>
+                            <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="zap" class="w-5 h-5 ml-2 text-cyan-400"></i> السرعة والأداء</h4>
+                        </div>
+
+                        <!-- Score 2: Accessibility -->
+                        <div class="flex flex-col items-center">
+                            <div class="score-circle" style="--score-percent: 99%;"><span class="drop-shadow-lg">99</span></div>
+                            <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="accessibility" class="w-5 h-5 ml-2 text-cyan-400"></i> إمكانية الوصول</h4>
+                        </div>
+
+                        <!-- Score 3: Best Practices -->
+                        <div class="flex flex-col items-center">
+                            <div class="score-circle" style="--score-percent: 100%;"><span class="drop-shadow-lg">100</span></div>
+                            <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="check-square" class="w-5 h-5 ml-2 text-cyan-400"></i> أفضل الممارسات</h4>
+                        </div>
+
+                        <!-- Score 4: SEO -->
+                        <div class="flex flex-col items-center">
+                            <div class="score-circle" style="--score-percent: 98%;"><span class="drop-shadow-lg">98</span></div>
+                            <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="trending-up" class="w-5 h-5 ml-2 text-cyan-400"></i> تحسين محركات البحث</h4>
+                        </div>
+                    </div>
+                    <p class="text-gray-500 mt-6 text-sm">
+                        (النتائج مستوحاة من اختبارات Google PageSpeed Insights على نماذج حقيقية.)
+                    </p>
+                </div>
+            </section>
+
+            <!-- Content Sections (About, Features, Advantages) -->
+            <main class="main-content max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-10">
+                
+                <!-- Section 1: عن القالب (About) -->
+                <section id="About" class="glass-card p-8 rounded-2xl lg:col-span-2 scroll-reveal-item">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-4 border-b border-white/20 pb-3">عن القالب: رؤية متطورة</h2>
+                    <h3 class="text-2xl font-semibold text-white mb-6">قالب Alpha Blog – قالب بلوجر عصري للمجلات</h3>
+                    <p class="text-gray-300 text-lg mb-8 leading-relaxed">
+                        Alpha Blog هو أكثر من مجرد قالب، إنه منصة متكاملة على بلوجر مصممة لدعم المجلات الرقمية والمدونات الضخمة ذات نظام مشاركة الأرباح والمؤلفين المتعددين. يتميز بلوحة تحكم متقدمة، وأدوات تعليق متنوعة، وميزات حصرية تعزز من تجربة المستخدم ورفع قيمة السيو.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
+                        <!-- Column 1: تفاصيل فنية -->
+                        <ul class="space-y-4">
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="layout-grid" class="w-5 h-5 ml-2 text-cyan-400"></i> المنصة:</b>
+                                <span class="text-cyan-300 font-extrabold">Blogger</span>
+                            </li>
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="tag" class="w-5 h-5 ml-2 text-cyan-400"></i> التصنيف:</b>
+                                <span class="text-white">قالب مجلة (Magazine Template)</span>
+                            </li>
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="calendar" class="w-5 h-5 ml-2 text-cyan-400"></i> تاريخ الإطلاق:</b>
+                                <span class="text-white">07 يوليو 2018</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="globe" class="w-5 h-5 ml-2 text-cyan-400"></i> اللغة الرئيسية:</b>
+                                <span class="text-white flex items-center">العربية ( مصر )</span>
+                            </li>
+                        </ul>
+                        <!-- Column 2: تفاصيل التطوير -->
+                        <ul class="space-y-4">
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="code" class="w-5 h-5 ml-2 text-cyan-400"></i> تصميم وتكويد:</b>
+                                <a href="#" target="_blank" class="text-cyan-300 hover:text-cyan-500 transition-colors font-medium">AbdoElbanaa</a>
+                            </li>
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="cpu" class="w-5 h-5 ml-2 text-cyan-400"></i> برمجة بلوجر:</b>
+                                <a href="#" target="_blank" class="text-cyan-300 hover:text-cyan-500 transition-colors font-medium">ElbanNet</a>
+                            </li>
+                            <li class="flex justify-between items-center pb-3 border-b border-white/10">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="rocket" class="w-5 h-5 ml-2 text-cyan-400"></i> الإصدار الحالي:</b>
+                                <span class="text-white font-mono text-lg">2.3.1</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <b class="text-purple-300 flex items-center"><i data-lucide="clock" class="w-5 h-5 ml-2 text-cyan-400"></i> آخر تحديث:</b>
+                                <span class="text-white">مايو 2023</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <!-- Section 2: ملامح القالب (Features - Focused List) -->
+                <section id="Features" class="glass-card p-8 rounded-2xl scroll-reveal-item">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-6 border-b border-white/20 pb-3">ملامح القالب الرئيسية</h2>
+                    <ul class="space-y-5">
+                        <li class="flex items-start feature-item border-b border-white/5 pb-3">
+                            <i data-lucide="message-circle-code" class="feature-icon w-7 h-7 ml-3 mt-1 text-purple-400 flex-shrink-0"></i>
+                            <span class="text-gray-200 text-lg font-medium">دعم أنظمة تعليقات متطورة (فيسبوك، ديسكش، بلوجر).</span>
+                        </li>
+                        <li class="flex items-start feature-item border-b border-white/5 pb-3">
+                            <i data-lucide="layers-3" class="feature-icon w-7 h-7 ml-3 mt-1 text-purple-400 flex-shrink-0"></i>
+                            <span class="text-gray-200 text-lg font-medium">وحدات عرض ديناميكية (سلايدر وأنماط متعددة) في الصفحة الرئيسية.</span>
+                        </li>
+                        <li class="flex items-start feature-item border-b border-white/5 pb-3">
+                            <i data-lucide="dollar-sign" class="feature-icon w-7 h-7 ml-3 mt-1 text-purple-400 flex-shrink-0"></i>
+                            <span class="text-gray-200 text-lg font-medium">مساحات إعلانية ذكية ومجهزة بأماكن استراتيجية لزيادة الأرباح.</span>
+                        </li>
+                        <li class="flex items-start feature-item border-b border-white/5 pb-3">
+                            <i data-lucide="sidebar-right" class="feature-icon w-7 h-7 ml-3 mt-1 text-purple-400 flex-shrink-0"></i>
+                            <span class="text-gray-200 text-lg font-medium">خيارات متعددة لعرض التدوينات في الشريط الجانبي والفوتر.</span>
+                        </li>
+                        <li class="flex items-start feature-item">
+                            <i data-lucide="share-2" class="feature-icon w-7 h-7 ml-3 mt-1 text-purple-400 flex-shrink-0"></i>
+                            <span class="text-gray-200 text-lg font-medium">أداة عرض تفاعلية لمواقع التواصل الاجتماعي وعداد المشتركين.</span>
+                        </li>
+                    </ul>
+                </section>
+
+            </main>
+
+            <!-- Section 3: مميزات القالب (Advantages - Full List) -->
+            <section id="Adventages" class="max-w-7xl mx-auto px-4 mt-16 scroll-reveal-item">
+                <div class="glass-card p-10 rounded-2xl">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 border-b border-white/20 pb-3 text-center">المميزات التنافسية (Competitive Advantages)</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        
+                        <!-- Item: لوحة تحكم قوية -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="settings-2" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                تحكم لا محدود
+                            </h4>
+                            <p class="text-gray-400 text-sm">لوحة تحكم قوية وسهلة تتيح تخصيص جميع العناصر واختيار عدد غير محدود من الألوان بمرونة عالية.</p>
+                        </div>
+                        <!-- Item: نظام مشاركة الأرباح -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="split" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                مشاركة أرباح المؤلفين
+                            </h4>
+                            <p class="text-gray-400 text-sm">إمكانية تخصيص شفرات إعلانية لكل كاتب لتظهر حصرياً في موضوعاته، مما يدعم نموذج المدونات الجماعية.</p>
+                        </div>
+                        <!-- Item: خدمات ما بعد البيع -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="handshake" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                دعم فني وتحديثات
+                            </h4>
+                            <p class="text-gray-400 text-sm">دعم فني مجاني ومستمر، بالإضافة إلى تحديثات مجانية لضمان التوافق مع أحدث معايير بلوجر.</p>
+                        </div>
+                        <!-- Item: متجاوب (Responsive) -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="scan-eye" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                تجاوب مثالي (Fully Responsive)
+                            </h4>
+                            <p class="text-gray-400 text-sm">تكامل تام مع جميع مقاسات الشاشات، الهواتف الذكية، والتابلت، مع نموذج خاص بالطباعة.</p>
+                        </div>
+                        <!-- Item: كود نظيف -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="zap" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                سيو عالي السرعة والنظافة
+                            </h4>
+                            <p class="text-gray-400 text-sm">كود خالي من الأخطاء، سيو قوي بأحدث هيكلة (Schema)، وسرعة تحميل فائقة.</p>
+                        </div>
+                        <!-- Item: سكربت منع النسخ -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="copy-slash" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                حماية المحتوى
+                            </h4>
+                            <p class="text-gray-400 text-sm">سكربت فعال لمنع نسخ محتوى المشاركات، يحافظ على حقوق الملكية الفكرية لمحتواك.</p>
+                        </div>
+                        <!-- Item: خاصية تقسيم الموضوع -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="file-splitter" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                تقسيم الموضوع
+                            </h4>
+                            <p class="text-gray-400 text-sm">خاصية حصرية لتقسيم التدوينة الطويلة إلى عدة صفحات باستخدام كود قصير، لتحسين قراءة المستخدم.</p>
+                        </div>
+                        <!-- Item: كود محتوى مخفي -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="lock-keyhole" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                المحتوى المشروط
+                            </h4>
+                            <p class="text-gray-400 text-sm">إضافة كود محتوى مخفي لا يظهر إلا بعد قيام الزائر بمشاركة الموضوع على منصات التواصل الاجتماعي.</p>
+                        </div>
+                        <!-- Item: صفحات حصرية للمؤلفين -->
+                        <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
+                            <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
+                                <i data-lucide="users-2" class="w-6 h-6 ml-3 text-purple-400"></i>
+                                صفحات المؤلفين
+                            </h4>
+                            <p class="text-gray-400 text-sm">صفحات مخصصة لعرض جميع كتّاب المدونة بشكل فردي أو جماعي مع نبذة وروابط التواصل الاجتماعي.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Purchase Section (kept inside landing-view) -->
+            <section id="Purchase" class="max-w-6xl mx-auto px-4 mt-20 text-center scroll-reveal-item">
+                <h2 class="text-6xl font-extrabold text-white mb-6">
+                    استثمر في تميزك <span class="text-red-400">عشرة دولارات فقط</span>
+                </h2>
+                <p class="text-gray-300 text-xl mb-10 font-light">
+                    استلم نسختك الأصلية وتفعيل الدعم الفني والتحديثات المجانية فوراً.
+                </p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <!-- منصات الشراء -->
+                    <!-- PayPal -->
+                    <a href="https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=AJKC9QC8ABLM8" target="_blank" class="glass-button bg-purple-700/80 hover:bg-purple-600/90 p-6 rounded-2xl flex flex-col items-center justify-center h-32 shadow-xl hover:shadow-2xl">
+                        <i data-lucide="credit-card" class="w-9 h-9 mb-1 text-white"></i>
+                        <span class="font-bold text-lg">PayPal</span>
+                    </a>
+                    <!-- Monafiz -->
+                    <a href="https://monafiz.com/ALPHA BLOG" target="_blank" class="glass-button bg-cyan-700/80 hover:bg-cyan-600/90 p-6 rounded-2xl flex flex-col items-center justify-center h-32 shadow-xl hover:shadow-2xl">
+                        <i data-lucide="briefcase" class="w-9 h-9 mb-1 text-white"></i>
+                        <span class="font-bold text-lg">Monafiz</span>
+                    </a>
+                    <!-- Khamsat -->
+                    <a href="https://khamsat.com/programming/content-management-systems/928169/?r=848097" target="_blank" class="glass-button bg-orange-700/80 hover:bg-orange-600/90 p-6 rounded-2xl flex flex-col items-center justify-center h-32 shadow-xl hover:shadow-2xl">
+                        <i data-lucide="package-open" class="w-9 h-9 mb-1 text-white"></i>
+                        <span class="font-bold text-lg">Khamsat</span>
+                    </a>
+                    <!-- Kafiil -->
+                    <a href="https://kafiil.com/services/5657?ref=674b2064-2be3-11ea-9fe1-e6161ba8d798" target="_blank" class="glass-button bg-fuchsia-700/80 hover:bg-fuchsia-600/90 p-6 rounded-2xl flex flex-col items-center justify-center h-32 shadow-xl hover:shadow-2xl">
+                        <i data-lucide="users-round" class="w-9 h-9 mb-1 text-white"></i>
+                        <span class="font-bold text-lg">Kafiil</span>
+                    </a>
+                </div>
+                <p class="text-sm text-gray-500 mt-6 font-medium">للدفع عبر فودافون كاش أو وسائل دفع أخرى، يرجى التواصل مباشرة معنا عبر الفيسبوك.</p>
+            </section>
+
+            <!-- Comments Section (Placeholder) -->
+            <section id="Comments" class="max-w-7xl mx-auto px-4 mt-20 mb-16 scroll-reveal-item">
+                <div class="glass-card p-10 rounded-2xl">
+                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 border-b border-white/20 pb-3">آراء العملاء ومجتمع Alpha Blog</h2>
+                    <!-- Facebook Comments Placeholder -->
+                    <div class="bg-white/5 p-8 rounded-xl text-center text-gray-400 border border-white/20 h-56 flex items-center justify-center shadow-inner">
+                        <p class="text-2xl font-semibold">
+                            <i data-lucide="facebook" class="w-8 h-8 inline-block ml-3 text-blue-400"></i>
+                            نافذة تعليقات فيسبوك: عرض تفاعلي لآراء المستخدمين.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- ==================== DOCUMENTATION VIEW (ملف الشرح) ==================== -->
+        <div id="documentation-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
+            <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
+                <i data-lucide="book-open-text" class="w-10 h-10 inline-block ml-3 text-cyan-400"></i>
+                ملف الشرح المفصل للقالب
+            </h1>
+            <p class="text-gray-300 text-xl mb-8">
+                شرح طريقة تركيب وتشغيل جميع عناصر قالب Alpha Blog. يتم تحديث ملف الشرح بشكل دوري.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1 glass-card p-6 rounded-2xl sticky top-24 h-fit">
+                    <nav id="docs-sidebar" class="space-y-2">
+                        <h3 class="text-lg font-bold">تركيب القالب</h3>
+                        <a href="#Installation" class="active flex items-center"><i data-lucide="upload-cloud" class="w-5 h-5 ml-2"></i>رفع وتفعيل القالب</a>
+                        <a href="#MetaCodes" class="flex items-center"><i data-lucide="file-text" class="w-5 h-5 ml-2"></i>أكواد الميتا</a>
+                        <a href="#Settings" class="flex items-center"><i data-lucide="settings" class="w-5 h-5 ml-2"></i>إعدادات القالب</a>
+                        
+                        <h3 class="text-lg font-bold">إدارة العناصر والوحدات</h3>
+                        <a href="#Social" class="flex items-center"><i data-lucide="users" class="w-5 h-5 ml-2"></i>إعدادات السوشيال ميديا والشعار</a>
+                        <a href="#Menu" class="flex items-center"><i data-lucide="list" class="w-5 h-5 ml-2"></i>القائمة الرئيسية (Mega Menu)</a>
+                        <a href="#Categories" class="flex items-center"><i data-lucide="layout-list" class="w-5 h-5 ml-2"></i>أقسام الصفحة الرئيسية</a>
+                        <a href="#Other-Widgets" class="flex items-center"><i data-lucide="terminal-square" class="w-5 h-5 ml-2"></i>عناصر إضافية وأكواد قصيرة</a>
+
+                        <h3 class="text-lg font-bold">المؤلفون والميزات</h3>
+                        <a href="#Authors" class="flex items-center"><i data-lucide="user-check" class="w-5 h-5 ml-2"></i>منطقة المؤلفين ومشاركة الأرباح</a>
+                        <a href="#Languages" class="flex items-center"><i data-lucide="globe" class="w-5 h-5 ml-2"></i>تخصيص لغة القالب</a>
+                    </nav>
+                </aside>
+
+                <!-- Main Content -->
+                <main id="docs-main-content" class="lg:col-span-3 overflow-y-auto">
+                    <div class="glass-card p-8 rounded-2xl space-y-8">
+                        
+                        <!-- Installation Section -->
+                        <section id="Installation" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="upload-cloud" class="w-6 h-6 ml-3"></i> 1. تركيب وتفعيل القالب</h2>
+                            <p class="text-gray-300">
+                                **رفع القالب:** أولًا، قم بأخذ نسخة احتياطية من القالب الحالي، ثم قم بنسخ محتوى ملف القالب ولصقه بعد تحرير كود HTML الخاص بالمدونة.
+                            </p>
+                            <p class="text-gray-300">
+                                **التفعيل:** يجب التواصل مع مصمم القالب للحصول على كود التفعيل وإضافته داخل عنصر **كود التفعيل** في تبويب التخطيط.
+                            </p>
+                            <div class="bg-gray-800/50 p-4 rounded-lg border border-cyan-400/50 text-sm">
+                                <p class="font-bold text-cyan-300 flex items-center"><i data-lucide="alert-triangle" class="w-5 h-5 ml-2"></i> ملاحظة هامة:</p>
+                                <p class="text-gray-400 mt-2">التفعيل مطلوب لضمان عمل جميع الميزات المتقدمة للقالب.</p>
+                            </div>
+                        </section>
+
+                        <!-- Meta Codes Section -->
+                        <section id="MetaCodes" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="file-text" class="w-6 h-6 ml-3"></i> 2. أكواد الميتا والإعدادات المتقدمة</h2>
+                            <p class="text-gray-300">
+                                يتم إعداد معظم أكواد الميتا تلقائيًا، ولكن يجب إضافة بعض المعرفات يدويًا لدعم وسائل التواصل الاجتماعي (مثل Facebook App ID و Page URL) لتحسين مشاركة المحتوى.
+                            </p>
+                            <h3 class="text-2xl font-semibold text-purple-300 mt-4">إعدادات القالب</h3>
+                            <p class="text-gray-300">
+                                يمكنك التحكم في خيارات برمجية صعبة (مثل عدد التدوينات، أنظمة التعليق، وخاصية منع النسخ) بسهولة عبر عنصر **إعدادات القالب** في التخطيط باستخدام الأكواد القصيرة المخصصة.
+                            </p>
+                        </section>
+
+                         <!-- Authors Section -->
+                        <section id="Authors" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="users-2" class="w-6 h-6 ml-3"></i> 3. منطقة المؤلفين ومشاركة الأرباح</h2>
+                            <p class="text-gray-300">
+                                يتيح هذا القسم إنشاء ملف شخصي لكل كاتب (نبذة، رتبة، روابط التواصل) و الأهم **إضافة وحدات إعلانية مستقلة (Top-ad, Mid-ad, Bot-ad)** تظهر حصرياً في تدويناته، مما يفعل نظام مشاركة الأرباح.
+                            </p>
+                            <p class="text-gray-400 text-sm">
+                                *ملاحظة: إذا لم يكن للكاتب أداة مخصصة باسمه، فلن يظهر ملفه الشخصي ولن تُفعل إعلاناته الخاصة.*
+                            </p>
+                        </section>
+
+                        <!-- Example Section (Shortcodes) -->
+                        <section id="Other-Widgets" class="space-y-5 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="terminal-square" class="w-6 h-6 ml-3"></i> 4. أدوات إضافية وأكواد قصيرة</h2>
+                            <p class="text-gray-300">
+                                يوفر القالب مجموعة واسعة من الأدوات الإضافية التي يمكن تفعيلها عبر إضافة أكواد قصيرة في عنوان أداة **قائمة الروابط**، مثل:
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300 pr-5">
+                                <li>**عداد مواقع التواصل:** لتفعيل عداد المشتركين (مثال: `[SOC]`).</li>
+                                <li>**الأكورديون:** لإنشاء أقسام سؤال وجواب قابلة للطي (مثال: `[ACC]`).</li>
+                                <li>**معرض الصور (Gallery):** لعرض الصور أو الوحدات الإعلانية المتجاوبة.</li>
+                            </ul>
+                        </section>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- ==================== FAQ VIEW (الأسئلة الشائعة) ==================== -->
+        <div id="faq-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
+            <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
+                <i data-lucide="message-circle-question" class="w-10 h-10 inline-block ml-3 text-cyan-400"></i>
+                الأسئلة الشائعة حول القالب (FAQ)
+            </h1>
+            <p class="text-gray-300 text-xl mb-8">
+                إجابة على الأسئلة الشائعة والمتكررة حول شروط استخدام قالب Alpha Blog وضمانات المشتري.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1 glass-card p-6 rounded-2xl sticky top-24 h-fit">
+                    <nav id="faq-sidebar" class="space-y-2">
+                        <h3 class="text-lg font-bold">المواضيع الرئيسية</h3>
+                        <a href="#FAQ-Pricing" class="active flex items-center"><i data-lucide="dollar-sign" class="w-5 h-5 ml-2"></i>السعر ووسائل الشراء</a>
+                        <a href="#FAQ-Usage" class="flex items-center"><i data-lucide="shield" class="w-5 h-5 ml-2"></i>التراخيص وشروط الاستخدام</a>
+                        <a href="#FAQ-Support" class="flex items-center"><i data-lucide="refresh-cw" class="w-5 h-5 ml-2"></i>الدعم الفني والتحديثات</a>
+                        <a href="#FAQ-Testing" class="flex items-center"><i data-lucide="test-tube-2" class="w-5 h-5 ml-2"></i>اختبارات الأداء والسيو</a>
+                    </nav>
+                </aside>
+
+                <!-- Main Content -->
+                <main id="faq-main-content" class="lg:col-span-3 overflow-y-auto">
+                    <div id="faq-main-content-inner" class="glass-card p-8 rounded-2xl space-y-8">
+                        
+                        <!-- FAQ Section 1: Pricing -->
+                        <section id="FAQ-Pricing" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="dollar-sign" class="w-6 h-6 ml-3"></i> 1. السعر ووسائل الشراء</h2>
+                            <h3 class="text-xl font-semibold text-white">كم سعر قالب Alpha Blog، وما هي وسائل الشراء؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                سعر القالب **عشرة دولارات فقط**. وسائل الشراء المتاحة هي:
+                                <ul class="list-disc list-inside pr-5 space-y-1 text-gray-400">
+                                    <li><a href="https://monafiz.com/blogger/ALPHA BLOG" target="_blank" class="text-purple-300 hover:text-cyan-400">مُنفِذ</a></li>
+                                    <li><a href="https://khamsat.com/programming/content-management-systems/928169/?r=848097" target="_blank" class="text-purple-300 hover:text-cyan-400">خمسات</a></li>
+                                    <li><a href="https://kafiil.com/services/5657?ref=674b2064-2be3-11ea-9fe1-e6161ba8d798" target="_blank" class="text-purple-300 hover:text-cyan-400">كفيل</a></li>
+                                    <li>فودافون كاش (بالتواصل المباشر عبر <a href="https://www.facebook.com/ALPHA BLOG.support" target="_blank" class="text-purple-300 hover:text-cyan-400">فيسبوك</a>).</li>
+                                </ul>
+                            </p>
+                        </section>
+
+                        <!-- FAQ Section 2: Usage -->
+                        <section id="FAQ-Usage" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="shield" class="w-6 h-6 ml-3"></i> 2. التراخيص وشروط الاستخدام</h2>
+                            
+                            <h3 class="text-xl font-semibold text-white">هل يمكنني تركيب قالب Alpha Blog على أكثر من مدونة؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                نعم، يحق لكل مشتري تركيب القالب على **ثلاث مدونات بحد أقصى**، شريطة أن تكون المدونة مملوكة له وألا يكون الهدف إعادة بيع القالب أو إهداؤه.
+                            </p>
+
+                            <h3 class="text-xl font-semibold text-white mt-4">كيف يتم تفعيل قالب Alpha Blog؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                يتم الحصول على كود التفعيل بالتواصل معنا وإرسال البريد الإلكتروني المسجل عليه المدونة. كود التفعيل ثابت ولا يمكن استبداله، ويظل يعمل ما دامت المدونة موجودة. يمكن تغيير النطاق (الدومين) دون الحاجة لكود جديد.
+                            </p>
+
+                            <h3 class="text-xl font-semibold text-white mt-4">هل يمكنني حذف حقوق قالب Alpha Blog الموجودة بشريط الحقوق؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                لا، حقوق قالب Alpha Blog الموجودة بشريط الحقوق **ثابتة ولا يمكن حذفها أو تعديلها**. محاولة حذفها أو إخفائها تتسبب في تعطل القالب.
+                            </p>
+                        </section>
+
+                        <!-- FAQ Section 3: Support & Updates -->
+                        <section id="FAQ-Support" class="space-y-5 border-b border-white/20 pb-6 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="refresh-cw" class="w-6 h-6 ml-3"></i> 3. الدعم الفني والتحديثات</h2>
+                            
+                            <h3 class="text-xl font-semibold text-white">ما هي مدة الدعم الفني المجاني لقالب Alpha Blog؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                مدة الدعم الفني المجاني هي **ستون يوماً (60 يومًا)** من تاريخ الشراء. الدعم الفني لا يشمل تركيب القالب (لوجود ملف الشرح)، ولا يشمل برمجة إضافات جديدة. بعد هذه الفترة، يصبح الدعم الفني مدفوعاً.
+                            </p>
+
+                            <h3 class="text-xl font-semibold text-white mt-4">هل يوجد تحديثات للقالب؟ وهل يمكنني الحصول عليها؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                **نعم**، يتم تحديث القالب بشكل دوري (لحل المشاكل العامة أو إضافة مميزات جديدة). يحق للمشتري الحصول على جميع تحديثات القالب المستقبلية **مجاناً** بدون أي رسوم إضافية.
+                            </p>
+                        </section>
+
+                         <!-- FAQ Section 4: Testing -->
+                        <section id="FAQ-Testing" class="space-y-5 pt-4">
+                            <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="test-tube-2" class="w-6 h-6 ml-3"></i> 4. اختبارات الأداء والسيو</h2>
+                            
+                            <h3 class="text-xl font-semibold text-white">كيف يمكنني إختبار قالب Alpha Blog قبل الشراء؟</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                يمكنك مراجعة أداء القالب عبر الروابط التالية لاختبار السرعة، التجاوب، والأكواد المنظمة:
+                            </p>
+                            <ul class="list-disc list-inside pr-5 space-y-2 text-gray-400 text-sm">
+                                <li><a target="_blank" rel="none" href="https://developers.google.com/speed/pagespeed/insights/?hl=en&amp;url=https%3A%2F%2FALPHA BLOG-demo.blogspot.com%2F?m=1" class="text-purple-300 hover:text-cyan-400">اختبار سرعة القالب بمعايير Google (الصفحة الرئيسية)</a></li>
+                                <li><a target="_blank" rel="none" href="https://googlechrome.github.io/lighthouse/viewer/?gist=2b2daef6b3fd6743b1ccc6ce38fed1b2" class="text-purple-300 hover:text-cyan-400">اختبار Google Lighthouse (الصفحة الرئيسية)</a></li>
+                                <li><a target="_blank" rel="none" href="https://gtmetrix.com/reports/ALPHA BLOG-demo.blogspot.com/CTDH6nW1" class="text-purple-300 hover:text-cyan-400">اختبار سرعة القالب GTmetrix (الصفحة الرئيسية)</a></li>
+                                <li><a target="_blank" rel="none" href="https://search.google.com/test/mobile-friendly?url=https%3A%2F%2FALPHA BLOG-demo.blogspot.com%2F2018%2F01%2Fnectose-pizzas-with-tortilla-bread.html" class="text-purple-300 hover:text-cyan-400">إختبار التجاوب بمعايير Google</a></li>
+                            </ul>
+                        </section>
+                    </div>
+                </main>
+            </div>
+        </div>
+        
+        <!-- ==================== UPDATES VIEW (التحديثات) ==================== -->
+        <div id="updates-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
+            <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
+                <i data-lucide="git-branch-plus" class="w-10 h-10 inline-block ml-3 text-cyan-400"></i>
+                سجل التحديثات والإصدارات (Changelog)
+            </h1>
+            <p class="text-gray-300 text-xl mb-12">
+                تفاصيل الميزات والتحسينات والإصلاحات التي تم إضافتها في كل إصدار من قالب Alpha Blog.
+            </p>
+
+            <div class="max-w-4xl mx-auto space-y-12">
+                
+                <!-- Update 2.3.1 -->
+                <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
+                            <i data-lucide="sparkles" class="w-6 h-6 ml-2 text-purple-400"></i>
+                            الإصدار 2.3.1
+                        </h2>
+                        <span class="text-sm font-medium text-gray-400">مايو 2023</span>
+                    </div>
+                    <ul class="list-disc pr-8 space-y-2 text-gray-300">
+                        <li class="flex items-start"><i data-lucide="layout-grid" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية عرض التدوينات الرئيسية في شكل شبكي.</li>
+                        <li class="flex items-start"><i data-lucide="pin" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تحديد موضع أداة "شاهد أيضًا" داخل المقال.</li>
+                        <li class="flex items-start"><i data-lucide="megaphone" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية إضافة إعلان في موضع مخصص داخل صفحة المقال.</li>
+                        <li class="flex items-start"><i data-lucide="eye-off" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية إخفاء التعليقات بشكل افتراضي.</li>
+                        <li class="flex items-start"><i data-lucide="crop" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية عدم اقتصاص الصور المصغرة وعرضها بالحجم الكامل (No Crop).</li>
+                        <li class="flex items-start"><i data-lucide="accessibility" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-yellow-400"></i> **حل مشكلات قابلية الوصول (Accessibility).**</li>
+                        <li class="flex items-start"><i data-lucide="speedometer" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-cyan-400"></i> تحسينات لزيادة سرعة القالب.</li>
+                    </ul>
+                </div>
+                
+                <!-- Update 2.3.0 -->
+                <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
+                            <i data-lucide="sun-moon" class="w-6 h-6 ml-2 text-purple-400"></i>
+                            الإصدار 2.3.0
+                        </h2>
+                        <span class="text-sm font-medium text-gray-400">07 أكتوبر 2020</span>
+                    </div>
+                    <ul class="list-disc pr-8 space-y-2 text-gray-300">
+                        <li class="flex items-start"><i data-lucide="palette" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إضافة زر لتبديل الألوان بين **الوضع الليلي والإفتراضي**.</li>
+                        <li class="flex items-start"><i data-lucide="maximize" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إضافة زر للتبديل بين وضع الخلفية الواسع والمربع.</li>
+                        <li class="flex items-start"><i data-lucide="list-plus" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إضافة أداة "شاهد أيضًا" لعرض مقالات متعلقة في منتصف المقال.</li>
+                        <li class="flex items-start"><i data-lucide="camera" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية إختيار تأثير ظهور الصور (Image lazy-loading effects).</li>
+                        <li class="flex items-start"><i data-lucide="x-circle" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-red-400"></i> **إلغاء مكتبة jQuery** واستخدام أكواد JavaScript نقية لزيادة السرعة.</li>
+                    </ul>
+                </div>
+                
+                <!-- Update 2.1.0 -->
+                <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
+                            <i data-lucide="align-right" class="w-6 h-6 ml-2 text-purple-400"></i>
+                            الإصدار 2.1.0
+                        </h2>
+                        <span class="text-sm font-medium text-gray-400">01 يناير 2020</span>
+                    </div>
+                    <ul class="list-disc pr-8 space-y-2 text-gray-300">
+                        <li class="flex items-start"><i data-lucide="rows" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> خاصية **Mega Menu** لعرض سلايدر تدوينات في القائمة الرئيسية.</li>
+                        <li class="flex items-start"><i data-lucide="plus-square" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية إضافة قائمة فرعية داخل قائمة فرعية أخرى.</li>
+                        <li class="flex items-start"><i data-lucide="pin-data" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تثبيت القائمة الرئيسية والشريط العلوي أثناء النزول.</li>
+                        <li class="flex items-start"><i data-lucide="dollar-sign" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إضافة مساحات إعلانية جديدة متعددة في صفحة المقالات (قبل العنوان، قبل التعليقات، إلخ).</li>
+                        <li class="flex items-start"><i data-lucide="repeat-2" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تكرار إعلان منتصف المقال تلقائياً قبل أي عنوان فرعي.</li>
+                    </ul>
+                </div>
+                
+                <!-- Update 2.0.0 -->
+                <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
+                            <i data-lucide="globe" class="w-6 h-6 ml-2 text-purple-400"></i>
+                            الإصدار 2.0.0
+                        </h2>
+                        <span class="text-sm font-medium text-gray-400">25 أبريل 2019</span>
+                    </div>
+                    <ul class="list-disc pr-8 space-y-2 text-gray-300">
+                        <li class="flex items-start"><i data-lucide="arrow-left-right" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> دعم الاتجاه من اليسار لليمين (LTR) للمدونات الأجنبية.</li>
+                        <li class="flex items-start"><i data-lucide="activity" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-cyan-400"></i> تحسين معدلات السرعة بعد تحديثات جوجل الأخيرة.</li>
+                        <li class="flex items-start"><i data-lucide="list-plus" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية إضافة أداة لعرض الصور/الإعلانات المتجاورة أو أداة الأكورديون.</li>
+                        <li class="flex items-start"><i data-lucide="sidebar" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تثبيت الشريط الجانبي أثناء التمرير.</li>
+                    </ul>
+                </div>
+                
+                <!-- Initial Release 1.0.0 -->
+                <div class="update-card bg-white/5 p-6 rounded-2xl border-none shadow-none">
+                     <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
+                            <i data-lucide="calendar-check" class="w-6 h-6 ml-2 text-purple-400"></i>
+                            الإصدار 1.0.0 (الإطلاق)
+                        </h2>
+                        <span class="text-sm font-medium text-gray-400">07 يوليو 2018</span>
+                    </div>
+                    <p class="text-lg font-medium text-gray-300">الإصدار الأولي للقالب وبداية رحلة Alpha Blog.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== MERGER VIEW (دمج الإصدارات) ==================== -->
+        <div id="merger-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
+            <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
+                <i data-lucide="layers-3" class="w-10 h-10 inline-block ml-3 text-cyan-400"></i>
+                أداة دمج الإصدارات (Template Merger)
+            </h1>
+            <p class="text-gray-300 text-xl mb-8">
+                تساعد هذه الأداة عملاء قالب Alpha Blog على دمج النسخة المستخدمة من القالب مع نسخة التحديث للحفاظ على التخصيصات (القوائم، الألوان، إعدادات العناصر) دون الحاجة لإعادة التخصيص من الصفر.
+            </p>
+
+            <div class="glass-card p-10 rounded-2xl space-y-10">
+                 <section>
+                    <h2 class="text-3xl font-bold text-purple-300 flex items-center mb-4">
+                        <i data-lucide="clipboard-list" class="w-6 h-6 ml-2"></i>
+                        ملاحظات هامة حول عملية الدمج
+                    </h2>
+                    <ul class="list-disc pr-8 space-y-3 text-gray-400 text-base bg-white/5 p-4 rounded-xl border border-white/10">
+                        <li>وظيفة الأداة تدمج فقط الأجزاء المخصصة (الألوان، الشعار، القوائم، شفرات الإعلانات الخاصة بالمؤلفين). **أي تعديلات يدوية أخرى داخل أكواد القالب لن يتم دمجها وستفقد.**</li>
+                        <li>قم دائمًا بتحميل **نسخة احتياطية** من قالبك الحالي قبل تركيب النسخة المدمجة.</li>
+                        <li>الأداة مخصصة **فقط** لإصدارات قالب Alpha Blog.</li>
+                        <li>لا تحتاج لاستخدام هذه الأداة إذا كنت ستقوم بتركيب القالب لأول مرة.</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="text-3xl font-bold text-purple-300 flex items-center mb-4">
+                        <i data-lucide="merge" class="w-6 h-6 ml-2"></i>
+                        منطقة الدمج والتحديث
+                    </h2>
+                    <form id="merger-form" class="merger-form grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <div class="form-group space-y-2">
+                            <label for="s-old-cm" class="code-label">1. أكواد الإصدار المستخدم (النسخة القديمة)</label>
+                            <!-- CodeMirror target textarea -->
+                            <textarea id="s-old-cm" required placeholder="الصق هنا كود القالب الحالي بمدونتك..."></textarea>
+                        </div>
+                        
+                        <div class="form-group space-y-2">
+                            <label for="s-new-cm" class="code-label">2. أكواد الإصدار الحديث (نسخة التحديث)</label>
+                            <!-- CodeMirror target textarea -->
+                            <textarea id="s-new-cm" required placeholder="الصق هنا كود الإصدار الجديد الذي تريد التحديث إليه..."></textarea>
+                        </div>
+
+                        <div class="md:col-span-2 flex justify-center">
+                            <button type="button" id="merge-button" class="glass-button merge-button px-8 py-3 text-lg">
+                                <i data-lucide="package-plus" class="w-6 h-6 ml-2"></i>
+                                دمج وتوليد أكواد التحديث
+                            </button>
+                        </div>
+
+                        <div id="result-group" class="form-group space-y-2 md:col-span-2 hidden">
+                            <label for="s-result-cm" class="code-label text-green-400">3. أكواد القالب بعد التحديث والدمج</label>
+                            <!-- CodeMirror target textarea -->
+                            <textarea id="s-result-cm" readonly placeholder="ستظهر الأكواد المدمجة هنا بعد الضغط على زر الدمج"></textarea>
+                            <button id="copy-result" class="glass-button bg-cyan-600/70 hover:bg-cyan-700/80 px-4 py-2 text-sm mt-3 hidden">
+                                <i data-lucide="clipboard" class="w-4 h-4 ml-2"></i>
+                                نسخ الأكواد
+                            </button>
+                        </div>
+                    </form>
+                </section>
+                
+            </div>
+        </div>
+
+
+        <!-- ==================== CLIENTS VIEW (العملاء) ==================== -->
+        <div id="clients-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
+            <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
+                <i data-lucide="crown" class="w-10 h-10 inline-block ml-3 text-purple-400"></i>
+                منطقة العملاء (إدارة التراخيص والإصدارات)
+            </h1>
+            <p class="text-gray-300 text-xl mb-12">
+                من خلال هذه الصفحة يمكن لعملاء قالب Alpha Blog المشترين الوصول لجميع إصدارات القالب ومراجعة بيانات عملية الشراء وتوليد كود التفعيل لجميع النسخ.
+            </p>
+
+            <div class="glass-card p-10 rounded-2xl space-y-8">
+                
+                <!-- Authentication / Sign-in Section -->
+                <div id="client-auth-section" class="text-center space-y-6">
+                    <h2 class="text-3xl font-bold text-cyan-400 flex items-center justify-center">
+                        <i data-lucide="log-in" class="w-7 h-7 ml-3"></i>
+                        تسجيل الدخول للتحقق من العضوية
+                    </h2>
+                    <div class="admin-msg text-gray-400 bg-red-800/20 p-4 rounded-xl border border-red-400/50 max-w-lg mx-auto">
+                        <p class="flex items-center justify-center font-medium">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 ml-2 text-red-400"></i>
+                            برجاء تسجيل الدخول بحسابك في جوجل للتحقق من كونك أحد العملاء المسجلين.
+                        </p>
+                    </div>
+                    <button id="sign-in-button" class="glass-button bg-red-600/70 hover:bg-red-700/80 px-8 py-3 rounded-full text-white font-bold flex items-center justify-center mx-auto transition-all">
+                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" class="w-6 h-6 ml-3" alt="Google Icon">
+                        تسجيل الدخول عبر جوجل
+                    </button>
+                    <p class="text-sm text-gray-500">سيُطلب منك السماح بعرض البريد الإلكتروني ومدوناتك (عرض فقط).</p>
+                </div>
+
+                <!-- Client Information & Management Section (Hidden by Default) -->
+                <div id="client-dashboard" class="hidden space-y-10">
+                    
+                    <!-- Client Info & Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-xl bg-purple-700/20 border border-purple-400/50">
+                        <!-- Profile Card -->
+                        <div class="md:col-span-1 flex flex-col items-center space-y-3 p-4 rounded-xl glass-card border-none">
+                            <img id="client-avatar" src="https://placehold.co/100x100/3b82f6/ffffff?text=U" class="w-20 h-20 rounded-full border-4 border-cyan-400" alt="صورة الملف الشخصي">
+                            <h5 id="client-name" class="text-xl font-bold text-white">العميل العزيز</h5>
+                            <span id="client-email" class="text-sm text-gray-400">client.email@example.com</span>
+                            <button id="sign-out-button" class="glass-button bg-gray-700/50 px-4 py-2 rounded-full text-sm hover:bg-gray-600/70">
+                                <i data-lucide="log-out" class="w-4 h-4 ml-2"></i>
+                                تسجيل الخروج
+                            </button>
+                        </div>
+                        
+                        <!-- Summary Stats -->
+                        <div class="md:col-span-2 grid grid-cols-2 gap-4 client-stats">
+                            <div><span>عدد مرات الشراء</span><b id="p-orders">1</b></div>
+                            <div><span>الحد الأقصى للمدونات</span><b id="max-blogs">3</b></div>
+                            <div><span>المدونات المفعلة</span><b id="rd-blogs">1</b></div>
+                            <div><span>المدونات المتبقية</span><b id="rm-blogs">2</b></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Blogs and Activation -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- Registered Blogs -->
+                        <div class="glass-card p-6 rounded-2xl space-y-4">
+                            <h3 class="text-2xl font-bold text-cyan-300 flex items-center border-b border-white/10 pb-2">
+                                <i data-lucide="check-circle" class="w-6 h-6 ml-2 text-green-400"></i>
+                                المدونات المسجلة (المُفعلة)
+                            </h3>
+                            <ul id="regtd-blogs-list" class="space-y-2">
+                                <!-- Dummy Registered Blog -->
+                                <li class="blog-item">
+                                    <span class="font-medium">demo-blog.blogspot.com</span>
+                                    <button class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded-full transition-colors" data-blog-id="1">
+                                        توليد كود التفعيل <i data-lucide="key-round" class="w-4 h-4 mr-1 inline-block"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                            <button id="new-blog-button" class="glass-button bg-cyan-600/70 hover:bg-cyan-700/80 px-4 py-2 rounded-full text-sm mt-4">
+                                <i data-lucide="plus" class="w-4 h-4 ml-1"></i>
+                                تسجيل مدونة جديدة
+                            </button>
+                        </div>
+                        
+                        <!-- New Blog Selection -->
+                        <div id="new-blog-selection" class="glass-card p-6 rounded-2xl space-y-4 hidden">
+                            <h3 class="text-2xl font-bold text-cyan-300 flex items-center border-b border-white/10 pb-2">
+                                <i data-lucide="list-checks" class="w-6 h-6 ml-2 text-purple-400"></i>
+                                إختيار المدونة للتفعيل
+                            </h3>
+                            <p class="text-gray-400 text-sm">قم باختيار مدونتك من القائمة أدناه لتوليد كود التفعيل:</p>
+                            <div id="chosn-blog-placeholder" class="space-y-3">
+                                <!-- Placeholder for dynamically loaded blogs -->
+                                <div class="blog-item bg-gray-700/50 justify-center">
+                                    <span class="text-gray-500">لا توجد مدونات متاحة حالياً.</span>
+                                </div>
+                            </div>
+                            <button id="register-blog-button" class="glass-button bg-red-600/70 disabled:opacity-50 px-6 py-2 rounded-full font-bold text-sm" disabled>
+                                تفعيل المدونة المختارة
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Important Notes -->
+                    <section>
+                        <h6 class="text-2xl font-bold text-purple-300 flex items-center mb-3">
+                            <i data-lucide="clipboard-list" class="w-6 h-6 ml-2"></i>
+                            ملاحظات هامة للعملاء
+                        </h6>
+                        <ul class="list-disc pr-8 space-y-2 text-gray-400 text-sm bg-white/5 p-4 rounded-xl border border-white/10">
+                            <li>لابد من **تسجيل الدخول بحساب جوجل** باستخدام البريد الإلكتروني الذي تم تسجيله في بيانات المشتري.</li>
+                            <li>لكل مشتري الحق في تفعيل القالب لـ **ثلاث مدونات** كحد أقصى (راجع صفحة <a href="#FAQ-Content" data-view="faq" class="text-cyan-400 hover:text-purple-400">الأسئلة الشائعة</a>).</li>
+                            <li>المدونات المفعلة لا يمكن حذف تفعيلها أو إستبدالها، لذا يرجى التأكد من الإختيار قبل التفعيل.</li>
+                            <li>يمكنك تفعيل المدونات المرتبطة بحسابك في بلوجر فقط.</li>
+                        </ul>
+                    </section>
+                </div>
+
+                <!-- Versions Section -->
+                <section>
+                    <h6 class="text-2xl font-bold text-purple-300 flex items-center mb-4">
+                        <i data-lucide="archive" class="w-6 h-6 ml-2"></i>
+                        إصدارات القالب المتاحة للتحميل
+                    </h6>
+                    <ul id="temp-versions-list" class="space-y-3 text-lg font-medium text-gray-300">
+                        <!-- Dummy Versions -->
+                        <li class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10">
+                            <span>الإصدار 2.3.1 - (مايو 2023)</span>
+                            <button class="bg-cyan-600 hover:bg-cyan-700 text-white text-sm px-3 py-1 rounded-full transition-colors flex items-center" disabled>
+                                تحميل <i data-lucide="download" class="w-4 h-4 mr-1 inline-block"></i>
+                            </button>
+                        </li>
+                         <li class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 opacity-70">
+                            <span>الإصدار 2.3.0 - (أكتوبر 2020)</span>
+                            <button class="bg-cyan-600 hover:bg-cyan-700 text-white text-sm px-3 py-1 rounded-full transition-colors flex items-center" disabled>
+                                تحميل <i data-lucide="download" class="w-4 h-4 mr-1 inline-block"></i>
+                            </button>
+                        </li>
+                    </ul>
+                    <p class="text-gray-500 text-sm mt-4">ملاحظة: زر التحميل يُفعل تلقائياً بعد تسجيل الدخول كعميل.</p>
+                </section>
+                
+            </div>
+        </div>
+
+
+    </div>
+    
+    <!-- ==================== Footer ==================== -->
+    <footer id="footer" class="glass-card mt-12 p-8 rounded-t-3xl shadow-2xl">
+        <div class="wrapper max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center text-base text-gray-400">
+                <!-- حقوق النشر -->
+                <div class="mb-4 md:mb-0 text-white font-medium">
+                    <span>&copy; جميع الحقوق محفوظة للمصمم <b class="text-cyan-400">AbdoElbanaa</b></span>
+                </div>
+                <!-- روابط التواصل الاجتماعي -->
+                <div class="flex space-x-6 space-x-reverse mb-4 md:mb-0">
+                    <a href="https://www.facebook.com/ALPHA BLOG.support/" target="_blank" class="text-gray-300 hover:text-blue-400 transition-colors transform hover:scale-110" title="Facebook"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+                    <a href="https://khamsat.com/user/ahmad-m-saleh/?r=848097" target="_blank" class="text-gray-300 hover:text-orange-400 transition-colors transform hover:scale-110" title="Khamsat"><i data-lucide="shopping-bag" class="w-6 h-6"></i></a>
+                    <a href="https://kafiil.com/services/5657?ref=674b2064-2be3-11ea-9fe1-e6161ba8d798" target="_blank" class="text-gray-300 hover:text-rose-400 transition-colors transform hover:scale-110" title="Kafiil"><i data-lucide="users-round" class="w-6 h-6"></i></a>
+                    <a href="https://www.youtube.com/c/ALPHA BLOGTemplate?sub_confirmation=1" target="_blank" class="text-gray-300 hover:text-red-400 transition-colors transform hover:scale-110" title="Youtube"><i data-lucide="youtube" class="w-6 h-6"></i></a>
+                </div>
+                <!-- روابط إضافية -->
+                <div class="space-x-4 space-x-reverse font-medium">
+                    <a href="/about" class="hover:text-cyan-300 transition-colors">عن الموقع</a>
+                    <a href="/privacy" class="hover:text-cyan-300 transition-colors">سياسة الخصوصية</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- سكربت Lucide Icons لتهيئة الأيقونات -->
+    <script>
+        lucide.createIcons();
+
+        // لضمان عمل الـ CSS الخاص بـ @keyframes
+        if (!document.querySelector('style').textContent.includes('@keyframes blob')) {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes blob {
+                    0%, 100% { transform: translate(0, 0) scale(1); }
+                    33% { transform: translate(40px, -60px) scale(1.2); }
+                    66% { transform: translate(-30px, 30px) scale(0.95); }
+                }
+                .animate-blob {
+                    animation: blob 8s infinite cubic-bezier(0.42, 0, 0.58, 1);
+                }
+                .animation-delay-2000 {
+                    animation-delay: 2s;
+                }
+                .scroll-reveal-item {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+                }
+                .scroll-reveal-item.visible {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            `;
+            document.head.append(style);
+        }
+    </script>
+    
+    <script>
+        // ===================================
+        // دالة لعرض رسالة (بديل لـ alert)
+        // ===================================
+        function showToast(message, type = 'info') {
+            const wrapper = document.querySelector('.toast-wrapper');
+            if (!wrapper) return;
+
+            const colorMap = {
+                info: 'bg-blue-600',
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-yellow-600'
+            };
+            
+            const iconMap = {
+                info: 'i-info',
+                success: 'i-check-circle',
+                error: 'i-alert-triangle',
+                warning: 'i-alert-circle'
+            };
+
+            const toastElement = document.createElement('div');
+            toastElement.className = `fixed bottom-5 right-5 p-4 rounded-lg shadow-lg text-white ${colorMap[type]} transition-opacity duration-300 opacity-0 transform translate-y-4`;
+            
+            toastElement.innerHTML = `<div class="flex items-center"><i data-lucide="${iconMap[type].substring(2)}" class="w-5 h-5 ml-2"></i> ${message}</div>`;
+            
+            wrapper.appendChild(toastElement);
+            lucide.createIcons({ attrs: { class: 'w-5 h-5 ml-2' }, name: iconMap[type].substring(2), element: toastElement.querySelector('i') });
+
+            // Show animation
+            setTimeout(() => {
+                toastElement.classList.remove('opacity-0', 'translate-y-4');
+                toastElement.classList.add('opacity-100', 'translate-y-0');
+            }, 100);
+
+            // Hide animation
+            setTimeout(() => {
+                toastElement.classList.remove('opacity-100', 'translate-y-0');
+                toastElement.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    wrapper.removeChild(toastElement);
+                }, 300);
+            }, 3000);
+        }
+
+
+        // ===================================
+        // 2. منطق تبديل طرق العرض والتمرير السلس (Switch View Logic)
+        // ===================================
+
+        function switchView(viewId, targetHash) {
+            // التحقق من وجود العناصر الأبوية
+            const landingView = document.getElementById('landing-view');
+            const documentationView = document.getElementById('documentation-view');
+            const faqView = document.getElementById('faq-view');
+            const updatesView = document.getElementById('updates-view'); 
+            const clientsView = document.getElementById('clients-view'); 
+            const mergerView = document.getElementById('merger-view'); 
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // قائمة بجميع طرق العرض المتاحة
+            const allViews = [landingView, documentationView, faqView, updatesView, clientsView, mergerView];
+
+            // 1. إزالة حالة التفعيل من جميع الروابط
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // تحديد View الحالي النشط قبل الإخفاء
+            let currentActiveView = null;
+            allViews.forEach(view => {
+                if (view && !view.classList.contains('hidden')) {
+                    currentActiveView = view;
+                }
+            });
+
+            // 2. إخفاء جميع طرق العرض (مع استخدام الانتقال)
+            if (currentActiveView) {
+                currentActiveView.classList.add('fade-out'); // بدء تلاشي المحتوى القديم
+                currentActiveView.style.maxHeight = currentActiveView.scrollHeight + 'px'; // ضمان أن الارتفاع محدد للانتقال
+            }
+
+            let viewToShow = null;
+            
+            switch (viewId) {
+                case 'docs':
+                    viewToShow = documentationView;
+                    break;
+                case 'faq':
+                    viewToShow = faqView;
+                    break;
+                case 'updates':
+                    viewToShow = updatesView;
+                    break;
+                case 'clients': 
+                    viewToShow = clientsView;
+                    break;
+                case 'merger': 
+                    viewToShow = mergerView;
+                    break;
+                case 'home':
+                case 'home-section':
+                    viewToShow = landingView;
+                    break;
+            }
+
+            // 3. إظهار طريقة العرض المطلوبة بعد انتهاء تلاشي المحتوى القديم
+            setTimeout(() => {
+                // إخفاء جميع طرق العرض بشكل نهائي بعد التلاشي
+                allViews.forEach(view => {
+                    if (view) {
+                        view.classList.add('hidden');
+                        view.classList.remove('fade-out');
+                    }
+                });
+                
+                if (viewToShow) {
+                    viewToShow.classList.remove('hidden');
+                    
+                    // 4. تفعيل الرابط المناسب في القائمة العلوية
+                    const activeLink = document.querySelector(`a[href="${targetHash}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                    
+                    // 5. التعامل مع التمرير (Scroll)
+                    const isSectionView = viewId === 'home-section';
+                    const headerHeight = document.getElementById('header').offsetHeight; // ارتفاع الهيدر
+                    
+                    // التمرير إلى أعلى الصفحة (للصفحات المنفصلة)
+                    if (viewId !== 'home-section' || targetHash === '#intro') {
+                        // إزاحة بسيطة من الهيدر الثابت
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } 
+                    
+                    // التمرير إلى قسم محدد ضمن صفحة الهبوط
+                    if (isSectionView && targetHash && targetHash !== '#intro') {
+                        const targetElement = document.querySelector(targetHash);
+                        if (targetElement) {
+                            // للحصول على الإزاحة الصحيحة بعد الهيدر الثابت
+                            const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+                            window.scrollTo({
+                                top: elementPosition - headerHeight - 20, // 20px margin
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                    
+                    // إعادة تفعيل Scroll Reveal عند العودة لصفحة الهبوط
+                    if (viewId === 'home' || viewId === 'home-section') {
+                        // إعادة تفعيل Scroll Reveal للعناصر غير الظاهرة بعد الانتقال
+                        document.querySelectorAll('.scroll-reveal-item:not(.visible)').forEach(el => {
+                            // إعادة تفعيل المراقبة
+                            const observer = new IntersectionObserver((entries) => {
+                                entries.forEach(entry => {
+                                    if (entry.isIntersecting) {
+                                        entry.target.classList.add('visible');
+                                        observer.unobserve(entry.target);
+                                    }
+                                });
+                            }, { threshold: 0.2 });
+                            observer.observe(el);
+                        });
+                    }
+                }
+            }, 300); // 300ms مهلة انتظار لانتهاء الانتقال (مطابقة لـ CSS transition duration)
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             // إضافة حاوية الـ Toast
+            const toastWrapper = document.createElement('div');
+            toastWrapper.className = 'toast-wrapper fixed bottom-0 right-0 p-4 space-y-2 z-50';
+            document.body.appendChild(toastWrapper);
+            
+            // ------------------------------------
+            // A. تجهيز CodeMirror
+            // ------------------------------------
+            let cmOld, cmNew, cmResult;
+
+            const initCodeMirror = () => {
+                const sOldCm = document.getElementById('s-old-cm');
+                const sNewCm = document.getElementById('s-new-cm');
+                const sResultCm = document.getElementById('s-result-cm');
+                
+                // يجب أن تكون عناصر textarea مرئية لكي يتم تهيئة CodeMirror بشكل صحيح
+                if (sOldCm && !cmOld) {
+                    cmOld = CodeMirror.fromTextArea(sOldCm, {
+                        mode: "xml",
+                        theme: "dracula",
+                        lineNumbers: true,
+                        readOnly: false,
+                        lineWrapping: true
+                    });
+                }
+                if (sNewCm && !cmNew) {
+                    cmNew = CodeMirror.fromTextArea(sNewCm, {
+                        mode: "xml",
+                        theme: "dracula",
+                        lineNumbers: true,
+                        readOnly: false,
+                        lineWrapping: true
+                    });
+                }
+                if (sResultCm && !cmResult) {
+                    cmResult = CodeMirror.fromTextArea(sResultCm, {
+                        mode: "xml",
+                        theme: "dracula",
+                        lineNumbers: true,
+                        readOnly: true,
+                        lineWrapping: true
+                    });
+                }
+            };
+            
+            // ------------------------------------
+            // B. منطق محاكاة الدمج (Code Merger Logic)
+            // ------------------------------------
+            const mergeButton = document.getElementById('merge-button');
+            const copyResultButton = document.getElementById('copy-result');
+            const resultGroup = document.getElementById('result-group');
+            
+            if (mergeButton) {
+                mergeButton.addEventListener('click', function() {
+                    if (!cmOld || !cmNew) {
+                         showToast('يرجى تهيئة المحرر أولاً (حاول إعادة تحميل الصفحة إذا استمر الخطأ)', 'error');
+                         return;
+                    }
+                    
+                    const oldCode = cmOld.getValue().trim();
+                    const newCode = cmNew.getValue().trim();
+
+                    if (!oldCode) {
+                        showToast('برجاء إدخال أكواد الإصدار المستخدم (القديم)', 'error');
+                        return;
+                    }
+                    if (!newCode) {
+                        showToast('برجاء إدخال أكواد الإصدار الحديث (الجديد)', 'error');
+                        return;
+                    }
+
+                    // --- Dummy Merging Process ---
+                    // محاكاة عملية الدمج
+                    const mergedCode = newCode + '\n<!-- Customizations preserved: Colors, Menus, Author Ads (DUMMY MERGE) -->';
+                    
+                    cmResult.setValue(mergedCode);
+                    resultGroup.classList.remove('hidden');
+                    copyResultButton.classList.remove('hidden');
+                    showToast('تم دمج نسخ القالب بنجاح! يمكنك الآن نسخ الكود.', 'success');
+                    
+                    // تحديث حجم CodeMirror النتيجة
+                    cmResult.refresh();
+                });
+            }
+
+            if (copyResultButton) {
+                copyResultButton.addEventListener('click', function() {
+                    const mergedCode = cmResult.getValue();
+                    if (mergedCode) {
+                        // Use clipboard API or fallback (execCommand)
+                         if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(mergedCode).then(() => {
+                                showToast('تم نسخ أكواد القالب المدمجة', 'info');
+                            }).catch(err => {
+                                console.error('Failed to copy text: ', err);
+                                showToast('فشل النسخ التلقائي، حاول التحديد والنسخ يدوياً.', 'error');
+                            });
+                        } else {
+                            // Fallback using execCommand
+                            const textarea = document.createElement('textarea');
+                            textarea.value = mergedCode;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('تم نسخ أكواد القالب المدمجة', 'info');
+                        }
+                    }
+                });
+            }
+
+
+            // ------------------------------------
+            // C. منطق تبديل طرق العرض
+            // ------------------------------------
+            document.querySelectorAll('a[data-view]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const viewType = this.getAttribute('data-view');
+                    const targetHash = this.getAttribute('href');
+
+                    // تهيئة CodeMirror إذا كنا ننتقل لصفحة الدمج
+                    if (viewType === 'merger') {
+                        // استخدام setTimeout لضمان تهيئة CodeMirror بعد ظهور المنطقة
+                        setTimeout(initCodeMirror, 50); 
+                    }
+
+                    switch (viewType) {
+                        case 'home':
+                            switchView('home', targetHash);
+                            break;
+                        case 'docs':
+                            switchView('docs', targetHash);
+                            break;
+                        case 'faq':
+                            switchView('faq', targetHash);
+                            break;
+                        case 'updates':
+                            switchView('updates', targetHash);
+                            break;
+                        case 'clients':
+                            switchView('clients', targetHash);
+                            break;
+                        case 'merger':
+                            switchView('merger', targetHash);
+                            break;
+                        case 'home-section':
+                            switchView('home-section', targetHash);
+                            break;
+                    }
+                });
+            });
+
+            // ------------------------------------
+            // D. تهيئة مؤثر الكتابة (Typewriter)
+            // ------------------------------------
+            const typewriterElement = document.getElementById('typewriter-text');
+            if (typewriterElement) {
+                const typewriter = new Typewriter(typewriterElement, {
+                    loop: false,
+                    delay: 50,
+                    cursor: ''
+                });
+
+                typewriter.typeString('قالب <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Alpha Blog</span>.')
+                    .pauseFor(300)
+                    .typeString('<br class="block md:hidden"> بوابة مجلتك العصرية على <span class="text-cyan-400">بلوجر</span>.')
+                    .start();
+            }
+            
+            // ------------------------------------
+            // E. Scroll Reveal and Initial Load
+            // ------------------------------------
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                 // إخفاء شاشة التحميل بعد تحميل الصفحة بالكامل
+                window.addEventListener('load', () => {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        scrollReveal('.scroll-reveal-item'); // تفعيل الـ Scroll Reveal بعد التحميل
+                    }, 500);
+                });
+            }
+            
+            // ------------------------------------
+            // F. منطق الهيدر الثابت والديناميكي
+            // ------------------------------------
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+
+            // ===================================
+            // 3. تفعيل الأكورديون في الأسئلة الشائعة (FAQ)
+            // ===================================
+            document.querySelectorAll('.faq-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.closest('.faq-item');
+                    
+                    const content = item ? item.querySelector('.faq-content') : null;
+                    const icon = header.querySelector('i');
+
+                    if (!item || !content || !icon) return; 
+
+                    const isActive = item.classList.contains('active');
+
+                    document.querySelectorAll('.faq-item.active').forEach(activeItem => {
+                        if (activeItem !== item) {
+                            activeItem.classList.remove('active');
+                            const activeContent = activeItem.querySelector('.faq-content');
+                            const activeIcon = activeItem.querySelector('i');
+                            
+                            if (activeContent) activeContent.style.maxHeight = '0';
+                            if (activeIcon) activeIcon.classList.remove('rotate-180');
+                        }
+                    });
+
+                    if (isActive) {
+                        item.classList.remove('active');
+                        content.style.maxHeight = '0';
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        item.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + "px"; 
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+            
+            // ===================================
+            // 4. تفعيل روابط الشريط الجانبي (FAQs, Docs)
+            // ===================================
+            // ملاحظة: تم تعديل هذه الدالة لاستخدام window.scrollTo بدلاً من mainContentElement.scroll
+            // وذلك لضمان عمل التمرير على مستوى الصفحة بالكامل بشكل صحيح، مع الحفاظ على التمرير السلس.
+            function setupSidebarScrolling(sidebarId) {
+                 const sidebarLinks = document.querySelectorAll(`${sidebarId} a`);
+                 const headerHeight = document.getElementById('header').offsetHeight; 
+                 const viewContainer = document.getElementById(sidebarId.includes('docs') ? 'documentation-view' : 'faq-view');
+                 
+                 // يتم استدعاء هذه الدالة عند التمرير لتحديث الروابط النشطة
+                 const updateActiveLinkOnScroll = () => {
+                     if (viewContainer && viewContainer.classList.contains('hidden')) return;
+
+                     let currentHash = '';
+                     // تحديد موضع التمرير في النافذة
+                     const scrollPosition = window.scrollY + headerHeight + 50; 
+                     
+                     // تحديد أقسام المحتوى داخل viewContainer (بدلاً من mainContentElement)
+                     const contentSections = viewContainer.querySelectorAll('section[id]');
+
+                     contentSections.forEach(section => {
+                         // يجب أن نستخدم offsetTop للعنصر بالنسبة للجسم الصفحة (document)
+                         if (section.offsetTop <= scrollPosition && section.offsetTop + section.offsetHeight > scrollPosition) {
+                             currentHash = '#' + section.id;
+                         }
+                     });
+
+                     sidebarLinks.forEach(link => {
+                         link.classList.remove('active');
+                         if (link.getAttribute('href') === currentHash) {
+                             link.classList.add('active');
+                         }
+                     });
+                 };
+                 
+                 // إضافة مستمع لحدث النقر (Scroll to Section logic)
+                 sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const targetHash = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetHash);
+                        
+                        if (targetElement) {
+                            // إزالة التفعيل من جميع الروابط وتفعيل الرابط الذي تم النقر عليه فوراً
+                            sidebarLinks.forEach(a => a.classList.remove('active'));
+                            this.classList.add('active');
+                            
+                            const headerHeight = document.getElementById('header').offsetHeight; // ارتفاع الهيدر
+                            // حساب الإزاحة الصحيحة للنقر
+                            const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
+
+                            window.scrollTo({
+                                top: offsetTop - headerHeight - 20, // 20px margin
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+
+                // إضافة مستمع لحدث التمرير لتحديث الروابط النشطة
+                window.addEventListener('scroll', updateActiveLinkOnScroll);
+                // تحديث أولي عند التحميل
+                updateActiveLinkOnScroll();
+            }
+            
+            setupSidebarScrolling('#faq-sidebar');
+            setupSidebarScrolling('#docs-sidebar');
+
+            // ===================================
+            // 5. منطق وهمي (Dummy Logic) لمنطقة العملاء
+            // ===================================
+            const authSection = document.getElementById('client-auth-section');
+            const dashboardSection = document.getElementById('client-dashboard');
+            const signInButton = document.getElementById('sign-in-button');
+            const signOutButton = document.getElementById('sign-out-button');
+            const newBlogButton = document.getElementById('new-blog-button');
+            const newBlogSelection = document.getElementById('new-blog-selection');
+
+            function dummySignIn() {
+                if (!authSection || !dashboardSection) return; // فحص إضافي
+                
+                authSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                console.log('Dummy Signed In');
+
+                // تحديث بيانات العميل الوهمية
+                const clientName = document.getElementById('client-name');
+                if(clientName) clientName.textContent = "أحمد صالح";
+                const clientEmail = document.getElementById('client-email');
+                if(clientEmail) clientEmail.textContent = "ahmad.saleh@demo.com";
+                const pOrders = document.getElementById('p-orders');
+                if(pOrders) pOrders.textContent = "5";
+                const rdBlogs = document.getElementById('rd-blogs');
+                if(rdBlogs) rdBlogs.textContent = "2";
+                const rmBlogs = document.getElementById('rm-blogs');
+                if(rmBlogs) rmBlogs.textContent = "1";
+                const maxBlogs = document.getElementById('max-blogs');
+                if(maxBlogs) maxBlogs.textContent = "3";
+                
+                // تفعيل أزرار التحميل
+                document.querySelectorAll('#temp-versions-list button').forEach(btn => btn.disabled = false);
+            }
+
+            function dummySignOut() {
+                if (!authSection || !dashboardSection || !newBlogSelection) return; // فحص إضافي
+
+                authSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+                newBlogSelection.classList.add('hidden');
+                console.log('Dummy Signed Out');
+                
+                // تعطيل أزرار التحميل
+                document.querySelectorAll('#temp-versions-list button').forEach(btn => btn.disabled = true);
+            }
+
+            if(signInButton) signInButton.addEventListener('click', dummySignIn);
+            if(signOutButton) signOutButton.addEventListener('click', dummySignOut);
+            
+            if(newBlogButton) newBlogButton.addEventListener('click', () => {
+                if (newBlogSelection) newBlogSelection.classList.toggle('hidden');
+            });
+            
+            // Dummy initialization state (if we want to simulate already logged in, but default is logged out)
+            // dummySignIn(); 
+            
+        });
+    </script>
+</body>
+</html>
