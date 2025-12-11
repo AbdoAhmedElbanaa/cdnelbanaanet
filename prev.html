@@ -7,23 +7,23 @@
     <!-- تضمين Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- تضمين الخط العربي: Cairo -->
-<link href='https://cdn.elbana.net/arfontmi.css' rel='stylesheet'/>
+    <link href='https://cdn.elbana.net/arfontmi.css' rel='stylesheet'/>
     <!-- Lucide Icons for aesthetic enhancement -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- CodeMirror V5 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
-    
+
     <style>
         /* التكوين الأولي لـ Tailwind والمظهر الاحترافي */
         :root {
             /* تعميق الألوان للخلفية والزجاج */
-            --glass-bg: rgba(255, 255, 255, 0.08); 
-            --glass-border: rgba(255, 255, 255, 0.3); 
-            --primary-color: #5b21b6; 
-            --secondary-color: #8b5cf6; 
-            --highlight-color: #06b6d4; 
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --primary-color: #5b21b6;
+            --secondary-color: #8b5cf6;
+            --highlight-color: #06b6d4;
             --sidebar-width: 280px;
         }
 
@@ -32,77 +32,79 @@
             /* تدرج لوني عميق واحترافي */
             background: linear-gradient(135deg, #1f013d 0%, #0d012e 50%, #000000 100%);
             min-height: 100vh;
-            color: #f3f4f6; 
+            color: #f3f4f6;
             overflow-x: hidden;
         }
 
         /* تخصيص تأثير Glassmorphism الأقوى */
         .glass-card {
             background-color: var(--glass-bg);
-            backdrop-filter: blur(20px); 
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5); 
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
         }
-        
+
         .glass-card:hover {
-            transform: translateY(-8px); 
+            transform: translateY(-8px);
             box-shadow: 0 18px 50px 0 rgba(0, 0, 0, 0.6);
         }
-        
+
         /* تحسين الهيدر ليكون أكثر وضوحًا وجاذبية - FULL WIDTH & DYNAMIC */
         #header {
-             /* إلغاء الهامش وجعله بكامل العرض */
-             margin: 0 !important;
-             border-radius: 0 !important;
-             padding: 1rem 0; /* padding عمودي فقط */
-             background-color: rgba(255, 255, 255, 0.05); /* شفاف جداً في الأعلى */
-             backdrop-filter: blur(5px);
-             -webkit-backdrop-filter: blur(5px);
-             box-shadow: none;
-             border: none;
-             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-             transition: all 0.3s ease-in-out;
-             position: fixed; /* تثبيت الهيدر */
-             width: 100%;
-             top: 0;
-             z-index: 50;
+            /* إلغاء الهامش وجعله بكامل العرض */
+            margin: 0 !important;
+            border-radius: 0 !important;
+            padding: 1rem 0; /* padding عمودي فقط */
+            background-color: rgba(255, 255, 255, 0.05); /* شفاف جداً في الأعلى */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: none;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+            position: fixed; /* تثبيت الهيدر */
+            width: 100%;
+            top: 0;
+            z-index: 50;
         }
-        
+
         /* حالة الهيدر عند التمرير للأسفل */
         #header.scrolled {
-             padding: 0.75rem 0;
-             background-color: rgba(31, 1, 61, 0.8); /* خلفية معتمة عند التمرير */
-             backdrop-filter: blur(20px);
-             -webkit-backdrop-filter: blur(20px);
-             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            padding: 0.75rem 0;
+            background-color: rgba(31, 1, 61, 0.8); /* خلفية معتمة عند التمرير */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
-        
+
         /* محتوى الهيدر الداخلي لضمان بقائه في المنتصف */
         #header .header-content {
-             max-width: 88rem; /* نفس عرض الـ container الرئيسي */
-             margin: 0 auto;
-             padding: 0 1.5rem; /* حماية من الحواف */
+            max-width: 88rem; /* نفس عرض الـ container الرئيسي */
+            margin: 0 auto;
+            padding: 0 1.5rem; /* حماية من الحواف */
         }
-        
+
         /* تخصيص تصميم اللوجو */
         .logo-container {
-             display: flex;
-             align-items: center;
-             cursor: pointer;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
         }
+
         .logo-icon {
-             background: linear-gradient(135deg, var(--highlight-color), var(--secondary-color));
-             box-shadow: 0 0 15px var(--highlight-color), inset 0 0 5px white; /* توهج وضوء داخلي */
-             transition: all 0.3s ease-in-out;
-             transform: scale(1);
+            background: linear-gradient(135deg, var(--highlight-color), var(--secondary-color));
+            box-shadow: 0 0 15px var(--highlight-color), inset 0 0 5px white; /* توهج وضوء داخلي */
+            transition: all 0.3s ease-in-out;
+            transform: scale(1);
         }
+
         .logo-container:hover .logo-icon {
-             transform: scale(1.05); /* تأثير تكبير بسيط عند التحويم */
-             box-shadow: 0 0 20px var(--highlight-color), inset 0 0 8px white;
+            transform: scale(1.05); /* تأثير تكبير بسيط عند التحويم */
+            box-shadow: 0 0 20px var(--highlight-color), inset 0 0 8px white;
         }
-        
+
         /* تأثير الأزرار المحسّن (3D effect) */
         .glass-button {
             position: relative;
@@ -120,14 +122,14 @@
 
         /* تأثيرات الأيقونات في قسم المميزات */
         .feature-item:hover .feature-icon {
-            color: var(--highlight-color); 
+            color: var(--highlight-color);
             transform: scale(1.15) rotate(3deg);
         }
 
         .feature-icon {
             transition: color 0.4s ease, transform 0.4s ease;
         }
-        
+
         /* شريط تقدم دائري للأداء - CSS Placeholder */
         .score-circle {
             position: relative;
@@ -145,36 +147,78 @@
 
         /* تخصيص الخلفية الزخرفية (Blobs) */
         @keyframes blob {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(40px, -60px) scale(1.2); }
-            66% { transform: translate(-30px, 30px) scale(0.95); }
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(40px, -60px) scale(1.2);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.95);
+            }
         }
+
         /* حركة الفقاعات الإضافية لزيادة الفخامة والعمق */
         .animate-blob-2 {
             animation: blob 9s infinite cubic-bezier(0.5, 0.5, 0.5, 1);
             animation-delay: 4s;
         }
+
         .animate-blob-3 {
             animation: blob 6s infinite cubic-bezier(0.2, 0.8, 0.8, 0.2);
             animation-delay: 1s;
         }
+
         .animate-blob-4 {
             animation: blob 10s infinite linear;
             animation-delay: 5s;
         }
-        
 
         /* تمييز الروابط النشطة في القائمة */
         .nav-link {
             transition: all 0.3s ease-in-out;
             border-bottom: 2px solid transparent; /* قاعدة لتجنب CLS */
         }
+
         .nav-link:hover, .nav-link.active {
             color: var(--highlight-color);
             border-bottom: 2px solid var(--highlight-color);
             padding-bottom: 6px;
             text-shadow: 0 0 8px rgba(6, 182, 212, 0.5); /* تأثير توهج بسيط */
         }
+        
+        /* Mobile Menu Slide-out (RTL) - القائمة المنبثقة للهاتف */
+        .rtl-slide-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .rtl-slide-out > div {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .rtl-slide-out.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .rtl-slide-out.active > div {
+            transform: translateX(0);
+        }
+        
+        /* Mobile Nav Links Styling */
+        .mobile-nav-link {
+            color: #f3f4f6;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease-in-out;
+            padding: 10px 15px;
+            border-right: 4px solid transparent; /* قاعدة لتجنب CLS */
+        }
+        .mobile-nav-link:hover, .mobile-nav-link.active {
+            background-color: rgba(6, 182, 212, 0.15);
+            color: var(--highlight-color);
+            border-right: 4px solid var(--highlight-color);
+        }
+
 
         /* إخفاء/إظهار تفاصيل الأسئلة الشائعة */
         .faq-content {
@@ -182,8 +226,9 @@
             overflow: hidden;
             transition: max-height 0.4s ease-out;
         }
+
         .faq-item.active .faq-content {
-            max-height: 500px; 
+            max-height: 500px;
             transition: max-height 0.5s ease-in;
         }
 
@@ -196,18 +241,20 @@
             transition: background-color 0.2s, color 0.2s;
             color: #ccc;
         }
+
         #docs-sidebar a:hover, #docs-sidebar a.active,
         #faq-sidebar a:hover, #faq-sidebar a.active {
-            background-color: rgba(6, 182, 212, 0.1); 
+            background-color: rgba(6, 182, 212, 0.1);
             color: var(--highlight-color);
         }
+
         #docs-sidebar h3, #faq-sidebar h3 {
             color: var(--secondary-color);
             padding: 0.5rem 0.75rem;
             font-weight: 700;
             margin-top: 1rem;
         }
-        
+
         /* تنسيق بطاقات التحديثات */
         .update-card {
             border-right: 4px solid var(--highlight-color);
@@ -215,6 +262,7 @@
             padding-right: 1.5rem;
             margin-right: 0.5rem;
         }
+
         .update-card::before {
             content: '';
             position: absolute;
@@ -224,41 +272,47 @@
             height: 16px;
             border-radius: 50%;
             background-color: var(--highlight-color);
-            border: 3px solid #1f013d; 
+            border: 3px solid #1f013d;
         }
-        
+
         /* تنسيق منطقة العملاء */
         .client-stats > div {
             @apply flex flex-col items-center p-4 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-purple-400/50;
         }
+
         .client-stats span {
             @apply text-sm font-medium text-gray-400;
         }
+
         .client-stats b {
             @apply text-3xl font-extrabold mt-1 text-cyan-300;
         }
+
         .blog-item {
             @apply flex justify-between items-center p-3 rounded-lg bg-gray-800/60 border border-gray-700 hover:bg-gray-700/60 transition-colors duration-200 cursor-pointer;
         }
-        
+
         /* تخصيص قسم العملاء */
         #clients-view .client-container {
             @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
         }
+
         #clients-view .client-right {
             @apply lg:col-span-1 space-y-6;
         }
+
         #clients-view .client-left {
             @apply lg:col-span-2 space-y-6;
         }
-        
+
         /* تنسيق أداة الدمج */
         .merger-form textarea {
             @apply w-full h-64 p-4 text-sm font-mono bg-black/30 border border-purple-400/50 rounded-lg text-white resize-none;
         }
+
         .merger-form .merge-button {
             @apply bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-3 rounded-full mt-4 flex items-center justify-center transition-all;
-            writing-mode: horizontal-tb; 
+            writing-mode: horizontal-tb;
         }
 
         .code-label {
@@ -271,30 +325,33 @@
             border: 1px solid rgba(139, 92, 246, 0.5);
             border-radius: 0.5rem;
         }
+
         .CodeMirror-vscrollbar {
-            width: 8px; 
+            width: 8px;
             background: #2a2c3a;
         }
+
         .CodeMirror-vscrollbar div {
-            background-color: #8b5cf6 !important; 
+            background-color: #8b5cf6 !important;
         }
-        
+
         /* Transition effect class for views */
         .view-transition {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             /* يتم إخفاؤها في CSS عند البدء */
             opacity: 1; /* حالة الظهور الافتراضية */
         }
+
         .view-transition.fade-out {
             opacity: 0;
             transform: translateY(10px);
             pointer-events: none;
             /* يتم التحكم في display/hidden بالجافاسكريبت */
         }
+
         .view-transition.hidden {
-             display: none !important;
+            display: none !important;
         }
-        
 
         /* Loading Screen Style */
         #loading-screen {
@@ -311,6 +368,7 @@
             transition: opacity 0.5s ease-out;
             opacity: 1;
         }
+
         .loader {
             border: 8px solid rgba(255, 255, 255, 0.2);
             border-top: 8px solid var(--highlight-color);
@@ -319,22 +377,27 @@
             height: 60px;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         /* Scroll Reveal Styles */
         .scroll-reveal-item {
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
+
         .scroll-reveal-item.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
     </style>
 </head>
 <body class="antialiased">
@@ -355,7 +418,7 @@
         <div class="loader"></div>
         <p class="text-white text-xl font-bold">جارِ تحميل واجهة Alpha Blog...</p>
     </div>
-    
+
     <!-- CodeMirror V5 Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
@@ -373,7 +436,9 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.2 });
+            }, {
+                threshold: 0.2
+            });
 
             elements.forEach(el => {
                 el.classList.add('scroll-reveal-item');
@@ -382,41 +447,80 @@
         };
     </script>
 
+    <!-- Mobile Menu Drawer (Fixed, Off-Canvas) -->
+    <div id="mobile-menu-drawer" class="fixed top-0 right-0 w-full h-full bg-black/70 z-[60] rtl-slide-out">
+        <!-- Drawer Content -->
+        <div class="absolute top-0 right-0 w-80 max-w-[80%] h-full bg-[#1f013d] glass-card border-l border-white/20 p-6 space-y-8 transform translate-x-full transition-transform duration-300 shadow-2xl">
+
+            <!-- Header & Close Button -->
+            <div class="flex justify-between items-center pb-4 border-b border-white/10">
+                <span class="text-xl font-bold text-cyan-400">قائمة التصفح</span>
+                <button id="mobile-menu-close" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6 text-white"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav>
+                <ul class="flex flex-col space-y-2 text-lg font-semibold">
+                    <li><a href="#intro" class="mobile-nav-link px-3 py-2 transition-all flex items-center active" data-view="home"><i data-lucide="home" class="w-6 h-6 ml-3"></i>الرئيسية</a></li>
+                    <li><a href="#Documentation-Content" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="docs"><i data-lucide="book-open" class="w-6 h-6 ml-3"></i>ملف الشرح</a></li>
+                    <li><a href="#FAQ-Content" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="faq"><i data-lucide="help-circle" class="w-6 h-6 ml-3"></i>الأسئلة الشائعة</a></li>
+                    <li><a href="#Updates-Content" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="updates"><i data-lucide="git-branch" class="w-6 h-6 ml-3"></i>التحديثات</a></li>
+                    <li><a href="#Clients-Content" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="clients"><i data-lucide="crown" class="w-6 h-6 ml-3"></i>العملاء</a></li>
+                    <li><a href="#Merger-Content" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="merger"><i data-lucide="layers-3" class="w-6 h-6 ml-3"></i>دمج الإصدارات</a></li>
+                    <li><a href="#Purchase" class="mobile-nav-link px-3 py-2 transition-all flex items-center" data-view="home-section"><i data-lucide="shopping-bag" class="w-6 h-6 ml-3"></i>الشراء</a></li>
+                </ul>
+            </nav>
+
+            <!-- Footer Info -->
+            <div class="absolute bottom-6 w-full pr-12 text-center">
+                <p class="text-xs text-gray-500">© Alpha Blog Template</p>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Main Content Container -->
     <div class="main-contenthome relative z-10 min-h-screen pt-24 ">
-        
+
         <!-- ==================== Header & Navigation ==================== -->
         <header id="header" class="sticky top-0 z-50">
-            <div class="header-content flex flex-col md:flex-row justify-between items-center">
+            <!-- تم تعديل الـ header-content ليتناسب مع قائمة الهاتف -->
+            <div class="header-content flex justify-between items-center">
                 <!-- الشعار -->
-                <div class="logo-container flex items-center space-x-3 space-x-reverse mb-4 md:mb-0" onclick="switchView('home', '#intro')">
+                <div class="logo-container flex items-center space-x-3 space-x-reverse" onclick="switchView('home', '#intro')">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJR3IzL0RRotc0J39jOd3SwNmLo_rcy6UowZIfLxsxT1KAErKdS2GmveGXqu8h-5OezAY_ULjUpiEPQ7h7az7IcImhFo6IWEgfJ9REflM-aC7q6bb9fzs80h8WVGasIqaxDzMTfukkOoU/s1600/S-SHORT.png" alt="ALPHA BLOG Logo" class="logo-icon h-12 w-12 rounded-full border border-white/40 p-1">
                     <span class="text-3xl font-black text-white tracking-widest bg-clip-text text-transparent bg-gradient-to-l from-purple-300 to-cyan-300">ALPHA BLOG</span>
                 </div>
 
-                <!-- قائمة التنقل -->
-                <nav class="w-full md:w-auto">
+                <!-- زر القائمة على الهاتف (يظهر فقط على الشاشات الصغيرة) -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-full hover:bg-white/10 transition-colors z-50">
+                    <i data-lucide="menu" class="w-7 h-7 text-white"></i>
+                </button>
+
+                <!-- قائمة التنقل (Desktop - تُخفى على الشاشات الصغيرة) -->
+                <nav class="hidden md:block w-full md:w-auto">
                     <ul class="flex flex-wrap justify-center md:justify-end space-x-6 space-x-reverse text-base font-semibold">
                         <!-- تم إضافة data-view لتحديد طريقة العرض -->
                         <li><a href="#intro" class="nav-link px-3 py-2 transition-all active flex items-center" data-view="home"><i data-lucide="home" class="w-5 h-5 ml-2"></i>الرئيسية</a></li>
                         <li><a href="#Documentation-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="docs"><i data-lucide="book-open" class="w-5 h-5 ml-2"></i>ملف الشرح</a></li>
                         <li><a href="#FAQ-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="faq"><i data-lucide="help-circle" class="w-5 h-5 ml-2"></i>الأسئلة الشائعة</a></li>
                         <li><a href="#Updates-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="updates"><i data-lucide="git-branch" class="w-5 h-5 ml-2"></i>التحديثات</a></li>
-                        <li><a href="#Clients-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="clients"><i data-lucide="crown" class="w-5 h-5 ml-2"></i>العملاء</a></li> <!-- الرابط الجديد -->
-                        <li><a href="#Merger-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="merger"><i data-lucide="layers-3" class="w-5 h-5 ml-2"></i>دمج الإصدارات</a></li> <!-- الرابط الجديد: دمج الإصدارات -->
+                        <li><a href="#Clients-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="clients"><i data-lucide="crown" class="w-5 h-5 ml-2"></i>العملاء</a></li>
+                        <li><a href="#Merger-Content" class="nav-link px-3 py-2 transition-all flex items-center" data-view="merger"><i data-lucide="layers-3" class="w-5 h-5 ml-2"></i>دمج الإصدارات</a></li>
                         <li><a href="#Purchase" class="nav-link px-3 py-2 transition-all flex items-center" data-view="home-section"><i data-lucide="shopping-bag" class="w-5 h-5 ml-2"></i>الشراء</a></li>
                     </ul>
                 </nav>
             </div>
         </header>
-        
 
         <!-- ==================== LANDING PAGE VIEW (الرئيسية) ==================== -->
         <div id="landing-view" class="view-transition">
             <!-- Hero Section (Intro) -->
             <section id="intro" class="max-w-7xl mx-auto text-center py-20 px-4 mb-16">
                 <h1 id="typewriter-text" class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-snug">
-                   <!-- Typewriter will render here -->
+                    <!-- Typewriter will render here -->
                 </h1>
                 <p class="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-10 font-medium scroll-reveal-item">
                     تصميم احترافي متكامل، سيو فائق السرعة، ونظام متطور لإدارة المؤلفين ومشاركة الأرباح، مصمم خصيصاً للمحتوى العربي الراقي.
@@ -443,12 +547,12 @@
                     </h2>
                     <div class="aspect-video w-full max-w-5xl mx-auto rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl">
                         <!-- Placeholder for YouTube/Vimeo Embed -->
-                        <iframe 
-                            class="w-full h-full" 
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=0" 
-                            title="Template Video Demo Placeholder" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        <iframe
+                            class="w-full h-full"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=0"
+                            title="Template Video Demo Placeholder"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen>
                         </iframe>
                     </div>
@@ -462,22 +566,21 @@
             <section id="Mockups" class="max-w-7xl mx-auto mb-20 px-4 scroll-reveal-item">
                 <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 pb-3 text-center">معرض التصميمات والأشكال (Mockups)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    
                     <!-- Mockup 1: Desktop View -->
                     <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
-                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Desktop+Home+Page+View" alt="نموذج عرض سطح المكتب" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Desktop+Home+Page+View" alt="" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
                         <p class="text-center text-gray-400 mt-3 font-medium text-sm">شكل الصفحة الرئيسية على الحاسوب</p>
                     </div>
 
                     <!-- Mockup 2: Post Page View -->
                     <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
-                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Single+Post+Page+Layout" alt="نموذج صفحة المقال الفردي" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Single+Post+Page+Layout" alt="" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
                         <p class="text-center text-gray-400 mt-3 font-medium text-sm">تصميم صفحة التدوينة الفردية</p>
                     </div>
 
                     <!-- Mockup 3: Mobile View -->
                     <div class="glass-card p-2 rounded-3xl border-2 border-transparent bg-clip-border bg-gradient-to-r from-purple-400/30 to-cyan-400/30">
-                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Fully+Responsive+Mobile+View" alt="نموذج العرض المتجاوب للهاتف" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
+                        <img src="https://placehold.co/800x450/0d012e/e5e7eb?text=Fully+Responsive+Mobile+View" alt="" class="w-full h-auto rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-purple-500/50">
                         <p class="text-center text-gray-400 mt-3 font-medium text-sm">التجاوب الكامل على أجهزة الموبايل</p>
                     </div>
                 </div>
@@ -494,25 +597,21 @@
                         قالب Alpha Blog مصمم لأعلى مستويات الأداء، مما يضمن لك أفضل ترتيب في محركات البحث وتجربة مستخدم لا مثيل لها.
                     </p>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        
                         <!-- Score 1: Performance -->
                         <div class="flex flex-col items-center">
                             <div class="score-circle" style="--score-percent: 96%;"><span class="drop-shadow-lg">96</span></div>
                             <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="zap" class="w-5 h-5 ml-2 text-cyan-400"></i> السرعة والأداء</h4>
                         </div>
-
                         <!-- Score 2: Accessibility -->
                         <div class="flex flex-col items-center">
                             <div class="score-circle" style="--score-percent: 99%;"><span class="drop-shadow-lg">99</span></div>
                             <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="accessibility" class="w-5 h-5 ml-2 text-cyan-400"></i> إمكانية الوصول</h4>
                         </div>
-
                         <!-- Score 3: Best Practices -->
                         <div class="flex flex-col items-center">
                             <div class="score-circle" style="--score-percent: 100%;"><span class="drop-shadow-lg">100</span></div>
                             <h4 class="mt-4 font-bold text-white text-xl flex items-center"><i data-lucide="check-square" class="w-5 h-5 ml-2 text-cyan-400"></i> أفضل الممارسات</h4>
                         </div>
-
                         <!-- Score 4: SEO -->
                         <div class="flex flex-col items-center">
                             <div class="score-circle" style="--score-percent: 98%;"><span class="drop-shadow-lg">98</span></div>
@@ -527,7 +626,7 @@
 
             <!-- Content Sections (About, Features, Advantages) -->
             <main class="main-content max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-10">
-                
+
                 <!-- Section 1: عن القالب (About) -->
                 <section id="About" class="glass-card p-8 rounded-2xl lg:col-span-2 scroll-reveal-item">
                     <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-4 border-b border-white/20 pb-3">عن القالب: رؤية متطورة</h2>
@@ -576,7 +675,7 @@
                         </ul>
                     </div>
                 </section>
-                
+
                 <!-- Section 2: ملامح القالب (Features - Focused List) -->
                 <section id="Features" class="glass-card p-8 rounded-2xl scroll-reveal-item">
                     <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-6 border-b border-white/20 pb-3">ملامح القالب الرئيسية</h2>
@@ -605,13 +704,11 @@
                 </section>
 
             </main>
-
             <!-- Section 3: مميزات القالب (Advantages - Full List) -->
             <section id="Adventages" class="max-w-7xl mx-auto px-4 mt-16 scroll-reveal-item">
                 <div class="glass-card p-10 rounded-2xl">
                     <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-400 to-purple-400 mb-8 border-b border-white/20 pb-3 text-center">المميزات التنافسية (Competitive Advantages)</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        
                         <!-- Item: لوحة تحكم قوية -->
                         <div class="p-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-500 shadow-md hover:shadow-lg hover:border-purple-500/50 border border-transparent">
                             <h4 class="text-xl font-extrabold text-cyan-400 mb-2 flex items-center">
@@ -687,7 +784,6 @@
                     </div>
                 </div>
             </section>
-
             <!-- Purchase Section (kept inside landing-view) -->
             <section id="Purchase" class="max-w-6xl mx-auto px-4 mt-20 text-center scroll-reveal-item">
                 <h2 class="text-6xl font-extrabold text-white mb-6">
@@ -696,7 +792,7 @@
                 <p class="text-gray-300 text-xl mb-10 font-light">
                     استلم نسختك الأصلية وتفعيل الدعم الفني والتحديثات المجانية فوراً.
                 </p>
-                
+
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <!-- منصات الشراء -->
                     <!-- PayPal -->
@@ -722,7 +818,6 @@
                 </div>
                 <p class="text-sm text-gray-500 mt-6 font-medium">للدفع عبر فودافون كاش أو وسائل دفع أخرى، يرجى التواصل مباشرة معنا عبر الفيسبوك.</p>
             </section>
-
             <!-- Comments Section (Placeholder) -->
             <section id="Comments" class="max-w-7xl mx-auto px-4 mt-20 mb-16 scroll-reveal-item">
                 <div class="glass-card p-10 rounded-2xl">
@@ -737,7 +832,6 @@
                 </div>
             </section>
         </div>
-
 
         <!-- ==================== DOCUMENTATION VIEW (ملف الشرح) ==================== -->
         <div id="documentation-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
@@ -757,7 +851,7 @@
                         <a href="#Installation" class="active flex items-center"><i data-lucide="upload-cloud" class="w-5 h-5 ml-2"></i>رفع وتفعيل القالب</a>
                         <a href="#MetaCodes" class="flex items-center"><i data-lucide="file-text" class="w-5 h-5 ml-2"></i>أكواد الميتا</a>
                         <a href="#Settings" class="flex items-center"><i data-lucide="settings" class="w-5 h-5 ml-2"></i>إعدادات القالب</a>
-                        
+
                         <h3 class="text-lg font-bold">إدارة العناصر والوحدات</h3>
                         <a href="#Social" class="flex items-center"><i data-lucide="users" class="w-5 h-5 ml-2"></i>إعدادات السوشيال ميديا والشعار</a>
                         <a href="#Menu" class="flex items-center"><i data-lucide="list" class="w-5 h-5 ml-2"></i>القائمة الرئيسية (Mega Menu)</a>
@@ -773,7 +867,7 @@
                 <!-- Main Content -->
                 <main id="docs-main-content" class="lg:col-span-3 overflow-y-auto">
                     <div class="glass-card p-8 rounded-2xl space-y-8">
-                        
+
                         <!-- Installation Section -->
                         <section id="Installation" class="space-y-5 border-b border-white/20 pb-6 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="upload-cloud" class="w-6 h-6 ml-3"></i> 1. تركيب وتفعيل القالب</h2>
@@ -801,7 +895,7 @@
                             </p>
                         </section>
 
-                         <!-- Authors Section -->
+                        <!-- Authors Section -->
                         <section id="Authors" class="space-y-5 border-b border-white/20 pb-6 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="users-2" class="w-6 h-6 ml-3"></i> 3. منطقة المؤلفين ومشاركة الأرباح</h2>
                             <p class="text-gray-300">
@@ -811,7 +905,6 @@
                                 *ملاحظة: إذا لم يكن للكاتب أداة مخصصة باسمه، فلن يظهر ملفه الشخصي ولن تُفعل إعلاناته الخاصة.*
                             </p>
                         </section>
-
                         <!-- Example Section (Shortcodes) -->
                         <section id="Other-Widgets" class="space-y-5 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="terminal-square" class="w-6 h-6 ml-3"></i> 4. أدوات إضافية وأكواد قصيرة</h2>
@@ -828,7 +921,6 @@
                 </main>
             </div>
         </div>
-
         <!-- ==================== FAQ VIEW (الأسئلة الشائعة) ==================== -->
         <div id="faq-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
             <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
@@ -854,7 +946,7 @@
                 <!-- Main Content -->
                 <main id="faq-main-content" class="lg:col-span-3 overflow-y-auto">
                     <div id="faq-main-content-inner" class="glass-card p-8 rounded-2xl space-y-8">
-                        
+
                         <!-- FAQ Section 1: Pricing -->
                         <section id="FAQ-Pricing" class="space-y-5 border-b border-white/20 pb-6 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="dollar-sign" class="w-6 h-6 ml-3"></i> 1. السعر ووسائل الشراء</h2>
@@ -873,7 +965,7 @@
                         <!-- FAQ Section 2: Usage -->
                         <section id="FAQ-Usage" class="space-y-5 border-b border-white/20 pb-6 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="shield" class="w-6 h-6 ml-3"></i> 2. التراخيص وشروط الاستخدام</h2>
-                            
+
                             <h3 class="text-xl font-semibold text-white">هل يمكنني تركيب قالب Alpha Blog على أكثر من مدونة؟</h3>
                             <p class="text-gray-300 leading-relaxed">
                                 نعم، يحق لكل مشتري تركيب القالب على **ثلاث مدونات بحد أقصى**، شريطة أن تكون المدونة مملوكة له وألا يكون الهدف إعادة بيع القالب أو إهداؤه.
@@ -893,7 +985,7 @@
                         <!-- FAQ Section 3: Support & Updates -->
                         <section id="FAQ-Support" class="space-y-5 border-b border-white/20 pb-6 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="refresh-cw" class="w-6 h-6 ml-3"></i> 3. الدعم الفني والتحديثات</h2>
-                            
+
                             <h3 class="text-xl font-semibold text-white">ما هي مدة الدعم الفني المجاني لقالب Alpha Blog؟</h3>
                             <p class="text-gray-300 leading-relaxed">
                                 مدة الدعم الفني المجاني هي **ستون يوماً (60 يومًا)** من تاريخ الشراء. الدعم الفني لا يشمل تركيب القالب (لوجود ملف الشرح)، ولا يشمل برمجة إضافات جديدة. بعد هذه الفترة، يصبح الدعم الفني مدفوعاً.
@@ -904,11 +996,10 @@
                                 **نعم**، يتم تحديث القالب بشكل دوري (لحل المشاكل العامة أو إضافة مميزات جديدة). يحق للمشتري الحصول على جميع تحديثات القالب المستقبلية **مجاناً** بدون أي رسوم إضافية.
                             </p>
                         </section>
-
-                         <!-- FAQ Section 4: Testing -->
+                        <!-- FAQ Section 4: Testing -->
                         <section id="FAQ-Testing" class="space-y-5 pt-4">
                             <h2 class="text-3xl font-bold text-cyan-400 flex items-center"><i data-lucide="test-tube-2" class="w-6 h-6 ml-3"></i> 4. اختبارات الأداء والسيو</h2>
-                            
+
                             <h3 class="text-xl font-semibold text-white">كيف يمكنني إختبار قالب Alpha Blog قبل الشراء؟</h3>
                             <p class="text-gray-300 leading-relaxed">
                                 يمكنك مراجعة أداء القالب عبر الروابط التالية لاختبار السرعة، التجاوب، والأكواد المنظمة:
@@ -924,7 +1015,7 @@
                 </main>
             </div>
         </div>
-        
+
         <!-- ==================== UPDATES VIEW (التحديثات) ==================== -->
         <div id="updates-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
             <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
@@ -936,7 +1027,6 @@
             </p>
 
             <div class="max-w-4xl mx-auto space-y-12">
-                
                 <!-- Update 2.3.1 -->
                 <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4">
@@ -956,7 +1046,7 @@
                         <li class="flex items-start"><i data-lucide="speedometer" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-cyan-400"></i> تحسينات لزيادة سرعة القالب.</li>
                     </ul>
                 </div>
-                
+
                 <!-- Update 2.3.0 -->
                 <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4">
@@ -974,7 +1064,7 @@
                         <li class="flex items-start"><i data-lucide="x-circle" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-red-400"></i> **إلغاء مكتبة jQuery** واستخدام أكواد JavaScript نقية لزيادة السرعة.</li>
                     </ul>
                 </div>
-                
+
                 <!-- Update 2.1.0 -->
                 <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4">
@@ -992,7 +1082,7 @@
                         <li class="flex items-start"><i data-lucide="repeat-2" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تكرار إعلان منتصف المقال تلقائياً قبل أي عنوان فرعي.</li>
                     </ul>
                 </div>
-                
+
                 <!-- Update 2.0.0 -->
                 <div class="update-card glass-card p-6 rounded-2xl shadow-xl">
                     <div class="flex justify-between items-center mb-4">
@@ -1009,10 +1099,10 @@
                         <li class="flex items-start"><i data-lucide="sidebar" class="w-5 h-5 ml-2 mt-1 flex-shrink-0 text-purple-300"></i> إمكانية تثبيت الشريط الجانبي أثناء التمرير.</li>
                     </ul>
                 </div>
-                
+
                 <!-- Initial Release 1.0.0 -->
                 <div class="update-card bg-white/5 p-6 rounded-2xl border-none shadow-none">
-                     <div class="flex justify-between items-center mb-4">
+                    <div class="flex justify-between items-center mb-4">
                         <h2 class="text-3xl font-extrabold text-cyan-300 flex items-center">
                             <i data-lucide="calendar-check" class="w-6 h-6 ml-2 text-purple-400"></i>
                             الإصدار 1.0.0 (الإطلاق)
@@ -1023,7 +1113,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- ==================== MERGER VIEW (دمج الإصدارات) ==================== -->
         <div id="merger-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
             <h1 class="text-5xl font-extrabold text-white mb-8 border-b border-white/30 pb-4">
@@ -1035,7 +1125,7 @@
             </p>
 
             <div class="glass-card p-10 rounded-2xl space-y-10">
-                 <section>
+                <section>
                     <h2 class="text-3xl font-bold text-purple-300 flex items-center mb-4">
                         <i data-lucide="clipboard-list" class="w-6 h-6 ml-2"></i>
                         ملاحظات هامة حول عملية الدمج
@@ -1047,20 +1137,20 @@
                         <li>لا تحتاج لاستخدام هذه الأداة إذا كنت ستقوم بتركيب القالب لأول مرة.</li>
                     </ul>
                 </section>
-                
+
                 <section>
                     <h2 class="text-3xl font-bold text-purple-300 flex items-center mb-4">
                         <i data-lucide="merge" class="w-6 h-6 ml-2"></i>
                         منطقة الدمج والتحديث
                     </h2>
                     <form id="merger-form" class="merger-form grid grid-cols-1 md:grid-cols-2 gap-8">
-                        
+
                         <div class="form-group space-y-2">
                             <label for="s-old-cm" class="code-label">1. أكواد الإصدار المستخدم (النسخة القديمة)</label>
                             <!-- CodeMirror target textarea -->
                             <textarea id="s-old-cm" required placeholder="الصق هنا كود القالب الحالي بمدونتك..."></textarea>
                         </div>
-                        
+
                         <div class="form-group space-y-2">
                             <label for="s-new-cm" class="code-label">2. أكواد الإصدار الحديث (نسخة التحديث)</label>
                             <!-- CodeMirror target textarea -->
@@ -1085,10 +1175,8 @@
                         </div>
                     </form>
                 </section>
-                
             </div>
         </div>
-
 
         <!-- ==================== CLIENTS VIEW (العملاء) ==================== -->
         <div id="clients-view" class="hidden view-transition max-w-7xl mx-auto p-4 md:p-8">
@@ -1101,7 +1189,6 @@
             </p>
 
             <div class="glass-card p-10 rounded-2xl space-y-8">
-                
                 <!-- Authentication / Sign-in Section -->
                 <div id="client-auth-section" class="text-center space-y-6">
                     <h2 class="text-3xl font-bold text-cyan-400 flex items-center justify-center">
@@ -1115,7 +1202,7 @@
                         </p>
                     </div>
                     <button id="sign-in-button" class="glass-button bg-red-600/70 hover:bg-red-700/80 px-8 py-3 rounded-full text-white font-bold flex items-center justify-center mx-auto transition-all">
-                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" class="w-6 h-6 ml-3" alt="Google Icon">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" class="w-6 h-6 ml-3" alt="">
                         تسجيل الدخول عبر جوجل
                     </button>
                     <p class="text-sm text-gray-500">سيُطلب منك السماح بعرض البريد الإلكتروني ومدوناتك (عرض فقط).</p>
@@ -1123,12 +1210,11 @@
 
                 <!-- Client Information & Management Section (Hidden by Default) -->
                 <div id="client-dashboard" class="hidden space-y-10">
-                    
                     <!-- Client Info & Stats -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-xl bg-purple-700/20 border border-purple-400/50">
                         <!-- Profile Card -->
                         <div class="md:col-span-1 flex flex-col items-center space-y-3 p-4 rounded-xl glass-card border-none">
-                            <img id="client-avatar" src="https://placehold.co/100x100/3b82f6/ffffff?text=U" class="w-20 h-20 rounded-full border-4 border-cyan-400" alt="صورة الملف الشخصي">
+                            <img id="client-avatar" src="https://placehold.co/100x100/3b82f6/ffffff?text=U" class="w-20 h-20 rounded-full border-4 border-cyan-400" alt="">
                             <h5 id="client-name" class="text-xl font-bold text-white">العميل العزيز</h5>
                             <span id="client-email" class="text-sm text-gray-400">client.email@example.com</span>
                             <button id="sign-out-button" class="glass-button bg-gray-700/50 px-4 py-2 rounded-full text-sm hover:bg-gray-600/70">
@@ -1136,7 +1222,7 @@
                                 تسجيل الخروج
                             </button>
                         </div>
-                        
+
                         <!-- Summary Stats -->
                         <div class="md:col-span-2 grid grid-cols-2 gap-4 client-stats">
                             <div><span>عدد مرات الشراء</span><b id="p-orders">1</b></div>
@@ -1145,10 +1231,9 @@
                             <div><span>المدونات المتبقية</span><b id="rm-blogs">2</b></div>
                         </div>
                     </div>
-                    
+
                     <!-- Blogs and Activation -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        
                         <!-- Registered Blogs -->
                         <div class="glass-card p-6 rounded-2xl space-y-4">
                             <h3 class="text-2xl font-bold text-cyan-300 flex items-center border-b border-white/10 pb-2">
@@ -1169,7 +1254,7 @@
                                 تسجيل مدونة جديدة
                             </button>
                         </div>
-                        
+
                         <!-- New Blog Selection -->
                         <div id="new-blog-selection" class="glass-card p-6 rounded-2xl space-y-4 hidden">
                             <h3 class="text-2xl font-bold text-cyan-300 flex items-center border-b border-white/10 pb-2">
@@ -1188,7 +1273,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Important Notes -->
                     <section>
                         <h6 class="text-2xl font-bold text-purple-300 flex items-center mb-3">
@@ -1203,7 +1288,6 @@
                         </ul>
                     </section>
                 </div>
-
                 <!-- Versions Section -->
                 <section>
                     <h6 class="text-2xl font-bold text-purple-300 flex items-center mb-4">
@@ -1218,7 +1302,7 @@
                                 تحميل <i data-lucide="download" class="w-4 h-4 mr-1 inline-block"></i>
                             </button>
                         </li>
-                         <li class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 opacity-70">
+                        <li class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 opacity-70">
                             <span>الإصدار 2.3.0 - (أكتوبر 2020)</span>
                             <button class="bg-cyan-600 hover:bg-cyan-700 text-white text-sm px-3 py-1 rounded-full transition-colors flex items-center" disabled>
                                 تحميل <i data-lucide="download" class="w-4 h-4 mr-1 inline-block"></i>
@@ -1227,13 +1311,10 @@
                     </ul>
                     <p class="text-gray-500 text-sm mt-4">ملاحظة: زر التحميل يُفعل تلقائياً بعد تسجيل الدخول كعميل.</p>
                 </section>
-                
             </div>
         </div>
 
-
     </div>
-    
     <!-- ==================== Footer ==================== -->
     <footer id="footer" class="glass-card mt-12 p-8 rounded-t-3xl shadow-2xl">
         <div class="wrapper max-w-7xl mx-auto">
@@ -1257,7 +1338,6 @@
             </div>
         </div>
     </footer>
-
     <!-- سكربت Lucide Icons لتهيئة الأيقونات -->
     <script>
         lucide.createIcons();
@@ -1290,7 +1370,6 @@
             document.head.append(style);
         }
     </script>
-    
     <script>
         // ===================================
         // دالة لعرض رسالة (بديل لـ alert)
@@ -1305,7 +1384,7 @@
                 error: 'bg-red-600',
                 warning: 'bg-yellow-600'
             };
-            
+
             const iconMap = {
                 info: 'i-info',
                 success: 'i-check-circle',
@@ -1315,11 +1394,17 @@
 
             const toastElement = document.createElement('div');
             toastElement.className = `fixed bottom-5 right-5 p-4 rounded-lg shadow-lg text-white ${colorMap[type]} transition-opacity duration-300 opacity-0 transform translate-y-4`;
-            
+
             toastElement.innerHTML = `<div class="flex items-center"><i data-lucide="${iconMap[type].substring(2)}" class="w-5 h-5 ml-2"></i> ${message}</div>`;
-            
+
             wrapper.appendChild(toastElement);
-            lucide.createIcons({ attrs: { class: 'w-5 h-5 ml-2' }, name: iconMap[type].substring(2), element: toastElement.querySelector('i') });
+            lucide.createIcons({
+                attrs: {
+                    class: 'w-5 h-5 ml-2'
+                },
+                name: iconMap[type].substring(2),
+                element: toastElement.querySelector('i')
+            });
 
             // Show animation
             setTimeout(() => {
@@ -1337,6 +1422,25 @@
             }, 3000);
         }
 
+        // ===================================
+        // 2.5 منطق تبديل القائمة المنبثقة (Mobile Menu Logic)
+        // ===================================
+        function toggleMobileMenu(forceClose = false) {
+            const drawer = document.getElementById('mobile-menu-drawer');
+            if (!drawer) return;
+
+            const isActive = drawer.classList.contains('active');
+
+            if (forceClose || isActive) {
+                drawer.classList.remove('active');
+                document.body.style.overflow = ''; // استعادة التمرير
+            } else {
+                drawer.classList.add('active');
+                document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+                lucide.createIcons(); // لضمان تهيئة أيقونات القائمة
+            }
+        }
+
 
         // ===================================
         // 2. منطق تبديل طرق العرض والتمرير السلس (Switch View Logic)
@@ -1347,17 +1451,17 @@
             const landingView = document.getElementById('landing-view');
             const documentationView = document.getElementById('documentation-view');
             const faqView = document.getElementById('faq-view');
-            const updatesView = document.getElementById('updates-view'); 
-            const clientsView = document.getElementById('clients-view'); 
-            const mergerView = document.getElementById('merger-view'); 
-            const navLinks = document.querySelectorAll('.nav-link');
-            
+            const updatesView = document.getElementById('updates-view');
+            const clientsView = document.getElementById('clients-view');
+            const mergerView = document.getElementById('merger-view');
+
             // قائمة بجميع طرق العرض المتاحة
             const allViews = [landingView, documentationView, faqView, updatesView, clientsView, mergerView];
 
-            // 1. إزالة حالة التفعيل من جميع الروابط
+            // 1. إزالة حالة التفعيل من جميع الروابط (سطح المكتب والهاتف)
+            const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
-            
+
             // تحديد View الحالي النشط قبل الإخفاء
             let currentActiveView = null;
             allViews.forEach(view => {
@@ -1373,7 +1477,7 @@
             }
 
             let viewToShow = null;
-            
+
             switch (viewId) {
                 case 'docs':
                     viewToShow = documentationView;
@@ -1384,10 +1488,10 @@
                 case 'updates':
                     viewToShow = updatesView;
                     break;
-                case 'clients': 
+                case 'clients':
                     viewToShow = clientsView;
                     break;
-                case 'merger': 
+                case 'merger':
                     viewToShow = mergerView;
                     break;
                 case 'home':
@@ -1398,6 +1502,9 @@
 
             // 3. إظهار طريقة العرض المطلوبة بعد انتهاء تلاشي المحتوى القديم
             setTimeout(() => {
+                // إغلاق القائمة المنبثقة على الهاتف إذا كانت مفتوحة
+                toggleMobileMenu(true);
+
                 // إخفاء جميع طرق العرض بشكل نهائي بعد التلاشي
                 allViews.forEach(view => {
                     if (view) {
@@ -1405,26 +1512,27 @@
                         view.classList.remove('fade-out');
                     }
                 });
-                
+
                 if (viewToShow) {
                     viewToShow.classList.remove('hidden');
-                    
-                    // 4. تفعيل الرابط المناسب في القائمة العلوية
-                    const activeLink = document.querySelector(`a[href="${targetHash}"]`);
-                    if (activeLink) {
-                        activeLink.classList.add('active');
-                    }
-                    
+
+                    // 4. تفعيل الرابط المناسب في القائمة العلوية وقائمة الهاتف
+                    const activeLinks = document.querySelectorAll(`a[href="${targetHash}"]`);
+                    activeLinks.forEach(link => link.classList.add('active'));
+
                     // 5. التعامل مع التمرير (Scroll)
                     const isSectionView = viewId === 'home-section';
                     const headerHeight = document.getElementById('header').offsetHeight; // ارتفاع الهيدر
-                    
+
                     // التمرير إلى أعلى الصفحة (للصفحات المنفصلة)
                     if (viewId !== 'home-section' || targetHash === '#intro') {
                         // إزاحة بسيطة من الهيدر الثابت
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    } 
-                    
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+
                     // التمرير إلى قسم محدد ضمن صفحة الهبوط
                     if (isSectionView && targetHash && targetHash !== '#intro') {
                         const targetElement = document.querySelector(targetHash);
@@ -1437,7 +1545,7 @@
                             });
                         }
                     }
-                    
+
                     // إعادة تفعيل Scroll Reveal عند العودة لصفحة الهبوط
                     if (viewId === 'home' || viewId === 'home-section') {
                         // إعادة تفعيل Scroll Reveal للعناصر غير الظاهرة بعد الانتقال
@@ -1450,7 +1558,9 @@
                                         observer.unobserve(entry.target);
                                     }
                                 });
-                            }, { threshold: 0.2 });
+                            }, {
+                                threshold: 0.2
+                            });
                             observer.observe(el);
                         });
                     }
@@ -1459,11 +1569,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-             // إضافة حاوية الـ Toast
+            // إضافة حاوية الـ Toast
             const toastWrapper = document.createElement('div');
             toastWrapper.className = 'toast-wrapper fixed bottom-0 right-0 p-4 space-y-2 z-50';
             document.body.appendChild(toastWrapper);
-            
+
             // ------------------------------------
             // A. تجهيز CodeMirror
             // ------------------------------------
@@ -1473,7 +1583,7 @@
                 const sOldCm = document.getElementById('s-old-cm');
                 const sNewCm = document.getElementById('s-new-cm');
                 const sResultCm = document.getElementById('s-result-cm');
-                
+
                 // يجب أن تكون عناصر textarea مرئية لكي يتم تهيئة CodeMirror بشكل صحيح
                 if (sOldCm && !cmOld) {
                     cmOld = CodeMirror.fromTextArea(sOldCm, {
@@ -1503,21 +1613,21 @@
                     });
                 }
             };
-            
+
             // ------------------------------------
             // B. منطق محاكاة الدمج (Code Merger Logic)
             // ------------------------------------
             const mergeButton = document.getElementById('merge-button');
             const copyResultButton = document.getElementById('copy-result');
             const resultGroup = document.getElementById('result-group');
-            
+
             if (mergeButton) {
                 mergeButton.addEventListener('click', function() {
                     if (!cmOld || !cmNew) {
-                         showToast('يرجى تهيئة المحرر أولاً (حاول إعادة تحميل الصفحة إذا استمر الخطأ)', 'error');
-                         return;
+                        showToast('يرجى تهيئة المحرر أولاً (حاول إعادة تحميل الصفحة إذا استمر الخطأ)', 'error');
+                        return;
                     }
-                    
+
                     const oldCode = cmOld.getValue().trim();
                     const newCode = cmNew.getValue().trim();
 
@@ -1533,12 +1643,12 @@
                     // --- Dummy Merging Process ---
                     // محاكاة عملية الدمج
                     const mergedCode = newCode + '\n<!-- Customizations preserved: Colors, Menus, Author Ads (DUMMY MERGE) -->';
-                    
+
                     cmResult.setValue(mergedCode);
                     resultGroup.classList.remove('hidden');
                     copyResultButton.classList.remove('hidden');
                     showToast('تم دمج نسخ القالب بنجاح! يمكنك الآن نسخ الكود.', 'success');
-                    
+
                     // تحديث حجم CodeMirror النتيجة
                     cmResult.refresh();
                 });
@@ -1549,7 +1659,7 @@
                     const mergedCode = cmResult.getValue();
                     if (mergedCode) {
                         // Use clipboard API or fallback (execCommand)
-                         if (navigator.clipboard && navigator.clipboard.writeText) {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
                             navigator.clipboard.writeText(mergedCode).then(() => {
                                 showToast('تم نسخ أكواد القالب المدمجة', 'info');
                             }).catch(err => {
@@ -1570,12 +1680,11 @@
                 });
             }
 
-
             // ------------------------------------
             // C. منطق تبديل طرق العرض
             // ------------------------------------
             document.querySelectorAll('a[data-view]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+                anchor.addEventListener('click', function(e) {
                     e.preventDefault();
                     const viewType = this.getAttribute('data-view');
                     const targetHash = this.getAttribute('href');
@@ -1583,34 +1692,38 @@
                     // تهيئة CodeMirror إذا كنا ننتقل لصفحة الدمج
                     if (viewType === 'merger') {
                         // استخدام setTimeout لضمان تهيئة CodeMirror بعد ظهور المنطقة
-                        setTimeout(initCodeMirror, 50); 
+                        setTimeout(initCodeMirror, 50);
                     }
 
-                    switch (viewType) {
-                        case 'home':
-                            switchView('home', targetHash);
-                            break;
-                        case 'docs':
-                            switchView('docs', targetHash);
-                            break;
-                        case 'faq':
-                            switchView('faq', targetHash);
-                            break;
-                        case 'updates':
-                            switchView('updates', targetHash);
-                            break;
-                        case 'clients':
-                            switchView('clients', targetHash);
-                            break;
-                        case 'merger':
-                            switchView('merger', targetHash);
-                            break;
-                        case 'home-section':
-                            switchView('home-section', targetHash);
-                            break;
-                    }
+                    // نستخدم switchView مباشرةً، وهي تتولى إغلاق قائمة الهاتف
+                    switchView(viewType, targetHash);
                 });
             });
+
+            // ------------------------------------
+            // C.1. Mobile Menu Listeners
+            // ------------------------------------
+            const mobileToggle = document.getElementById('mobile-menu-toggle');
+            const mobileClose = document.getElementById('mobile-menu-close');
+            const mobileDrawer = document.getElementById('mobile-menu-drawer');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => toggleMobileMenu());
+            }
+            if (mobileClose) {
+                mobileClose.addEventListener('click', () => toggleMobileMenu(true));
+            }
+
+            // إغلاق القائمة عند النقر خارج المحتوى (على الخلفية الداكنة)
+            if (mobileDrawer) {
+                mobileDrawer.addEventListener('click', function(e) {
+                    // تحقق مما إذا كان النقر على الخلفية الداكنة وليس على محتوى القائمة
+                    if (e.target === mobileDrawer) {
+                        toggleMobileMenu(true);
+                    }
+                });
+            }
 
             // ------------------------------------
             // D. تهيئة مؤثر الكتابة (Typewriter)
@@ -1628,13 +1741,13 @@
                     .typeString('<br class="block md:hidden"> بوابة مجلتك العصرية على <span class="text-cyan-400">بلوجر</span>.')
                     .start();
             }
-            
+
             // ------------------------------------
             // E. Scroll Reveal and Initial Load
             // ------------------------------------
             const loadingScreen = document.getElementById('loading-screen');
             if (loadingScreen) {
-                 // إخفاء شاشة التحميل بعد تحميل الصفحة بالكامل
+                // إخفاء شاشة التحميل بعد تحميل الصفحة بالكامل
                 window.addEventListener('load', () => {
                     loadingScreen.style.opacity = '0';
                     setTimeout(() => {
@@ -1643,7 +1756,7 @@
                     }, 500);
                 });
             }
-            
+
             // ------------------------------------
             // F. منطق الهيدر الثابت والديناميكي
             // ------------------------------------
@@ -1656,18 +1769,17 @@
                 }
             });
 
-
             // ===================================
             // 3. تفعيل الأكورديون في الأسئلة الشائعة (FAQ)
             // ===================================
             document.querySelectorAll('.faq-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const item = header.closest('.faq-item');
-                    
+
                     const content = item ? item.querySelector('.faq-content') : null;
                     const icon = header.querySelector('i');
 
-                    if (!item || !content || !icon) return; 
+                    if (!item || !content || !icon) return;
 
                     const isActive = item.classList.contains('active');
 
@@ -1676,7 +1788,7 @@
                             activeItem.classList.remove('active');
                             const activeContent = activeItem.querySelector('.faq-content');
                             const activeIcon = activeItem.querySelector('i');
-                            
+
                             if (activeContent) activeContent.style.maxHeight = '0';
                             if (activeIcon) activeIcon.classList.remove('rotate-180');
                         }
@@ -1688,61 +1800,59 @@
                         icon.classList.remove('rotate-180');
                     } else {
                         item.classList.add('active');
-                        content.style.maxHeight = content.scrollHeight + "px"; 
+                        content.style.maxHeight = content.scrollHeight + "px";
                         icon.classList.add('rotate-180');
                     }
                 });
             });
-            
+
             // ===================================
             // 4. تفعيل روابط الشريط الجانبي (FAQs, Docs)
             // ===================================
-            // ملاحظة: تم تعديل هذه الدالة لاستخدام window.scrollTo بدلاً من mainContentElement.scroll
-            // وذلك لضمان عمل التمرير على مستوى الصفحة بالكامل بشكل صحيح، مع الحفاظ على التمرير السلس.
             function setupSidebarScrolling(sidebarId) {
-                 const sidebarLinks = document.querySelectorAll(`${sidebarId} a`);
-                 const headerHeight = document.getElementById('header').offsetHeight; 
-                 const viewContainer = document.getElementById(sidebarId.includes('docs') ? 'documentation-view' : 'faq-view');
-                 
-                 // يتم استدعاء هذه الدالة عند التمرير لتحديث الروابط النشطة
-                 const updateActiveLinkOnScroll = () => {
-                     if (viewContainer && viewContainer.classList.contains('hidden')) return;
+                const sidebarLinks = document.querySelectorAll(`${sidebarId} a`);
+                const headerHeight = document.getElementById('header').offsetHeight;
+                const viewContainer = document.getElementById(sidebarId.includes('docs') ? 'documentation-view' : 'faq-view');
 
-                     let currentHash = '';
-                     // تحديد موضع التمرير في النافذة
-                     const scrollPosition = window.scrollY + headerHeight + 50; 
-                     
-                     // تحديد أقسام المحتوى داخل viewContainer (بدلاً من mainContentElement)
-                     const contentSections = viewContainer.querySelectorAll('section[id]');
+                // يتم استدعاء هذه الدالة عند التمرير لتحديث الروابط النشطة
+                const updateActiveLinkOnScroll = () => {
+                    if (viewContainer && viewContainer.classList.contains('hidden')) return;
 
-                     contentSections.forEach(section => {
-                         // يجب أن نستخدم offsetTop للعنصر بالنسبة للجسم الصفحة (document)
-                         if (section.offsetTop <= scrollPosition && section.offsetTop + section.offsetHeight > scrollPosition) {
-                             currentHash = '#' + section.id;
-                         }
-                     });
+                    let currentHash = '';
+                    // تحديد موضع التمرير في النافذة
+                    const scrollPosition = window.scrollY + headerHeight + 50;
 
-                     sidebarLinks.forEach(link => {
-                         link.classList.remove('active');
-                         if (link.getAttribute('href') === currentHash) {
-                             link.classList.add('active');
-                         }
-                     });
-                 };
-                 
-                 // إضافة مستمع لحدث النقر (Scroll to Section logic)
-                 sidebarLinks.forEach(link => {
+                    // تحديد أقسام المحتوى داخل viewContainer (بدلاً من mainContentElement)
+                    const contentSections = viewContainer.querySelectorAll('section[id]');
+
+                    contentSections.forEach(section => {
+                        // يجب أن نستخدم offsetTop للعنصر بالنسبة للجسم الصفحة (document)
+                        if (section.offsetTop <= scrollPosition && section.offsetTop + section.offsetHeight > scrollPosition) {
+                            currentHash = '#' + section.id;
+                        }
+                    });
+
+                    sidebarLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === currentHash) {
+                            link.classList.add('active');
+                        }
+                    });
+                };
+
+                // إضافة مستمع لحدث النقر (Scroll to Section logic)
+                sidebarLinks.forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
-                        
+
                         const targetHash = this.getAttribute('href');
                         const targetElement = document.querySelector(targetHash);
-                        
+
                         if (targetElement) {
                             // إزالة التفعيل من جميع الروابط وتفعيل الرابط الذي تم النقر عليه فوراً
                             sidebarLinks.forEach(a => a.classList.remove('active'));
                             this.classList.add('active');
-                            
+
                             const headerHeight = document.getElementById('header').offsetHeight; // ارتفاع الهيدر
                             // حساب الإزاحة الصحيحة للنقر
                             const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
@@ -1760,7 +1870,7 @@
                 // تحديث أولي عند التحميل
                 updateActiveLinkOnScroll();
             }
-            
+
             setupSidebarScrolling('#faq-sidebar');
             setupSidebarScrolling('#docs-sidebar');
 
@@ -1776,25 +1886,25 @@
 
             function dummySignIn() {
                 if (!authSection || !dashboardSection) return; // فحص إضافي
-                
+
                 authSection.classList.add('hidden');
                 dashboardSection.classList.remove('hidden');
                 console.log('Dummy Signed In');
 
                 // تحديث بيانات العميل الوهمية
                 const clientName = document.getElementById('client-name');
-                if(clientName) clientName.textContent = "أحمد صالح";
+                if (clientName) clientName.textContent = "أحمد صالح";
                 const clientEmail = document.getElementById('client-email');
-                if(clientEmail) clientEmail.textContent = "ahmad.saleh@demo.com";
+                if (clientEmail) clientEmail.textContent = "ahmad.saleh@demo.com";
                 const pOrders = document.getElementById('p-orders');
-                if(pOrders) pOrders.textContent = "5";
+                if (pOrders) pOrders.textContent = "5";
                 const rdBlogs = document.getElementById('rd-blogs');
-                if(rdBlogs) rdBlogs.textContent = "2";
+                if (rdBlogs) rdBlogs.textContent = "2";
                 const rmBlogs = document.getElementById('rm-blogs');
-                if(rmBlogs) rmBlogs.textContent = "1";
+                if (rmBlogs) rmBlogs.textContent = "1";
                 const maxBlogs = document.getElementById('max-blogs');
-                if(maxBlogs) maxBlogs.textContent = "3";
-                
+                if (maxBlogs) maxBlogs.textContent = "3";
+
                 // تفعيل أزرار التحميل
                 document.querySelectorAll('#temp-versions-list button').forEach(btn => btn.disabled = false);
             }
@@ -1806,21 +1916,20 @@
                 dashboardSection.classList.add('hidden');
                 newBlogSelection.classList.add('hidden');
                 console.log('Dummy Signed Out');
-                
+
                 // تعطيل أزرار التحميل
                 document.querySelectorAll('#temp-versions-list button').forEach(btn => btn.disabled = true);
             }
 
-            if(signInButton) signInButton.addEventListener('click', dummySignIn);
-            if(signOutButton) signOutButton.addEventListener('click', dummySignOut);
-            
-            if(newBlogButton) newBlogButton.addEventListener('click', () => {
+            if (signInButton) signInButton.addEventListener('click', dummySignIn);
+            if (signOutButton) signOutButton.addEventListener('click', dummySignOut);
+
+            if (newBlogButton) newBlogButton.addEventListener('click', () => {
                 if (newBlogSelection) newBlogSelection.classList.toggle('hidden');
             });
-            
+
             // Dummy initialization state (if we want to simulate already logged in, but default is logged out)
-            // dummySignIn(); 
-            
+            // dummySignIn();
         });
     </script>
 </body>
