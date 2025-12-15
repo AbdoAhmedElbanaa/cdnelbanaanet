@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="page.title">Crave.io – أطلق المنتجات بشكل أسرع</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for aesthetic appeal -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Load AOS CSS for Animate On Scroll effects -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Load Cairo font for Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Load smooth-scroll library for smooth scrolling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/smooth-scroll/16.1.3/smooth-scroll.min.js"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#0f172a', // Slate-900 equivalent for background
+                        'accent': '#6366f1', // Indigo-500
+                        'accent-light': '#818cf8', // Indigo-400
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%, 100%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                        }
+                    },
+                    animation: {
+                        blob: 'blob 7s infinite cubic-bezier(0.6, 0.2, 0.4, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Import the Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Set the default font stack to prioritize Cairo for RTL */
+        body[dir="rtl"] {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            text-align: right; 
+        }
+
+        /* Set Inter as primary for LTR */
+        body[dir="ltr"] {
+            font-family: 'Inter', 'Cairo', sans-serif;
+            text-align: left;
+        }
+        
+        /* Base dark background for body */
+        body {
+            background-color: #0f172a; /* Flat primary dark */
+            min-height: 100vh;
+            position: relative;
+            scroll-behavior: smooth; /* تم الإضافة: لتمرير الماوس السلس */
+        }
+
+        /* Dynamic light effect overlay */
+        #dynamic-bg-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Ignore mouse events */
+            opacity: 0.25; /* Subtle opacity */
+            z-index: -1;
+            /* Initial state */
+            background: radial-gradient(circle at 50% 50%, #6366f1, transparent 40%);
+            transition: opacity 0.3s ease; /* Smooth opacity transition */
+        }
+
+        /* The core Glassmorphism class */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.05); /* Very slight white transparency */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2), 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom scrollbar styling for aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5); /* Accent color for the thumb */
+            border-radius: 10px;
+        }
+        
+        /* Language switcher specific styling */
+        .lang-button {
+            min-width: 48px;
+            text-align: center;
+            font-weight: 700;
+            padding: 0.5rem 0.75rem; /* Larger padding for bubble feel */
+            border: none;
+            /* Use a larger font size for emojis */
+            font-size: 1.25rem; 
+        }
+
+        /* Styling for the large feature bubble icon container */
+        .bubble-icon {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 72px; /* Large bubble size */
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            /* Apply glassmorphism styling to the bubble */
+            background-color: rgba(99, 102, 241, 0.1); /* Light accent background */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover .bubble-icon {
+            background-color: rgba(99, 102, 241, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Styling for small inline bubble icon container (for headers/footer) */
+        .inline-bubble-icon {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            /* Apply glassmorphism styling to the bubble */
+            background-color: rgba(99, 102, 241, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s ease;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        
+        /* Tab Styling Integration */
+        .tab-button {
+            /* Base style: subtle background, integrated look */
+            background-color: transparent;
+            border-radius: 0;
+            border-bottom: 3px solid transparent;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            color: #fff;
+        }
+        .tab-button.active-tab {
+            /* Active style: Strong accent bottom border */
+            color: var(--accent-light);
+            border-bottom: 3px solid #818cf8; 
+            background-color: rgba(255, 255, 255, 0.05); /* Slight lift on active */
+        }
+
+        /* Responsive spacing fixes for RTL/LTR */
+        [dir="ltr"] .space-x-reverse > * + * {
+            margin-right: var(--tw-space-x-reverse);
+            margin-left: 0;
+        }
+        [dir="rtl"] .space-x-reverse > * + * {
+            margin-right: 0;
+            margin-left: var(--tw-space-x-reverse);
+        }
+
+        /* Fixed buttons container for language switcher and scroll-to-top */
+        #fixed-controls {
+            position: fixed;
+            bottom: 1.5rem;
+            /* Adjust spacing based on direction */
+            right: 1.5rem; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body class="text-white font-sans">
+    <!-- Dynamic Background Layer -->
+    <div id="dynamic-bg-light"></div>
+    <div id="wrapper">
+        <!-- Header & Navigation -->
+        <header class="sticky top-0 z-50 glass-card bg-primary-dark/80 backdrop-blur-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <a href="#top" class="flex-shrink-0 text-xl font-bold text-white tracking-widest">
+                        Crave<span class="text-accent">.io</span>
+                    </a>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex space-x-4 space-x-reverse" id="desktop-nav">
+                        <!-- Navigation Links with Icons/Bubbles -->
+                        <a href="#about-us" class="px-3 py-2 text-sm font-medium hover:text-accent-light hover:bg-white/5 rounded-full transition duration-150" data-i18n="nav.about"><i data-lucide="users" class="inline w-4 h-4 ms-2"></i>عنا</a>
+                        <a href="#features" class="px-3 py-2 text-sm font-medium hover:text-accent-light hover:bg-white/5 rounded-full transition duration-150" data-i18n="nav.features"><i data-lucide="layout-grid" class="inline w-4 h-4 ms-2"></i>المميزات</a>
+                        <a href="#client-testimonials" class="px-3 py-2 text-sm font-medium hover:text-accent-light hover:bg-white/5 rounded-full transition duration-150" data-i18n="nav.testimonials"><i data-lucide="star" class="inline w-4 h-4 ms-2"></i>الآراء</a>
+                        <a href="#contact-us" class="px-3 py-2 text-sm font-medium hover:text-accent-light hover:bg-white/5 rounded-full transition duration-150" data-i18n="nav.contact"><i data-lucide="mail" class="inline w-4 h-4 ms-2"></i>اتصل بنا</a>
+                        <a href="https://discord.gg/7XUGszkVHz" target="_blank" class="px-3 py-2 text-sm font-medium hover:text-accent-light hover:bg-white/5 rounded-full transition duration-150" data-i18n="nav.discord"><i data-lucide="message-circle" class="inline w-4 h-4 ms-2"></i>انضم لديسكورد</a>
+                    </nav>
+
+                    <!-- CTA Button -->
+                    <div class="flex items-center space-x-4 space-x-reverse md:space-x-4">
+                        <a href="https://foss.crave.io/" target="_blank" class="glass-card px-4 py-2 text-sm font-semibold rounded-full bg-accent hover:bg-accent-light transition duration-300 transform hover:scale-105" data-i18n="nav.cta">
+                            <i data-lucide="rocket" class="inline w-4 h-4 ms-2"></i>Crave للبرمجيات الحرة
+                        </a>
+                        <!-- Mobile Menu Button - Placeholder -->
+                        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-white/10 transition duration-150">
+                            <i data-lucide="menu" class="w-6 h-6 text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="main">
+            <!-- Anchor for Scroll-to-Top -->
+            <div id="top"></div>
+
+            <!-- Hero Section (Intro Block) -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32 text-center relative overflow-hidden">
+                <div class="relative z-10" data-aos="fade-up" data-aos-duration="1000">
+                    <span class="text-accent-light text-lg font-semibold uppercase tracking-wider mb-4 block" data-i18n="hero.tagline">سرعة لا مثيل لها</span>
+                    <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold mb-6 leading-tight" style="text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);">
+                        <span data-i18n="hero.headline.part1">انتقل يسارًا، </span><br class="hidden sm:block" />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent-light" data-i18n="hero.headline.part2">واشحن مباشرة</span>
+                    </h1>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-10" data-i18n="hero.subtitle">
+                        هاجر فريق التطوير الخاص بك من الأنظمة القديمة إلى السحابة، في دقائق بدلاً من شهور، باستخدام بيئات تطوير موحدة فورية.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                        <a href="https://foss.crave.io/" target="_blank" class="glass-card px-8 py-3 text-lg font-bold rounded-full bg-accent hover:bg-accent-light transition duration-300 transform hover:scale-105 shadow-2xl" data-i18n="hero.cta_start">
+                            <i data-lucide="rocket" class="inline w-5 h-5 ms-2"></i>ابدأ مع Crave الآن
+                        </a>
+                        <a href="https://forms.gle/KW78ykpU3CUzvE489" target="_blank" class="text-gray-300 hover:text-accent-light transition duration-300 px-4 py-2" data-i18n="hero.cta_android">
+                            <i data-lucide="monitor-dot" class="inline w-5 h-5 ms-2"></i>احصل على حساب لبناء ROM أندرويد
+                        </a>
+                    </div>
+                </div>
+                <!-- Abstract Design Elements (Vibrant Circles) -->
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <div class="w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 absolute top-10 left-10 animate-blob"></div>
+                    <div class="w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 absolute bottom-10 right-10 animate-blob animation-delay-2000"></div>
+                </div>
+            </section>
+
+            <!-- Overview/Tabs Section (using Integrated Tab Design) -->
+            <section id="about-us" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down" data-i18n="tabs.title">حلول Crave.io لكل دور</h2>
+
+                <div class="glass-card rounded-2xl p-6 sm:p-10" data-aos="fade-up">
+                    <!-- Tab Navigation (Integrated Look) -->
+                    <div class="flex justify-center flex-wrap gap-1 mb-10 border-b border-white/10">
+                        <button data-tab="tab1" class="tab-button text-sm sm:text-base font-semibold transition duration-200 active-tab" data-i18n="tab.platform_engineer">مهندس منصة</button>
+                        <button data-tab="tab2" class="tab-button text-sm sm:text-base font-semibold transition duration-200" data-i18n="tab.devops_lead">قائد DevOps</button>
+                        <button data-tab="tab3" class="tab-button text-sm sm:text-base font-semibold transition duration-200" data-i18n="tab.tech_lead">قائد تقني</button>
+                        <button data-tab="tab4" class="tab-button text-sm sm:text-base font-semibold transition duration-200" data-i18n="tab.developer">مطور</button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div id="tab-content-container">
+                        <!-- Tab 1: Platform Engineer -->
+                        <div id="tab1" class="tab-pane flex flex-col md:flex-row-reverse gap-8 items-center active" data-aos="fade-up" data-aos-once="true">
+                            <div class="md:w-1/2 p-4">
+                                <h3 class="text-3xl font-bold text-accent-light mb-4" data-i18n="tab1.headline">وداعًا لصعوبات ترحيل السحابة</h3>
+                                <p class="text-gray-300 mb-4" data-i18n="tab1.p1">ترحيل السحابة؟ بالنسبة لفرق DevOps، إنه مثل محاولة عزف الجاز على آلة لم يلمسوها من قبل. أنت تكافح أدوات غير مألوفة، وتصارع إعدادات الأمان، وكل ذلك بينما يطالب المطورون بسيمفونية. تتراكم المقاومة، من التذمر السلبي إلى الرفض الصريح.</p>
+                                <p class="text-gray-200 font-medium" data-i18n="tab1.p2">لكن لا تخف، فبفضل **البنية التحتية لدينا التي تعمل بنقرة واحدة وتوفر بيئات تطوير موحدة لفريقك**، ستتمكن قريبًا من العزف منفردًا على تلك السحابة، ضاربًا كل نوتة ببراعة.</p>
+                            </div>
+                            <div class="md:w-1/2 flex justify-center">
+                                <i data-lucide="cloud-cog" class="w-36 h-36 text-accent-light opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: DevOps Lead -->
+                        <div id="tab2" class="tab-pane hidden flex-col md:flex-row-reverse gap-8 items-center">
+                            <div class="md:w-1/2 p-4">
+                                <h3 class="text-3xl font-bold text-accent-light mb-4" data-i18n="tab2.headline">مساحات التطوير (Devspaces): ابدأ البرمجة على الفور</h3>
+                                <p class="text-gray-300 mb-4" data-i18n="tab2.p1">هل سئمت من إضاعة ساعات في ضبط أجهزة الكمبيوتر المحمولة للمطورين؟ ونحن كذلك. لنكن واقعيين، إن إعداد بيئة مطور جديد أمر مؤلم: التعارض في التبعيات، واستكشاف الأخطاء وإصلاحها الذي لا ينتهي، والقلق المستمر بشأن الأمان يخلق تضاربًا في الأخطاء.</p>
+                            <p class="text-gray-200 font-medium" data-i18n="tab2.p2">ولهذا السبب قمنا ببناء Devspaces – بيئة تطوير سريعة للغاية تظهر في ثوانٍ. انسَ المتاعب، وابدأ بالبرمجة!</p>
+                            </div>
+                            <div class="md:w-1/2 flex justify-center">
+                                <i data-lucide="rocket" class="w-36 h-36 text-accent-light opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Tech Lead -->
+                        <div id="tab3" class="tab-pane hidden flex-col md:flex-row-reverse gap-8 items-center">
+                            <div class="md:w-1/2 p-4">
+                                <h3 class="text-3xl font-bold text-accent-light mb-4" data-i18n="tab3.headline">أسطورة 'إنه يعمل على جهازي': تم كسرها!</h3>
+                                <p class="text-gray-300 mb-4" data-i18n="tab3.p1">تمامًا كما تحقق الأوركسترا الانسجام من خلال العزف المتزامن، يجب أن يتصرف الكود بشكل متطابق على جهاز الكمبيوتر الخاص بك وفي الإنتاج. يواجه مطوروكم غالبًا إحباط متلازمة "إنه يعمل على جهازي".</p>
+                                <p class="text-gray-200 font-medium" data-i18n="tab3.p2">يؤدي هذا التناقض **إلى تأخير إصدارات المنتج وزيادة مخاطر التراجع المكلفة**. ماذا لو كان لديك بيئة واحدة تناسب الجميع، في متناول يدك مباشرةً.</p>
+                            </div>
+                            <div class="md:w-1/2 flex justify-center">
+                                <i data-lucide="maximize-2" class="w-36 h-36 text-accent-light opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <!-- Tab 4: Developer -->
+                        <div id="tab4" class="tab-pane hidden flex-col md:flex-row-reverse gap-8 items-center">
+                            <div class="md:w-1/2 p-4">
+                                <h3 class="text-3xl font-bold text-accent-light mb-4" data-i18n="tab4.headline">تصحيح الأخطاء كما تنشر. تملك المرحلة.</h3>
+                                <p class="text-gray-300 mb-4" data-i18n="tab4.p1">تصحيح أخطاء الخدمات المصغرة محليًا يشبه أوركسترا تعزف من نوتات موسيقية مختلفة. تخلق مشكلات التبعية بيئات مجزأة، مما يؤدي إلى تأخير يعيق إصدارات المنتج.</p>
+                                <p class="text-gray-200 font-medium" data-i18n="tab4.p2">الحل يكمن في بيئة موحدة تعمل عن بعد ولكن تبدو محلية، مما يتيح تصحيح الأخطاء والاختبار بسلاسة ضمن سياق واقعي.</p>
+                            </div>
+                            <div class="md:w-1/2 flex justify-center">
+                                <i data-lucide="bug" class="w-36 h-36 text-accent-light opacity-80"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section id="client-testimonials" class="py-24 bg-primary-dark/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-4xl font-bold text-center mb-16" data-aos="fade-down" data-i18n="testimonials.title">المستخدمون يحبون Crave</h2>
+
+                    <!-- Testimonial Grid (Responsive 1-2-3 columns) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                        <!-- Testimonial 1 -->
+                        <div class="glass-card rounded-xl p-6 flex flex-col justify-between hover:border-accent/50" data-aos="fade-up" data-aos-delay="100">
+                            <i data-lucide="quote" class="w-10 h-10 text-accent-light mb-4"></i>
+                            <blockquote class="text-lg italic text-gray-200 mb-6" data-i18n="testimony.t1">
+                                "قلل Crave وقت البناء من 3 ساعات إلى 30 دقيقة. كان من المنطقي أن يتحول فريق الهندسة بالكامل إلى Crave."
+                            </blockquote>
+                            <div class="flex items-center">
+                                <img src="https://crave.io/wp-content/uploads/2025/01/BadriKollu.jpeg" alt="Badri Kollu" class="w-12 h-12 rounded-full object-cover ring-2 ring-accent/50 me-3" />
+                                <div>
+                                    <p class="font-bold text-white">Badri Kollu</p>
+                                    <p class="text-sm text-gray-400" data-i18n="testimony.t1_position">مدير أول، الهندسة في Brocade</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 2 -->
+                        <div class="glass-card rounded-xl p-6 flex flex-col justify-between hover:border-accent/50" data-aos="fade-up" data-aos-delay="300">
+                            <i data-lucide="quote" class="w-10 h-10 text-accent-light mb-4"></i>
+                            <blockquote class="text-lg italic text-gray-200 mb-6" data-i18n="testimony.t2">
+                                "نحن نستخدم Crave لتسريع بناء منتجنا بأكثر من 20 مرة وتوفير موارد الحوسبة في نفس الوقت."
+                            </blockquote>
+                            <div class="flex items-center">
+                                <img src="https://crave.io/wp-content/uploads/2025/01/VioletJenBroadcom.jpeg" alt="Violet Jen" class="w-12 h-12 rounded-full object-cover ring-2 ring-accent/50 me-3" />
+                                <div>
+                                    <p class="font-bold text-white">Violet Jen</p>
+                                    <p class="text-sm text-gray-400" data-i18n="testimony.t2_position">مدير أول، Devops في Broadcom</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 3 -->
+                        <div class="glass-card rounded-xl p-6 flex flex-col justify-between hover:border-accent/50" data-aos="fade-up" data-aos-delay="500">
+                            <i data-lucide="quote" class="w-10 h-10 text-accent-light mb-4"></i>
+                            <blockquote class="text-lg italic text-gray-200 mb-6" data-i18n="testimony.t3">
+                                "يقضي Crave على حالات فشل البناء وقد خفض دورات التجميع لدينا إلى النصف!"
+                            </blockquote>
+                            <div class="flex items-center">
+                                <img src="https://crave.io/wp-content/uploads/2025/01/RyanDeushaneSibros.jpeg" alt="Ryan Deushane" class="w-12 h-12 rounded-full object-cover ring-2 ring-accent/50 me-3" />
+                                <div>
+                                    <p class="font-bold text-white">Ryan Deushane</p>
+                                    <p class="text-sm text-gray-400" data-i18n="testimony.t3_position">مطور وبنية تحتية رئيسي، Sibros Tech</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature Block (Enterprise Ready) -->
+            <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16" data-aos="fade-down">
+                    <span class="text-accent-light font-semibold uppercase tracking-wider mb-2 block" data-i18n="features.tagline">جاهز للمؤسسات</span>
+                    <h2 class="text-4xl font-bold mb-4" data-i18n="features.headline">مؤسسة رشيقة؟ Devspaces هو السيمفونية الخاصة بك.</h2>
+                    <p class="text-gray-300 max-w-4xl mx-auto" data-i18n="features.subtitle">
+                        هل سئمت من تجميع بناءاتك؟ Devspaces هو المايسترو سهل الاستخدام الذي يحرر المطورين لديك للتركيز على إنشاء كود مذهل ويجعل منتجك يصل إلى السوق بشكل أسرع.
+                    </p>
+                </div>
+
+                <!-- Feature List Grid - Icons inside Bubble Design -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1: Migrate -->
+                    <div class="glass-card rounded-xl p-8 text-center hover:shadow-accent/20" data-aos="zoom-in" data-aos-delay="100">
+                        <div class="bubble-icon">
+                            <i data-lucide="cloud-lightning" class="w-8 h-8 text-accent-light"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-i18n="feature1.title">ترحيل</h3>
+                        <p class="text-gray-300 mb-4" data-i18n="feature1.subtitle">توسع في السحابة:</p>
+                        <ul class="text-start space-y-2 text-gray-400">
+                            <li data-i18n="feature1.p1"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>انتقال سهل</li>
+                            <li data-i18n="feature1.p2"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>استخدم ما تحتاجه فقط</li>
+                            <li data-i18n="feature1.p3"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تقليل الإنفاق</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature 2: Accelerate -->
+                    <div class="glass-card rounded-xl p-8 text-center hover:shadow-accent/20" data-aos="zoom-in" data-aos-delay="300">
+                        <div class="bubble-icon">
+                            <i data-lucide="zap" class="w-8 h-8 text-accent-light"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-i18n="feature2.title">تسريع</h3>
+                        <p class="text-gray-300 mb-4" data-i18n="feature2.subtitle">تسريع كل جزء من عملية التطوير:</p>
+                        <ul class="text-start space-y-2 text-gray-400">
+                            <li data-i18n="feature2.p1"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تجميع متوازي</li>
+                            <li data-i18n="feature2.p2"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تخزين ذكي مؤقت</li>
+                            <li data-i18n="feature2.p3"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>للمطورين والتكامل المستمر</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature 3: Unify -->
+                    <div class="glass-card rounded-xl p-8 text-center hover:shadow-accent/20" data-aos="zoom-in" data-aos-delay="500">
+                        <div class="bubble-icon">
+                            <i data-lucide="combine" class="w-8 h-8 text-accent-light"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-i18n="feature3.title">توحيد</h3>
+                        <p class="text-gray-300 mb-4" data-i18n="feature3.subtitle">تبسيط المؤسسة الهندسية بأكملها:</p>
+                        <ul class="text-start space-y-2 text-gray-400">
+                            <li data-i18n="feature3.p1"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>مساحات عمل مُحاوية (Containerized)</li>
+                            <li data-i18n="feature3.p2"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>اتساق خط الأنابيب (Pipeline)</li>
+                            <li data-i18n="feature3.p3"><i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>رؤية إدارية واحدة</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Form Section -->
+            <section id="contact-us" class="py-24">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="glass-card rounded-2xl p-8 lg:p-16 flex flex-col lg:flex-row-reverse gap-12" data-aos="fade-up">
+                        <!-- Content Side -->
+                        <div class="lg:w-5/12">
+                            <span class="text-accent-light font-semibold uppercase tracking-wider mb-2 block" data-i18n="contact.tagline">اتصل بنا</span>
+                            <h2 class="text-4xl font-bold mb-6" data-i18n="contact.headline">اسألنا كيف يمكن لـ Crave أن:</h2>
+                            <ul class="space-y-3 text-gray-300 text-lg list-none p-0">
+                                <li data-i18n="contact.p1"><i data-lucide="trending-up" class="inline w-5 h-5 text-accent-light ms-2"></i>يسرّع تجميع الكود والاختبارات والتكامل المستمر (CI).</li>
+                                <li data-i18n="contact.p2"><i data-lucide="layout-grid" class="inline w-5 h-5 text-accent-light ms-2"></i>يبسّط إدارة البنية التحتية المشتركة للتطوير والاختبار.</li>
+                                <li data-i18n="contact.p3"><i data-lucide="cloud" class="inline w-5 h-5 text-accent-light ms-2"></i>يسهّل الترحيل إلى السحابة العامة أو الخاصة.</li>
+                                <li data-i18n="contact.p4"><i data-lucide="dollar-sign" class="inline w-5 h-5 text-accent-light ms-2"></i>يقلل التكاليف التشغيلية للسحابة (opex).</li>
+                            </ul>
+                        </div>
+
+                        <!-- Form Side (Placeholder - Simplified) -->
+                        <div class="lg:w-7/12">
+                            <form class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="fname" class="text-sm font-medium text-gray-300" data-i18n="form.fname.label">الاسم الأول*</label>
+                                        <input type="text" id="fname" data-i18n-placeholder="form.fname.placeholder" placeholder="أدخل اسمك" required
+                                            class="w-full p-3 rounded-lg bg-white/5 border border-white/10 focus:border-accent-light focus:ring-accent-light text-white transition duration-200">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="lname" class="text-sm font-medium text-gray-300" data-i18n="form.lname.label">اسم العائلة*</label>
+                                        <input type="text" id="lname" data-i18n-placeholder="form.lname.placeholder" placeholder="أدخل اسم عائلتك" required
+                                            class="w-full p-3 rounded-lg bg-white/5 border border-white/10 focus:border-accent-light focus:ring-accent-light text-white transition duration-200">
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="contact_email" class="text-sm font-medium text-gray-300" data-i18n="form.email.label">البريد الإلكتروني*</label>
+                                    <input type="email" id="contact_email" data-i18n-placeholder="form.email.placeholder" placeholder="أدخل بريدك الإلكتروني" required
+                                        class="w-full p-3 rounded-lg bg-white/5 border border-white/10 focus:border-accent-light focus:ring-accent-light text-white transition duration-200">
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="comment" class="text-sm font-medium text-gray-300" data-i18n="form.message.label">رسالتك</label>
+                                    <textarea id="comment" rows="4" data-i18n-placeholder="form.message.placeholder" placeholder="أدخل رسالتك"
+                                        class="w-full p-3 rounded-lg bg-white/5 border border-white/10 focus:border-accent-light focus:ring-accent-light text-white transition duration-200"></textarea>
+                                </div>
+                                <p class="text-sm text-gray-500" data-i18n="form.mandatory">* حقول إلزامية</p>
+                                <button type="submit" class="w-full sm:w-auto glass-card px-8 py-3 text-lg font-bold rounded-full bg-accent hover:bg-accent-light transition duration-300 transform hover:scale-105 shadow-xl" data-i18n="form.submit">
+                                    <i data-lucide="send" class="inline w-5 h-5 ms-2"></i>اتصل بنا
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-primary-dark border-t border-white/10 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-white/10 pb-8 mb-8">
+                    <!-- Logo & Slogan -->
+                    <div>
+                        <a href="#top" class="text-2xl font-bold text-white tracking-widest">
+                            Crave<span class="text-accent">.io</span>
+                        </a>
+                        <p class="mt-2 text-gray-400" data-i18n="footer.slogan">أطلق المنتجات بشكل أسرع</p>
+                    </div>
+
+                    <!-- Contact & Social -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                             <span class="inline-bubble-icon ms-2">
+                                <i data-lucide="message-circle" class="w-5 h-5 text-accent-light"></i>
+                            </span>
+                            <span data-i18n="footer.contact_title">التواصل</span>
+                        </h4>
+                        <a href="tel:+14089093007" class="text-gray-400 hover:text-accent-light block">+1 408 909 3007</a>
+                        <div class="flex space-x-4 space-x-reverse mt-4">
+                            <a href="https://www.linkedin.com/company/crave-io/" target="_blank" aria-label="LinkedIn" class="text-gray-400 hover:text-accent-light transition duration-150">
+                                <i data-lucide="linkedin" class="w-6 h-6"></i>
+                            </a>
+                            <a href="https://discord.gg/QBnF4QkXsZ" target="_blank" aria-label="Discord" class="text-gray-400 hover:text-accent-light transition duration-150">
+                                <i data-lucide="message-square" class="w-6 h-6"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Legal Links -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                            <span class="inline-bubble-icon ms-2">
+                                <i data-lucide="info" class="w-5 h-5 text-accent-light"></i>
+                            </span>
+                            <span data-i18n="footer.info_title">معلومات</span>
+                        </h4>
+                        <ul class="space-y-2">
+                            <li><a href="https://crave.io/crave-io-privacy-policy/" class="text-gray-400 hover:text-accent-light" data-i18n="footer.privacy"><i data-lucide="lock" class="inline w-4 h-4 ms-2"></i>سياسة الخصوصية</a></li>
+                            <li><a href="https://crave.io/crave-website-terms-of-use/" class="text-gray-400 hover:text-accent-light" data-i18n="footer.terms"><i data-lucide="file-text" class="inline w-4 h-4 ms-2"></i>شروط الاستخدام</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Copyright -->
+                <div class="text-center text-sm text-gray-500" data-i18n="footer.copyright">
+                    &copy; 2019-2025 Crave.io Inc. جميع الحقوق محفوظة.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Fixed Controls Container -->
+    <div id="fixed-controls">
+        <!-- Floating Language Switcher -->
+        <div id="lang-switcher-fixed" class="flex text-lg font-medium rounded-full p-0.5 glass-card bg-white/5 shadow-inner space-x-1">
+            <!-- AR: Egypt Flag Emoji -->
+            <button id="lang-ar-btn-fixed" data-lang="ar" class="lang-button rounded-full transition duration-200" title="العربية">🇪🇬</button>
+            <!-- EN: USA Flag Emoji -->
+            <button id="lang-en-btn-fixed" data-lang="en" class="lang-button rounded-full transition duration-200" title="English">🇺🇸</button>
+        </div>
+
+        <!-- Scroll to Top Button (Hidden by default) -->
+        <a href="#top" id="scroll-to-top" class="glass-card w-12 h-12 flex items-center justify-center rounded-full bg-accent hover:bg-accent-light transition duration-300 opacity-0 pointer-events-none" style="transform: translateY(10px);">
+            <i data-lucide="arrow-up" class="w-6 h-6 text-white"></i>
+        </a>
+    </div>
+
+    <!-- JavaScript for AOS, Tab Functionality, Smooth Scroll, and Dynamic UI -->
+    <!-- Load AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // Initialize AOS
+        AOS.init({
+            duration: 800, // global duration for AOS animations
+            once: true,    // elements should only animate once
+            mirror: false, // elements should not animate when scrolling up
+        });
+
+        // Initialize Smooth Scroll
+        const scroll = new SmoothScroll('a[href*="#"]', {
+            speed: 800,
+            speedAsDuration: true,
+            offset: 80 // Offset for the fixed header height
+        });
+
+        // --- Dynamic Background Logic ---
+        const dynamicBg = document.getElementById('dynamic-bg-light');
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Use percentage for consistency across screen sizes
+            const xPercent = (x / window.innerWidth) * 100;
+            const yPercent = (y / window.innerHeight) * 100;
+
+            // Update the radial gradient position
+            dynamicBg.style.background = `radial-gradient(circle at ${xPercent}% ${yPercent}%, #6366f1, transparent 40%)`;
+        });
+
+        // --- Scroll-to-Top Button Visibility ---
+        const scrollBtn = document.getElementById('scroll-to-top');
+        const scrollThreshold = 400; // Scroll distance in pixels to show the button
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > scrollThreshold) {
+                scrollBtn.classList.remove('opacity-0', 'pointer-events-none');
+                scrollBtn.classList.add('opacity-100', 'pointer-events-auto');
+                scrollBtn.style.transform = 'translateY(0)';
+            } else {
+                scrollBtn.classList.remove('opacity-100', 'pointer-events-auto');
+                scrollBtn.classList.add('opacity-0', 'pointer-events-none');
+                scrollBtn.style.transform = 'translateY(10px)';
+            }
+        });
+
+
+        // --- Internationalization (i18n) Logic ---
+        const translations = {
+            'ar': {
+                'page.title': 'Crave.io – أطلق المنتجات بشكل أسرع',
+                'nav.about': '<i data-lucide="users" class="inline w-4 h-4 ms-2"></i>عنا',
+                'nav.features': '<i data-lucide="layout-grid" class="inline w-4 h-4 ms-2"></i>المميزات',
+                'nav.testimonials': '<i data-lucide="star" class="inline w-4 h-4 ms-2"></i>الآراء',
+                'nav.contact': '<i data-lucide="mail" class="inline w-4 h-4 ms-2"></i>اتصل بنا',
+                'nav.discord': '<i data-lucide="message-circle" class="inline w-4 h-4 ms-2"></i>انضم لديسكورد',
+                'nav.cta': '<i data-lucide="rocket" class="inline w-4 h-4 ms-2"></i>Crave للبرمجيات الحرة',
+                'hero.tagline': 'سرعة لا مثيل لها',
+                'hero.headline.part1': 'انتقل يسارًا،',
+                'hero.headline.part2': 'واشحن مباشرة',
+                'hero.subtitle': 'هاجر فريق التطوير الخاص بك من الأنظمة القديمة إلى السحابة، في دقائق بدلاً من شهور، باستخدام بيئات تطوير موحدة فورية.',
+                'hero.cta_start': '<i data-lucide="rocket" class="inline w-5 h-5 ms-2"></i>ابدأ مع Crave الآن',
+                'hero.cta_android': '<i data-lucide="monitor-dot" class="inline w-5 h-5 ms-2"></i>احصل على حساب لبناء ROM أندرويد',
+                'tabs.title': 'حلول Crave.io لكل دور',
+                'tab.platform_engineer': 'مهندس منصة',
+                'tab.devops_lead': 'قائد DevOps',
+                'tab.tech_lead': 'قائد تقني',
+                'tab.developer': 'مطور',
+                'tab1.headline': 'وداعًا لصعوبات ترحيل السحابة',
+                'tab1.p1': 'ترحيل السحابة؟ بالنسبة لفرق DevOps، إنه مثل محاولة عزف الجاز على آلة لم يلمسوها من قبل. أنت تكافح أدوات غير مألوفة، وتصارع إعدادات الأمان، وكل ذلك بينما يطالب المطورون بسيمفونية. تتراكم المقاومة، من التذمر السلبي إلى الرفض الصريح.',
+                'tab1.p2': 'لكن لا تخف، فبفضل **البنية التحتية لدينا التي تعمل بنقرة واحدة وتوفر بيئات تطوير موحدة لفريقك**، ستتمكن قريبًا من العزف منفردًا على تلك السحابة، ضاربًا كل نوتة ببراعة.',
+                'tab2.headline': 'مساحات التطوير (Devspaces): ابدأ البرمجة على الفور',
+                'tab2.p1': 'هل سئمت من إضاعة ساعات في ضبط أجهزة الكمبيوتر المحمولة للمطورين؟ ونحن كذلك. لنكن واقعيين، إن إعداد بيئة مطور جديد أمر مؤلم: التعارض في التبعيات، واستكشاف الأخطاء وإصلاحها الذي لا ينتهي، والقلق المستمر بشأن الأمان يخلق تضاربًا في الأخطاء.',
+                'tab2.p2': 'ولهذا السبب قمنا ببناء Devspaces – بيئة تطوير سريعة للغاية تظهر في ثوانٍ. انسَ المتاعب، وابدأ بالبرمجة!',
+                'tab3.headline': 'أسطورة \'إنه يعمل على جهازي\': تم كسرها!',
+                'tab3.p1': 'تمامًا كما تحقق الأوركسترا الانسجام من خلال العزف المتزامن، يجب أن يتصرف الكود بشكل متطابق على جهاز الكمبيوتر الخاص بك وفي الإنتاج. يواجه مطوروكم غالبًا إحباط متلازمة "إنه يعمل على جهازي".',
+                'tab3.p2': 'يؤدي هذا التناقض **إلى تأخير إصدارات المنتج وزيادة مخاطر التراجع المكلفة**. ماذا لو كان لديك بيئة واحدة تناسب الجميع، في متناول يدك مباشرةً.',
+                'tab4.headline': 'تصحيح الأخطاء كما تنشر. تملك المرحلة.',
+                'tab4.p1': 'تصحيح أخطاء الخدمات المصغرة محليًا يشبه أوركسترا تعزف من نوتات موسيقية مختلفة. تخلق مشكلات التبعية بيئات مجزأة، مما يؤدي إلى تأخير يعيق إصدارات المنتج.',
+                'tab4.p2': 'الحل يكمن في بيئة موحدة تعمل عن بعد ولكن تبدو محلية، مما يتيح تصحيح الأخطاء والاختبار بسلاسة ضمن سياق واقعي.',
+                'testimonials.title': 'المستخدمون يحبون Crave',
+                'testimony.t1': 'قلل Crave وقت البناء من 3 ساعات إلى 30 دقيقة. كان من المنطقي أن يتحول فريق الهندسة بالكامل إلى Crave.',
+                'testimony.t1_position': 'مدير أول، الهندسة في Brocade',
+                'testimony.t2': 'نحن نستخدم Crave لتسريع بناء منتجنا بأكثر من 20 مرة وتوفير موارد الحوسبة في نفس الوقت.',
+                'testimony.t2_position': 'مدير أول، Devops في Broadcom',
+                'testimony.t3': 'يقضي Crave على حالات فشل البناء وقد خفض دورات التجميع لدينا إلى النصف!',
+                'testimony.t3_position': 'مطور وبنية تحتية رئيسي، Sibros Tech',
+                'features.tagline': 'جاهز للمؤسسات',
+                'features.headline': 'مؤسسة رشيقة؟ Devspaces هو السيمفونية الخاصة بك.',
+                'features.subtitle': 'هل سئمت من تجميع بناءاتك؟ Devspaces هو المايسترو سهل الاستخدام الذي يحرر المطورين لديك للتركيز على إنشاء كود مذهل ويجعل منتجك يصل إلى السوق بشكل أسرع.',
+                'feature1.title': 'ترحيل',
+                'feature1.subtitle': 'توسع في السحابة:',
+                'feature1.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>انتقال سهل',
+                'feature1.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>استخدم ما تحتاجه فقط',
+                'feature1.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تقليل الإنفاق',
+                'feature2.title': 'تسريع',
+                'feature2.subtitle': 'تسريع كل جزء من عملية التطوير:',
+                'feature2.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تجميع متوازي',
+                'feature2.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>تخزين ذكي مؤقت',
+                'feature2.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>للمطورين والتكامل المستمر',
+                'feature3.title': 'توحيد',
+                'feature3.subtitle': 'تبسيط المؤسسة الهندسية بأكملها:',
+                'feature3.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>مساحات عمل مُحاوية (Containerized)',
+                'feature3.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>اتساق خط الأنابيب (Pipeline)',
+                'feature3.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 ms-2"></i>رؤية إدارية واحدة',
+                'contact.tagline': 'اتصل بنا',
+                'contact.headline': 'اسألنا كيف يمكن لـ Crave أن:',
+                'contact.p1': '<i data-lucide="trending-up" class="inline w-5 h-5 text-accent-light ms-2"></i>يسرّع تجميع الكود والاختبارات والتكامل المستمر (CI).',
+                'contact.p2': '<i data-lucide="layout-grid" class="inline w-5 h-5 text-accent-light ms-2"></i>يبسّط إدارة البنية التحتية المشتركة للتطوير والاختبار.',
+                'contact.p3': '<i data-lucide="cloud" class="inline w-5 h-5 text-accent-light ms-2"></i>يسهّل الترحيل إلى السحابة العامة أو الخاصة.',
+                'contact.p4': '<i data-lucide="dollar-sign" class="inline w-5 h-5 text-accent-light ms-2"></i>يقلل التكاليف التشغيلية للسحابة (opex).',
+                'form.fname.label': 'الاسم الأول*',
+                'form.fname.placeholder': 'أدخل اسمك',
+                'form.lname.label': 'اسم العائلة*',
+                'form.lname.placeholder': 'أدخل اسم عائلتك',
+                'form.email.label': 'البريد الإلكتروني*',
+                'form.email.placeholder': 'أدخل بريدك الإلكتروني',
+                'form.message.label': 'رسالتك',
+                'form.message.placeholder': 'أدخل رسالتك',
+                'form.mandatory': '* حقول إلزامية',
+                'form.submit': '<i data-lucide="send" class="inline w-5 h-5 ms-2"></i>اتصل بنا',
+                'footer.slogan': 'أطلق المنتجات بشكل أسرع',
+                'footer.contact_title': 'التواصل',
+                'footer.info_title': 'معلومات',
+                'footer.privacy': '<i data-lucide="lock" class="inline w-4 h-4 ms-2"></i>سياسة الخصوصية',
+                'footer.terms': '<i data-lucide="file-text" class="inline w-4 h-4 ms-2"></i>شروط الاستخدام',
+                'footer.copyright': '© 2019-2025 Crave.io Inc. جميع الحقوق محفوظة.',
+            },
+            'en': {
+                'page.title': 'Crave.io – Release products faster',
+                'nav.about': '<i data-lucide="users" class="inline w-4 h-4 me-2"></i>About Us',
+                'nav.features': '<i data-lucide="layout-grid" class="inline w-4 h-4 me-2"></i>Features',
+                'nav.testimonials': '<i data-lucide="star" class="inline w-4 h-4 me-2"></i>Testimonials',
+                'nav.contact': '<i data-lucide="mail" class="inline w-4 h-4 me-2"></i>Contact',
+                'nav.discord': '<i data-lucide="message-circle" class="inline w-4 h-4 me-2"></i>Join Discord',
+                'nav.cta': '<i data-lucide="rocket" class="inline w-4 h-4 me-2"></i>Crave for FOSS',
+                'hero.tagline': 'Unmatched Speed',
+                'hero.headline.part1': 'Shift left,',
+                'hero.headline.part2': 'Ship right away',
+                'hero.subtitle': 'Migrate your dev team from legacy to cloud, in minutes not months, using unified instant development environments.',
+                'hero.cta_start': '<i data-lucide="rocket" class="inline w-5 h-5 me-2"></i>Start with Crave Now',
+                'hero.cta_android': '<i data-lucide="monitor-dot" class="inline w-5 h-5 me-2"></i>Get an Android ROM builders account',
+                'tabs.title': 'Crave.io Solutions for Every Role',
+                'tab.platform_engineer': 'Platform Engineer',
+                'tab.devops_lead': 'DevOps Lead',
+                'tab.tech_lead': 'Tech Lead',
+                'tab.developer': 'Developer',
+                'tab1.headline': 'Say Goodbye to Cloud Migration Blues',
+                'tab1.p1': 'Cloud migration? For DevOps teams, it\'s like trying to play jazz on an instrument you\'ve never touched. You\'re battling unfamiliar tools, wrestling with security settings, and all the while, developers are tapping their foot, demanding a symphony. Resistance brews, from passive grumbling to outright pushback.',
+                'tab1.p2': 'But fear not, with **our one-click infra that provides unified dev environments for your team**, you\'ll soon be soloing on that cloud, hitting every note with style.',
+                'tab2.headline': 'Devspaces: Hit the Ground Coding',
+                'tab2.p1': 'Tired of wasting hours tuning up developer laptops? Us too. Let\'s be real, onboarding a new developer’s environment is a pain: conflicting dependencies, endless troubleshooting, and the constant worry about security create a cacophony of errors.',
+                'tab2.p2': 'That\'s why we built Devspaces – a lightning-fast dev environment that pops up in seconds. Forget the hassle, get coding!',
+                'tab3.headline': 'The \'It Works on My Machine\' Myth: Busted!',
+                'tab3.p1': 'Just as an orchestra achieves harmony through synchronized play, code must behave identically on your computer and in production. Your developers often encounter the frustration of the "it works on my machine" syndrome. Discrepancies between local, staging and production environments inevitably arise, leading to unexpected issues when deploying.',
+                'tab3.p2': 'This inconsistency **delays product releases, increases the risk of costly rollbacks, and ultimately jeopardizes timely delivery to market**. What if you had one environment that fits all, right at your finger tips.',
+                'tab4.headline': 'Debug Like You Deploy. Own the Stage.',
+                'tab4.p1': 'Debugging microservices locally resembles an orchestra playing from different scores. Dependency issues create fragmented environments, leading to delays that cripple product releases. Developers and DevOps teams struggle, slowing innovation and derailing time-to-market.',
+                'tab4.p2': 'The solution lies in a unified environment that works remotely yet feels local, enabling seamless debugging and testing within a realistic context.',
+                'testimonials.title': 'Users love Crave',
+                'testimony.t1': 'Crave reduced build time from 3 hours to 30 minutes. It just made sense for my entire engineering team to switch to Crave.',
+                'testimony.t1_position': 'Sr. Director, Engineering at Brocade',
+                'testimony.t2': 'We use Crave to speed up our product build 20+ times and save compute resources at the same time.',
+                'testimony.t2_position': 'Sr Director, Devops at Broadcom',
+                'testimony.t3': 'Crave eliminates build failures and has halved our compilation cycles!',
+                'testimony.t3_position': 'Lead developer and infrastructure, Sibros Tech',
+                'features.tagline': 'ENTERPRISE READY',
+                'features.headline': 'Agile Enterprise? Devspaces is your symphony.',
+                'features.subtitle': 'Tired of hacking together your builds? Devspaces is the easy-to-use orchestra conductor that frees up your developers to focus on creating amazing code and gets your product to the stage faster.',
+                'feature1.title': 'Migrate',
+                'feature1.subtitle': 'Scale into the cloud:',
+                'feature1.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Transition easily',
+                'feature1.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Use only what you need',
+                'feature1.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Reduce spend',
+                'feature2.title': 'Accelerate',
+                'feature2.subtitle': 'Speed up every part of the development:',
+                'feature2.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Parallelized compilation',
+                'feature2.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Smart caching',
+                'feature2.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>For devs & CI',
+                'feature3.title': 'Unify',
+                'feature3.subtitle': 'Streamline the entire engineering organization:',
+                'feature3.p1': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Containerized workspaces',
+                'feature3.p2': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Pipeline consistency',
+                'feature3.p3': '<i data-lucide="check-circle" class="inline w-4 h-4 text-green-400 me-2"></i>Single admin view',
+                'contact.tagline': 'CONTACT US',
+                'contact.headline': 'Ask us how Crave can:',
+                'contact.p1': '<i data-lucide="trending-up" class="inline w-5 h-5 text-accent-light me-2"></i>Speed up code compilation, tests and CI.',
+                'contact.p2': '<i data-lucide="layout-grid" class="inline w-5 h-5 text-accent-light me-2"></i>Simplify management of shared dev-test infrastructure.',
+                'contact.p3': '<i data-lucide="cloud" class="inline w-5 h-5 text-accent-light me-2"></i>Ease migration to Public or Private Cloud.',
+                'contact.p4': '<i data-lucide="dollar-sign" class="inline w-5 h-5 text-accent-light me-2"></i>Reduce Cloud opex costs.',
+                'form.fname.label': 'First name*',
+                'form.fname.placeholder': 'enter your name',
+                'form.lname.label': 'Last name*',
+                'form.lname.placeholder': 'enter your last name',
+                'form.email.label': 'Email address*',
+                'form.email.placeholder': 'enter your email address',
+                'form.message.label': 'Your Message',
+                'form.message.placeholder': 'enter your message',
+                'form.mandatory': '* Mandatory fields',
+                'form.submit': '<i data-lucide="send" class="inline w-5 h-5 me-2"></i>Contact us',
+                'footer.slogan': 'Release products faster',
+                'footer.contact_title': 'Contact',
+                'footer.info_title': 'Information',
+                'footer.privacy': '<i data-lucide="lock" class="inline w-4 h-4 me-2"></i>Privacy Policy',
+                'footer.terms': '<i data-lucide="file-text" class="inline w-4 h-4 me-2"></i>Terms of Use',
+                'footer.copyright': '© 2019-2025 Crave.io Inc. All Rights Reserved',
+            }
+        };
+
+        const htmlElement = document.documentElement;
+        const arBtn = document.getElementById('lang-ar-btn-fixed'); // Targeting fixed button
+        const enBtn = document.getElementById('lang-en-btn-fixed'); // Targeting fixed button
+
+        // Function to translate all elements on the page
+        const translatePage = (lang) => {
+            const currentTranslations = translations[lang];
+
+            // 1. Update Title and Content
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (currentTranslations[key]) {
+                    // Use innerHTML to allow for formatting like <b> or <span>
+                    element.innerHTML = currentTranslations[key];
+                }
+            });
+
+            // 2. Update Placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (currentTranslations[key]) {
+                    element.setAttribute('placeholder', currentTranslations[key]);
+                }
+            });
+
+            // 3. Update Text with Lucide Icons (to re-render the icon)
+            lucide.createIcons();
+        };
+
+        // Function to update the UI (Direction, Lang Attribute, and Text)
+        const updateLanguageUI = (lang) => {
+            if (lang === 'en') {
+                htmlElement.setAttribute('lang', 'en');
+                htmlElement.setAttribute('dir', 'ltr');
+                document.body.setAttribute('dir', 'ltr'); // Set body direction explicitly for font control
+                
+                // Button Styling
+                enBtn.classList.add('bg-accent', 'text-white');
+                enBtn.classList.remove('text-gray-300', 'hover:text-white', 'bg-accent/5');
+                arBtn.classList.remove('bg-accent', 'text-white');
+                arBtn.classList.add('text-gray-300', 'hover:text-white', 'bg-accent/5');
+
+            } else { // Default to Arabic (ar)
+                htmlElement.setAttribute('lang', 'ar');
+                htmlElement.setAttribute('dir', 'rtl');
+                document.body.setAttribute('dir', 'rtl'); // Set body direction explicitly for font control
+
+                // Button Styling
+                arBtn.classList.add('bg-accent', 'text-white');
+                arBtn.classList.remove('text-gray-300', 'hover:text-white', 'bg-accent/5');
+                enBtn.classList.remove('bg-accent', 'text-white');
+                enBtn.classList.add('text-gray-300', 'hover:text-white', 'bg-accent/5');
+            }
+            // Translate all elements on the page
+            translatePage(lang);
+        };
+        
+        // Load initial language state (defaults to 'ar' if not set)
+        const initialLang = localStorage.getItem('craveLang') || 'ar';
+        updateLanguageUI(initialLang);
+
+        arBtn.addEventListener('click', () => {
+            localStorage.setItem('craveLang', 'ar');
+            updateLanguageUI('ar');
+        });
+
+        enBtn.addEventListener('click', () => {
+            localStorage.setItem('craveLang', 'en');
+            updateLanguageUI('en');
+        });
+        
+        // Tab functionality script
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            const activateTab = (tabId) => {
+                // Remove active classes from all buttons and panes
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active-tab');
+                });
+                tabPanes.forEach(pane => {
+                    pane.classList.add('hidden');
+                    pane.classList.remove('flex');
+                });
+
+                // Add active classes to the selected button and pane
+                const selectedButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+                const selectedPane = document.getElementById(tabId);
+
+                if (selectedButton && selectedPane) {
+                    selectedButton.classList.add('active-tab');
+                    
+                    // Use flex to ensure the content layout (flex-col md:flex-row-reverse) applies
+                    selectedPane.classList.remove('hidden');
+                    selectedPane.classList.add('flex');
+                    
+                    // Trigger AOS animation for the content
+                    // By changing content visibility and refreshing AOS, the fade-in effect is achieved.
+                    AOS.refreshHard(); 
+                }
+            };
+
+            // Initial setup: apply active state to the first tab content on load
+            activateTab('tab1');
+
+            // Add event listeners to buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    activateTab(tabId);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
