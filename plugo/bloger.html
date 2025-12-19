@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugo Widget</title>
+    
+    <!-- الخطوط والأيقونات والمكتبات -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* تنسيق الجذر الرئيسي للتطبيق
+           الآن يأخذ كامل المساحة المتاحة كأنه صفحة مستقلة
+        */
+        #plugo-widget-root {
+            --widget-bg-primary: #0f172a;
+            --widget-bg-secondary: #1e293b;
+            --widget-text-main: #f1f5f9;
+            --widget-text-dim: #94a3b8;
+            --widget-accent: #38bdf8;
+            --widget-border: rgba(255, 255, 255, 0.1);
+            --widget-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            font-family: 'Tajawal', sans-serif;
+            
+            /* خصائص العرض الكامل */
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--widget-bg-primary);
+            color: var(--widget-text-main);
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar مخصص */
+        .plugo-scroll::-webkit-scrollbar { width: 6px; }
+        .plugo-scroll::-webkit-scrollbar-track { background: var(--widget-bg-primary); }
+        .plugo-scroll::-webkit-scrollbar-thumb { background: var(--widget-bg-secondary); border-radius: 10px; }
+
+        /* كلاسات مساعدة */
+        .glass-card { background-color: var(--widget-bg-secondary); border: 1px solid var(--widget-border); }
+        .active-nav { background: linear-gradient(135deg, var(--widget-accent), #6366f1); color: white !important; }
+        
+        /* Animations */
+        .animate-fade-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loader Overlay */
+        #ui-loader {
+            position: fixed; /* يغطي الشاشة بالكامل أثناء التحميل */
+            inset: 0;
+            background: var(--widget-bg-primary);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* استجابة الجوال */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                right: 0;
+                top: 0;
+                height: 100%;
+                z-index: 50;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .overlay-backdrop {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .overlay-backdrop.open { display: block; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0;">
+
+    <!-- 
+        Container Root: 
+        هذا العنصر يحتوي على التطبيق بالكامل ويظهر كجزء من الصفحة
+    -->
+    <div id="plugo-widget-root">
+        
+        <!-- محتوى التطبيق الداخلي -->
+        <div id="app" class="w-full min-h-screen flex flex-col"></div>
+        
+        <!-- عناصر واجهة المستخدم العامة -->
+        <div id="toast-container"></div>
+        
+        <div id="ui-loader">
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-sm font-bold text-slate-400">جاري التحميل...</p>
+            </div>
+        </div>
+
+        <!-- خلفية معتمة للجوال عند فتح القائمة -->
+        <div id="mobile-backdrop" class="overlay-backdrop" onclick="Actions.toggleSidebar()"></div>
+
+    </div>
+
+    <script>
+        // ============================================
+        // 1. Config & State Management
+        // ============================================
+        const CONFIG = {
+            SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzzphGByU8izIrzux7cGsvq3BVBA6sE7s6ehHIwhaNOQe_qfXe3Pupql99feo3vncsf/exec"
+        };
+        
+        const state = {
+            view: 'login', 
+            activeSection: 'overview',
+            user: null,
+            blogs: [],
+            sidebarOpen: false,
+            update(newState) {
+                Object.assign(this, newState);
+                renderApp();
+            }
+        };
+
+        // ============================================
+        // 2. Components
+        // ============================================
+        
+        const Components = {
+            // Login View
+            LoginView: () => `
+                <div class="flex items-center justify-center min-h-screen w-full bg-[radial-gradient(circle_at_top,#1e293b,#0f172a)] p-6">
+                    <div class="glass-card rounded-3xl p-8 md:p-12 max-w-md w-full animate-fade-up text-center border-t border-white/5 shadow-2xl">
+                        <div class="w-20 h-20 mx-auto bg-slate-800/50 border border-slate-700 rounded-2xl flex items-center justify-center mb-6 shadow-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-sky-500/10 blur-xl"></div>
+                            <i data-lucide="shield-check" class="w-10 h-10 text-sky-400 relative z-10"></i>
+                        </div>
+                        <h1 class="text-3xl font-black mb-2 text-white">Plugo AI</h1>
+                        <p class="text-slate-400 text-sm mb-8">سجل دخولك لإدارة التراخيص</p>
+                        
+                        <div class="space-y-4 text-right">
+                            <div class="relative group">
+                                <input type="email" id="login-email" placeholder="البريد الإلكتروني" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 px-4 pr-10 text-white outline-none focus:border-sky-500 transition-all text-sm" dir="rtl">
+                                <i data-lucide="mail" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"></i>
+                            </div>
+                            <div class="relative group">
+                                <input type="password" id="login-password" placeholder="كود الدخول" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 px-4 pr-10 text-white outline-none focus:border-sky-500 transition-all text-sm" dir="rtl">
+                                <i data-lucide="lock" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"></i>
+                            </div>
+                            <button onclick="Actions.login()" class="w-full bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm flex items-center justify-center gap-2 mt-2">
+                                <span>تسجيل الدخول</span> <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <p class="mt-6 text-[10px] text-slate-600">محمي بواسطة أنظمة Plugo &copy; 2025</p>
+                    </div>
+                </div>
+            `,
+
+            // Dashboard Container
+            Dashboard: () => `
+                <div class="flex min-h-screen w-full relative">
+                    <!-- Sidebar -->
+                    <aside class="sidebar w-64 bg-[#1e293b] border-l border-slate-700 flex flex-col flex-shrink-0 transition-all ${state.sidebarOpen ? 'open' : ''}">
+                        <div class="p-6 flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-sky-500/20">P</div>
+                                <h2 class="text-lg font-black text-white">Plugo</h2>
+                            </div>
+                            <button class="md:hidden text-slate-400" onclick="Actions.toggleSidebar()"><i data-lucide="x"></i></button>
+                        </div>
+
+                        <nav class="flex-grow space-y-2 px-3">
+                            ${Components.NavItem('overview', 'layout-dashboard', 'نظرة عامة')}
+                            ${Components.NavItem('blogs', 'globe', 'التفعيلات')}
+                            ${Components.NavItem('products', 'download', 'التحميلات')}
+                        </nav>
+                        
+                        <div class="p-4 mt-auto border-t border-slate-700">
+                            <div class="flex items-center gap-3 mb-4 px-2">
+                                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">${state.user.name.charAt(0)}</div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs font-bold text-white truncate">${state.user.name}</p>
+                                    <p class="text-[10px] text-slate-500 truncate" dir="ltr">${state.user.email || 'user@example.com'}</p>
+                                </div>
+                            </div>
+                            <button onclick="Actions.logout()" class="w-full flex items-center justify-start gap-3 p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors">
+                                <i data-lucide="log-out" size="18"></i> <span class="text-sm font-bold">تسجيل خروج</span>
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- Main Content Area -->
+                    <main class="flex-grow bg-[#0f172a] flex flex-col w-full md:w-auto">
+                        <!-- Header (Mobile Only Toggle) -->
+                        <header class="p-6 border-b border-slate-800 flex justify-between items-center bg-[#0f172a] sticky top-0 z-10 md:hidden">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold">P</div>
+                                <h3 class="text-lg font-black text-white">لوحة التحكم</h3>
+                            </div>
+                            <button onclick="Actions.toggleSidebar()" class="p-2 border border-slate-700 rounded-lg text-slate-300"><i data-lucide="menu"></i></button>
+                        </header>
+
+                        <div class="hidden md:flex p-8 pb-0 justify-between items-end">
+                            <div>
+                                <h3 class="text-2xl font-black text-white">لوحة التحكم</h3>
+                                <p class="text-slate-500 text-sm mt-1">مرحباً بك مجدداً، ${state.user.name.split(' ')[0]} 👋</p>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Content -->
+                        <div class="flex-grow p-6 md:p-8 overflow-y-auto plugo-scroll">
+                            ${state.activeSection === 'overview' ? Components.OverviewSection() : ''}
+                            ${state.activeSection === 'blogs' ? Components.BlogsSection() : ''}
+                            ${state.activeSection === 'products' ? Components.ProductsSection() : ''}
+                        </div>
+                    </main>
+                </div>
+            `,
+
+            NavItem: (id, icon, label) => `
+                <button onclick="Actions.setSection('${id}')" 
+                    class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all ${state.activeSection === id ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}">
+                    <i data-lucide="${icon}" size="20"></i> 
+                    <span class="text-sm font-bold">${label}</span>
+                </button>
+            `,
+
+            // Sections
+            OverviewSection: () => {
+                const uniqueProds = Helpers.getUniqueProducts();
+                return `
+                    <div class="space-y-6 animate-fade-up max-w-5xl mx-auto">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            ${Components.StatBox('shield-check', 'text-sky-400', 'bg-sky-500/10', `${state.blogs.length} / ${state.user.maxActivations}`, 'التراخيص المستخدمة')}
+                            ${Components.StatBox('shopping-cart', 'text-purple-400', 'bg-purple-500/10', uniqueProds.length, 'القوالب المتاحة')}
+                            ${Components.StatBox('globe', 'text-emerald-400', 'bg-emerald-500/10', state.blogs.length, 'المدونات النشطة')}
+                        </div>
+                        
+                        <div class="bg-[#1e293b] rounded-2xl border border-slate-700 overflow-hidden">
+                            <div class="p-5 border-b border-slate-700/50">
+                                <h4 class="text-sm font-bold text-white">آخر النشاطات المسجلة</h4>
+                            </div>
+                            <div class="divide-y divide-slate-700/50">
+                                ${state.blogs.length === 0 ? '<p class="text-center text-slate-500 text-sm py-8">لا توجد بيانات لعرضها حالياً</p>' : 
+                                state.blogs.slice().reverse().map(b => `
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-slate-800/50 transition gap-4">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-sky-500 border border-slate-700"><i data-lucide="key" size="18"></i></div>
+                                            <div>
+                                                <p class="text-sm font-bold text-white">${b.blogname}</p>
+                                                <p class="text-[10px] text-emerald-400 flex items-center gap-1"><i data-lucide="check-circle" size="10"></i> نشط</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto bg-slate-900/50 sm:bg-transparent p-2 sm:p-0 rounded-lg">
+                                            <span class="text-xs font-mono text-sky-400 font-bold tracking-wider" dir="ltr">${b.licenseCode}</span>
+                                            <button onclick="Helpers.copy('${b.licenseCode}')" class="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition" title="نسخ"><i data-lucide="copy" size="14"></i></button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            StatBox: (icon, color, bg, val, label) => `
+                <div class="bg-[#1e293b] p-6 rounded-2xl border border-slate-700 flex items-center gap-4 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 ${bg} rounded-xl flex items-center justify-center ${color} shadow-lg shadow-black/20">
+                        <i data-lucide="${icon}" size="24"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-2xl font-black text-white">${val}</h5>
+                        <p class="text-xs text-slate-400 font-bold">${label}</p>
+                    </div>
+                </div>
+            `,
+
+            BlogsSection: () => `
+                <div class="space-y-6 animate-fade-up max-w-5xl mx-auto">
+                    <div class="bg-gradient-to-br from-[#1e293b] to-[#0f172a] p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 to-purple-500"></div>
+                        <h4 class="text-lg font-black text-white mb-6">تفعيل قالب جديد</h4>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input id="blog-id-input" type="text" placeholder="أدخل معرف المدونة (Blog ID)" class="flex-grow bg-slate-900/80 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition" dir="ltr">
+                            <button onclick="Actions.searchBlog()" class="bg-sky-500 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-sky-600 shadow-lg shadow-sky-500/20 whitespace-nowrap flex items-center justify-center gap-2">
+                                <i data-lucide="search" size="16"></i> تحقق من المدونة
+                            </button>
+                        </div>
+                        
+                        <div id="search-result-box" class="hidden mt-6 p-6 bg-sky-500/10 border border-sky-500/20 rounded-xl animate-fade-up">
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div>
+                                    <h5 id="result-name" class="font-bold text-white text-lg mb-1"></h5>
+                                    <p id="result-url" class="text-sm text-sky-400 opacity-80" dir="ltr"></p>
+                                </div>
+                                <button onclick="Actions.registerBlog()" class="w-full sm:w-auto bg-white text-slate-900 px-8 py-3 rounded-xl text-sm font-black hover:bg-slate-100 shadow-xl transition transform hover:scale-105">تفعيل الترخيص الآن</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${state.blogs.map(b => `
+                            <div class="bg-[#1e293b] p-5 rounded-2xl border border-slate-700 flex justify-between items-start group hover:border-slate-600 transition">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                        <p class="text-sm font-bold text-white">${b.blogname}</p>
+                                    </div>
+                                    <p class="text-xs text-slate-500 font-mono mb-3" dir="ltr">ID: ${b.blogid}</p>
+                                    <div class="bg-slate-900/50 inline-block px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-mono text-sky-400" onclick="Helpers.copy('${b.licenseCode}')">
+                                        ${b.licenseCode}
+                                    </div>
+                                </div>
+                                <button onclick="Actions.deleteBlog('${b.blogid}')" class="text-slate-500 p-2 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition opacity-0 group-hover:opacity-100 focus:opacity-100"><i data-lucide="trash-2" size="16"></i></button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+
+            ProductsSection: () => {
+                const uniqueProds = Helpers.getUniqueProducts();
+                return `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-up max-w-6xl mx-auto">
+                        ${uniqueProds.map(p => `
+                            <div class="bg-[#1e293b] rounded-3xl border border-slate-700 overflow-hidden flex flex-col h-full group hover:border-slate-600 transition duration-300">
+                                <div class="h-48 bg-slate-800 relative overflow-hidden">
+                                    <img src="${p.image}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#1e293b] to-transparent"></div>
+                                    <div class="absolute bottom-4 right-4">
+                                        <span class="bg-emerald-500 text-white text-[10px] font-black px-2 py-1 rounded shadow-lg">مرخص</span>
+                                    </div>
+                                </div>
+                                <div class="p-6 flex-grow flex flex-col">
+                                    <h4 class="font-black text-white text-xl mb-2">${p.name}</h4>
+                                    <p class="text-sm text-slate-400 line-clamp-2 mb-6 flex-grow leading-relaxed">${p.desc || 'لا يوجد وصف متاح لهذا المنتج.'}</p>
+                                    
+                                    <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-700/50">
+                                        ${(p.versions || ["V1.0"]).map(v => `
+                                            <button onclick="Actions.download('${p.link}', '${v}')" class="bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-300 border border-slate-600 hover:border-sky-500 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                                                <i data-lucide="download" size="12"></i> تحميل ${v}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${uniqueProds.length === 0 ? '<p class="text-center text-slate-500 text-sm py-20 col-span-full font-bold">عفواً، لا توجد منتجات متاحة للتحميل في حسابك حالياً.</p>' : ''}
+                    </div>
+                `;
+            }
+        };
+
+        // ============================================
+        // 3. Logic Implementation
+        // ============================================
+
+        const Helpers = {
+            toast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const colors = { success: 'bg-emerald-500', error: 'bg-red-500', loading: 'bg-sky-500' };
+                const icons = { success: 'check-circle', error: 'alert-circle', loading: 'loader-2' };
+                
+                toast.className = `p-4 rounded-xl text-white text-sm font-bold flex items-center gap-3 shadow-xl animate-fade-up ${colors[type] || 'bg-slate-700'}`;
+                toast.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="${type === 'loading' ? 'animate-spin' : ''}"></i><span>${msg}</span>`;
+                
+                container.appendChild(toast);
+                lucide.createIcons();
+                
+                const remove = () => { 
+                    toast.style.opacity = '0'; 
+                    toast.style.transform = 'translateY(-10px)'; 
+                    setTimeout(() => toast.remove(), 300); 
+                };
+                
+                if (type !== 'loading') setTimeout(remove, 4000);
+                return { close: remove };
+            },
+            toggleLoader(show) { 
+                document.getElementById('ui-loader').style.display = show ? 'flex' : 'none'; 
+            },
+            getUniqueProducts() {
+                if (!state.user) return [];
+                const unique = new Map();
+                const add = (p) => { if(p && p.name) unique.set(p.name, p); };
+                (Array.isArray(state.user.products) ? state.user.products : [state.user.products]).forEach(add);
+                state.blogs.forEach(b => add(b.productData));
+                return Array.from(unique.values());
+            },
+            copy(text) {
+                navigator.clipboard.writeText(text);
+                Helpers.toast("تم نسخ الكود بنجاح!");
+            },
+            jsonp(id) {
+                return new Promise((resolve, reject) => {
+                    const cb = 'cb_' + Math.floor(Math.random() * 1000);
+                    window[cb] = (data) => { delete window[cb]; document.getElementById(cb)?.remove(); data?.feed ? resolve(data) : reject(); };
+                    const s = document.createElement('script'); s.id = cb; s.src = `https://www.blogger.com/feeds/${id}/posts/default?alt=json-in-script&callback=${cb}`;
+                    s.onerror = () => { delete window[cb]; reject(); };
+                    document.body.appendChild(s);
+                });
+            }
+        };
+
+        const Actions = {
+            async login() {
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-password').value;
+                if(!email || !pass) return Helpers.toast("يرجى إدخال البريد والكود", "error");
+
+                Helpers.toggleLoader(true);
+                try {
+                    const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                    const result = await res.json();
+                    
+                    if (result.status === 'success') {
+                        localStorage.setItem('plugo_user_session', JSON.stringify({ email, password: pass }));
+                        state.user = result.meta;
+                        state.blogs = result.blogs || [];
+                        state.view = 'dashboard';
+                        state.update({});
+                        Helpers.toast("أهلاً بك! تم تسجيل الدخول");
+                    } else {
+                        Helpers.toast("بيانات الدخول غير صحيحة", "error");
+                    }
+                } catch(e) { Helpers.toast("خطأ في الاتصال بالخادم", "error"); }
+                finally { Helpers.toggleLoader(false); }
+            },
+            logout() {
+                if(!confirm('هل تريد تسجيل الخروج؟')) return;
+                localStorage.removeItem('plugo_user_session');
+                state.view = 'login';
+                state.user = null;
+                state.update({});
+            },
+            setSection(sec) { 
+                state.update({ activeSection: sec, sidebarOpen: false }); 
+                const backdrop = document.getElementById('mobile-backdrop');
+                if(backdrop) backdrop.classList.remove('open');
+            },
+            toggleSidebar() {
+                state.sidebarOpen = !state.sidebarOpen;
+                const sidebar = document.querySelector('.sidebar');
+                const backdrop = document.getElementById('mobile-backdrop');
+                
+                if(state.sidebarOpen) {
+                    sidebar.classList.add('open');
+                    backdrop.classList.add('open');
+                } else {
+                    sidebar.classList.remove('open');
+                    backdrop.classList.remove('open');
+                }
+            },
+            
+            async searchBlog() {
+                const id = document.getElementById('blog-id-input').value;
+                if(!id) return Helpers.toast("أدخل معرف المدونة أولاً", "error");
+                const loader = Helpers.toast("جاري البحث عن المدونة...", "loading");
+                try {
+                    const data = await Helpers.jsonp(id);
+                    state.searchResult = { 
+                        blogid: id, 
+                        blogname: data.feed.title.$t, 
+                        blogurl: data.feed.link.find(l => l.rel === 'alternate')?.href 
+                    };
+                    document.getElementById('result-name').innerText = state.searchResult.blogname;
+                    document.getElementById('result-url').innerText = state.searchResult.blogurl;
+                    document.getElementById('search-result-box').classList.remove('hidden');
+                    loader.close();
+                } catch { loader.close(); Helpers.toast("لم يتم العثور على المدونة، تأكد من المعرف", "error"); }
+            },
+            async registerBlog() {
+                const loader = Helpers.toast("جاري تسجيل وتفعيل الترخيص...", "loading");
+                const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+                const payload = {
+                    action: 'add', ...state.searchResult,
+                    licenseCode: `PLUGO-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+                    userName: state.user.name, userEmail: session.email
+                };
+                try {
+                    const res = await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    const result = await res.json();
+                    loader.close();
+                    if(result.result === 'success') {
+                        Helpers.toast("تم التفعيل بنجاح!");
+                        Actions.refreshData(session.email, session.password);
+                    } else Helpers.toast("فشل التفعيل: " + result.message, "error");
+                } catch { loader.close(); Helpers.toast("حدث خطأ أثناء الاتصال", "error"); }
+            },
+            async deleteBlog(id) {
+                if(!confirm("هل أنت متأكد من حذف هذا الترخيص؟ ستتوقف المدونة عن العمل.")) return;
+                const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+                const loader = Helpers.toast("جاري الحذف...", "loading");
+                await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', blogid: id, userEmail: session.email }) });
+                loader.close();
+                Helpers.toast("تم الحذف بنجاح");
+                Actions.refreshData(session.email, session.password);
+            },
+            async refreshData(email, pass) {
+                const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                const result = await res.json();
+                if(result.status === 'success') state.update({ user: result.meta, blogs: result.blogs || [] });
+            },
+            download(link, v) {
+                if(!link) return;
+                window.open(link, '_blank');
+            }
+        };
+
+        function renderApp() {
+            const app = document.getElementById('app');
+            app.innerHTML = state.view === 'login' ? Components.LoginView() : Components.Dashboard();
+            lucide.createIcons();
+        }
+
+        function initApp() {
+            const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+            if(session) Actions.refreshData(session.email, session.password).then(() => {
+                if(state.user) { state.view = 'dashboard'; state.update({}); }
+                else { state.view = 'login'; renderApp(); }
+            });
+            else { state.view = 'login'; renderApp(); }
+        }
+
+        // Expose global
+        window.Actions = Actions;
+        window.Helpers = Helpers;
+        
+        // Auto Start
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>

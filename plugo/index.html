@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم Plugo AI</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root[data-theme='dark'] { 
+            --bg-primary: #0f172a; 
+            --bg-secondary: #1e293b; 
+            --text-main: #f1f5f9; 
+            --text-dim: #94a3b8; 
+            --accent: #38bdf8; 
+            --accent-glow: rgba(56, 189, 248, 0.5);
+            --border: rgba(255, 255, 255, 0.1); 
+            --toast-bg: rgba(15, 23, 42, 0.95); 
+        }
+        :root[data-theme='light'] { 
+            --bg-primary: #f8fafc; 
+            --bg-secondary: #ffffff; 
+            --text-main: #0f172a; 
+            --text-dim: #64748b; 
+            --accent: #0ea5e9; 
+            --accent-glow: rgba(14, 165, 233, 0.3);
+            --border: #e2e8f0; 
+            --toast-bg: rgba(255, 255, 255, 0.95); 
+        }
+        
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg-primary); color: var(--text-main); transition: background-color 0.4s, color 0.4s; overflow-x: hidden; }
+        
+        /* البطاقات الزجاجية العامة */
+        .glass-card { background-color: var(--bg-secondary); border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .active-nav { background: linear-gradient(135deg, var(--accent), #6366f1); color: white !important; box-shadow: 0 4px 15px var(--accent-glow); }
+        
+        .sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @media (max-width: 768px) { .sidebar { position: fixed; transform: translateX(100%); z-index: 50; } .sidebar.open { transform: translateX(0); } }
+        
+        .code-badge { font-family: 'Fira Code', monospace; background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(56, 189, 248, 0.2); transition: 0.2s; }
+        .code-badge:hover { background: rgba(56, 189, 248, 0.2); }
+
+        /* Loader */
+        #ui-loader { position: fixed; inset: 0; background: var(--bg-primary); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
+        /* Toast Notification */
+        #toast-container { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; }
+        .toast-card { pointer-events: auto; min-width: 320px; background: var(--toast-bg); backdrop-filter: blur(16px); border: 1px solid var(--border); padding: 16px 24px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 14px; animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; overflow: hidden; }
+        .toast-card.hide { animation: toastOut 0.4s ease forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-40px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+        .toast-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--accent); width: 100%; transform-origin: left; }
+
+        /* الأنيميشن العام */
+        .animate-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* تصميم صفحة تسجيل الدخول الفاخر */
+        .login-wrapper { background: radial-gradient(circle at top left, #0f172a, #020617); position: relative; overflow: hidden; min-height: 100vh; }
+        .login-bg-shape { position: absolute; filter: blur(80px); z-index: 0; opacity: 0.6; animation: floatShape 10s infinite alternate ease-in-out; }
+        .shape-1 { top: -10%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, #38bdf8 0%, transparent 70%); }
+        .shape-2 { bottom: -10%; left: -10%; width: 400px; height: 400px; background: radial-gradient(circle, #818cf8 0%, transparent 70%); animation-delay: -5s; }
+        @keyframes floatShape { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        .login-card-deluxe { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; z-index: 1; overflow: hidden; }
+        .login-card-deluxe::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
+
+        .input-group-deluxe { position: relative; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; transition: all 0.3s ease; }
+        .input-group-deluxe:focus-within { background: rgba(255, 255, 255, 0.05); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+        .input-deluxe { background: transparent !important; border: none !important; color: white !important; width: 100%; padding: 16px 16px 16px 50px; font-weight: bold; outline: none !important; }
+        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); transition: color 0.3s; }
+        .input-group-deluxe:focus-within .input-icon { color: var(--accent); }
+
+        .btn-glow { background: linear-gradient(135deg, #0ea5e9, #3b82f6); position: relative; z-index: 1; overflow: hidden; transition: all 0.3s; }
+        .btn-glow::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #38bdf8, #60a5fa); opacity: 0; z-index: -1; transition: opacity 0.3s; }
+        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.5); }
+        .btn-glow:hover::after { opacity: 1; }
+
+        .icon-gradient-blue { background: linear-gradient(135deg, #38bdf8, #2563eb); }
+        .icon-gradient-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+        .icon-gradient-emerald { background: linear-gradient(135deg, #34d399, #059669); }
+        .icon-gradient-rose { background: linear-gradient(135deg, #fb7185, #e11d48); }
+        .icon-gradient-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+        
+        input:not(.input-deluxe) { background: rgba(0,0,0,0.2) !important; border: 1px solid var(--border) !important; color: white !important; }
+        input:not(.input-deluxe):focus { border-color: var(--accent) !important; outline: none; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- العنصر الحاوي الوحيد للتطبيق -->
+    <div id="app"></div>
+
+    <!-- عناصر ثابتة خارج دورة إعادة الرسم -->
+    <div id="ui-loader">
+        <div class="flex flex-col items-center gap-4">
+            <div class="relative">
+                <div class="w-16 h-16 border-4 border-slate-700 rounded-full"></div>
+                <div class="w-16 h-16 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+            </div>
+            <p class="font-bold text-white text-sm tracking-wide">Plugo AI Dashboard</p>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+        // ============================================
+        // Config & State
+        // ============================================
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzphGByU8izIrzux7cGsvq3BVBA6sE7s6ehHIwhaNOQe_qfXe3Pupql99feo3vncsf/exec";
+        
+        const state = {
+            view: 'login', // login, dashboard, banned, no-products
+            activeSection: 'overview', // overview, blogs, products
+            user: null,
+            blogs: [],
+            lastSearchResult: null,
+            theme: localStorage.getItem('theme') || 'dark'
+        };
+
+        // ============================================
+        // Templates Generators (Views)
+        // ============================================
+        
+        // 1. شاشة تسجيل الدخول
+        const getLoginTemplate = () => `
+            <div class="flex items-center justify-center min-h-screen login-wrapper">
+                <div class="login-bg-shape shape-1"></div>
+                <div class="login-bg-shape shape-2"></div>
+                <div class="login-card-deluxe rounded-[2.5rem] p-10 md:p-16 max-w-md w-full animate-fade-up mx-4">
+                    <div class="text-center mb-12">
+                        <div class="relative inline-block mb-6">
+                            <div class="absolute inset-0 bg-sky-500 blur-2xl opacity-20 rounded-full"></div>
+                            <div class="w-24 h-24 bg-slate-900/50 border border-slate-700/50 rounded-3xl flex items-center justify-center relative backdrop-blur-md shadow-2xl">
+                                <i data-lucide="shield-check" class="w-12 h-12 text-sky-400 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]"></i>
+                            </div>
+                        </div>
+                        <h1 class="text-5xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">Plugo AI</h1>
+                        <p class="text-slate-400 font-medium text-sm">بوابة إدارة التراخيص والعملاء</p>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2 mr-1">البريد الإلكتروني</label>
+                            <div class="input-group-deluxe flex items-center">
+                                <input type="email" id="login-email" placeholder="name@example.com" class="input-deluxe text-right" dir="ltr">
+                                <i data-lucide="mail" class="input-icon w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2 mr-1">كلمة المرور / كود الدخول</label>
+                            <div class="input-group-deluxe flex items-center">
+                                <input type="password" id="login-password" placeholder="••••••••" class="input-deluxe text-right" dir="ltr">
+                                <i data-lucide="lock" class="input-icon w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <button onclick="handleManualLogin()" class="btn-glow w-full py-5 rounded-2xl font-bold text-white shadow-xl flex items-center justify-center gap-3 mt-4 text-lg group">
+                            <span>تسجيل الدخول</span>
+                            <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                    <div class="mt-8 text-center border-t border-white/5 pt-6">
+                        <p class="text-slate-500 text-xs font-medium">محمي بواسطة أنظمة Plugo AI الأمنية &copy; 2025</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 2. شاشة الحظر
+        const getBannedTemplate = () => `
+            <div class="flex items-center justify-center min-h-screen bg-slate-950 p-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#450a0a_0%,_#0f172a_70%)] opacity-50"></div>
+                <div class="glass-card rounded-[3rem] p-10 md:p-14 max-w-md w-full animate-fade-up text-center relative border-red-500/30 backdrop-blur-xl">
+                    <div class="w-24 h-24 icon-gradient-red rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(239,68,68,0.4)] animate-pulse">
+                        <i data-lucide="ban" class="w-12 h-12 text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-black mb-4 text-red-100">حساب محظور</h2>
+                    <p class="text-red-200/70 font-bold leading-relaxed mb-8 text-sm">
+                        تم تعليق الوصول إلى حسابك حالياً لمخالفة الشروط. يرجى مراجعة الدعم الفني.
+                    </p>
+                    <button onclick="logout()" class="w-full py-4 rounded-2xl font-black bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-500/20 transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="log-out" size="18"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 3. شاشة لا توجد منتجات
+        const getNoProductsTemplate = () => `
+            <div class="flex items-center justify-center min-h-screen bg-slate-950 p-6">
+                <div class="glass-card rounded-[3rem] p-10 md:p-14 max-w-md w-full animate-fade-up text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 to-orange-500"></div>
+                    <div class="w-24 h-24 icon-gradient-rose rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-rose-500/30">
+                        <i data-lucide="shopping-cart" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-black mb-4">نعتذر منك <span class="text-rose-400">${state.user ? state.user.name.split(' ')[0] : ''}</span></h2>
+                    <p class="text-slate-400 font-bold leading-relaxed mb-8">
+                        لا توجد أي منتجات أو قوالب مرتبطة بحسابك حالياً.
+                    </p>
+                    <button onclick="logout()" class="w-full py-4 rounded-2xl font-black bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="log-out" size="18"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 4. الداشبورد الكاملة
+        const getDashboardTemplate = () => {
+            const user = state.user || {};
+            const session = JSON.parse(localStorage.getItem('plugo_user_session') || '{}');
+            const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=38bdf8&color=fff`;
+
+            // Sidebar
+            const sidebar = `
+                <aside id="sidebar" class="sidebar w-80 bg-[var(--bg-secondary)] border-l border-[var(--border)] p-8 flex flex-col h-screen">
+                    <div class="flex items-center justify-between mb-16">
+                        <div class="flex items-center gap-4"><div class="w-10 h-10 icon-gradient-blue rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-sky-500/20">P</div><h2 class="text-2xl font-black">Plugo AI</h2></div>
+                        <button class="md:hidden" onclick="toggleSidebar()"><i data-lucide="x"></i></button>
+                    </div>
+                    <nav class="flex-grow space-y-3">
+                        <button onclick="changeSection('overview')" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold ${state.activeSection === 'overview' ? 'active-nav' : ''}"><i data-lucide="layout-dashboard"></i> نظرة عامة</button>
+                        <button onclick="changeSection('blogs')" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold ${state.activeSection === 'blogs' ? 'active-nav' : ''}"><i data-lucide="globe"></i> التفعيلات</button>
+                        <button onclick="changeSection('products')" class="nav-item w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold ${state.activeSection === 'products' ? 'active-nav' : ''}"><i data-lucide="download"></i> التحميلات</button>
+                    </nav>
+                    <div class="mt-auto pt-8 border-t border-[var(--border)]">
+                        <div class="flex items-center gap-4 p-4 bg-white/5 rounded-[2rem] mb-6 overflow-hidden text-right">
+                            <img src="${avatar}" class="w-10 h-10 rounded-full border-2 border-sky-500">
+                            <div class="overflow-hidden">
+                                <p class="text-sm font-black truncate">${user.name}</p>
+                                <p class="text-[10px] text-slate-500 truncate" dir="ltr">${session.email}</p>
+                            </div>
+                        </div>
+                        <button onclick="logout()" class="w-full flex items-center gap-3 p-4 text-red-400 font-black text-sm"><i data-lucide="log-out"></i> خروج</button>
+                    </div>
+                </aside>
+            `;
+
+            // Main Content Area
+            let contentHTML = '';
+            
+            // Overview Content
+            if (state.activeSection === 'overview') {
+                contentHTML = `
+                    <section class="animate-fade-up">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                            <div class="glass-card p-8 rounded-[2.5rem] flex items-center gap-6 group hover:-translate-y-1 transition-transform">
+                                <div class="w-16 h-16 icon-gradient-blue rounded-2xl flex items-center justify-center text-white shadow-xl shadow-sky-500/20"><i data-lucide="shield-check" size="28"></i></div>
+                                <div class="text-right"><p class="text-slate-500 text-xs font-black mb-1">التراخيص المستخدمة</p><h5 class="text-3xl font-black">${state.blogs.length} / ${user.maxActivations}</h5></div>
+                            </div>
+                            <div class="glass-card p-8 rounded-[2.5rem] flex items-center gap-6 group hover:-translate-y-1 transition-transform">
+                                <div class="w-16 h-16 icon-gradient-purple rounded-2xl flex items-center justify-center text-white shadow-xl shadow-purple-500/20"><i data-lucide="package" size="28"></i></div>
+                                <div class="text-right"><p class="text-slate-500 text-xs font-black mb-1">قوالبك المتاحة</p><h5 class="text-3xl font-black">${getUniqueProducts().length}</h5></div>
+                            </div>
+                            <div class="glass-card p-8 rounded-[2.5rem] flex items-center gap-6 group hover:-translate-y-1 transition-transform">
+                                <div class="w-16 h-16 icon-gradient-emerald rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20"><i data-lucide="globe" size="28"></i></div>
+                                <div class="text-right"><p class="text-slate-500 text-xs font-black mb-1">إجمالي المدونات</p><h5 class="text-3xl font-black">${state.blogs.length}</h5></div>
+                            </div>
+                        </div>
+                        <h4 class="text-xl font-black mb-6 text-right">الأنشطة الأخيرة</h4>
+                        <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                            ${state.blogs.length === 0 ? '<div class="p-20 text-center text-slate-500 italic">لا توجد أنشطة مسجلة حالياً.</div>' : 
+                            [...state.blogs].reverse().map(b => `
+                                <div class="p-6 flex flex-col md:flex-row items-center justify-between border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
+                                    <div class="flex items-center gap-4 mb-4 md:mb-0">
+                                        <div class="w-12 h-12 bg-sky-500/10 rounded-xl flex items-center justify-center text-sky-400"><i data-lucide="key"></i></div>
+                                        <div class="text-right"><p class="font-black text-white">${b.blogname}</p><p class="text-[10px] text-emerald-400 font-bold">تفعيل نشط</p></div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <p class="font-black text-sky-400 font-mono" dir="ltr">${b.licenseCode}</p>
+                                        <button onclick="copyToClipboard('${b.licenseCode}')" class="p-3 bg-sky-500 text-white rounded-xl shadow-lg hover:scale-105 transition-transform"><i data-lucide="copy" size="18"></i></button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            
+            // Blogs Section
+            if (state.activeSection === 'blogs') {
+                contentHTML = `
+                    <section class="animate-fade-up text-right">
+                        <div class="glass-card rounded-[3rem] p-10 mb-8">
+                            <h4 class="text-2xl font-black mb-8">تفعيل قالب جديد</h4>
+                            <div class="flex flex-col lg:flex-row gap-5">
+                                <input id="blog-id-input" type="text" placeholder="Blog ID (مثال: 14393793...)" class="flex-grow p-5 rounded-2xl font-bold text-right" dir="ltr">
+                                <button onclick="handleSearchBlog()" class="bg-sky-500 text-white px-10 py-5 rounded-2xl font-black hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/20">تحقق من المدونة</button>
+                            </div>
+                            <div id="search-result-box" class="hidden mt-10 p-10 border-2 border-dashed border-sky-400/30 rounded-[2.5rem] bg-sky-400/5">
+                                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                                    <div class="text-right">
+                                        <h5 id="result-name" class="text-3xl font-black text-white"></h5>
+                                        <p id="result-url" class="text-sky-400 font-bold" dir="ltr"></p>
+                                    </div>
+                                    <button onclick="handleRegisterBlog()" class="bg-white text-slate-950 px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">تفعيل الترخيص الآن</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card rounded-[3rem] p-10">
+                            <h4 class="text-xl font-black mb-8">مدوناتك المسجلة</h4>
+                            <div class="space-y-4">
+                                ${state.blogs.length === 0 ? '<p class="text-center opacity-30 py-10">لا توجد تفعيلات مسجلة.</p>' : 
+                                state.blogs.map(b => `
+                                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 animate-fade-up">
+                                        <div class="truncate text-right">
+                                            <p class="text-sm font-black text-white">${b.blogname}</p>
+                                            <p class="text-[10px] text-sky-400 font-mono" dir="ltr">${b.blogid}</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div onclick="copyToClipboard('${b.licenseCode}')" class="code-badge text-[10px]">${b.licenseCode}</div>
+                                            <button onclick="handleDeleteBlog('${b.blogid}')" class="p-2 text-red-400 hover:bg-red-400/10 rounded-lg"><i data-lucide="trash-2" size="16"></i></button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            // Products Section
+            if (state.activeSection === 'products') {
+                const uniqueProds = getUniqueProducts();
+                contentHTML = `
+                    <section class="animate-fade-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            ${uniqueProds.length === 0 ? '<p class="text-center opacity-30 py-20 col-span-full font-bold">لا توجد منتجات متاحة للتحميل حالياً.</p>' : 
+                            uniqueProds.map(p => `
+                                <div class="glass-card rounded-[2.5rem] overflow-hidden animate-fade-up">
+                                    <div class="relative h-48 overflow-hidden">
+                                        <img src="${p.image}" class="w-full h-full object-cover opacity-60">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
+                                        <div class="absolute bottom-6 right-6 left-6 flex justify-between items-end">
+                                            <h4 class="text-2xl font-black text-white">${p.name}</h4>
+                                            <span class="bg-emerald-500 text-white font-black px-3 py-1 rounded-lg text-[10px]">مفعّل</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-8 text-right">
+                                        <p class="text-slate-400 mb-6 font-bold text-sm leading-relaxed">${p.desc || 'لا يوجد وصف متاح.'}</p>
+                                        <div class="flex flex-wrap gap-3 justify-end">
+                                            ${(p.versions || ["V1.0.0"]).map(v => `
+                                                <button onclick="handleDownload('${p.link || '#'}', '${v}')" class="bg-sky-500 text-white px-5 py-3 rounded-xl transition-all font-black text-[11px] flex items-center gap-2">
+                                                    <i data-lucide="download" size="14"></i> تحميل الإصدار ${v}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+
+            // Combine Dashboard
+            return `
+                <div class="flex flex-col md:flex-row min-h-screen">
+                    ${sidebar}
+                    <main class="flex-grow p-6 md:p-12 overflow-y-auto">
+                        <header class="flex justify-between items-center mb-12">
+                            <div class="text-right">
+                                <h3 class="text-3xl font-black">لوحة التحكم</h3>
+                                <p class="text-slate-500 font-bold">مرحباً بك، ${user.name.split(' ')[0]} 👋</p>
+                            </div>
+                            <button onclick="toggleTheme()" class="p-4 rounded-2xl border border-[var(--border)] glass-card">
+                                <i data-lucide="${state.theme === 'dark' ? 'sun' : 'moon'}" class="text-sky-400"></i>
+                            </button>
+                        </header>
+                        ${contentHTML}
+                    </main>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // Core Logic
+        // ============================================
+
+        const renderApp = () => {
+            const app = document.getElementById('app');
+            document.documentElement.setAttribute('data-theme', state.theme);
+            
+            if (state.view === 'login') app.innerHTML = getLoginTemplate();
+            else if (state.view === 'banned') app.innerHTML = getBannedTemplate();
+            else if (state.view === 'no-products') app.innerHTML = getNoProductsTemplate();
+            else if (state.view === 'dashboard') app.innerHTML = getDashboardTemplate();
+
+            lucide.createIcons();
+        };
+
+        const getUniqueProducts = () => {
+            if (!state.user) return [];
+            const uniqueProducts = [];
+            const userProds = Array.isArray(state.user.products) ? state.user.products : [state.user.products];
+            if (userProds) userProds.forEach(p => { if (p && p.name && !uniqueProducts.find(up => up.name === p.name)) uniqueProducts.push(p); });
+            state.blogs.forEach(b => { if (b.productData && b.productData.name && !uniqueProducts.find(up => up.name === b.productData.name)) uniqueProducts.push(b.productData); });
+            return uniqueProducts;
+        };
+
+        // Actions
+        window.changeSection = (section) => {
+            state.activeSection = section;
+            renderApp();
+        };
+
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        };
+
+        window.toggleTheme = () => {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', state.theme);
+            renderApp();
+        };
+
+        window.handleManualLogin = async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+            if(!email || !pass) return showUIMessage("⚠️ يرجى تعبئة كافة الحقول", "error");
+
+            toggleLoader(true);
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                const result = await res.json();
+                
+                if (result.status === 'banned') {
+                    state.view = 'banned';
+                    renderApp();
+                    showUIMessage("⛔ هذا الحساب محظور", "error");
+                    return;
+                }
+
+                if (result.status === 'success') {
+                    state.user = result.meta;
+                    state.blogs = result.blogs || [];
+                    localStorage.setItem('plugo_user_session', JSON.stringify({ email, password: pass }));
+                    
+                    if (getUniqueProducts().length > 0) state.view = 'dashboard';
+                    else state.view = 'no-products';
+                    
+                    renderApp();
+                    showUIMessage("✅ أهلاً بك، تم تسجيل دخولك بنجاح");
+                } else {
+                    showUIMessage("❌ بريد إلكتروني أو كلمة مرور غير صحيحة", "error");
+                }
+            } catch (e) {
+                showUIMessage("❌ خطأ في الاتصال بالخادم", "error");
+            } finally {
+                toggleLoader(false);
+            }
+        };
+
+        window.logout = () => {
+            localStorage.removeItem('plugo_user_session');
+            state.user = null;
+            state.blogs = [];
+            state.view = 'login';
+            renderApp();
+        };
+
+        const refreshUserData = async (email, password) => {
+            toggleLoader(true);
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                const result = await res.json();
+                
+                if (result.status === 'banned') {
+                    state.view = 'banned';
+                    renderApp();
+                    return;
+                }
+
+                if (result.status === 'success') {
+                    state.user = result.meta;
+                    state.blogs = result.blogs || [];
+                    
+                    if (getUniqueProducts().length > 0) state.view = 'dashboard';
+                    else state.view = 'no-products';
+                    
+                    renderApp();
+                } else { window.logout(); }
+            } catch (e) {
+                showUIMessage("❌ تعذر المزامنة، يرجى تسجيل الدخول مجدداً", "error");
+                window.logout();
+            } finally { toggleLoader(false); }
+        };
+
+        window.handleSearchBlog = async () => {
+            const blogId = document.getElementById('blog-id-input').value.trim();
+            if(!blogId) return showUIMessage("⚠️ أدخل معرف المدونة أولاً", "error");
+
+            const isExists = state.blogs.some(b => b.blogid.toString() === blogId);
+            if(isExists) return showUIMessage("🚫 هذه المدونة مسجلة مسبقاً في حسابك.", "error");
+
+            const loadingToast = showUIMessage("🔍 جاري التحقق من هوية المدونة...", "loading");
+            
+            const fetchBloggerInfoJSONP = (id) => {
+                return new Promise((resolve, reject) => {
+                    const callbackName = 'bloggerCallback_' + Math.floor(Math.random() * 1000000);
+                    window[callbackName] = (data) => { delete window[callbackName]; const s = document.getElementById(callbackName); if(s) s.remove(); if(data && data.feed) resolve(data); else reject('Data Error'); };
+                    const script = document.createElement('script'); script.id = callbackName; script.src = `https://www.blogger.com/feeds/${id}/posts/default?alt=json-in-script&callback=${callbackName}`;
+                    script.onerror = () => { delete window[callbackName]; reject('Network Error'); };
+                    document.body.appendChild(script);
+                });
+            };
+
+            try {
+                const data = await fetchBloggerInfoJSONP(blogId);
+                const name = data.feed.title.$t; 
+                const url = data.feed.link.find(l => l.rel === 'alternate')?.href;
+                state.lastSearchResult = { blogid: blogId, blogname: name, blogurl: url };
+                
+                document.getElementById('result-name').innerText = name; 
+                document.getElementById('result-url').innerText = url;
+                document.getElementById('search-result-box').classList.remove('hidden'); 
+                loadingToast.close();
+                showUIMessage("✅ تم العثور على المدونة");
+            } catch (e) { 
+                loadingToast.close();
+                showUIMessage("❌ لم يتم العثور على المدونة، تأكد من المعرف", "error"); 
+            }
+        };
+
+        window.handleRegisterBlog = async () => {
+            if(!state.lastSearchResult) return;
+            if(state.blogs.length >= state.user.maxActivations) return showUIMessage("⚠️ عذراً، لقد تجاوزت الحد الأقصى للتراخيص المسموحة.", "error");
+            
+            const loadingToast = showUIMessage("🚀 جاري التحقق والتفعيل...", "loading");
+            const license = `PLUGO-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+            const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+
+            const payload = { 
+                action: 'add', 
+                ...state.lastSearchResult, 
+                licenseCode: license, 
+                userName: state.user.name, 
+                userEmail: session.email 
+            };
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await response.json();
+                loadingToast.close();
+
+                if (result.result === 'success') {
+                    showUIMessage("🎉 تم التفعيل بنجاح!");
+                    setTimeout(() => refreshUserData(session.email, session.password), 2000);
+                } else {
+                    showUIMessage(result.message || "❌ فشل التفعيل", "error");
+                }
+            } catch (e) { 
+                loadingToast.close();
+                showUIMessage("❌ فشل الاتصال بالخادم", "error"); 
+            }
+        };
+
+        window.handleDeleteBlog = async (blogid) => {
+            if(!confirm("هل أنت متأكد من رغبتك في إلغاء تفعيل هذه المدونة؟")) return;
+            const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+            const loadingToast = showUIMessage("🗑️ جاري معالجة طلب الإلغاء...", "loading");
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', blogid: blogid, userEmail: session.email }) });
+                const result = await response.json();
+                loadingToast.close();
+                
+                if(result.result === 'success') {
+                    showUIMessage("✅ تم إلغاء التفعيل بنجاح");
+                    setTimeout(() => refreshUserData(session.email, session.password), 1000);
+                } else {
+                    showUIMessage("❌ حدث خطأ أثناء الحذف", "error");
+                }
+            } catch (e) { 
+                loadingToast.close();
+                showUIMessage("❌ حدث خطأ أثناء محاولة الحذف", "error"); 
+            }
+        };
+
+        window.handleDownload = (link, version) => {
+            if (!link || link === '#') return showUIMessage("⚠️ عذراً، لا يوجد رابط تحميل حالياً.", "error");
+            showUIMessage(`📥 جاري فتح رابط تحميل الإصدار ${version}...`);
+            setTimeout(() => window.open(link, '_blank'), 1000);
+        };
+
+        window.copyToClipboard = (text) => {
+            const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); 
+            document.execCommand('copy'); document.body.removeChild(t); showUIMessage("📋 تم نسخ كود الترخيص!");
+        };
+
+        // UI Helpers
+        const toggleLoader = (show) => { document.getElementById('ui-loader').style.display = show ? 'flex' : 'none'; };
+        
+        const showUIMessage = (text, type = 'success', duration = 4000) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icons = { success: '<i data-lucide="check-circle" class="text-emerald-400"></i>', error: '<i data-lucide="alert-circle" class="text-red-400"></i>', loading: '<div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>' };
+            toast.className = 'toast-card';
+            toast.innerHTML = `${icons[type] || icons.success}<span class="font-black text-sm text-white">${text}</span>${type !== 'loading' ? '<div class="toast-progress"></div>' : ''}`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            if (type !== 'loading') {
+                const progress = toast.querySelector('.toast-progress');
+                progress.style.transition = `transform ${duration}ms linear`;
+                setTimeout(() => progress.style.transform = 'scaleX(0)', 10);
+                setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 400); }, duration);
+            }
+            return { close: () => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 400); } };
+        };
+
+        // Init
+        window.onload = () => {
+            const sessionData = localStorage.getItem('plugo_user_session');
+            if (sessionData) {
+                const session = JSON.parse(sessionData);
+                refreshUserData(session.email, session.password);
+            } else {
+                state.view = 'login';
+                renderApp();
+            }
+        };
+    </script>
+</body>
+</html>
