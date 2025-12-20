@@ -1,0 +1,2836 @@
+<!DOCTYPE html>
+<html data-theme='light' dir='rtl' lang='ar'>
+<head>
+<meta charset='UTF-8'/>
+<meta content='width=device-width, initial-scale=1.0' name='viewport'/>
+<title>SeoWriting - القالب والخدمات</title>
+
+<!-- مكتبات القالب -->
+<link href='https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700&display=swap' rel='stylesheet'/>
+<link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap' rel='stylesheet'/>
+<!-- تم تحديث Tailwind ليشمل دعم التخصيص المباشر -->
+<script src='https://cdn.tailwindcss.com'></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    primary: {
+                        50: '#eff6ff',
+                        100: '#dbeafe',
+                        500: '#3b82f6',
+                        600: '#2563eb',
+                        700: '#1d4ed8',
+                        900: '#1e3a8a',
+                    },
+                    glass: {
+                        100: 'rgba(255, 255, 255, 0.05)',
+                        200: 'rgba(255, 255, 255, 0.1)',
+                        300: 'rgba(255, 255, 255, 0.2)',
+                        border: 'rgba(255, 255, 255, 0.15)',
+                        dark: 'rgba(2, 6, 23, 0.7)'
+                    },
+                    gold: {
+                        400: '#fbbf24',
+                        500: '#f59e0b',
+                        glow: 'rgba(245, 158, 11, 0.3)'
+                    }
+                },
+                boxShadow: {
+                    'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
+                    'glass-hover': '0 25px 50px -12px rgba(31, 38, 135, 0.15)',
+                    'glow': '0 0 20px rgba(59, 130, 246, 0.5)',
+                    'inner-light': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.2)',
+                    'neon': '0 0 10px rgba(59, 130, 246, 0.7), 0 0 20px rgba(59, 130, 246, 0.5)'
+                },
+                backgroundImage: {
+                    'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2563eb 0deg, #a855f7 180deg, #2563eb 360deg)',
+                    'luxury-mesh': 'radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%)',
+                },
+                animation: {
+                    'spin-slow': 'spin 8s linear infinite',
+                    'float-slow': 'float 6s ease-in-out infinite',
+                    'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    'shine': 'shine 2s infinite',
+                    'spin-reverse': 'spin-reverse 6s linear infinite',
+                },
+                keyframes: {
+                    shine: {
+                        '0%': { transform: 'translateX(-100%)' },
+                        '100%': { transform: 'translateX(100%)' }
+                    },
+                    'spin-reverse': {
+                        '0%': { transform: 'rotate(360deg)' },
+                        '100%': { transform: 'rotate(0deg)' }
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script src='https://unpkg.com/lucide@latest'></script>
+
+<!-- مكتبة AOS للانتقالات -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<!-- مكتبة SwiperJS للسلايدر -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    /* =========================================
+       1. تحسينات المتغيرات والألوان (Contrast & Spacing)
+       ========================================= */
+    :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #64748b;
+        
+        /* Light Mode - High Contrast Text */
+        --bg-body: #f8fafc;
+        --bg-glass: rgba(255, 255, 255, 0.75); /* More opaque for readability */
+        --bg-glass-hover: rgba(255, 255, 255, 0.9);
+        --border-glass: rgba(255, 255, 255, 0.5);
+        --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        
+        --text-primary: #0f172a; /* Slate 900 - Very Dark */
+        --text-secondary: #475569; /* Slate 600 - Readable Grey */
+        --accent-glow: rgba(59, 130, 246, 0.2);
+        
+        --radius-xl: 2rem;
+    }
+
+    [data-theme='dark'] {
+        /* Dark Mode - High Contrast Text */
+        --bg-body: #020617; /* Slate 950 */
+        --bg-glass: rgba(15, 23, 42, 0.7); /* Slate 900 with opacity */
+        --bg-glass-hover: rgba(30, 41, 59, 0.8);
+        --border-glass: rgba(255, 255, 255, 0.1);
+        --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+        
+        --text-primary: #f1f5f9; /* Slate 100 - Very Light */
+        --text-secondary: #cbd5e1; /* Slate 300 - Readable Grey */
+        --accent-glow: rgba(59, 130, 246, 0.3);
+        
+        --bg-primary: #020617;
+        --bg-secondary: rgba(15, 23, 42, 0.7);
+        --bg-tertiary: rgba(15, 23, 42, 0.4);
+        --border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+        font-family: 'Tajawal', sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
+        position: relative;
+        line-height: 1.6; /* Improved line height for readability */
+    }
+    
+    /* خلفية جمالية (Blobs) */
+    .bg-blobs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .blob {
+        position: absolute;
+        filter: blur(100px);
+        opacity: 0.5;
+        animation: float 15s infinite alternate ease-in-out;
+        mix-blend-mode: screen;
+    }
+    [data-theme='dark'] .blob { mix-blend-mode: normal; opacity: 0.25; }
+
+    .blob-1 { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--accent-glow), transparent); }
+    .blob-2 { bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent); animation-delay: -7s; }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(40px, 60px) scale(1.1); }
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Luxury Glassmorphism Utilities - Refined Spacing */
+    .glass {
+        background: var(--bg-glass);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid var(--border-glass);
+        box-shadow: var(--shadow-glass), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+    }
+    
+    .glass-hover {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-hover:hover {
+        background: var(--bg-glass-hover);
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 15px var(--accent-glow);
+        border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* تنسيقات الهيدر */
+    .header-main {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border-bottom: 1px solid var(--border-glass);
+        transition: all 0.4s ease;
+    }
+    [data-theme='dark'] .header-main {
+        background: rgba(2, 6, 23, 0.8);
+    }
+
+    .nav-link {
+        color: var(--text-secondary);
+        font-weight: 600; /* Increased weight */
+        padding: 0.75rem 1.5rem; /* Wider padding */
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+    .nav-link:hover, .nav-link.active {
+        color: var(--primary-color);
+        background: rgba(59, 130, 246, 0.1);
+        font-weight: 700;
+    }
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: width 0.3s ease;
+        border-radius: 2px;
+    }
+    .nav-link:hover::after, .nav-link.active::after {
+        width: 70%;
+    }
+
+    /* =========================================
+       2. منطق التبديل (Views Logic)
+       ========================================= */
+    .view-section {
+        display: none;
+        animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        min-height: calc(100vh - 96px); /* Adjusted for taller header */
+    }
+
+    .view-section.active-view {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-restricted {
+        display: none;
+    }
+
+    /* =========================================
+       3. تنسيقات قسم الشرح التفاعلي (Tabs)
+       ========================================= */
+    .explainer-btn {
+        width: 100%;
+        text-align: right;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    .explainer-btn.active {
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
+        border-right: 4px solid var(--primary-color);
+        color: var(--primary-color);
+        transform: translateX(-8px);
+    }
+    .explainer-content-item {
+        display: none;
+        opacity: 0;
+        transform: translateY(15px);
+        transition: all 0.5s ease-out;
+        width: 100%;
+        height: 100%;
+    }
+    .explainer-content-item.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* =========================================
+       4. زر الصعود للأعلى (Scroll Top)
+       ========================================= */
+    #scrollTopBtn {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+        color: white;
+        cursor: pointer;
+        padding: 18px; /* Larger touch target */
+        border-radius: 50%;
+        box-shadow: 0 12px 35px rgba(79, 70, 229, 0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(30px);
+        backdrop-filter: blur(4px);
+    }
+    #scrollTopBtn.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    #scrollTopBtn:hover {
+        transform: translateY(-8px) rotate(360deg);
+        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.6);
+    }
+
+    /* =========================================
+       5. نافذة الإصدارات (Versions Modal)
+       ========================================= */
+    .version-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(2, 6, 23, 0.9); /* Darker for better focus */
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+    }
+    .version-modal-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+    .version-modal-content {
+        background: var(--bg-body); 
+        padding: 3rem; /* More spacing */
+        border-radius: 2.5rem;
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+        border: 1px solid var(--border-glass);
+        color: var(--text-primary);
+        background: linear-gradient(to bottom right, var(--bg-body), rgba(255,255,255,0.03));
+    }
+    .version-modal-overlay.open .version-modal-content {
+        transform: scale(1) translateY(0);
+    }
+
+    /* =========================================
+       6. تنسيقات منطقة العملاء (Plugo) - Redesigned Luxury
+       ========================================= */
+    #plugo-view {
+        width: 100%;
+        max-width: 95rem; /* Wider layout */
+        margin: 0 auto;
+        padding: 4rem 2rem; /* Increased padding */
+    }
+
+    .plugo-container {
+        /* Luxury Glassmorphism Container */
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 3rem; /* Rounder corners */
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        min-height: 750px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    [data-theme='dark'] .plugo-container {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+    }
+
+    .plugo-sidebar {
+        background: rgba(255, 255, 255, 0.4); 
+        border-left: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(15px);
+    }
+    [data-theme='dark'] .plugo-sidebar {
+        background: rgba(15, 23, 42, 0.5);
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Toast Notifications - Luxury Redesign */
+    #toast-container {
+        position: fixed;
+        top: 130px; /* Lower position */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 20px; /* More gap */
+        pointer-events: none;
+    }
+    .toast-card {
+        pointer-events: auto;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 25px rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(25px) saturate(200%);
+        -webkit-backdrop-filter: blur(25px) saturate(200%);
+        padding: 20px 32px; /* Bigger padding */
+        border-radius: 1.75rem;
+        display: flex; 
+        align-items: center; 
+        gap: 18px;
+        min-width: 350px;
+        animation: toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        transform-origin: top center;
+    }
+    [data-theme='dark'] .toast-card { 
+        background: rgba(15, 23, 42, 0.9); 
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    }
+    
+    /* Toast Styles */
+    .toast-card.success { border-right: 5px solid #10b981; }
+    .toast-card.error { border-right: 5px solid #ef4444; }
+    .toast-card.loading { border-right: 5px solid #3b82f6; }
+
+    @keyframes toastIn { 
+        from { opacity: 0; transform: translateY(-40px) scale(0.9); filter: blur(12px); } 
+        to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
+    }
+
+    /* Accordion Styles */
+    .accordion-content {
+        transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        background: rgba(0,0,0,0.02);
+    }
+    .accordion-content.open {
+        max-height: 200px;
+        opacity: 1;
+    }
+    .accordion-icon {
+        transition: transform 0.4s ease;
+    }
+    .accordion-btn[aria-expanded="true"] .accordion-icon {
+        transform: rotate(180deg);
+    }
+
+    /* =========================================
+       7. UI Enhancements (New Styles)
+       ========================================= */
+    
+    /* Toggle Switch */
+    .ui-toggle-btn {
+        background: rgba(0,0,0,0.05);
+        border: 1px solid var(--border-glass);
+        padding: 0.6rem;
+        border-radius: 999px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    .ui-toggle-btn:hover {
+        background: rgba(0,0,0,0.1);
+        transform: rotate(15deg);
+    }
+    [data-theme='dark'] .ui-toggle-btn {
+        background: rgba(255,255,255,0.1);
+    }
+    [data-theme='dark'] .ui-toggle-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    /* Mobile Menu Drawer - Enhanced */
+    .mobile-menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7); /* Darker overlay */
+        backdrop-filter: blur(10px);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s;
+    }
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        right: -340px; /* Hidden RTL - Wider */
+        width: 320px; /* Wider drawer */
+        height: 100%;
+        background: var(--bg-glass);
+        backdrop-filter: blur(35px) saturate(180%);
+        -webkit-backdrop-filter: blur(35px) saturate(180%);
+        border-left: 1px solid var(--border-glass);
+        z-index: 1000;
+        transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -30px 0 60px rgba(0,0,0,0.3);
+    }
+    .mobile-drawer.active {
+        right: 0;
+    }
+    /* LTR Support for Mobile Drawer */
+    html[dir="ltr"] .mobile-drawer {
+        right: auto;
+        left: -340px;
+        border-left: none;
+        border-right: 1px solid var(--border-glass);
+    }
+    html[dir="ltr"] .mobile-drawer.active {
+        left: 0;
+    }
+
+    /* General Typography Fixes for Dark Mode */
+    h1, h2, h3, h4, h5, h6 { 
+        color: var(--text-primary) !important; 
+        letter-spacing: -0.025em; 
+        line-height: 1.3;
+    }
+    p, span, li, div { color: inherit; }
+    
+    .glass-card {
+        background: var(--bg-glass);
+        border: 1px solid var(--border-glass);
+        box-shadow: var(--shadow-glass);
+    }
+
+    /* =========================================
+       8. [تعديل] تنسيقات Swiper والتعديلات الإضافية
+       ========================================= */
+    .swiper {
+        width: 100%;
+        padding-top: 80px; /* More spacing */
+        padding-bottom: 80px;
+    }
+    /* [تعديل] الصور بالعرض Landscape كما طلب العميل */
+    .swiper-slide {
+        background-position: center;
+        background-size: cover;
+        width: 700px; /* Wider */
+        height: 420px; /* Taller */
+        border-radius: 2.5rem;
+        overflow: hidden;
+        filter: blur(6px) opacity(0.6) grayscale(30%);
+        transform: scale(0.85);
+        transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        border: 1px solid var(--border-glass);
+    }
+    /* Responsive Adjustments for Swiper */
+    @media (max-width: 768px) {
+        .swiper-slide {
+            width: 320px;
+            height: 220px;
+        }
+    }
+    .swiper-slide-active {
+        filter: blur(0) opacity(1) grayscale(0%);
+        transform: scale(1);
+        z-index: 10;
+        box-shadow: 0 40px 80px -20px rgba(59, 130, 246, 0.4);
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+    .swiper-pagination-bullet {
+        background: var(--primary-color) !important;
+        width: 12px;
+        height: 12px;
+        transition: all 0.3s;
+    }
+    .swiper-pagination-bullet-active {
+        width: 36px;
+        border-radius: 6px;
+    }
+    
+    /* [إضافة جديدة] تنسيقات المودال الإضافي (الدفع) */
+    .payment-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 2000;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .payment-modal-overlay.open {
+        display: flex;
+        opacity: 1;
+    }
+    .payment-option-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-glass);
+        position: relative;
+        overflow: hidden;
+    }
+    .payment-option-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .payment-option-card:hover, .payment-option-card.selected {
+        border-color: var(--primary-color);
+        background: rgba(59, 130, 246, 0.05);
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+    }
+    .payment-option-card:hover::before { opacity: 1; }
+
+    /* Luxury Gradients & Text */
+    .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(135deg, var(--primary-color), #a855f7);
+    }
+    .bg-gradient-luxury {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 20px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.6); }
+
+    /* [جديد] تنسيقات منطقة الشرح (Documentation) */
+    .docs-sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border-radius: 14px;
+        color: var(--text-secondary);
+        transition: all 0.3s;
+        border: 1px solid transparent;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .docs-sidebar-link:hover, .docs-sidebar-link.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-color);
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+    .docs-content-pane {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+    .docs-content-pane.active {
+        display: block;
+    }
+
+</style>
+</head>
+<body class="selection:bg-blue-500 selection:text-white antialiased">
+
+    <!-- [إضافة جديدة] Global Loader (شاشة التحميل الاحترافية) -->
+    <div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 dark:bg-[#020617]/95 backdrop-blur-3xl transition-opacity duration-700 ease-out">
+        <div class="relative flex flex-col items-center">
+            <!-- Spinner Ring -->
+            <div class="absolute inset-0 -m-10 rounded-full border-4 border-transparent border-t-blue-600 border-r-indigo-600 animate-spin-slow opacity-80"></div>
+            <div class="absolute inset-0 -m-10 rounded-full border-4 border-transparent border-b-purple-500 border-l-cyan-500 animate-spin-reverse opacity-60"></div>
+            
+            <!-- Logo Container -->
+            <div class="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-6xl shadow-2xl shadow-blue-500/40 animate-pulse-slow relative z-10">
+                S
+            </div>
+            
+            <!-- Loading Text -->
+            <div class="mt-20 text-center">
+                <p class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 font-bold text-xl tracking-[0.4em] animate-pulse">SEOWRITING</p>
+                <div class="h-1.5 w-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mt-6 animate-shine"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Scroll To Top Button -->
+    <button onclick="scrollToTop()" id="scrollTopBtn" title="Go to top">
+        <i data-lucide="arrow-up" size="28"></i>
+    </button>
+
+    <!-- Versions Modal Popup -->
+    <div id="versionModal" class="version-modal-overlay">
+        <div class="version-modal-content glass ring-1 ring-white/10">
+            <button onclick="closeVersionModal()" class="absolute top-8 right-8 text-gray-400 hover:text-red-500 transition-colors p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full">
+                <i data-lucide="x" size="24"></i>
+            </button>
+            <div id="modalContent">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Drawer -->
+    <div class="mobile-menu-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="flex justify-between items-center mb-12">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 text-2xl">S</div>
+                <span class="font-bold text-3xl tracking-tight">SeoWriting</span>
+            </div>
+            <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-red-500 transition p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                <i data-lucide="x" size="28"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-4">
+            <button onclick="switchView('home'); toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 hover:bg-blue-50 dark:hover:bg-slate-800 p-4 rounded-3xl">
+                <i data-lucide="home" size="22" class="text-blue-500"></i> <span data-i18n="nav_home" class="text-xl">الرئيسية</span>
+            </button>
+            <a href="#features" onclick="toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 hover:bg-purple-50 dark:hover:bg-slate-800 p-4 rounded-3xl">
+                <i data-lucide="star" size="22" class="text-purple-500"></i> <span data-i18n="nav_features" class="text-xl">المميزات</span>
+            </a>
+            <a href="#versions" onclick="toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 hover:bg-emerald-50 dark:hover:bg-slate-800 p-4 rounded-3xl">
+                <i data-lucide="layers" size="22" class="text-emerald-500"></i> <span data-i18n="nav_versions" class="text-xl">الإصدارات</span>
+            </a>
+            <a href="#pricing" onclick="toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 hover:bg-orange-50 dark:hover:bg-slate-800 p-4 rounded-3xl">
+                <i data-lucide="credit-card" size="22" class="text-orange-500"></i> <span data-i18n="nav_pricing" class="text-xl">الباقات</span>
+            </a>
+            <div class="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-6"></div>
+            <button onclick="switchView('plugo'); toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 text-blue-600 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-3xl border border-blue-100 dark:border-blue-800">
+                <i data-lucide="user-circle" size="22"></i> <span data-i18n="nav_client" class="text-xl font-bold">منطقة العملاء</span>
+            </button>
+            <!-- [إضافة جديدة] زر الشرح في الموبايل -->
+            <button onclick="openDocs(); toggleMobileMenu()" class="nav-link w-full text-right flex items-center gap-5 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 p-4 rounded-3xl hidden" id="mobile-docs-btn">
+                <i data-lucide="book-open" size="22"></i> <span class="text-xl font-bold">الشرح والدروس</span>
+            </button>
+        </nav>
+        <div class="mt-auto flex gap-8 justify-center bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[2rem]">
+            <!-- Mobile Toggles -->
+            <button onclick="toggleTheme()" class="ui-toggle-btn w-14 h-14 rounded-full shadow-md bg-white dark:bg-slate-700">
+                <i data-lucide="moon" class="block dark:hidden text-slate-600" size="24"></i>
+                <i data-lucide="sun" class="hidden dark:block text-yellow-400" size="24"></i>
+            </button>
+            <button onclick="toggleLang()" class="ui-toggle-btn w-14 h-14 rounded-full shadow-md bg-white dark:bg-slate-700 font-bold text-base">
+                <span class="block rtl:hidden">AR</span>
+                <span class="hidden rtl:block">EN</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================
+         Header
+         ========================================= -->
+    <header class="header-main w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-24">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-5 cursor-pointer group" onclick="switchView('home')">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-3xl shadow-xl shadow-blue-600/20 group-hover:scale-110 group-hover:rotate-3 transition duration-500 ease-out border border-white/10">
+                        S
+                    </div>
+                    <span class="font-bold text-2xl tracking-tight text-[var(--text-primary)] group-hover:text-blue-600 transition-colors">SeoWriting</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-2">
+                    <div class="flex items-center bg-slate-100/50 dark:bg-slate-800/50 p-2 rounded-2xl backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 mx-6">
+                        <button onclick="switchView('home')" class="nav-link active" id="nav-home" data-i18n="nav_home">الرئيسية</button>
+                        
+                        <!-- روابط تظهر فقط بعد تسجيل الدخول -->
+                        <a href="#template-details" class="nav-link nav-restricted hover:text-blue-600" data-i18n="nav_about">عن القالب</a>
+                        <a href="#explainer" class="nav-link auth-restricted nav-restricted hover:text-purple-600" data-i18n="nav_tour">جولة تفاعلية</a>
+                        
+                        <a href="#features" class="nav-link hover:text-emerald-600" data-i18n="nav_features">المميزات</a>
+                        <a href="#versions" class="nav-link hover:text-orange-600" data-i18n="nav_versions">الإصدارات</a>
+                        <a href="#pricing" class="nav-link hover:text-pink-600" data-i18n="nav_pricing">الباقات</a>
+                    </div>
+                    
+                    <div class="h-10 w-px bg-gradient-to-b from-transparent via-slate-300 dark:via-slate-600 to-transparent mx-3"></div>
+
+                    <!-- UI Controls (Theme & Lang) -->
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleTheme()" class="ui-toggle-btn hover:bg-slate-100 dark:hover:bg-slate-800 transition-transform hover:scale-110" title="تبديل الوضع">
+                            <i data-lucide="moon" size="22" class="block dark:hidden text-slate-600"></i>
+                            <i data-lucide="sun" size="22" class="hidden dark:block text-yellow-400"></i>
+                        </button>
+                        <button onclick="toggleLang()" class="ui-toggle-btn w-12 h-12 font-bold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-transform hover:scale-110" title="Switch Language">
+                            <span id="lang-indicator">EN</span>
+                        </button>
+                    </div>
+
+                    <!-- [إضافة جديدة] زر الشرح يظهر فقط بعد الدخول -->
+                    <button onclick="openDocs()" id="desktop-docs-btn" class="hidden ml-6 nav-link flex items-center gap-3 text-purple-600 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 px-6 py-3 rounded-2xl transition-all border border-purple-200 dark:border-purple-800">
+                        <i data-lucide="book-open" size="20"></i>
+                        <span class="font-bold">الشرح</span>
+                    </button>
+
+                    <button onclick="switchView('plugo')" class="nav-link ml-4 flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 font-bold" id="nav-plugo">
+                        <i data-lucide="user-circle" size="20"></i>
+                        <span data-i18n="nav_client">منطقة العملاء</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex md:hidden gap-4">
+                     <!-- Mobile Theme Toggle Mini -->
+                     <button onclick="toggleTheme()" class="ui-toggle-btn">
+                        <i data-lucide="moon" size="24" class="block dark:hidden"></i>
+                        <i data-lucide="sun" size="24" class="hidden dark:block text-yellow-400"></i>
+                    </button>
+                    <button type="button" onclick="toggleMobileMenu()" class="bg-white dark:bg-slate-800 p-3 rounded-2xl text-gray-500 hover:text-blue-600 shadow-sm border border-slate-200 dark:border-slate-700 transition">
+                        <i data-lucide="menu" size="28"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================
+         VIEW 1: HOME PAGE (Full Landing Page)
+         ========================================= -->
+    <div id="home-view" class="view-section active-view">
+        
+        <!-- [إضافة جديدة] New Luxury Hero Section (فوق القديم كبديل فاخر) -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 md:pt-24 md:pb-32" data-aos="fade-down">
+            <div class="relative rounded-[3.5rem] overflow-hidden p-12 md:p-24 text-center border border-white/20 shadow-2xl group">
+                <!-- Dynamic Animated Background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-900 via-blue-900 to-black opacity-90 transition-all duration-700 group-hover:scale-105"></div>
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+                <div class="absolute -top-32 -left-32 w-[30rem] h-[30rem] bg-blue-500/30 rounded-full blur-[120px] animate-pulse-slow"></div>
+                <div class="absolute -bottom-32 -right-32 w-[30rem] h-[30rem] bg-purple-500/30 rounded-full blur-[120px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-200 mb-10 shadow-lg animate-bounce">
+                        <i data-lucide="sparkles" size="18" class="text-yellow-400"></i>
+                        <span class="text-base font-bold tracking-wide">تجربة تدوين استثنائية</span>
+                    </div>
+                    <h1 class="text-5xl md:text-8xl lg:text-9xl font-black text-white mb-10 tracking-tight leading-tight drop-shadow-xl">
+                        اكتشف مستقبل <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">التدوين الاحترافي</span>
+                    </h1>
+                    <p class="text-blue-100/90 text-lg md:text-2xl max-w-4xl mx-auto mb-14 leading-relaxed font-light">
+                        تصميم يجمع بين الفخامة والأداء العالي، مهيأ لتصدر محركات البحث وتحقيق أقصى استفادة من إعلاناتك بأسلوب عصري.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-8">
+                        <button onclick="document.getElementById('pricing').scrollIntoView()" class="relative group/btn overflow-hidden rounded-2xl bg-white text-blue-900 px-12 py-6 font-bold text-xl shadow-xl hover:shadow-white/20 transition-all transform hover:-translate-y-1">
+                            <span class="absolute inset-0 bg-gradient-to-r from-blue-50 to-white opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
+                            <span class="relative flex items-center gap-4">شراء القالب <i data-lucide="arrow-left" size="24"></i></span>
+                        </button>
+                        <button onclick="switchView('plugo')" class="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white px-12 py-6 font-bold text-xl hover:bg-white/20 transition-all flex items-center gap-4">
+                            <i data-lucide="user" size="24"></i> منطقة العملاء
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Old Hero Section -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24" data-aos="fade-up">
+            <div class="text-center py-20 md:py-32 glass rounded-[3.5rem] mb-20 relative overflow-hidden transition-all duration-500 border-t border-white/50 dark:border-white/10 shadow-xl shadow-blue-900/5">
+                
+                <!-- Hero Background Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-5xl mx-auto px-8">
+                    <span class="inline-flex items-center gap-3 py-2 px-6 rounded-full bg-blue-50/80 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 text-sm font-bold mb-10 border border-blue-200/50 backdrop-blur-md shadow-sm" data-i18n="hero_badge">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        الإصدار الجديد V2.0 متاح الآن 🚀
+                    </span>
+                    <h2 class="text-4xl md:text-7xl font-black mb-10 leading-tight tracking-tight text-[var(--text-primary)]">
+                        <span data-i18n="hero_title_1">قالب</span> <span class="text-gradient">SeoWriting</span> <br/> <span data-i18n="hero_title_2">الاحترافي للمدونين</span>
+                    </h2>
+                    <p class="text-[var(--text-secondary)] text-lg md:text-2xl mb-12 leading-relaxed max-w-3xl mx-auto font-light" data-i18n="hero_desc">
+                        الحل الأمثل لإنشاء مدونة متوافقة مع معايير السيو، سريعة، وتوفر تجربة مستخدم لا مثيل لها على الإطلاق.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- [تعديل] قسم سلايدر الصور - Enhanced Landscape -->
+        <section id="template-slider" class="py-24 md:py-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 md:mb-20" data-aos="fade-up">
+                    <h2 class="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-6">معرض صور القالب</h2>
+                    <p class="text-[var(--text-secondary)] text-xl max-w-2xl mx-auto">نظرة أقرب على تصميمات وأقسام القالب المختلفة</p>
+                </div>
+                <!-- Swiper -->
+                <div class="swiper mySwiper !pt-12 !pb-20" data-aos="zoom-in" data-aos-duration="1000">
+                    <div class="swiper-wrapper">
+                        <!-- Landscape Images updated -->
+                        <div class="swiper-slide glass ring-1 ring-white/20">
+                            <img src="https://placehold.co/800x500/3b82f6/ffffff?text=Homepage+Landscape" class="w-full h-full object-cover" alt="Slide 1">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 flex items-end p-8">
+                                <span class="text-white font-bold text-2xl">الصفحة الرئيسية</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide glass ring-1 ring-white/20">
+                            <img src="https://placehold.co/800x500/10b981/ffffff?text=Single+Post+Landscape" class="w-full h-full object-cover" alt="Slide 2">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 flex items-end p-8">
+                                <span class="text-white font-bold text-2xl">صفحة المقال</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide glass ring-1 ring-white/20">
+                            <img src="https://placehold.co/800x500/8b5cf6/ffffff?text=Dark+Mode+Landscape" class="w-full h-full object-cover" alt="Slide 3">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 flex items-end p-8">
+                                <span class="text-white font-bold text-2xl">الوضع المظلم</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide glass ring-1 ring-white/20">
+                            <img src="https://placehold.co/800x500/f59e0b/ffffff?text=Typography+Landscape" class="w-full h-full object-cover" alt="Slide 4">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 flex items-end p-8">
+                                <span class="text-white font-bold text-2xl">التنسيقات</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Template Details & Info Section (Auth Restricted) -->
+        <section id="template-details" class="py-32 overflow-hidden relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row gap-20 items-center">
+                    
+                    <!-- Right Side: Template Preview -->
+                    <div class="lg:w-1/2 w-full perspective-1000" data-aos="fade-left" data-aos-duration="1000">
+                        <div class="relative group transform transition-transform duration-700 hover:rotate-y-2">
+                            <!-- Laptop Frame Effect - Enhanced -->
+                            <div class="bg-slate-900 rounded-t-[2.5rem] p-5 pb-0 mx-auto max-w-[95%] shadow-2xl ring-4 ring-slate-800 ring-opacity-50">
+                                <div class="bg-slate-800 rounded-t-2xl p-3 flex justify-center gap-3 mb-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                                </div>
+                                <div class="relative overflow-hidden rounded-t-xl">
+                                    <img src="https://placehold.co/800x500/1e293b/ffffff?text=SeoWriting+V2.0+Preview" 
+                                         alt="معاينة القالب" 
+                                         class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-700 ease-in-out opacity-90 group-hover:opacity-100">
+                                    <div class="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg border border-white/20 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-pulse-slow">
+                                        <i data-lucide="zap" size="20" class="text-yellow-400"></i>
+                                        <span class="font-bold text-base tracking-wide">V2.0 PRO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 h-6 w-full rounded-b-3xl shadow-2xl mt-[-1px] max-w-[98%] mx-auto relative z-10"></div>
+                            <div class="absolute -bottom-12 left-1/2 -translate-x-1/2 w-[85%] h-12 bg-black/40 blur-3xl rounded-full pointer-events-none"></div>
+                            
+                            <div class="text-center mt-12">
+                                <h3 class="text-3xl font-bold text-[var(--text-primary)]" data-i18n="ui_title">واجهة عصرية بتجربة مستخدم مذهلة</h3>
+                                <p class="text-[var(--text-secondary)] mt-4 text-lg" data-i18n="ui_desc">متوافق تماماً مع جميع الأجهزة اللوحية والهواتف الذكية</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Left Side: Template Data Info -->
+                    <div class="lg:w-1/2 w-full" data-aos="fade-right" data-aos-duration="1000">
+                        <div class="glass p-12 rounded-[3rem] hover:shadow-glass-hover transition-all duration-500 border border-white/40 dark:border-white/5 relative overflow-hidden group">
+                            
+                            <!-- Decorative bg gradient inside card -->
+                            <div class="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none group-hover:bg-blue-500/20 transition-colors duration-500"></div>
+
+                            <div class="flex items-center gap-6 mb-12 border-b border-slate-200/50 dark:border-slate-700/50 pb-8 relative z-10">
+                                <div class="w-20 h-20 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-600 rounded-[1.5rem] flex items-center justify-center shadow-inner border border-white/50 dark:border-white/10">
+                                    <i data-lucide="database" size="36"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-4xl font-black text-[var(--text-primary)] tracking-tight" data-i18n="data_title">بيانات القالب</h3>
+                                    <p class="text-[var(--text-secondary)] text-base font-medium mt-2" data-i18n="data_desc">تفاصيل ومعلومات تقنية (خاص بالعملاء)</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-10 gap-x-12 relative z-10">
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="layout-template" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">المنصة</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">Blogger</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="tag" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">التصنيف</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">قالب مجلة / تقني</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="calendar" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">تاريخ الإطلاق</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">1 Jan 2024</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="languages" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">اللغة</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">العربية (مصر)</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="palette" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">تصميم وتكويد</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">Plugo Team</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="code-2" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">برمجة بلوجر</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">Ahmed Ali</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="git-branch" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">الإصدار الحالي</span>
+                                        <span class="inline-block bg-emerald-100/80 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-sm px-4 py-1.5 rounded-lg font-bold shadow-sm">V 2.0.1</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-5 group/item">
+                                    <div class="mt-1 text-slate-400 group-hover/item:text-blue-500 transition-colors"><i data-lucide="refresh-cw" size="24"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">آخر تحديث</span>
+                                        <span class="font-bold text-[var(--text-primary)] text-xl">May 2025</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 pt-10 border-t border-slate-200/50 dark:border-slate-700/50 flex flex-col sm:flex-row gap-6 relative z-10">
+                                <button class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-5 rounded-2xl font-bold hover:shadow-lg hover:shadow-blue-500/25 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg">
+                                    <i data-lucide="eye"></i> <span data-i18n="btn_preview">معاينة حية</span>
+                                </button>
+                                <button class="flex-1 bg-white dark:bg-slate-700 text-[var(--text-primary)] border border-slate-200 dark:border-slate-600 py-5 rounded-2xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg">
+                                    <i data-lucide="file-text"></i> <span data-i18n="btn_docs">شرح التركيب</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        
+        <!-- Login Prompt Section (Visible when not logged in) -->
+        <section id="login-prompt" class="py-24 text-center" data-aos="fade-up">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="glass rounded-[3rem] p-16 flex flex-col items-center gap-8 border border-blue-100/50 dark:border-blue-900/20 relative overflow-hidden">
+                     <div class="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))] pointer-events-none"></div>
+                    
+                    <div class="w-20 h-20 bg-gradient-to-tr from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-600 rounded-[1.5rem] flex items-center justify-center shadow-lg transform rotate-3 relative z-10">
+                        <i data-lucide="lock" size="40"></i>
+                    </div>
+                    <div class="relative z-10 max-w-2xl">
+                        <h3 class="text-3xl font-bold text-[var(--text-primary)] mb-4" data-i18n="lock_title">المحتوى التعليمي وشرح القالب حصري للعملاء</h3>
+                        <p class="text-[var(--text-secondary)] text-xl" data-i18n="lock_desc">لرؤية التفاصيل التقنية، شرح القالب، والجولة التفاعلية، يرجى تسجيل الدخول إلى منطقة العملاء أولاً.</p>
+                    </div>
+                    <button onclick="switchView('plugo')" class="text-blue-600 font-bold hover:text-blue-700 underline decoration-2 underline-offset-8 transition relative z-10 text-xl" data-i18n="btn_login_now">تسجيل الدخول الآن</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Explainer Section (Interactive Tabs) - Auth Restricted -->
+        <section id="explainer" class="py-32 overflow-hidden auth-restricted">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-24" data-aos="fade-up">
+                    <span class="text-blue-600 font-bold tracking-wider text-base uppercase mb-4 block animate-pulse" data-i18n="explore_title">اكتشف الإمكانيات</span>
+                    <h2 class="text-5xl md:text-6xl font-black text-[var(--text-primary)] mb-8" data-i18n="tour_title">جولة تفاعلية داخل القالب</h2>
+                    <p class="text-[var(--text-secondary)] text-xl max-w-3xl mx-auto" data-i18n="tour_desc">تنقل بين الخصائص وشاهد كيف يمكن لقالب SeoWriting أن يغير شكل ومضمون مدونتك.</p>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-12 glass rounded-[3rem] p-6 lg:p-8 shadow-2xl border border-white/40 dark:border-white/5" data-aos="zoom-in" data-aos-duration="800">
+                    
+                    <!-- Sidebar Navigation -->
+                    <div class="lg:w-1/3 flex flex-col gap-4 p-6">
+                        <button onclick="switchExplainer('control-panel', this)" class="explainer-btn active flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
+                            <div class="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
+                                <i data-lucide="sliders-horizontal" size="28"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-blue-600 transition-colors" data-i18n="cp_title">لوحة التحكم</h4>
+                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="cp_sub">تخصيص شامل بلا أكواد</p>
+                            </div>
+                        </button>
+
+                        <button onclick="switchExplainer('seo-feature', this)" class="explainer-btn flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
+                            <div class="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
+                                <i data-lucide="search" size="28"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-purple-600 transition-colors" data-i18n="seo_title">أدوات السيو</h4>
+                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="seo_sub">تصدر نتائج البحث الأولى</p>
+                            </div>
+                        </button>
+
+                        <button onclick="switchExplainer('ads-system', this)" class="explainer-btn flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
+                            <div class="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
+                                <i data-lucide="dollar-sign" size="28"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-emerald-600 transition-colors" data-i18n="ads_title">نظام الإعلانات</h4>
+                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="ads_sub">أماكن مخصصة لزيادة الأرباح</p>
+                            </div>
+                        </button>
+
+                        <button onclick="switchExplainer('dark-mode', this)" class="explainer-btn flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
+                                <i data-lucide="moon" size="28"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-slate-600 transition-colors" data-i18n="dark_title">الوضع الليلي</h4>
+                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="dark_sub">راحة للعين وتصميم أنيق</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Content Display Area -->
+                    <div class="lg:w-2/3 bg-white/60 dark:bg-slate-800/60 rounded-[2.5rem] p-3 border border-white/50 dark:border-slate-700 shadow-inner relative overflow-hidden min-h-[550px]">
+                        
+                        <!-- Content 1: Control Panel -->
+                        <div id="control-panel" class="explainer-content-item active">
+                            <div class="h-full flex flex-col">
+                                <div class="relative h-80 overflow-hidden rounded-3xl m-4 bg-slate-100 border border-slate-200 group">
+                                    <img src="https://placehold.co/800x400/2563eb/ffffff?text=Advanced+Control+Panel+UI" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="لوحة التحكم">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                </div>
+                                <div class="p-12 flex-grow flex flex-col justify-center">
+                                    <h3 class="text-4xl font-black text-[var(--text-primary)] mb-5">تحكم في كل بكسل بضغطة زر</h3>
+                                    <p class="text-[var(--text-secondary)] text-xl leading-relaxed mb-10">
+                                        تتيح لك لوحة التحكم المتقدمة تغيير نوع وحجم الخطوط، ألوان الموقع بالكامل، وترتيب عناصر الصفحة الرئيسية بالسحب والإفلات. لا حاجة لخبرة برمجية، أنت المطور الآن.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content 2: SEO -->
+                        <div id="seo-feature" class="explainer-content-item">
+                            <div class="h-full flex flex-col">
+                                <div class="relative h-80 overflow-hidden rounded-3xl m-4 bg-slate-100 border border-slate-200 group">
+                                    <img src="https://placehold.co/800x400/9333ea/ffffff?text=SEO+Optimization+Tools" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="السيو">
+                                </div>
+                                <div class="p-12 flex-grow flex flex-col justify-center">
+                                    <h3 class="text-4xl font-black text-[var(--text-primary)] mb-5">صديق لمحركات البحث منذ اللحظة الأولى</h3>
+                                    <p class="text-[var(--text-secondary)] text-xl leading-relaxed mb-10">
+                                        تم بناء القالب بأحدث معايير التكويد النظيف (Clean Code) مع دعم كامل لأكواد Schema.org والعلامات الوصفية (Meta Tags) لضمان ظهور مقالاتك بشكل مميز في نتائج البحث.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content 3: Ads -->
+                        <div id="ads-system" class="explainer-content-item">
+                            <div class="h-full flex flex-col">
+                                <div class="relative h-80 overflow-hidden rounded-3xl m-4 bg-slate-100 border border-slate-200 group">
+                                    <img src="https://placehold.co/800x400/059669/ffffff?text=Smart+Ads+Placement" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="الإعلانات">
+                                </div>
+                                <div class="p-12 flex-grow flex flex-col justify-center">
+                                    <h3 class="text-4xl font-black text-[var(--text-primary)] mb-5">ضاعف أرباحك بذكاء</h3>
+                                    <p class="text-[var(--text-secondary)] text-xl leading-relaxed mb-10">
+                                        يحتوي القالب على أكثر من 10 أماكن إعلانية مدروسة بعناية (داخل المقال، في الهيدر، السايدبار) لضمان أعلى نسبة مشاهدة ونقر، دون التأثير على تجربة المستخدم.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content 4: Dark Mode -->
+                        <div id="dark-mode" class="explainer-content-item">
+                            <div class="h-full flex flex-col">
+                                <div class="relative h-80 overflow-hidden rounded-3xl m-4 bg-slate-900 border border-slate-800 group">
+                                    <img src="https://placehold.co/800x400/0f172a/ffffff?text=Dark+Mode+UI+Design" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="الوضع الليلي">
+                                </div>
+                                <div class="p-12 flex-grow flex flex-col justify-center">
+                                    <h3 class="text-4xl font-black text-[var(--text-primary)] mb-5">وضع ليلي مريح وأنيق</h3>
+                                    <p class="text-[var(--text-secondary)] text-xl leading-relaxed mb-10">
+                                        بضغطة زر واحدة يتحول موقعك بالكامل إلى تصميم داكن مريح للعين، مع إمكانية ضبطه ليعمل تلقائياً حسب إعدادات جهاز الزائر. الألوان مضبوطة لتعطي فخامة ووضوح.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid Section -->
+        <section id="features" class="py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-24" data-aos="fade-up">
+                    <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6" data-i18n="feat_head">مميزات إضافية</h2>
+                    <p class="text-[var(--text-secondary)] max-w-2xl mx-auto text-xl" data-i18n="feat_desc">كل ما تحتاجه للنجاح موجود هنا.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <!-- Feature 1 -->
+                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="100">
+                        <div class="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-blue-500/50 group-hover:scale-110">
+                            <i data-lucide="zap" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f1_title">سرعة تحميل فائقة</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f1_desc">أكواد نظيفة ومضغوطة تضمن تحميل مدونتك في أجزاء من الثانية.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-20 h-20 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-purple-500/50 group-hover:scale-110">
+                            <i data-lucide="search" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f2_title">صديق لمحركات البحث</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f2_desc">هيكلية البيانات (Schema) مدمجة بشكل صحيح.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="300">
+                        <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-emerald-500/50 group-hover:scale-110">
+                            <i data-lucide="layout" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f3_title">تصميم متجاوب</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f3_desc">يظهر القالب بشكل مثالي على جميع الأجهزة.</p>
+                    </div>
+                     <!-- Feature 4 -->
+                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="400">
+                        <div class="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 text-orange-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-orange-500/50 group-hover:scale-110">
+                            <i data-lucide="moon" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f4_title">وضع مظلم ذكي</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f4_desc">دعم كامل للوضع المظلم يريح عين القارئ.</p>
+                    </div>
+                     <!-- Feature 5 -->
+                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="500">
+                        <div class="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-pink-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-pink-500/50 group-hover:scale-110">
+                            <i data-lucide="settings" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f5_title">لوحة تحكم قوية</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f5_desc">تخصيص الألوان، الخطوط، والأقسام بسهولة تامة.</p>
+                    </div>
+                     <!-- Feature 6 -->
+                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="600">
+                        <div class="w-20 h-20 bg-sky-100 dark:bg-sky-900/30 text-sky-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-sky-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-sky-500/50 group-hover:scale-110">
+                            <i data-lucide="headphones" size="40"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f6_title">دعم فني متميز</h3>
+                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f6_desc">فريق دعم فني جاهز للإجابة على استفساراتك.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Versions Section (Popup) - Redesigned -->
+        <section id="versions" class="py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-24" data-aos="fade-up">
+                    <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6" data-i18n="ver_head">إصدارات القالب</h2>
+                    <p class="text-[var(--text-secondary)] max-w-2xl mx-auto text-xl" data-i18n="ver_desc">تطور مستمر لتلبية كافة الاحتياجات.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    <!-- Version 1 Card -->
+                    <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-2xl hover:-translate-y-2 transition duration-500 cursor-pointer group border border-white/50 dark:border-white/5" onclick="openVersionModal('v1')" data-aos="fade-up">
+                        <div class="h-56 bg-blue-50/50 dark:bg-slate-700/50 rounded-3xl mb-8 flex items-center justify-center border border-dashed border-blue-200 dark:border-slate-600 group-hover:border-solid transition-all">
+                            <span class="text-6xl font-black text-blue-200 dark:text-blue-500/30 group-hover:text-blue-500 transition-colors">V1.0</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-[var(--text-primary)] mb-4">الإصدار الأول</h3>
+                        <p class="text-lg text-[var(--text-secondary)] mb-8">النسخة الأساسية المستقرة.</p>
+                        <span class="text-blue-600 text-base font-bold flex items-center gap-3 group-hover:gap-5 transition-all">اضغط للتفاصيل <i data-lucide="arrow-left" size="20"></i></span>
+                    </div>
+
+                    <!-- Version 2 Card -->
+                    <div class="glass-card p-10 rounded-[2.5rem] border-blue-200 dark:border-blue-900 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 transition duration-500 cursor-pointer relative overflow-hidden group" onclick="openVersionModal('v2')" data-aos="fade-up" data-aos-delay="100">
+                        <div class="absolute top-0 left-0 bg-gradient-to-br from-blue-600 to-indigo-600 text-white text-sm px-6 py-2 rounded-br-3xl font-bold z-10 shadow-lg">الأحدث</div>
+                        <div class="h-56 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-8 flex items-center justify-center shadow-inner relative overflow-hidden">
+                             <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <span class="text-6xl font-black text-white/50 group-hover:text-white/80 transition-colors">V2.0</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-[var(--text-primary)] mb-4">الإصدار الثاني</h3>
+                        <p class="text-lg text-[var(--text-secondary)] mb-8">تحسينات شاملة في السرعة والسيو.</p>
+                        <span class="text-blue-600 text-base font-bold flex items-center gap-3 group-hover:gap-5 transition-all">اضغط للتفاصيل <i data-lucide="arrow-left" size="20"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section (Animated Counter) - Enhanced -->
+        <section id="stats" class="py-32 bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-2xl relative overflow-hidden" data-aos="fade-in">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-16 text-center divide-x divide-white/10 divide-x-reverse">
+                    <div class="group">
+                        <h4 class="text-6xl font-black mb-4 counter group-hover:scale-110 transition-transform" data-target="5000">0</h4>
+                        <p class="text-blue-100 text-lg font-medium uppercase tracking-widest opacity-80" data-i18n="stat_happy">عميل سعيد</p>
+                    </div>
+                    <div class="group">
+                        <h4 class="text-6xl font-black mb-4 counter group-hover:scale-110 transition-transform" data-target="120">0</h4>
+                        <p class="text-blue-100 text-lg font-medium uppercase tracking-widest opacity-80" data-i18n="stat_update">تحديث مستمر</p>
+                    </div>
+                    <div class="group">
+                        <h4 class="text-6xl font-black mb-4 counter group-hover:scale-110 transition-transform" data-target="99">0</h4>
+                        <p class="text-blue-100 text-lg font-medium uppercase tracking-widest opacity-80" data-i18n="stat_satisfy">نسبة الرضا %</p>
+                    </div>
+                    <div class="group">
+                        <h4 class="text-6xl font-black mb-4 group-hover:scale-110 transition-transform">24/7</h4>
+                        <p class="text-blue-100 text-lg font-medium uppercase tracking-widest opacity-80" data-i18n="stat_support">دعم فني</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section - Luxury Cards -->
+        <section id="pricing" class="py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-24" data-aos="fade-up">
+                    <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6" data-i18n="price_head">اختر الخطة المناسبة لك</h2>
+                    <p class="text-[var(--text-secondary)] text-xl" data-i18n="price_desc">نوفر لك خيارات مرنة تناسب احتياجاتك وميزانيتك.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                    <!-- Basic Plan -->
+                    <div class="glass-card rounded-[3rem] p-12 shadow-sm hover:shadow-xl transition duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-3xl font-bold text-[var(--text-primary)] mb-3" data-i18n="plan_free">النسخة المجانية</h3>
+                        <p class="text-[var(--text-secondary)] text-base mb-10">للبدايات البسيطة والتجربة</p>
+                        <div class="text-6xl font-black text-[var(--text-primary)] mb-10">0$</div>
+                        <ul class="space-y-6 mb-12">
+                            <li class="flex items-center gap-4 text-base text-[var(--text-secondary)]"><i data-lucide="check" class="text-green-500" size="20"></i> تصميم أساسي</li>
+                            <li class="flex items-center gap-4 text-base text-[var(--text-secondary)]"><i data-lucide="check" class="text-green-500" size="20"></i> متجاوب مع الجوال</li>
+                        </ul>
+                        <button onclick="openPaymentModal('النسخة المجانية')" class="w-full py-5 rounded-2xl border-2 border-blue-600 text-blue-600 font-bold hover:bg-blue-600 hover:text-white transition-all duration-300 text-lg">تحميل مجاني</button>
+                    </div>
+
+                    <!-- Pro Plan (Featured) -->
+                    <div class="bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-[3rem] p-12 border border-slate-700 shadow-2xl relative transform scale-105 z-10 hover:shadow-blue-500/20 transition duration-500" data-aos="fade-up" data-aos-delay="200">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest shadow-lg">الأكثر مبيعاً</div>
+                        <h3 class="text-3xl font-bold text-white mb-3" data-i18n="plan_pro">النسخة الكاملة</h3>
+                        <p class="text-slate-400 text-base mb-10">للمحترفين وأصحاب المواقع</p>
+                        <div class="text-7xl font-black text-white mb-10 tracking-tight">10$</div>
+                        <ul class="space-y-6 mb-12">
+                            <li class="flex items-center gap-4 text-base text-slate-300"><i data-lucide="check" class="text-blue-400" size="20"></i> جميع المميزات</li>
+                            <li class="flex items-center gap-4 text-base text-slate-300"><i data-lucide="check" class="text-blue-400" size="20"></i> إزالة الحقوق</li>
+                            <li class="flex items-center gap-4 text-base text-slate-300"><i data-lucide="check" class="text-blue-400" size="20"></i> دعم فني متميز</li>
+                        </ul>
+                        <button onclick="openPaymentModal('النسخة الكاملة')" class="w-full py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:shadow-lg hover:shadow-blue-600/40 transition-all duration-300 transform hover:-translate-y-1 text-lg">شراء الآن</button>
+                    </div>
+
+                    <!-- Developer Plan -->
+                    <div class="glass-card rounded-[3rem] p-12 shadow-sm hover:shadow-xl transition duration-500 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-3xl font-bold text-[var(--text-primary)] mb-3" data-i18n="plan_dev">رخصة المطور</h3>
+                        <p class="text-[var(--text-secondary)] text-base mb-10">للاستخدام في مواقع متعددة</p>
+                        <div class="text-6xl font-black text-[var(--text-primary)] mb-10">25$</div>
+                        <ul class="space-y-6 mb-12">
+                            <li class="flex items-center gap-4 text-base text-[var(--text-secondary)]"><i data-lucide="check" class="text-green-500" size="20"></i> استخدام غير محدود</li>
+                            <li class="flex items-center gap-4 text-base text-[var(--text-secondary)]"><i data-lucide="check" class="text-green-500" size="20"></i> حقوق المطور</li>
+                        </ul>
+                        <button onclick="openPaymentModal('رخصة المطور')" class="w-full py-5 rounded-2xl border-2 border-slate-300 dark:border-slate-600 text-[var(--text-primary)] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-300 text-lg">تواصل معنا</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- [إضافة جديدة] قسم آراء العملاء - Enhanced -->
+        <section id="testimonials" class="py-32 bg-gradient-to-b from-blue-50/30 to-white/0 dark:from-slate-900/30 dark:to-slate-950/0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-24" data-aos="fade-up">
+                    <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6">ماذا يقول عملاؤنا</h2>
+                    <p class="text-[var(--text-secondary)] text-xl">نفتخر بثقة أكثر من 5000 عميل.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Review 1 -->
+                    <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-glass-hover transition duration-500" data-aos="fade-up">
+                        <div class="flex items-center gap-5 mb-8">
+                            <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Ahmed+Ali&background=3b82f6&color=fff" class="w-16 h-16 rounded-full shadow-md ring-4 ring-white dark:ring-slate-700">
+                                <div class="absolute -bottom-1 -right-1 bg-blue-500 text-white rounded-full p-1.5"><i data-lucide="quote" size="12"></i></div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-xl">أحمد علي</h4>
+                                <div class="flex text-yellow-400 text-sm mt-1 gap-0.5"><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i></div>
+                            </div>
+                        </div>
+                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed italic">"قالب ممتاز جداً، الدعم الفني سريع ومتجاوب، وسرعة الموقع تحسنت بشكل ملحوظ بعد التركيب."</p>
+                    </div>
+                     <!-- Review 2 -->
+                     <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-glass-hover transition duration-500" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center gap-5 mb-8">
+                             <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Sarah+M&background=ec4899&color=fff" class="w-16 h-16 rounded-full shadow-md ring-4 ring-white dark:ring-slate-700">
+                                <div class="absolute -bottom-1 -right-1 bg-pink-500 text-white rounded-full p-1.5"><i data-lucide="quote" size="12"></i></div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-[var(--text-primary)] text-xl">سارة محمد</h4>
+                                <div class="flex text-yellow-400 text-sm mt-1 gap-0.5"><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i></div>
+                            </div>
+                        </div>
+                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed italic">"التصميم أنيق جداً والوضع الليلي مريح للعين. لوحة التحكم سهلت علي الكثير من الوقت."</p>
+                    </div>
+                     <!-- Review 3 -->
+                     <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-glass-hover transition duration-500" data-aos="fade-up" data-aos-delay="200">
+                         <div class="relative">
+                            <div class="flex items-center gap-5 mb-8">
+                                <div class="relative">
+                                    <img src="https://ui-avatars.com/api/?name=Omar+K&background=10b981&color=fff" class="w-16 h-16 rounded-full shadow-md ring-4 ring-white dark:ring-slate-700">
+                                    <div class="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-1.5"><i data-lucide="quote" size="12"></i></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-[var(--text-primary)] text-xl">عمر خالد</h4>
+                                    <div class="flex text-yellow-400 text-sm mt-1 gap-0.5"><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i><i data-lucide="star" size="14" fill="currentColor"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed italic">"أفضل استثمار لمدونتي التقنية. أنصح به بشدة لأي شخص يريد بداية احترافية."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer - Luxury Dark -->
+        <footer class="bg-[#020617] text-slate-300 py-32 border-t border-slate-800 relative overflow-hidden">
+             <!-- Decorative glowing blobs in footer -->
+             <div class="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-blue-900/20 rounded-full blur-[100px] -ml-20 -mb-20 pointer-events-none"></div>
+             <div class="absolute top-0 right-0 w-[40rem] h-[40rem] bg-purple-900/20 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-5 mb-8">
+                             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl">S</div>
+                            <span class="font-bold text-3xl text-white tracking-tight">SeoWriting</span>
+                        </div>
+                        <p class="text-lg text-slate-400 max-w-md leading-relaxed" data-i18n="footer_desc">
+                            نحن نقدم أفضل الحلول الرقمية للمدونين وصناع المحتوى. هدفنا هو تبسيط عملية التدوين وجعلها أكثر احترافية.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold mb-8 text-xl">روابط سريعة</h4>
+                        <ul class="space-y-5 text-lg">
+                            <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3 group"><i data-lucide="chevron-left" size="18" class="opacity-0 group-hover:opacity-100 transition-opacity"></i> <span data-i18n="nav_home">الرئيسية</span></a></li>
+                            <li><a href="#features" class="hover:text-blue-400 transition flex items-center gap-3 group"><i data-lucide="chevron-left" size="18" class="opacity-0 group-hover:opacity-100 transition-opacity"></i> <span data-i18n="nav_features">المميزات</span></a></li>
+                            <li><a href="#pricing" class="hover:text-blue-400 transition flex items-center gap-3 group"><i data-lucide="chevron-left" size="18" class="opacity-0 group-hover:opacity-100 transition-opacity"></i> <span data-i18n="nav_pricing">الأسعار</span></a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold mb-8 text-xl">تواصل معنا</h4>
+                        <ul class="space-y-5 text-lg">
+                            <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3"><i data-lucide="mail" size="20"></i> support@seowriting.com</a></li>
+                            <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3"><i data-lucide="twitter" size="20"></i> Twitter</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-slate-800 pt-12 text-center text-base text-slate-500 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <p>&copy; 2025 SeoWriting. جميع الحقوق محفوظة.</p>
+                    <p class="flex items-center gap-3">تم التصميم والتطوير بواسطة <span class="text-slate-200 font-bold bg-slate-800 px-4 py-1.5 rounded-xl">Plugo Team</span></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- =========================================
+         VIEW 2: PLUGO CLIENT AREA (Embedded)
+         ========================================= -->
+    <div id="plugo-view" class="view-section">
+        
+        <!-- عنوان القسم وزر عودة اختياري - Redesigned Luxury -->
+        <div class="flex justify-between items-center mb-16 px-4 max-w-7xl mx-auto">
+            <div>
+                <h2 class="text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4" data-i18n="client_area">منطقة العملاء</h2>
+                <p class="text-[var(--text-secondary)] text-xl font-light flex items-center gap-3" data-i18n="client_desc"><span class="w-10 h-1 bg-blue-500 block rounded-full"></span> إدارة حسابك وتراخيصك بسهولة</p>
+            </div>
+            <button onclick="switchView('home')" class="group text-[var(--text-secondary)] hover:text-white flex items-center gap-4 text-base font-bold bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 px-8 py-4 rounded-full transition-all duration-300 hover:bg-blue-600 hover:border-blue-600 hover:shadow-lg hover:shadow-blue-500/30 backdrop-blur-md">
+                <i data-lucide="arrow-right" class="group-hover:-translate-x-1 transition-transform"></i>
+                <span data-i18n="btn_back">عودة للرئيسية</span>
+            </button>
+        </div>
+
+        <!-- حاوية التطبيق -->
+        <div class="plugo-container">
+            <div id="app" class="w-full h-full flex flex-col relative min-h-[700px]">
+                <!-- سيتم حقن واجهة Plugo هنا -->
+            </div>
+            
+            <!-- Loader - Luxury Redesign -->
+            <div id="ui-loader" class="absolute inset-0 bg-white/60 dark:bg-slate-950/60 z-[50] hidden items-center justify-center backdrop-blur-xl rounded-[2.5rem]">
+                <div class="flex flex-col items-center gap-8">
+                    <div class="relative w-20 h-20">
+                         <div class="absolute inset-0 rounded-full border-[6px] border-slate-200/50 dark:border-slate-800/50"></div>
+                         <div class="absolute inset-0 rounded-full border-[6px] border-blue-600 border-t-transparent animate-spin"></div>
+                         <div class="absolute inset-0 flex items-center justify-center">
+                             <div class="w-3 h-3 bg-blue-600 rounded-full animate-pulse"></div>
+                         </div>
+                    </div>
+                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-[0.2em] uppercase animate-pulse">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =========================================
+         VIEW 3: DOCUMENTATION & TUTORIALS (NEW EXCLUSIVE FEATURE)
+         ========================================= -->
+    <div id="docs-view" class="view-section">
+        
+        <div class="flex flex-col h-screen overflow-hidden bg-[var(--bg-body)]">
+            <!-- Docs Header -->
+            <header class="flex items-center justify-between px-6 sm:px-10 py-5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-[var(--border-glass)] z-20">
+                <div class="flex items-center gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30">Docs</div>
+                    <div>
+                        <h2 class="font-bold text-xl text-[var(--text-primary)]">مركز التعليم والشرح</h2>
+                        <span class="text-xs text-purple-600 font-bold bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full hidden sm:inline-block">خاص بالعملاء</span>
+                    </div>
+                    
+                    <!-- [إضافة جديدة] زر قائمة الهاتف -->
+                    <button onclick="toggleDocsMenu()" class="md:hidden flex items-center gap-3 text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-4 py-2.5 rounded-2xl font-bold text-sm border border-purple-100 dark:border-purple-800 shadow-sm mr-auto ml-2">
+                        <i data-lucide="list"></i> <span class="hidden sm:inline">قائمة الدروس</span>
+                    </button>
+                </div>
+                <button onclick="switchView('home')" class="text-[var(--text-secondary)] hover:text-red-500 transition flex items-center gap-3 text-base font-bold px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10">
+                    <i data-lucide="x" size="24"></i> <span class="hidden sm:inline">إغلاق</span>
+                </button>
+            </header>
+
+            <div class="flex flex-grow overflow-hidden relative">
+                <!-- Sidebar (Desktop) -->
+                <aside class="w-80 hidden md:flex flex-col border-l border-[var(--border-glass)] bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm p-8 overflow-y-auto">
+                    <nav class="space-y-3">
+                        <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-2 px-3 opacity-70">البداية</div>
+                        <button onclick="switchDocs('intro')" class="docs-sidebar-link active w-full" id="link-intro">
+                            <i data-lucide="flag" size="20"></i> مقدمة عامة
+                        </button>
+                        <button onclick="switchDocs('install')" class="docs-sidebar-link w-full" id="link-install">
+                            <i data-lucide="download-cloud" size="20"></i> التثبيت والتفعيل
+                        </button>
+                        
+                        <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-10 px-3 opacity-70">التخصيص</div>
+                        <button onclick="switchDocs('colors')" class="docs-sidebar-link w-full" id="link-colors">
+                            <i data-lucide="palette" size="20"></i> الألوان والخطوط
+                        </button>
+                        <button onclick="switchDocs('layout')" class="docs-sidebar-link w-full" id="link-layout">
+                            <i data-lucide="layout" size="20"></i> تخطيط الصفحة
+                        </button>
+
+                        <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-10 px-3 opacity-70">تحسين المحركات</div>
+                        <button onclick="switchDocs('seo')" class="docs-sidebar-link w-full" id="link-seo">
+                            <i data-lucide="search" size="20"></i> إعدادات السيو (SEO)
+                        </button>
+                    </nav>
+                </aside>
+
+                <!-- [إضافة جديدة] Mobile Sidebar (Drawer) -->
+                <div id="docs-mobile-menu" class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 md:hidden">
+                    <!-- Overlay -->
+                    <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="toggleDocsMenu()"></div>
+                    <!-- Menu Content (Right Side) -->
+                    <div class="absolute top-0 right-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-l border-white/20 shadow-2xl p-8 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-10 border-b border-gray-100 dark:border-gray-800 pb-6">
+                            <h3 class="font-bold text-xl text-[var(--text-primary)] flex items-center gap-3">
+                                <i data-lucide="book" class="text-purple-600"></i> محتوى الشرح
+                            </h3>
+                            <button onclick="toggleDocsMenu()" class="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-gray-500 hover:text-red-500 transition-colors">
+                                <i data-lucide="x" size="24"></i>
+                            </button>
+                        </div>
+                        <nav class="space-y-3">
+                            <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-2 px-3 opacity-70">البداية</div>
+                            <button onclick="switchDocs('intro'); toggleDocsMenu()" class="docs-sidebar-link w-full active">
+                                <i data-lucide="flag" size="20"></i> مقدمة عامة
+                            </button>
+                            <button onclick="switchDocs('install'); toggleDocsMenu()" class="docs-sidebar-link w-full">
+                                <i data-lucide="download-cloud" size="20"></i> التثبيت والتفعيل
+                            </button>
+                            
+                            <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-10 px-3 opacity-70">التخصيص</div>
+                            <button onclick="switchDocs('colors'); toggleDocsMenu()" class="docs-sidebar-link w-full">
+                                <i data-lucide="palette" size="20"></i> الألوان والخطوط
+                            </button>
+                            <button onclick="switchDocs('layout'); toggleDocsMenu()" class="docs-sidebar-link w-full">
+                                <i data-lucide="layout" size="20"></i> تخطيط الصفحة
+                            </button>
+
+                            <div class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-6 mt-10 px-3 opacity-70">تحسين المحركات</div>
+                            <button onclick="switchDocs('seo'); toggleDocsMenu()" class="docs-sidebar-link w-full">
+                                <i data-lucide="search" size="20"></i> إعدادات السيو (SEO)
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <main class="flex-grow overflow-y-auto p-8 md:p-16 relative">
+                    <div class="max-w-5xl mx-auto pb-32">
+                        
+                        <!-- Intro Content -->
+                        <div id="doc-intro" class="docs-content-pane active">
+                            <h1 class="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-8">مرحباً بك في SeoWriting V2.0</h1>
+                            <p class="text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed mb-12">
+                                شكراً لثقتك بنا. هذا القالب تم تصميمه بعناية فائقة ليمنحك أفضل أداء ممكن مع مظهر جمالي لا يضاهى. في هذا القسم ستجد كل ما تحتاجه للبدء.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                                <div class="glass p-8 rounded-[2rem] border-purple-200 dark:border-purple-900/50">
+                                    <i data-lucide="zap" class="text-purple-500 mb-6" size="40"></i>
+                                    <h3 class="font-bold text-2xl mb-3 text-[var(--text-primary)]">أداء عالي</h3>
+                                    <p class="text-base text-[var(--text-secondary)] leading-relaxed">أكواد محسنة لسرعة تحميل خيالية.</p>
+                                </div>
+                                <div class="glass p-8 rounded-[2rem] border-blue-200 dark:border-blue-900/50">
+                                    <i data-lucide="shield" class="text-blue-500 mb-6" size="40"></i>
+                                    <h3 class="font-bold text-2xl mb-3 text-[var(--text-primary)]">أمان وموثوقية</h3>
+                                    <p class="text-base text-[var(--text-secondary)] leading-relaxed">تحديثات أمنية مستمرة ودعم فني.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Install Content -->
+                        <div id="doc-install" class="docs-content-pane">
+                            <h1 class="text-4xl font-black text-[var(--text-primary)] mb-8">خطوات التثبيت والتفعيل</h1>
+                            <div class="space-y-8">
+                                <div class="flex gap-6 items-start">
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-lg">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-xl text-[var(--text-primary)] mb-3">تحميل ملف القالب</h4>
+                                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed">اذهب إلى منطقة العملاء > التحميلات وقم بتحميل آخر نسخة (XML).</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-6 items-start">
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-lg">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-xl text-[var(--text-primary)] mb-3">التنظيف</h4>
+                                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed">استخدم قالب التنظيف المرفق لإزالة أي مخلفات من القوالب السابقة.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-6 items-start">
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-lg">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-xl text-[var(--text-primary)] mb-3">رفع القالب</h4>
+                                        <p class="text-[var(--text-secondary)] text-lg leading-relaxed">في لوحة تحكم بلوجر > المظهر > تعديل HTML، انسخ كود القالب بالكامل والصقه.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colors Content (Placeholder) -->
+                        <div id="doc-colors" class="docs-content-pane">
+                            <h1 class="text-4xl font-black text-[var(--text-primary)] mb-8">تخصيص الألوان</h1>
+                            <p class="text-[var(--text-secondary)] text-lg leading-relaxed">يمكنك تعديل جميع ألوان الموقع من خلال مصمم النماذج في بلوجر أو عبر لوحة التحكم الخاصة بالقالب.</p>
+                        </div>
+
+                        <!-- Layout Content (Placeholder) -->
+                        <div id="doc-layout" class="docs-content-pane">
+                            <h1 class="text-4xl font-black text-[var(--text-primary)] mb-8">إدارة التخطيط</h1>
+                            <p class="text-[var(--text-secondary)] text-lg leading-relaxed">شرح مفصل لكيفية ترتيب الأدوات والقطاعات في الصفحة الرئيسية.</p>
+                        </div>
+
+                        <!-- SEO Content (Placeholder) -->
+                        <div id="doc-seo" class="docs-content-pane">
+                            <h1 class="text-4xl font-black text-[var(--text-primary)] mb-8">إعدادات السيو المتقدمة</h1>
+                            <p class="text-[var(--text-secondary)] text-lg leading-relaxed">كيفية ضبط أكواد الميتا، وتفعيل ميزة Schema.org للمقالات.</p>
+                        </div>
+
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+    
+    <!-- [إضافة جديدة] مودال اختيار طريقة الدفع - Luxury Design -->
+    <div id="paymentMethodsModal" class="payment-modal-overlay">
+        <div class="bg-[var(--bg-body)] rounded-[2.5rem] p-10 w-full max-w-4xl border border-[var(--border-glass)] relative transform scale-95 opacity-0 transition-all duration-400 glass shadow-2xl" id="paymentMethodsContent">
+            <button onclick="closePaymentModal()" class="absolute top-8 right-8 text-gray-400 hover:text-red-500 transition-colors p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                <i data-lucide="x" size="28"></i>
+            </button>
+            
+            <h3 class="text-4xl font-black text-[var(--text-primary)] mb-10 text-center">اختر وسيلة الدفع المناسبة</h3>
+            
+            <div class="mb-10">
+                <h4 class="font-bold text-[var(--text-secondary)] mb-6 text-base uppercase tracking-wider px-3 border-r-4 border-blue-500 mr-2">منصات العمل الحر</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div onclick="selectPaymentMethod('Kafiel')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform"><i data-lucide="briefcase" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">كفيل</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Nafezly')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform"><i data-lucide="hammer" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">نفذلي</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Khamsat')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                         <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform"><i data-lucide="shopping-bag" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">خمسات</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Mostaql')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                         <div class="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center text-cyan-600 group-hover:scale-110 transition-transform"><i data-lucide="monitor" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">مستقل</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-[var(--text-secondary)] mb-6 text-base uppercase tracking-wider px-3 border-r-4 border-purple-500 mr-2">محافظ إلكترونية وبنوك</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div onclick="selectPaymentMethod('Vodafone Cash')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform"><i data-lucide="smartphone" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">فودافون</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Orange Cash')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                         <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform"><i data-lucide="smartphone" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">أورنج</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Etisalat Cash')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                         <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform"><i data-lucide="smartphone" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">اتصالات</span>
+                    </div>
+                    <div onclick="selectPaymentMethod('Bank Transfer')" class="payment-option-card p-6 rounded-3xl bg-white/50 dark:bg-slate-800/50 text-center flex flex-col items-center justify-center gap-4 h-36 group">
+                         <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:scale-110 transition-transform"><i data-lucide="landmark" size="24"></i></div>
+                        <span class="font-bold text-[var(--text-primary)] text-lg">تحويل بنكي</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [إضافة جديدة] مودال بيانات الشراء - Luxury Design -->
+    <div id="purchaseDataModal" class="payment-modal-overlay">
+        <div class="bg-[var(--bg-body)] rounded-[2.5rem] p-10 w-full max-w-xl border border-[var(--border-glass)] relative transform scale-95 opacity-0 transition-all duration-400 glass shadow-2xl" id="purchaseDataContent">
+            <button onclick="closePurchaseModal()" class="absolute top-8 right-8 text-gray-400 hover:text-red-500 transition-colors p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                <i data-lucide="x" size="28"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20 animate-bounce">
+                    <i data-lucide="check-circle" size="40"></i>
+                </div>
+                <h3 class="text-4xl font-black text-[var(--text-primary)] mb-3">أكمل طلبك</h3>
+                <p class="text-[var(--text-secondary)] text-base">سيتم التواصل معك فوراً لإتمام عملية الدفع</p>
+            </div>
+
+            <form id="purchaseForm" onsubmit="submitPurchaseData(event)" class="space-y-6">
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-700">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">الخطة المختارة</label>
+                            <input type="text" id="form-plan" readonly class="w-full bg-transparent border-none p-0 text-lg font-black text-[var(--text-primary)] focus:ring-0">
+                        </div>
+                        <div class="border-r border-slate-200 dark:border-slate-700 pr-6">
+                            <label class="block text-xs font-bold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">وسيلة الدفع</label>
+                            <input type="text" id="form-method" readonly class="w-full bg-transparent border-none p-0 text-lg font-black text-[var(--text-primary)] focus:ring-0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-[var(--text-secondary)] mb-3 px-1">الاسم الكامل</label>
+                    <div class="relative">
+                        <i data-lucide="user" size="20" class="absolute top-1/2 right-5 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="form-name" required class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl pl-5 pr-12 py-5 text-lg outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition text-[var(--text-primary)] shadow-sm" placeholder="ادخل اسمك هنا">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-[var(--text-secondary)] mb-3 px-1">رقم الهاتف (واتساب)</label>
+                     <div class="relative">
+                        <i data-lucide="phone" size="20" class="absolute top-1/2 right-5 -translate-y-1/2 text-slate-400"></i>
+                        <input type="tel" id="form-phone" required class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl pl-5 pr-12 py-5 text-lg outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition text-[var(--text-primary)] shadow-sm" placeholder="01xxxxxxxxx">
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-5 rounded-2xl font-bold shadow-xl shadow-blue-600/30 transition-all hover:-translate-y-1 flex items-center justify-center gap-4 text-xl mt-6">
+                    <span>إرسال الطلب</span>
+                    <i data-lucide="send" size="24"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- مكتبة AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- [إضافة جديدة] مكتبة Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- =========================================
+         EXISTING LOGIC (Untouched + Extensions)
+         ========================================= -->
+    <script>
+        // --- 1. PRESERVE EXISTING JS LOGIC (NO DELETION) ---
+        
+        // تهيئة مكتبة الحركات
+        AOS.init({
+            duration: 1000, // Slower for luxury feel
+            once: true,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)' // Smoother easing
+        });
+
+        // --- Scroll To Top Logic ---
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                scrollTopBtn.classList.add("show");
+            } else {
+                scrollTopBtn.classList.remove("show");
+            }
+        };
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Versions Modal Logic ---
+        const versionData = {
+            v1: {
+                title: "الإصدار 1.0 (الأساسي)",
+                date: "يناير 2024",
+                features: ["تصميم متجاوب", "يدعم الوضع المظلم", "لوحة تحكم أساسية"],
+                desc: "هذه هي النسخة الأولى المستقرة من القالب. تتميز بالخفة والسرعة وتلبي كافة احتياجات المدونات البسيطة."
+            },
+            v2: {
+                title: "الإصدار 2.0 (المطور)",
+                date: "مايو 2025",
+                features: ["نظام إعلانات ذكي", "تحسينات سيو ضخمة", "أكواد Schema جديدة", "لوحة تحكم متقدمة"],
+                desc: "تحديث شامل يركز على زيادة الأرباح وتحسين ترتيب الموقع في محركات البحث مع أدوات تخصيص جديدة كلياً."
+            }
+        };
+
+        function openVersionModal(versionKey) {
+            const data = versionData[versionKey];
+            if(!data) return;
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="text-center mb-8">
+                     <span class="inline-block px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full text-sm font-bold mb-4">${data.date}</span>
+                    <h3 class="text-4xl font-black text-[var(--text-primary)] mb-3">${data.title}</h3>
+                </div>
+                <p class="text-[var(--text-secondary)] mb-10 leading-relaxed text-center text-xl">${data.desc}</p>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-3xl border border-slate-100 dark:border-slate-700">
+                    <h4 class="font-bold text-base text-[var(--text-primary)] mb-5 uppercase tracking-wider flex items-center gap-3"><i data-lucide="star" size="20" class="text-yellow-500"></i> أبرز المميزات:</h4>
+                    <ul class="space-y-4">
+                        ${data.features.map(f => `<li class="flex items-center gap-4 text-lg text-[var(--text-secondary)]"><i data-lucide="check-circle" size="22" class="text-green-500"></i> ${f}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('versionModal').classList.add('open');
+            lucide.createIcons();
+        }
+
+        function closeVersionModal() {
+            document.getElementById('versionModal').classList.remove('open');
+        }
+
+        // --- Number Counter Animation ---
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200; // The lower the slower
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText;
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc);
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        };
+
+        // Trigger counter when in view
+        let counterTriggered = false;
+        const statsSection = document.getElementById('stats');
+        window.addEventListener('scroll', () => {
+            if(!statsSection) return;
+            const sectionPos = statsSection.getBoundingClientRect().top;
+            const screenPos = window.innerHeight / 1.3;
+            if(sectionPos < screenPos && !counterTriggered) {
+                animateCounters();
+                counterTriggered = true;
+            }
+        });
+
+
+        // --- Auth Restricted Logic ---
+        function toggleAuthSections(isAuthenticated) {
+            const authSections = document.querySelectorAll('.auth-restricted');
+            const loginPrompt = document.getElementById('login-prompt');
+            const navLinks = document.querySelectorAll('.nav-restricted');
+            
+            // New Elements for Docs
+            const desktopDocsBtn = document.getElementById('desktop-docs-btn');
+            const mobileDocsBtn = document.getElementById('mobile-docs-btn');
+
+            if (isAuthenticated) {
+                authSections.forEach(el => el.style.display = 'block');
+                if(loginPrompt) loginPrompt.style.display = 'none';
+                navLinks.forEach(el => el.style.display = 'inline-block');
+                
+                // Show Docs Buttons
+                if(desktopDocsBtn) desktopDocsBtn.classList.remove('hidden');
+                if(mobileDocsBtn) mobileDocsBtn.classList.remove('hidden');
+                if(mobileDocsBtn) mobileDocsBtn.classList.add('flex');
+            } else {
+                authSections.forEach(el => el.style.display = 'none');
+                if(loginPrompt) loginPrompt.style.display = 'block';
+                navLinks.forEach(el => el.style.display = 'none');
+                
+                // Hide Docs Buttons
+                if(desktopDocsBtn) desktopDocsBtn.classList.add('hidden');
+                if(mobileDocsBtn) mobileDocsBtn.classList.add('hidden');
+                if(mobileDocsBtn) mobileDocsBtn.classList.remove('flex');
+            }
+        }
+
+        // --- Explainer Tabs Logic ---
+        function switchExplainer(targetId, btn) {
+            document.querySelectorAll('.explainer-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+
+            document.querySelectorAll('.explainer-content-item').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetContent = document.getElementById(targetId);
+            setTimeout(() => {
+                targetContent.classList.add('active');
+            }, 50);
+        }
+
+        // --- View Switcher Logic ---
+        function switchView(viewName) {
+            const homeView = document.getElementById('home-view');
+            const plugoView = document.getElementById('plugo-view');
+            const docsView = document.getElementById('docs-view'); // New View
+            const navHome = document.getElementById('nav-home');
+            const navPlugo = document.getElementById('nav-plugo');
+
+            // Hide all first
+            homeView.classList.remove('active-view');
+            plugoView.classList.remove('active-view');
+            if(docsView) docsView.classList.remove('active-view');
+
+            if (viewName === 'home') {
+                homeView.classList.add('active-view');
+                if(navHome) navHome.classList.add('active');
+                if(navPlugo) navPlugo.classList.remove('ring-2', 'ring-blue-200');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (viewName === 'plugo') {
+                plugoView.classList.add('active-view');
+                if(navHome) navHome.classList.remove('active');
+                if(navPlugo) navPlugo.classList.add('ring-2', 'ring-blue-200');
+                if (!state.initialized) initApp();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (viewName === 'docs') {
+                if(docsView) docsView.classList.add('active-view');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // --- Accordion Logic ---
+        function toggleAccordion(btn) {
+            const content = btn.nextElementSibling;
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            document.querySelectorAll('.accordion-btn').forEach(b => {
+                b.setAttribute('aria-expanded', 'false');
+                b.nextElementSibling.classList.remove('open');
+            });
+            if (!expanded) {
+                btn.setAttribute('aria-expanded', 'true');
+                content.classList.add('open');
+            }
+        }
+
+        // ============================================
+        // PLUGO CORE LOGIC (UNCHANGED)
+        // ============================================
+        const CONFIG = {
+            SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzzphGByU8izIrzux7cGsvq3BVBA6sE7s6ehHIwhaNOQe_qfXe3Pupql99feo3vncsf/exec"
+        };
+        
+        const state = {
+            view: 'login', 
+            activeSection: 'overview',
+            user: null,
+            blogs: [],
+            initialized: false,
+            update(newState) {
+                Object.assign(this, newState);
+                renderApp();
+            }
+        };
+
+        const Components = {
+            // [إعادة تصميم] واجهة تسجيل الدخول - Luxury Glassmorphism
+            LoginView: () => `
+                <div class="flex items-center justify-center flex-grow w-full h-full p-4 relative overflow-hidden">
+                    <!-- Background Elements -->
+                    <div class="absolute top-10 left-10 w-48 h-48 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+                    <div class="absolute bottom-10 right-10 w-48 h-48 bg-purple-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                    <div class="glass p-12 md:p-16 max-w-lg w-full animate-fade-up border border-white/40 dark:border-white/10 shadow-2xl relative z-10 backdrop-blur-2xl">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-tr from-blue-500 to-indigo-600 text-white rounded-[2rem] flex items-center justify-center mb-10 shadow-lg shadow-blue-500/30 transform rotate-3 hover:rotate-6 transition-transform duration-500">
+                            <i data-lucide="shield-check" size="48"></i>
+                        </div>
+                        <h2 class="text-4xl font-black mb-4 text-[var(--text-primary)] text-center tracking-tight">تسجيل الدخول</h2>
+                        <p class="text-[var(--text-secondary)] text-lg mb-12 text-center leading-relaxed">أهلاً بك في منطقة العملاء المميزة. قم بالدخول لإدارة منتجاتك.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="group relative">
+                                <i data-lucide="mail" class="absolute top-1/2 right-5 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size="22"></i>
+                                <input type="email" id="login-email" placeholder="البريد الإلكتروني" class="w-full bg-white/40 dark:bg-slate-800/40 border border-white/50 dark:border-white/10 rounded-2xl pr-14 pl-6 py-5 text-lg outline-none focus:border-blue-500 focus:bg-white/60 dark:focus:bg-slate-800/60 focus:ring-4 focus:ring-blue-500/10 transition-all text-[var(--text-primary)] placeholder-slate-400" dir="rtl">
+                            </div>
+                            <div class="group relative">
+                                <i data-lucide="lock" class="absolute top-1/2 right-5 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size="22"></i>
+                                <input type="password" id="login-password" placeholder="كلمة المرور / كود التفعيل" class="w-full bg-white/40 dark:bg-slate-800/40 border border-white/50 dark:border-white/10 rounded-2xl pr-14 pl-6 py-5 text-lg outline-none focus:border-blue-500 focus:bg-white/60 dark:focus:bg-slate-800/60 focus:ring-4 focus:ring-blue-500/10 transition-all text-[var(--text-primary)] placeholder-slate-400" dir="rtl">
+                            </div>
+                            <button onclick="Actions.login()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-5 rounded-2xl font-bold shadow-xl shadow-blue-600/30 transition-all text-xl flex items-center justify-center gap-3 transform hover:-translate-y-1 hover:shadow-blue-600/50 mt-4 group">
+                                <span>تسجيل الدخول</span> <i data-lucide="arrow-left" size="24" class="group-hover:-translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `,
+
+            // [إعادة تصميم] لوحة التحكم - Luxury Dashboard
+            Dashboard: () => `
+                <div class="flex flex-col md:flex-row h-full min-h-[700px] bg-white/10 dark:bg-black/10 backdrop-blur-3xl rounded-[2.5rem] overflow-hidden border border-white/20 dark:border-white/5 shadow-2xl">
+                    <!-- Sidebar - Glassmorphism -->
+                    <aside class="plugo-sidebar w-full md:w-80 flex-col flex-shrink-0 p-8 hidden md:flex relative overflow-hidden">
+                        <!-- Decorative gradient behind sidebar -->
+                        <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-white/40 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none"></div>
+
+                        <div class="flex items-center gap-4 mb-16 relative z-10">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 text-xl border border-white/20">P</div>
+                            <div>
+                                <h2 class="text-2xl font-black text-[var(--text-primary)] tracking-tight">لوحة التحكم</h2>
+                                <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Client Area</span>
+                            </div>
+                        </div>
+
+                        <nav class="flex-grow space-y-4 relative z-10">
+                            ${Components.NavItem('overview', 'layout-dashboard', 'نظرة عامة')}
+                            ${Components.NavItem('blogs', 'globe', 'إدارة التراخيص')}
+                            ${Components.NavItem('products', 'download', 'مركز التحميل')}
+                        </nav>
+                        
+                        <div class="pt-8 mt-auto border-t border-white/20 dark:border-white/10 relative z-10">
+                            <div class="flex items-center gap-4 mb-6 bg-white/30 dark:bg-black/20 p-3 rounded-2xl backdrop-blur-md">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-500 text-white flex items-center justify-center text-lg font-bold shadow-md">${state.user.name.charAt(0)}</div>
+                                <div class="overflow-hidden">
+                                    <p class="text-sm font-bold text-[var(--text-primary)] truncate">${state.user.name}</p>
+                                    <p class="text-[11px] text-[var(--text-secondary)] truncate opacity-80 font-medium" dir="ltr">${state.user.email}</p>
+                                </div>
+                            </div>
+                            <button onclick="Actions.logout()" class="w-full flex items-center gap-3 p-4 text-red-500 hover:text-white hover:bg-red-500 rounded-2xl transition-all duration-300 text-sm font-bold shadow-sm hover:shadow-red-500/30 group">
+                                <i data-lucide="log-out" size="18" class="group-hover:rotate-180 transition-transform duration-500"></i> تسجيل خروج
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- Content Area -->
+                    <main class="flex-grow flex flex-col w-full relative bg-white/5 dark:bg-black/20 backdrop-blur-sm">
+                        <!-- Mobile Header -->
+                        <header class="p-6 border-b border-white/20 dark:border-white/5 flex justify-between items-center md:hidden glass bg-white/80 dark:bg-slate-900/80 sticky top-0 z-20">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">P</div>
+                                <h3 class="font-bold text-[var(--text-primary)] text-lg">لوحة التحكم</h3>
+                            </div>
+                            <button onclick="Actions.logout()" class="text-red-500 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 transition"><i data-lucide="log-out" size="20"></i></button>
+                        </header>
+                        
+                        <!-- Mobile Nav Bar -->
+                        <div class="md:hidden flex overflow-x-auto gap-3 p-4 bg-white/50 dark:bg-slate-900/80 border-b border-white/20 dark:border-white/5 no-scrollbar backdrop-blur-md sticky top-[88px] z-20">
+                             <button onclick="Actions.setSection('overview')" class="px-6 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition ${state.activeSection === 'overview' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 bg-white/50 dark:bg-slate-800/50 border border-white/20'}">نظرة عامة</button>
+                             <button onclick="Actions.setSection('blogs')" class="px-6 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition ${state.activeSection === 'blogs' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 bg-white/50 dark:bg-slate-800/50 border border-white/20'}">التفعيلات</button>
+                             <button onclick="Actions.setSection('products')" class="px-6 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition ${state.activeSection === 'products' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 bg-white/50 dark:bg-slate-800/50 border border-white/20'}">التحميلات</button>
+                        </div>
+
+                        <!-- Main Content Scrollable -->
+                        <div class="flex-grow p-8 md:p-12 overflow-y-auto">
+                            <div class="max-w-6xl mx-auto">
+                                ${state.activeSection === 'overview' ? Components.OverviewSection() : ''}
+                                ${state.activeSection === 'blogs' ? Components.BlogsSection() : ''}
+                                ${state.activeSection === 'products' ? Components.ProductsSection() : ''}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `,
+
+            NavItem: (id, icon, label) => `
+                <button onclick="Actions.setSection('${id}')" 
+                    class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden ${state.activeSection === id ? 'text-white shadow-xl shadow-blue-600/20' : 'text-[var(--text-secondary)] hover:bg-white/40 dark:hover:bg-white/5'}">
+                    
+                    ${state.activeSection === id ? '<div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600"></div>' : ''}
+                    
+                    <i data-lucide="${icon}" size="22" class="relative z-10 ${state.activeSection === id ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'} transition-colors"></i> 
+                    <span class="text-sm font-bold tracking-wide relative z-10">${label}</span>
+                    
+                    ${state.activeSection === id ? '<i data-lucide="chevron-left" size="18" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 opacity-80"></i>' : ''}
+                </button>
+            `,
+
+            OverviewSection: () => {
+                const uniqueProds = Helpers.getUniqueProducts();
+                return `
+                    <div class="space-y-12 animate-fade-up">
+                        <div class="hidden md:block">
+                            <h3 class="text-4xl font-black text-[var(--text-primary)] mb-2 tracking-tight">نظرة عامة</h3>
+                            <p class="text-[var(--text-secondary)] text-lg">ملخص شامل لنشاط حسابك.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                            ${Components.StatBox('shield-check', 'text-blue-600', 'bg-blue-50 dark:bg-blue-900/20', `${state.blogs.length} / ${state.user.maxActivations}`, 'التراخيص المستخدمة')}
+                            ${Components.StatBox('shopping-cart', 'text-purple-600', 'bg-purple-50 dark:bg-purple-900/20', uniqueProds.length, 'المنتجات المتاحة')}
+                            ${Components.StatBox('globe', 'text-emerald-600', 'bg-emerald-50 dark:bg-emerald-900/20', state.blogs.length, 'المواقع النشطة')}
+                        </div>
+                        
+                        <div class="glass rounded-[2rem] border border-white/40 dark:border-white/5 overflow-hidden shadow-xl">
+                            <div class="p-8 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-white/5 backdrop-blur-md flex justify-between items-center">
+                                <h4 class="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2"><i data-lucide="activity" size="20" class="text-blue-500"></i> آخر النشاطات</h4>
+                                <span class="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full font-bold">Log</span>
+                            </div>
+                            <div class="divide-y divide-white/20 dark:divide-white/5">
+                                ${state.blogs.length === 0 ? '<div class="text-center py-20 flex flex-col items-center gap-4"><div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400"><i data-lucide="inbox" size="32"></i></div><p class="text-slate-500 font-bold">لا توجد نشاطات مسجلة</p></div>' : 
+                                state.blogs.slice().reverse().map(b => `
+                                    <div class="flex items-center justify-between p-6 hover:bg-white/40 dark:hover:bg-white/5 transition duration-300 group">
+                                        <div class="flex items-center gap-5">
+                                            <div class="w-14 h-14 rounded-2xl bg-white/60 dark:bg-slate-800/60 flex items-center justify-center text-slate-500 shadow-sm group-hover:scale-110 transition-transform duration-300"><i data-lucide="key" size="24"></i></div>
+                                            <div>
+                                                <p class="text-lg font-bold text-[var(--text-primary)] mb-1">${b.blogname}</p>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                    <p class="text-xs text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-800">نشط الآن</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onclick="Helpers.copy('${b.licenseCode}')" class="text-xs font-mono text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-5 py-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 border border-blue-100 dark:border-blue-800 font-bold flex items-center gap-3 group/btn">
+                                            ${b.licenseCode} <i data-lucide="copy" size="14" class="opacity-70 group-hover/btn:opacity-100 transition-opacity"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            StatBox: (icon, color, bg, val, label) => `
+                <div class="glass p-8 rounded-[2rem] border border-white/40 dark:border-white/5 flex flex-col items-center justify-center text-center hover:-translate-y-2 transition duration-500 shadow-lg hover:shadow-2xl relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="w-16 h-16 ${bg} rounded-2xl flex items-center justify-center ${color} mb-5 shadow-sm group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <i data-lucide="${icon}" size="32"></i>
+                    </div>
+                    <h5 class="text-4xl font-black text-[var(--text-primary)] mb-2 relative z-10">${val}</h5>
+                    <p class="text-sm text-[var(--text-secondary)] font-bold uppercase tracking-wider opacity-70 relative z-10">${label}</p>
+                </div>
+            `,
+
+            BlogsSection: () => `
+                <div class="space-y-10 animate-fade-up">
+                    <div class="hidden md:block">
+                        <h3 class="text-3xl font-black text-[var(--text-primary)] mb-2">إدارة التراخيص</h3>
+                        <p class="text-[var(--text-secondary)] text-lg">قم بتفعيل قوالبك على المدونات الخاصة بك.</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 rounded-[2.5rem] text-white shadow-2xl shadow-blue-600/30 relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <h4 class="font-bold text-xl mb-8 flex items-center gap-3"><span class="bg-white/20 p-2 rounded-xl"><i data-lucide="plus" size="24"></i></span> تفعيل مدونة جديدة</h4>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <div class="relative flex-grow">
+                                    <i data-lucide="link" class="absolute top-1/2 right-5 -translate-y-1/2 text-white/50" size="20"></i>
+                                    <input id="blog-id-input" type="text" placeholder="Blog ID (من لوحة تحكم بلوجر)" class="w-full bg-white/10 border border-white/20 rounded-2xl px-6 pr-14 py-4 text-lg text-white placeholder-white/50 outline-none focus:bg-white/20 focus:border-white/50 transition backdrop-blur-md shadow-inner" dir="ltr">
+                                </div>
+                                <button onclick="Actions.searchBlog()" class="bg-white text-blue-600 px-10 py-4 rounded-2xl text-base font-bold hover:bg-blue-50 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                                    تحقق <i data-lucide="search" size="18"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Search Result -->
+                            <div id="search-result-box" class="hidden mt-8 p-6 bg-white/10 rounded-3xl border border-white/20 backdrop-blur-xl shadow-lg animate-fade-in-up">
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div class="text-center sm:text-right">
+                                        <h5 id="result-name" class="font-black text-xl text-white mb-1"></h5>
+                                        <p id="result-url" class="text-sm opacity-70 text-blue-100 font-mono bg-black/20 px-3 py-1 rounded-lg inline-block" dir="ltr"></p>
+                                    </div>
+                                    <button onclick="Actions.registerBlog()" class="bg-emerald-500 text-white px-8 py-3 rounded-2xl text-sm font-bold hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 transition transform hover:scale-105 flex items-center gap-2">
+                                        <i data-lucide="check" size="18"></i> تفعيل الآن
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Decoration -->
+                        <div class="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-[80px] -mr-20 -mt-20 group-hover:bg-white/15 transition-colors duration-700 pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-60 h-60 bg-blue-400/20 rounded-full blur-[60px] -ml-10 -mb-10 group-hover:bg-blue-400/30 transition-colors duration-700 pointer-events-none"></div>
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-5">
+                        ${state.blogs.map(b => `
+                            <div class="glass p-6 rounded-[2rem] border border-white/40 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center group hover:border-blue-300 dark:hover:border-blue-700 transition duration-300 hover:shadow-lg bg-white/40 dark:bg-white/5 backdrop-blur-md gap-4">
+                                <div class="flex items-center gap-5 w-full sm:w-auto">
+                                     <div class="w-14 h-14 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all shadow-sm">
+                                        <i data-lucide="globe" size="24"></i>
+                                     </div>
+                                    <div class="overflow-hidden">
+                                        <p class="text-lg font-bold text-[var(--text-primary)] mb-1 truncate">${b.blogname}</p>
+                                        <p class="text-xs text-slate-500 font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg inline-block border border-slate-200 dark:border-slate-700" dir="ltr">ID: ${b.blogid}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                                    <button onclick="Helpers.copy('${b.licenseCode}')" class="text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 font-mono border border-slate-200 dark:border-slate-700 transition font-bold shadow-sm flex items-center gap-2">
+                                        ${b.licenseCode} <i data-lucide="copy" size="14"></i>
+                                    </button>
+                                    <button onclick="Actions.deleteBlog('${b.blogid}')" class="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-3 rounded-xl transition border border-transparent hover:border-red-200"><i data-lucide="trash-2" size="20"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+
+            ProductsSection: () => {
+                const uniqueProds = Helpers.getUniqueProducts();
+                return `
+                    <div class="space-y-10 animate-fade-up">
+                        <div class="hidden md:block">
+                            <h3 class="text-3xl font-black text-[var(--text-primary)] mb-2">ملفات التحميل</h3>
+                            <p class="text-[var(--text-secondary)] text-lg">تحميل أحدث إصدارات القوالب المشتراة.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            ${uniqueProds.map(p => `
+                                <div class="glass rounded-[2.5rem] border border-white/40 dark:border-white/5 overflow-hidden flex flex-col hover:shadow-2xl transition duration-500 hover:-translate-y-2 group bg-white/40 dark:bg-white/5">
+                                    <div class="h-56 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                                        <img src="${p.image}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-700 filter group-hover:brightness-110">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                        <div class="absolute top-5 right-5">
+                                            <span class="bg-emerald-500/90 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg border border-white/20">نسخة مدفوعة</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-8 flex-grow flex flex-col">
+                                        <h4 class="font-black text-[var(--text-primary)] text-2xl mb-3 group-hover:text-blue-600 transition-colors">${p.name}</h4>
+                                        <p class="text-sm text-[var(--text-secondary)] line-clamp-2 mb-8 flex-grow leading-relaxed opacity-80">${p.desc || 'قالب احترافي متعدد الاستخدامات يتميز بالسرعة والأداء العالي.'}</p>
+                                        
+                                        <div class="flex flex-wrap gap-3 pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
+                                            ${(p.versions || ["V1.0"]).map(v => `
+                                                <button onclick="Actions.download('${p.link}', '${v}')" class="bg-white dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-blue-600 px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 group/btn shadow-sm hover:shadow-lg">
+                                                    <i data-lucide="download" size="16" class="group-hover/btn:animate-bounce"></i> ${v}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${uniqueProds.length === 0 ? '<div class="col-span-full py-24 text-center glass rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400 shadow-inner"><i data-lucide="package-open" size="40"></i></div><p class="text-slate-500 font-bold text-lg">لا توجد منتجات متاحة للتحميل حالياً</p></div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        // --- Helpers & Actions (UNCHANGED) ---
+        const Helpers = {
+            toast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                // Updated styles reference in CSS block (toast-card)
+                const styles = { 
+                    success: 'success', 
+                    error: 'error', 
+                    loading: 'loading' 
+                };
+                const icons = { success: 'check-circle', error: 'alert-triangle', loading: 'loader-2' };
+                const iconColor = { success: 'text-emerald-500', error: 'text-red-500', loading: 'text-blue-500 animate-spin' };
+
+                toast.className = `toast-card ${styles[type]}`;
+                toast.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                        <i data-lucide="${icons[type]}" class="${iconColor[type]}" size="20"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold uppercase tracking-wider opacity-50 mb-0.5">${type === 'loading' ? 'جاري العمل' : (type === 'success' ? 'نجاح' : 'تنبيه')}</span>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">${msg}</span>
+                    </div>
+                `;
+                
+                container.appendChild(toast);
+                lucide.createIcons();
+                
+                const remove = () => { 
+                    toast.style.opacity = '0'; 
+                    toast.style.transform = 'translateY(-20px) scale(0.9)';
+                    setTimeout(() => toast.remove(), 300); 
+                };
+                
+                if (type !== 'loading') setTimeout(remove, 4000);
+                return { close: remove };
+            },
+            toggleLoader(show) { 
+                const loader = document.getElementById('ui-loader');
+                if(loader) loader.style.display = show ? 'flex' : 'none'; 
+            },
+            getUniqueProducts() {
+                if (!state.user) return [];
+                const unique = new Map();
+                const add = (p) => { if(p && p.name) unique.set(p.name, p); };
+                (Array.isArray(state.user.products) ? state.user.products : [state.user.products]).forEach(add);
+                state.blogs.forEach(b => add(b.productData));
+                return Array.from(unique.values());
+            },
+            copy(text) {
+                navigator.clipboard.writeText(text);
+                Helpers.toast("تم نسخ الكود بنجاح");
+            },
+            jsonp(id) {
+                return new Promise((resolve, reject) => {
+                    const cb = 'cb_' + Math.floor(Math.random() * 1000);
+                    window[cb] = (data) => { delete window[cb]; document.getElementById(cb)?.remove(); data?.feed ? resolve(data) : reject(); };
+                    const s = document.createElement('script'); s.id = cb; s.src = `https://www.blogger.com/feeds/${id}/posts/default?alt=json-in-script&callback=${cb}`;
+                    s.onerror = () => { delete window[cb]; reject(); };
+                    document.body.appendChild(s);
+                });
+            }
+        };
+
+        const Actions = {
+            async login() {
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-password').value;
+                if(!email || !pass) return Helpers.toast("أدخل البيانات كاملة", "error");
+
+                Helpers.toggleLoader(true);
+                try {
+                    const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                    const result = await res.json();
+                    
+                    if (result.status === 'success') {
+                        localStorage.setItem('plugo_user_session', JSON.stringify({ email, password: pass }));
+                        state.user = result.meta;
+                        state.blogs = result.blogs || [];
+                        state.view = 'dashboard';
+                        state.update({});
+                        Helpers.toast("تم تسجيل الدخول بنجاح");
+                        toggleAuthSections(true);
+                    } else {
+                        Helpers.toast("بيانات الدخول غير صحيحة", "error");
+                    }
+                } catch(e) { Helpers.toast("خطأ في الاتصال بالخادم", "error"); }
+                finally { Helpers.toggleLoader(false); }
+            },
+            logout() {
+                if(!confirm('هل أنت متأكد من تسجيل الخروج؟')) return;
+                localStorage.removeItem('plugo_user_session');
+                state.view = 'login';
+                state.user = null;
+                state.update({});
+                toggleAuthSections(false);
+                Helpers.toast("تم تسجيل الخروج");
+            },
+            setSection(sec) { state.update({ activeSection: sec }); },
+            
+            async searchBlog() {
+                const id = document.getElementById('blog-id-input').value;
+                if(!id) return Helpers.toast("أدخل معرف المدونة (Blog ID)", "error");
+                const loader = Helpers.toast("جاري البحث عن المدونة...", "loading");
+                try {
+                    const data = await Helpers.jsonp(id);
+                    state.searchResult = { 
+                        blogid: id, 
+                        blogname: data.feed.title.$t, 
+                        blogurl: data.feed.link.find(l => l.rel === 'alternate')?.href 
+                    };
+                    document.getElementById('result-name').innerText = state.searchResult.blogname;
+                    document.getElementById('result-url').innerText = state.searchResult.blogurl;
+                    document.getElementById('search-result-box').classList.remove('hidden');
+                    loader.close();
+                } catch { loader.close(); Helpers.toast("لم يتم العثور على مدونة بهذا المعرف", "error"); }
+            },
+            async registerBlog() {
+                const loader = Helpers.toast("جاري تفعيل الترخيص...", "loading");
+                const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+                const payload = {
+                    action: 'add', ...state.searchResult,
+                    licenseCode: `PLUGO-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+                    userName: state.user.name, userEmail: session.email
+                };
+                try {
+                    const res = await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    const result = await res.json();
+                    loader.close();
+                    if(result.result === 'success') {
+                        Helpers.toast("تم تفعيل المدونة بنجاح!");
+                        Actions.refreshData(session.email, session.password);
+                    } else Helpers.toast("فشل التفعيل: " + result.message, "error");
+                } catch { loader.close(); }
+            },
+            async deleteBlog(id) {
+                if(!confirm("هل أنت متأكد من حذف هذا الترخيص؟")) return;
+                const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+                const loader = Helpers.toast("جاري حذف الترخيص...", "loading");
+                await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', blogid: id, userEmail: session.email }) });
+                loader.close();
+                Helpers.toast("تم حذف الترخيص بنجاح");
+                Actions.refreshData(session.email, session.password);
+            },
+            async refreshData(email, pass) {
+                const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                const result = await res.json();
+                if(result.status === 'success') state.update({ user: result.meta, blogs: result.blogs || [] });
+            },
+            download(link, v) {
+                if(!link) return;
+                window.open(link, '_blank');
+            }
+        };
+
+        // --- Initialization ---
+        function renderApp() {
+            const app = document.getElementById('app');
+            app.innerHTML = state.view === 'login' ? Components.LoginView() : Components.Dashboard();
+            lucide.createIcons();
+        }
+
+        function initApp() {
+            state.initialized = true;
+            const session = JSON.parse(localStorage.getItem('plugo_user_session'));
+            if(session) {
+                Helpers.toggleLoader(true);
+                Actions.refreshData(session.email, session.password)
+                    .then(() => {
+                        if(state.user) {
+                            state.view = 'dashboard';
+                            toggleAuthSections(true);
+                        } else {
+                            state.view = 'login';
+                            toggleAuthSections(false);
+                        }
+                        renderApp();
+                    })
+                    .finally(() => Helpers.toggleLoader(false));
+            } else { 
+                state.view = 'login'; 
+                renderApp(); 
+                toggleAuthSections(false);
+            }
+        }
+
+        // --- 2. NEW LOGIC EXTENSIONS (SAFE ADDITIONS) ---
+
+        // A. Dark/Light Mode Logic
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Sync icons
+            lucide.createIcons();
+        }
+
+        // Initialize Theme from LocalStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+
+        // B. Mobile Menu Logic
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobileDrawer');
+            const overlay = document.getElementById('mobileOverlay');
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // C. Translation Logic (Simple Text Swapping)
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_about: "About",
+                nav_tour: "Template Tour",
+                nav_features: "Features",
+                nav_versions: "Versions",
+                nav_pricing: "Pricing",
+                nav_client: "Client Area",
+                hero_badge: "New Version V2.0 Available 🚀",
+                hero_title_1: "Template",
+                hero_title_2: "Professional for Bloggers",
+                hero_desc: "The perfect solution for creating SEO-friendly, fast blogs with unmatched user experience. Start your blogging journey with the right tools.",
+                btn_buy: "Buy Template",
+                btn_client: "Client Area",
+                btn_preview: "Live Preview",
+                btn_docs: "Documentation",
+                ui_title: "Modern UI & Amazing UX",
+                ui_desc: "Fully compatible with all tablets and smartphones",
+                data_title: "Template Data",
+                data_desc: "Technical details (Client Only)",
+                lock_title: "Educational Content & Tour are Client Exclusive",
+                lock_desc: "To view technical details, explanation, and interactive tour, please login first.",
+                btn_login_now: "Login Now",
+                explore_title: "Discover Possibilities",
+                tour_title: "Interactive Template Tour",
+                tour_desc: "Navigate through features and see how SeoWriting can transform your blog.",
+                cp_title: "Control Panel",
+                cp_sub: "Code-free customization",
+                seo_title: "SEO Tools",
+                seo_sub: "Top search results",
+                ads_title: "Ads System",
+                ads_sub: "Profit placements",
+                dark_title: "Dark Mode",
+                dark_sub: "Elegant & Comfortable",
+                feat_head: "Extra Features",
+                feat_desc: "Everything you need for success is here.",
+                f1_title: "Super Fast Loading",
+                f1_desc: "Clean compressed code ensuring your blog loads in split seconds.",
+                f2_title: "SEO Friendly",
+                f2_desc: "Schema structured data integrated correctly.",
+                f3_title: "Responsive Design",
+                f3_desc: "Displays perfectly on all devices.",
+                f4_title: "Smart Dark Mode",
+                f4_desc: "Full dark mode support for reader comfort.",
+                f5_title: "Powerful Panel",
+                f5_desc: "Customize colors, fonts easily.",
+                f6_title: "Premium Support",
+                f6_desc: "Support team ready to answer your questions.",
+                ver_head: "Versions",
+                ver_desc: "Continuous evolution to meet needs.",
+                stat_happy: "Happy Client",
+                stat_update: "Updates",
+                stat_satisfy: "Satisfaction",
+                stat_support: "Support",
+                price_head: "Choose Your Plan",
+                price_desc: "Flexible options for your needs.",
+                plan_free: "Free Version",
+                plan_pro: "Full Version",
+                plan_dev: "Developer License",
+                footer_desc: "We provide best digital solutions for bloggers. Our goal is to simplify blogging.",
+                client_area: "Client Area",
+                client_desc: "Manage your account and licenses",
+                btn_back: "Back to Home"
+            },
+            ar: {
+                 // Original Arabic text is already in HTML
+            }
+        };
+
+        let currentLang = 'ar';
+        function toggleLang() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const html = document.documentElement;
+            const indicator = document.getElementById('lang-indicator');
+            
+            // Update Direction
+            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            html.setAttribute('lang', currentLang);
+            indicator.innerText = currentLang === 'ar' ? 'EN' : 'AR'; // Show opposite label for switch
+            
+            // Apply Translations
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (currentLang === 'en' && translations.en[key]) {
+                    // Store original arabic in data attribute if not present
+                    if (!el.hasAttribute('data-original')) el.setAttribute('data-original', el.innerText);
+                    el.innerText = translations.en[key];
+                } else if (currentLang === 'ar' && el.hasAttribute('data-original')) {
+                    el.innerText = el.getAttribute('data-original');
+                }
+            });
+        }
+
+        // ============================================
+        // 3. [إضافة جديدة] منطق المودالات والدفع والسلايدر
+        // ============================================
+        
+        // --- Swiper Init ---
+        // تهيئة السلايدر عند تحميل الصفحة
+        var swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            coverflowEffect: {
+                rotate: 40,
+                stretch: 0,
+                depth: 200,
+                modifier: 1,
+                slideShadows: true,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: false,
+            },
+            loop: true
+        });
+
+        // --- Payment Modals Logic ---
+        let selectedPlan = '';
+        let selectedMethod = '';
+
+        function openPaymentModal(plan) {
+            selectedPlan = plan;
+            const modal = document.getElementById('paymentMethodsModal');
+            const content = document.getElementById('paymentMethodsContent');
+            modal.classList.add('open');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closePaymentModal() {
+            const modal = document.getElementById('paymentMethodsModal');
+            const content = document.getElementById('paymentMethodsContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.remove('open');
+            }, 300);
+        }
+
+        function selectPaymentMethod(method) {
+            selectedMethod = method;
+            
+            // Highlight selected
+            document.querySelectorAll('.payment-option-card').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // Open Data Modal after short delay
+            setTimeout(() => {
+                closePaymentModal();
+                openPurchaseModal();
+            }, 400);
+        }
+
+        function openPurchaseModal() {
+            const modal = document.getElementById('purchaseDataModal');
+            const content = document.getElementById('purchaseDataContent');
+            
+            // Fill Form Data
+            document.getElementById('form-plan').value = selectedPlan;
+            document.getElementById('form-method').value = selectedMethod;
+
+            modal.classList.add('open');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closePurchaseModal() {
+            const modal = document.getElementById('purchaseDataModal');
+            const content = document.getElementById('purchaseDataContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.remove('open');
+            }, 300);
+        }
+
+        // --- Telegram Integration ---
+        async function submitPurchaseData(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="animate-spin mr-2 inline-block">⌛</span> جاري الإرسال...';
+            btn.disabled = true;
+
+            const name = document.getElementById('form-name').value;
+            const phone = document.getElementById('form-phone').value;
+
+            // Telegram Bot Config
+            // ملاحظة: يجب استبدال التوكن والآيدي بالبيانات الحقيقية
+            const BOT_TOKEN = "7295719875:AAHp-Y4d2N8pM5w-gJ8d1K9h4X7d3s6a"; // PLACEHOLDER
+            const CHAT_ID = "123456789";   // PLACEHOLDER
+
+            const message = `
+🔔 *طلب شراء جديد*
+👤 الاسم: ${name}
+📱 الهاتف: ${phone}
+📦 الخطة: ${selectedPlan}
+💳 الدفع: ${selectedMethod}
+            `;
+
+            try {
+                // محاكاة إرسال (لأن التوكن غير حقيقي)
+                await new Promise(r => setTimeout(r, 1500));
+                
+                Helpers.toast("تم إرسال طلبك بنجاح! سنتواصل معك قريباً.");
+                closePurchaseModal();
+                
+                // Reset Form
+                document.getElementById('purchaseForm').reset();
+
+            } catch (error) {
+                console.error(error);
+                Helpers.toast("حدث خطأ، يرجى المحاولة لاحقاً", "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ============================================
+        // 4. [جديد] منطق منطقة الشرح (Documentation)
+        // ============================================
+        
+        function openDocs() {
+            // التحقق من تسجيل الدخول (باستخدام state من Plugo)
+            if (!state.user) {
+                Helpers.toast("يجب تسجيل الدخول أولاً للوصول للشرح", "error");
+                switchView('plugo');
+                return;
+            }
+            switchView('docs');
+        }
+
+        function switchDocs(docId) {
+            // Update Sidebar Active State
+            document.querySelectorAll('.docs-sidebar-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById('link-' + docId);
+            if(activeLink) activeLink.classList.add('active');
+
+            // Show Content
+            document.querySelectorAll('.docs-content-pane').forEach(pane => pane.classList.remove('active'));
+            const targetPane = document.getElementById('doc-' + docId);
+            if(targetPane) targetPane.classList.add('active');
+        }
+
+        // [إضافة جديدة] منطق قائمة الهاتف لمركز التعليم
+        function toggleDocsMenu() {
+            const menu = document.getElementById('docs-mobile-menu');
+            if (menu) {
+                const isHidden = menu.classList.contains('translate-x-full');
+                if (isHidden) {
+                    menu.classList.remove('translate-x-full');
+                    menu.classList.add('translate-x-0');
+                } else {
+                    menu.classList.add('translate-x-full');
+                    menu.classList.remove('translate-x-0');
+                }
+            }
+        }
+
+
+        // إتاحة الكائنات للوصول العام
+        window.Actions = Actions;
+        window.Helpers = Helpers;
+        window.initApp = initApp;
+        window.switchView = switchView;
+        window.toggleAccordion = toggleAccordion;
+        window.switchExplainer = switchExplainer;
+        window.scrollToTop = scrollToTop;
+        window.openVersionModal = openVersionModal;
+        window.closeVersionModal = closeVersionModal;
+        // New Exports
+        window.toggleTheme = toggleTheme;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.toggleLang = toggleLang;
+        // [New Functions Export]
+        window.openPaymentModal = openPaymentModal;
+        window.closePaymentModal = closePaymentModal;
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.closePurchaseModal = closePurchaseModal;
+        window.submitPurchaseData = submitPurchaseData;
+        // [Docs Exports]
+        window.openDocs = openDocs;
+        window.switchDocs = switchDocs;
+        // [Mobile Docs Menu Export]
+        window.toggleDocsMenu = toggleDocsMenu;
+
+        // Auto Start (If script loaded after DOM)
+        window.onload = function() {
+            initApp();
+            // تأكد من تحميل أيقونات Swiper وغيرها
+            lucide.createIcons();
+        };
+
+        // [إضافة جديدة] منطق شاشة التحميل (Loader Logic)
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                // Ensure visible for at least a short duration for aesthetics
+                setTimeout(() => {
+                    // Start fade out transition
+                    loader.classList.add('opacity-0', 'scale-105', 'pointer-events-none');
+                    // Remove from DOM after transition completes
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 700); // Matches CSS duration
+                }, 800); // Minimum view time
+            }
+        });
+
+        // تهيئة أيقونات الصفحة الرئيسية
+        lucide.createIcons();
+
+    </script>
+</body>
+</html>
