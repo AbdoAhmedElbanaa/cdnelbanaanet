@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html data-theme='light' dir='rtl' lang='ar'>
+<head>
+    <meta charset='UTF-8'/>
+    <meta content='width=device-width, initial-scale=1.0' name='viewport'/>
+    <title>Plugo Client Area - Premium Environment</title>
+    
+    <!-- الخطوط -->
+    <link href='https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700&display=swap' rel='stylesheet'/>
+    <link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap' rel='stylesheet'/>
+    
+    <!-- Tailwind CSS -->
+    <script src='https://cdn.tailwindcss.com'></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Driver.js (الجولة التعريفية) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' },
+                        slate: { 850: '#1e293b', 950: '#020617' },
+                        glass: { 
+                            border: 'rgba(255, 255, 255, 0.12)', 
+                            dark: 'rgba(15, 23, 42, 0.6)' 
+                        }
+                    },
+                    animation: { 
+                        'spin-slow': 'spin 8s linear infinite',
+                        'fade-up': 'fadeUp 0.5s ease-out forwards',
+                        'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        scaleIn: { '0%': { opacity: '0', transform: 'scale(0.9)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    },
+                    boxShadow: {
+                        'premium': '0 25px 50px -12px rgba(0, 0, 0, 0.08)',
+                        'premium-dark': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                        'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- أيقونات Lucide -->
+    <script src='https://unpkg.com/lucide@latest'></script>
+
+    <style>
+        :root { 
+            --primary-color: #3b82f6; 
+            --bg-body: #f8fafc; 
+            --bg-glass: rgba(255, 255, 255, 0.75); 
+            --border-glass: rgba(255, 255, 255, 0.5); 
+            --text-primary: #0f172a; 
+            --text-secondary: #475569; 
+            --sidebar-bg: rgba(255, 255, 255, 0.4);
+        }
+        
+        [data-theme='dark'] { 
+            --bg-body: #020617; 
+            --bg-glass: rgba(15, 23, 42, 0.7); 
+            --border-glass: rgba(255, 255, 255, 0.08); 
+            --text-primary: #f1f5f9; 
+            --text-secondary: #94a3b8; 
+            --sidebar-bg: rgba(15, 23, 42, 0.5);
+        }
+
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-primary); 
+            margin: 0; 
+            padding: 0; 
+            transition: background-color 0.5s ease, color 0.5s ease; 
+            min-height: 100vh; 
+        }
+        
+        .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; filter: blur(120px); opacity: 0.45; }
+        .blob-1 { top: -10%; left: -5%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent); animation: float 10s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -5%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent); animation: float 12s infinite alternate-reverse; }
+
+        .glass { 
+            background: var(--bg-glass); 
+            backdrop-filter: blur(24px) saturate(180%); 
+            -webkit-backdrop-filter: blur(24px) saturate(180%); 
+            border: 1px solid var(--border-glass); 
+            border-radius: 1.5rem; 
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; 
+        }
+        
+        .plugo-container { 
+            background: var(--bg-glass); 
+            border-radius: 3rem; 
+            border: 1px solid var(--border-glass); 
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08); 
+            backdrop-filter: blur(30px); 
+            min-height: 750px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
+        .plugo-sidebar { 
+            background: var(--sidebar-bg); 
+            border-left: 1px solid var(--border-glass); 
+            border-right: 1px solid var(--border-glass);
+            backdrop-filter: blur(15px); 
+        }
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 15px; pointer-events: none; }
+        .toast-card { 
+            pointer-events: auto; 
+            background: var(--bg-glass); 
+            color: var(--text-primary); 
+            border: 1px solid var(--border-glass); 
+            backdrop-filter: blur(25px); 
+            padding: 18px 28px; 
+            border-radius: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            min-width: 320px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+        }
+        
+        ::-webkit-scrollbar { width: 6px; } 
+        ::-webkit-scrollbar-track { background: transparent; } 
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.2); border-radius: 20px; }
+        
+        .dev-theme-toggle { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 30px; 
+            z-index: 9999; 
+            background: var(--bg-glass); 
+            border: 1px solid var(--border-glass); 
+            padding: 12px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease; 
+        }
+        
+        .modal-overlay { 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            background: rgba(0,0,0,0.4); 
+            position: fixed; 
+            inset: 0; 
+            z-index: 1000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(8px); 
+        } 
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-content { transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); } 
+        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
+
+        .btn-premium { position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .btn-premium::after { 
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%; 
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); 
+            transform: rotate(45deg); 
+            transition: 0.5s; 
+        }
+        .btn-premium:hover::after { left: 120%; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Heatmap Styling */
+        .heatmap-cell { width: 12px; height: 12px; border-radius: 2px; }
+        .level-0 { background: #ebedf0; }
+        .level-1 { background: #9be9a8; }
+        .level-2 { background: #40c463; }
+        .level-3 { background: #30a14e; }
+        .level-4 { background: #216e39; }
+        [data-theme='dark'] .level-0 { background: #1e293b; }
+
+        /* Driver.js Custom Style */
+        .driver-popover {
+            background: var(--bg-glass) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 2rem !important;
+            padding: 25px !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important;
+            color: var(--text-primary) !important;
+            font-family: 'Tajawal', sans-serif !important;
+            max-width: 320px !important;
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-500 selection:text-white antialiased text-start">
+
+    <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    
+    <button onclick="toggleTheme()" class="dev-theme-toggle" title="تبديل الوضع"><i data-lucide="sun-moon" size="24"></i></button>
+    
+    <div id="toast-container"></div>
+
+    <div id="plugo-view" class="w-full max-w-[95rem] mx-auto px-4 py-8 md:py-12 flex flex-col">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-10 px-2 animate-fade-up shrink-0 gap-6">
+            <div class="text-center sm:text-start">
+                <h2 id="page-title" class="text-3xl md:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-3">منطقة العملاء</h2>
+                <p id="page-subtitle" class="text-[var(--text-secondary)] text-lg md:text-xl font-light flex items-center justify-center sm:justify-start gap-4">
+                    <span class="w-12 h-1.5 bg-blue-500 block rounded-full shadow-lg shadow-blue-500/40"></span> 
+                    <span id="page-subtitle-text">إدارة ذكية لتراخيصك ومنتجاتك</span>
+                </p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="Actions.toggleLanguage()" class="btn-premium flex items-center gap-3 text-sm font-black bg-blue-600/10 text-blue-600 px-6 py-4 rounded-full border border-blue-600/20 hover:bg-blue-600 hover:text-white transition-all">
+                    <i data-lucide="languages" size="18"></i>
+                    <span id="lang-btn-text">English</span>
+                </button>
+                <button onclick="location.reload()" class="btn-premium group text-[var(--text-secondary)] hover:text-white flex items-center gap-4 text-sm md:text-base font-bold bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 px-8 py-4 rounded-full transition-all duration-300 hover:bg-blue-600 hover:border-blue-600 hover:shadow-2xl shadow-premium backdrop-blur-md">
+                    <i data-lucide="home" class="group-hover:scale-110 transition-transform"></i><span id="home-btn-text">الرئيسية</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="plugo-container relative">
+            <div id="app" class="w-full h-full relative overflow-visible"></div>
+            
+            <div id="ui-loader" class="absolute inset-0 bg-white/80 dark:bg-slate-950/80 z-[100] hidden items-center justify-center backdrop-blur-2xl rounded-[2.5rem] transition-opacity duration-300">
+                <div class="flex flex-col items-center gap-8">
+                    <div class="relative w-28 h-28">
+                         <div class="absolute inset-0 rounded-full border-[8px] border-slate-200/50 dark:border-slate-800/50"></div>
+                         <div class="absolute inset-0 rounded-full border-[8px] border-blue-600 border-t-transparent animate-spin"></div>
+                         <div class="absolute inset-0 flex items-center justify-center"><div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 animate-pulse"><i data-lucide="shield-check" size="28"></i></div></div>
+                    </div>
+                    <div class="text-center">
+                        <p id="loader-text" class="text-xl font-bold text-[var(--text-primary)] tracking-wide mb-3">جاري المزامنة...</p>
+                        <div class="h-1.5 w-32 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto overflow-hidden"><div class="h-full bg-blue-600 w-1/2 animate-[shine_1s_infinite]"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Modal -->
+            <div id="profile-modal" class="modal-overlay" onclick="if(event.target === this) Actions.closeProfileModal()">
+                <div class="modal-content glass w-full max-w-md p-10 relative shadow-premium-dark border border-white/40 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 rounded-[3rem]">
+                    <button onclick="Actions.closeProfileModal()" class="absolute top-8 right-8 text-slate-400 hover:text-red-500 transition-all p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><i data-lucide="x" size="24"></i></button>
+                    <div class="text-center mb-10 text-start">
+                        <div class="w-28 h-28 mx-auto bg-gradient-to-tr from-blue-500 via-indigo-600 to-purple-600 rounded-[2.5rem] flex items-center justify-center text-white text-5xl font-bold shadow-2xl shadow-blue-500/30 mb-8 relative group">
+                            <span id="modal-avatar-char" class="group-hover:scale-110 transition-transform">U</span>
+                            <div class="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-full border-4 border-white dark:border-slate-900 shadow-lg"><i data-lucide="check" size="16" stroke-width="4"></i></div>
+                        </div>
+                        <h3 id="modal-user-name" class="text-3xl font-black text-[var(--text-primary)] mb-2 text-center">User Name</h3>
+                        <p id="modal-user-email" class="text-slate-500 font-medium font-mono bg-slate-100 dark:bg-slate-800/80 px-4 py-1.5 rounded-xl inline-block text-sm border border-slate-200 dark:border-slate-700 w-full text-center" dir="ltr">user@example.com</p>
+                    </div>
+                    <div class="space-y-5 mb-10">
+                        <div class="flex items-center justify-between p-5 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-inner-light">
+                            <div class="flex items-center gap-4 text-[var(--text-secondary)]"><div class="bg-blue-100 dark:bg-blue-900/30 p-2.5 rounded-xl text-blue-600"><i data-lucide="shield" size="20"></i></div><span id="modal-status-label" class="font-bold">حالة الحساب</span></div>
+                            <span id="modal-status-badge" class="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-1.5 rounded-xl text-sm font-bold border border-emerald-100 dark:border-emerald-800">نشط</span>
+                        </div>
+                        <div class="flex items-center justify-between p-5 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-inner-light">
+                            <div class="flex items-center gap-4 text-[var(--text-secondary)]"><div class="bg-purple-100 dark:bg-purple-900/30 p-2.5 rounded-xl text-purple-600"><i data-lucide="shield-check" size="20"></i></div><span id="modal-license-label" class="font-bold">استهلاك التراخيص</span></div>
+                            <span id="modal-license-count" class="text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-4 py-1.5 rounded-xl text-sm font-bold border border-blue-100 dark:border-blue-800">0 / 0</span>
+                        </div>
+                    </div>
+                    <button id="modal-logout-btn" onclick="Actions.logout()" class="w-full py-5 rounded-2xl bg-red-50 dark:bg-red-900/10 text-red-600 border border-red-100 dark:border-red-900/20 font-bold hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-4 group shadow-lg hover:shadow-red-500/20"><i data-lucide="log-out" size="22" class="group-hover:-translate-x-1 transition-transform"></i> تسجيل الخروج آمن</button>
+                </div>
+            </div>
+
+            <!-- Download Terms Modal -->
+            <div id="download-terms-modal" class="modal-overlay" onclick="if(event.target === this) Actions.closeDownloadModal()">
+                <div class="modal-content glass w-full max-w-xl p-10 relative shadow-premium-dark border border-white/40 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 rounded-[3rem]">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 mx-auto bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-xl"><i data-lucide="file-text" size="36"></i></div>
+                        <h3 id="terms-title" class="text-3xl font-black text-[var(--text-primary)] mb-2">سياسات الاستخدام</h3>
+                        <p id="terms-subtitle" class="text-slate-500 font-medium">يرجى قراءة الشروط قبل تحميل الملف</p>
+                    </div>
+                    <div id="terms-content" class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 h-64 overflow-y-auto mb-8 text-sm leading-relaxed text-start text-[var(--text-secondary)]">
+                        <!-- Content handled by translations -->
+                    </div>
+                    <div class="flex gap-4">
+                        <button id="terms-confirm" onclick="Actions.confirmDownload()" class="flex-1 py-5 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-500/30 transition-all transform hover:-translate-y-1">موافق، ابدأ التحميل</button>
+                        <button id="terms-cancel" onclick="Actions.closeDownloadModal()" class="flex-1 py-5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-[var(--text-secondary)] font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition shadow-sm">غير موافق</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- License Delete Confirmation Modal -->
+            <div id="delete-confirm-modal" class="modal-overlay" onclick="if(event.target === this) Actions.closeDeleteModal()">
+                <div class="modal-content glass w-full max-w-md p-10 text-center border border-white/40 dark:border-white/10 bg-white dark:bg-slate-900 rounded-[3rem] shadow-premium-dark">
+                    <div class="w-24 h-24 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-red-500/20 animate-pulse-slow"><i data-lucide="trash-2" size="48"></i></div>
+                    <h3 id="delete-modal-title" class="text-3xl font-black text-[var(--text-primary)] mb-4">حذف الترخيص؟</h3>
+                    <p id="delete-modal-desc" class="text-[var(--text-secondary)] mb-10 leading-relaxed font-medium text-lg">أنت على وشك حذف هذا التفعيل نهائياً من حسابك. لن يتمكن الموقع المرتبط من الوصول لخدماتنا.</p>
+                    <div class="flex gap-4">
+                        <button id="delete-modal-confirm" onclick="Actions.confirmDelete()" class="flex-1 py-5 rounded-2xl bg-red-600 text-white font-black hover:bg-red-700 shadow-xl shadow-blue-500/40 transition-all transform hover:-translate-y-1">تأكيد الحذف</button>
+                        <button id="delete-modal-cancel" onclick="Actions.closeDeleteModal()" class="flex-1 py-5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-[var(--text-secondary)] font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition shadow-sm">إلغاء</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logout Confirmation -->
+            <div id="logout-confirm-modal" class="modal-overlay" onclick="if(event.target === this) Actions.cancelLogout()">
+                <div class="modal-content glass w-full max-w-sm p-10 text-center border border-white/40 dark:border-white/10 bg-white dark:bg-slate-900 rounded-[3rem] shadow-premium-dark">
+                    <div class="w-24 h-24 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-red-500/20 animate-pulse-slow"><i data-lucide="power" size="48"></i></div>
+                    <h3 id="logout-modal-title" class="text-3xl font-black text-[var(--text-primary)] mb-4">هل أنت متأكد؟</h3>
+                    <p id="logout-modal-desc" class="text-[var(--text-secondary)] mb-10 leading-relaxed font-medium">سيتم إنهاء جلستك الحالية وحذف بيانات الوصول المؤقتة.</p>
+                    <div class="flex gap-4">
+                        <button id="logout-modal-cancel" onclick="Actions.cancelLogout()" class="flex-1 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-[var(--text-secondary)] font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition shadow-sm">تراجع</button>
+                        <button id="logout-modal-confirm" onclick="Actions.performLogout()" class="flex-1 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 shadow-xl shadow-red-500/40 transition transform hover:-translate-y-1">تأكيد الخروج</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- نظام اللغات والترجمة (I18n) الشامل ---
+        const i18n = {
+            ar: {
+                pageTitle: "منطقة العملاء",
+                pageSubtitle: "إدارة ذكية لتراخيصك ومنتجاتك",
+                langBtn: "English",
+                homeBtn: "الرئيسية",
+                loginHeader: "الدخول الآمن",
+                loginEmail: "البريد الإلكتروني",
+                loginPass: "كلمة المرور",
+                loginBtn: "دخول المنصة",
+                overview: "الرئيسية",
+                licenses: "التراخيص",
+                downloads: "التحميلات",
+                profile: "الملف الشخصي",
+                logout: "خروج آمن",
+                statsTitle: "التحليلات الذكية",
+                statsSubtitle: "مراقبة حية لنشاط حسابك واستهلاك الموارد.",
+                statLicenses: "التراخيص",
+                statActiveSites: "المواقع النشطة",
+                statAccess: "مرات الوصول",
+                statProducts: "المنتجات",
+                distTitle: "توزيع الاستهلاك",
+                activityTitle: "النشاط الأسبوعي الحقيقي",
+                heatmapTitle: "كثافة استخدام المنصة",
+                heatmapLess: "أقل",
+                heatmapMore: "أكثر",
+                usageRate: "معدل الاستهلاك",
+                seatsLeft: "متبقي لديك {n} مقاعد متاحة",
+                addNewLicense: "تفعيل ترخيص جديد",
+                licensePlaceholder: "أدخل معرف المدونة (Blog ID)...",
+                checkNow: "تحقق الآن",
+                activeLicenses: "المواقع المرخصة",
+                activeLicenseTag: "الرخصة النشطة",
+                licenseManagerSubtitle: "إدارة تراخيصك المرتبطة بحسابك بسهولة.",
+                licenseManagerTitle: "مدير التراخيص",
+                noLicenses: "لا توجد تراخيص نشطة حالياً",
+                productsTitle: "مركز التحميل",
+                productsSubtitle: "احصل على أحدث إصدارات القوالب المعتمدة والمستقرة.",
+                availableVersions: "الإصدارات المتاحة",
+                termsTitle: "سياسات الاستخدام",
+                termsSubtitle: "يرجى قراءة الشروط قبل تحميل الملف",
+                termsConfirm: "موافق، ابدأ التحميل",
+                termsCancel: "غير موافق",
+                deleteTitle: "حذف الترخيص؟",
+                deleteConfirm: "تأكيد الحذف",
+                logoutConfirm: "تأكيد الخروج",
+                tourNavTitle: "روابط التنقل",
+                tourNavDesc: "من هنا يمكنك التنقل بين لوحة التحليلات، إدارة التراخيص، ومركز التحميلات.",
+                tourStatsTitle: "نظرة سريعة",
+                tourStatsDesc: "تابع استهلاك تراخيصك وعدد مرات الوصول لحسابك فوراً.",
+                tourChartsTitle: "الرسوم البيانية",
+                tourChartsDesc: "تحليلات بصرية ذكية توضح توزيع استهلاكك ونشاطك الأسبوعي.",
+                tourUserTitle: "حسابك الشخصي",
+                tourUserDesc: "من هنا يمكنك تعديل ملفك الشخصي أو تسجيل الخروج الآمن من المنصة.",
+                toastSync: "📡 جاري المزامنة...",
+                toastWelcome: "أهلاً بك مجدداً، {name}",
+                toastFields: "يرجى ملء كافة الحقول",
+                toastError: "حدث خطأ في معالجة البيانات، تأكد من اتصالك",
+                toastCopied: "تم النسخ بنجاح",
+                toastVerifying: "جاري التحقق من هوية الموقع...",
+                toastActivating: "جاري ربط الترخيص بالخادم...",
+                toastActivated: "تم التفعيل بنجاح!",
+                toastDeleting: "جاري حذف التفعيل...",
+                toastDeleted: "تم حذف التفعيل بنجاح",
+                errInvalidId: "المعرف غير صالح (أرقام فقط)",
+                errAlreadyOwned: "هذا الموقع مسجل مسبقاً في حسابك الحالي",
+                errThirdParty: "هذا الموقع مسجل في حساب مستخدم آخر",
+                errMaxReached: "لقد وصلت للحد الأقصى من التفعيلات",
+                termsList: [
+                    "يلتزم العميل باستخدام القالب على النطاقات المرخصة له فقط.",
+                    "يمنع منعاً باتاً إعادة بيع القالب أو توزيعه لأي جهة أخرى.",
+                    "يمنع إزالة حقوق الملكية الخاصة بـ Plugo من الكود المصدري."
+                ],
+                stBanned: {t: "حظر الوصول", m: "لقد تم حظر حسابك لمخالفة القوانين."},
+                stSecHold: {t: "تعليق أمني", m: "هوية المستخدم تتطلب مراجعة أمنية."},
+                stMaintenance: {t: "صيانة دورية", m: "النظام تحت التحديث حالياً."},
+                stRestricted: {t: "وصول مقيد", m: "لديك صلاحيات محدودة حالياً."},
+                stInactive: {t: "الحساب غير نشط", m: "يرجى التواصل لتفعيل حسابك."},
+                stExpired: {t: "انتهت الفترة", m: "يرجى ترقية حسابك للاستمرار."},
+                stLocked: {t: "حساب مقفل", m: "تم قفل الحساب لكثرة المحاولات."},
+                stPending: {t: "قيد المراجعة", m: "طلبك تحت الدراسة الآن."},
+                stEmail: {t: "بريد غير مؤكد", m: "يرجى تأكيد بريدك الإلكتروني."},
+                stPayment: {t: "يتطلب دفع", m: "يرجى إتمام عملية الدفع."},
+                stSupport: {t: "يتطلب دعم", m: "يرجى مراسلة فريق الدعم."},
+                stFraud: {t: "رصد احتيال", m: "تم رصد نشاط مريب على حسابك."},
+                stArchived: {t: "حساب مؤرشف", m: "هذا الحساب لم يعد نشطاً."},
+                stCanceled: {t: "اشتراك ملغي", m: "لقد قمت بإلغاء اشتراكك."},
+                stIdentity: {t: "انتظار هوية", m: "يرجى رفع صورة الهوية."},
+                stCompliance: {t: "مراجعة امتثال", m: "نراجع مدى توافقك مع الشروط."},
+                stUpdate: {t: "تحديث مطلوب", m: "يجب تحديث نسخة القالب."},
+                stAction: {t: "إجراء مطلوب", m: "يرجى إتمام الإجراءات المطلوبة."},
+                stWait: {t: "انتظار موافقة", m: "ننتظر موافقة القسم المختص."},
+                stFailed: {t: "فشل دفع", m: "فشلت عملية التجديد التلقائي."}
+            },
+            en: {
+                pageTitle: "Client Area",
+                pageSubtitle: "Smart management for your licenses and products",
+                langBtn: "العربية",
+                homeBtn: "Home",
+                loginHeader: "Secure Access",
+                loginEmail: "Email Address",
+                loginPass: "Password",
+                loginBtn: "Sign In",
+                overview: "Overview",
+                licenses: "Licenses",
+                downloads: "Downloads",
+                profile: "Profile",
+                logout: "Logout",
+                statsTitle: "Smart Analytics",
+                statsSubtitle: "Live monitoring of your account activity and resource consumption.",
+                statLicenses: "Licenses",
+                statActiveSites: "Active Sites",
+                statAccess: "Access Count",
+                statProducts: "Products",
+                distTitle: "Consumption Distribution",
+                activityTitle: "Real Weekly Activity",
+                heatmapTitle: "Platform Usage Intensity",
+                heatmapLess: "Less",
+                heatmapMore: "More",
+                usageRate: "Usage Rate",
+                seatsLeft: "{n} seats remaining",
+                addNewLicense: "Activate New License",
+                licensePlaceholder: "Enter Blog ID...",
+                checkNow: "Verify Now",
+                activeLicenses: "Licensed Sites",
+                activeLicenseTag: "Active License",
+                licenseManagerTitle: "License Manager",
+                licenseManagerSubtitle: "Manage and monitor all your active licenses from one place.",
+                noLicenses: "No active licenses currently",
+                productsTitle: "Download Center",
+                productsSubtitle: "Get the latest certified and stable template versions.",
+                availableVersions: "Available Versions",
+                termsTitle: "Usage Policy",
+                termsSubtitle: "Please read terms before downloading",
+                termsConfirm: "Agree, Start Download",
+                termsCancel: "Decline",
+                deleteTitle: "Delete License?",
+                deleteConfirm: "Confirm Delete",
+                logoutConfirm: "Confirm Logout",
+                tourNavTitle: "Navigation Links",
+                tourNavDesc: "Navigate between Analytics, Licenses, and Download center.",
+                tourStatsTitle: "Quick Stats",
+                tourStatsDesc: "Monitor your license usage and access count instantly.",
+                tourChartsTitle: "Visual Analytics",
+                tourChartsDesc: "Smart charts showing your consumption distribution and weekly activity.",
+                tourUserTitle: "Your Profile",
+                tourUserDesc: "Edit your profile or logout securely from the platform.",
+                toastSync: "📡 Syncing...",
+                toastWelcome: "Welcome back, {name}",
+                toastFields: "Please fill all fields",
+                toastError: "Data processing error, check your connection",
+                toastCopied: "Copied successfully",
+                toastVerifying: "Verifying site identity...",
+                toastActivating: "Linking license to server...",
+                toastActivated: "Activated successfully!",
+                toastDeleting: "Deleting activation...",
+                toastDeleted: "Activation deleted successfully",
+                errInvalidId: "Invalid ID (Numbers only)",
+                errAlreadyOwned: "This site is already registered in your account",
+                errThirdParty: "This site is registered to another user account",
+                errMaxReached: "Maximum activations reached",
+                termsList: [
+                    "Client must use the template only on licensed domains.",
+                    "Reselling or distributing the template is strictly forbidden.",
+                    "Removing Plugo copyrights from source code is prohibited."
+                ],
+                stBanned: {t: "Banned Access", m: "Your access has been suspended due to violations."},
+                stSecHold: {t: "Security Hold", m: "Account requires security verification."},
+                stMaintenance: {t: "Maintenance", m: "System is currently under maintenance."},
+                stRestricted: {t: "Restricted", m: "Your account has limited permissions."},
+                stInactive: {t: "Inactive", m: "Please contact us to activate account."},
+                stExpired: {t: "Expired", m: "Please upgrade your account to continue."},
+                stLocked: {t: "Locked", m: "Account locked due to many attempts."},
+                stPending: {t: "Pending", m: "Your request is under review."},
+                stEmail: {t: "Verify Email", m: "Please verify your email address."},
+                stPayment: {t: "Payment Required", m: "Please complete your payment."},
+                stSupport: {t: "Support Required", m: "Please contact our support team."},
+                stFraud: {t: "Fraud Detected", m: "Suspicious activity detected."},
+                stArchived: {t: "Archived", m: "This account is no longer active."},
+                stCanceled: {t: "Canceled", m: "Your subscription was canceled."},
+                stIdentity: {t: "Identity Pending", m: "Please upload your ID document."},
+                stCompliance: {t: "Compliance Review", m: "Reviewing term compliance."},
+                stUpdate: {t: "Update Required", m: "Please update your template version."},
+                stAction: {t: "Action Required", m: "Please complete required actions."},
+                stWait: {t: "Wait Approval", m: "Waiting for department approval."},
+                stFailed: {t: "Payment Failed", m: "Auto-renewal process failed."}
+            }
+        };
+
+        // --- المنطق البرمجي والبيانات ---
+        const SECRET_KEY = "AbdoABDOelbanaELBANAbassantBASSANT29920051102004";
+        const CONFIG = {
+            SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxg-DT9IJdBHmpvkCWZz0nVUx9tKUGLrc2gx5jNt20sa9vlGBm95eqp2Ax1ExbSWbTe/exec",
+            TG_TOKEN: "7295719875:AAHp-Y4d2N8pM5w-gJ8d1K9h4X7d3s6a", 
+            TG_CHAT_ID: "123456789" 
+        };
+
+        const XORCipher = {
+            process: (text, key) => {
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                }
+                return result;
+            },
+            encrypt: (data, key) => {
+                try {
+                    const json = JSON.stringify(data);
+                    const utf8Bytes = unescape(encodeURIComponent(json));
+                    const xored = XORCipher.process(utf8Bytes, key);
+                    return btoa(xored);
+                } catch(e) { return null; }
+            },
+            decrypt: (encoded, key) => {
+                try {
+                    const binary = atob(encoded);
+                    const xored = XORCipher.process(binary, key);
+                    const json = decodeURIComponent(escape(xored));
+                    return JSON.parse(json);
+                } catch (e) { return null; }
+            }
+        };
+
+        const SessionManager = {
+            key: 'plugo_session',
+            accessKey: 'plugo_access_count',
+            tourKey: 'plugo_tour_completed',
+            langKey: 'plugo_lang',
+            genToken: () => {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+                let res = '';
+                for (let i = 0; i < 150; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+                return res;
+            },
+            create: (userData) => {
+                const now = Date.now();
+                const payload = {
+                    email: userData.email, password: userData.password, 
+                    name: userData.name, status: userData.status,
+                    trialEndsAt: userData.trialEndsAt || (now + (3 * 24 * 60 * 60 * 1000)),
+                    issuedAt: now
+                };
+                const session = {
+                    token: SessionManager.genToken(),
+                    expiresAt: now + (60 * 60 * 1000),
+                    payload: XORCipher.encrypt(payload, SECRET_KEY)
+                };
+                localStorage.setItem(SessionManager.key, JSON.stringify(session));
+                const count = parseInt(localStorage.getItem(SessionManager.accessKey) || "0") + 1;
+                localStorage.setItem(SessionManager.accessKey, count.toString());
+            },
+            get: () => {
+                const raw = localStorage.getItem(SessionManager.key);
+                if (!raw) return null;
+                try {
+                    const session = JSON.parse(raw);
+                    if (Date.now() > session.expiresAt) return null; 
+                    const data = XORCipher.decrypt(session.payload, SECRET_KEY);
+                    return { ...session, data };
+                } catch (e) { return null; }
+            },
+            getAccessCount: () => localStorage.getItem(SessionManager.accessKey) || "1",
+            isTourCompleted: () => localStorage.getItem(SessionManager.tourKey) === 'true',
+            completeTour: () => localStorage.setItem(SessionManager.tourKey, 'true'),
+            getLang: () => localStorage.getItem(SessionManager.langKey) || 'ar',
+            setLang: (l) => localStorage.setItem(SessionManager.langKey, l),
+            clear: () => { localStorage.removeItem(SessionManager.key); }
+        };
+
+        const state = {
+            view: 'login', activeSection: 'overview', user: null, blogs: [],
+            pendingDownload: null,
+            pendingDelete: null,
+            lang: SessionManager.getLang(),
+            update(newState) { Object.assign(this, newState); window.renderApp(); }
+        };
+
+        const TourService = {
+            start() {
+                if(SessionManager.isTourCompleted() || state.view !== 'dashboard') return;
+                const t = i18n[state.lang];
+                
+                const driverObj = window.driver.js.driver({
+                    showProgress: true,
+                    nextBtnText: state.lang === 'ar' ? 'التالي' : 'Next',
+                    prevBtnText: state.lang === 'ar' ? 'السابق' : 'Prev',
+                    doneBtnText: state.lang === 'ar' ? 'تم' : 'Done',
+                    allowClose: false,
+                    overlayColor: 'rgba(2, 6, 23, 0.8)',
+                    onDismisssed: () => SessionManager.completeTour(),
+                    onDestroyed: () => SessionManager.completeTour(),
+                    steps: [
+                        { element: '#tour-nav', popover: { title: t.tourNavTitle, description: t.tourNavDesc, side: "left", align: 'start' } },
+                        { element: '#tour-stats', popover: { title: t.tourStatsTitle, description: t.tourStatsDesc, side: "bottom", align: 'center' } },
+                        { element: '#tour-charts', popover: { title: t.tourChartsTitle, description: t.tourChartsDesc, side: "top", align: 'center' } },
+                        { element: '#tour-user', popover: { title: t.tourUserTitle, description: t.tourUserDesc, side: "top", align: 'start' } }
+                    ]
+                });
+
+                setTimeout(() => driverObj.drive(), 1500);
+            }
+        };
+
+        const Helpers = {
+            getUserEmail() { return state.user?.email || SessionManager.get()?.data?.email || 'unknown@user.com'; },
+            toast(msg, type = 'success') {
+                let container = document.getElementById('toast-container');
+                if (!container) { container = document.createElement('div'); container.id = 'toast-container'; document.body.appendChild(container); }
+                const toast = document.createElement('div');
+                const icons = { success: 'check-circle', error: 'alert-triangle', loading: 'loader-2', info: 'info' };
+                const iconColor = { success: 'text-emerald-500', error: 'text-red-500', loading: 'text-blue-500 animate-spin', info: 'text-blue-500' };
+                toast.className = `toast-card animate-scale-in`;
+                toast.innerHTML = `<div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-premium border border-slate-200 dark:border-white/10"><i data-lucide="${icons[type] || 'info'}" class="${iconColor[type] || 'text-blue-500'}" size="24"></i></div><div class="flex flex-col text-start"><span class="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">${state.lang === 'ar' ? 'إشعار النظام' : 'System Notification'}</span><span class="text-sm font-bold text-slate-700 dark:text-slate-200">${msg}</span></div>`;
+                container.appendChild(toast);
+                lucide.createIcons();
+                anime({ targets: toast, translateY: [-30, 0], opacity: [0, 1], duration: 800, easing: 'easeOutElastic(1, .6)' });
+                const remove = () => { anime({ targets: toast, scale: 0.9, opacity: 0, duration: 300, easing: 'easeInQuad', complete: () => toast.remove() }); };
+                if (type !== 'loading') setTimeout(remove, 4500);
+                return { close: remove };
+            },
+            toggleLoader(show, text) { 
+                const loader = document.getElementById('ui-loader');
+                if(loader) {
+                    document.getElementById('loader-text').innerText = text || i18n[state.lang].toastSync;
+                    if (show) { loader.style.display = 'flex'; anime({ targets: loader, opacity: [0, 1], duration: 400, easing: 'linear' }); } 
+                    else { anime({ targets: loader, opacity: 0, duration: 400, easing: 'linear', complete: () => loader.style.display = 'none' }); }
+                }
+            },
+            getUniqueProducts() {
+                if (!state.user) return [];
+                const unique = new Map();
+                const rawProducts = Array.isArray(state.user.products) ? state.user.products : (state.user.products ? [state.user.products] : []);
+                rawProducts.forEach(p => {
+                    if(!p || !p.name) return;
+                    const links = typeof p.link === 'string' ? p.link.split(',') : [p.link];
+                    const processedVersions = Array.isArray(p.versions) ? p.versions.map((v, i) => ({ label: v, link: links[i] || links[0] || "#" })) : [{ label: 'V1.0.0 Stable', link: links[0] || "#" }];
+                    unique.set(p.name, { ...p, versions: processedVersions });
+                });
+                state.blogs.forEach(b => { 
+                    if(b.productData && b.productData.name) {
+                        const existing = unique.get(b.productData.name);
+                        if (!existing) {
+                            const p = b.productData;
+                            const links = typeof p.link === 'string' ? p.link.split(',') : [p.link];
+                            const processedVersions = Array.isArray(p.versions) ? p.versions.map((v, i) => ({ label: v, link: links[i] || links[0] || "#" })) : [{ label: 'V1.0.0 Stable', link: links[0] || "#" }];
+                            unique.set(p.name, { ...p, versions: processedVersions });
+                        }
+                    }
+                });
+                return Array.from(unique.values());
+            },
+            copy(text) { navigator.clipboard.writeText(text); Helpers.toast(i18n[state.lang].toastCopied); },
+            jsonp(id) {
+                return new Promise((resolve, reject) => {
+                    const cb = 'cb_' + Math.floor(Math.random() * 10000);
+                    window[cb] = (data) => { delete window[cb]; document.getElementById(cb)?.remove(); resolve(data); };
+                    const s = document.createElement('script'); s.src = `https://www.blogger.com/feeds/${id}/posts/default?alt=json-in-script&callback=${cb}`;
+                    s.onerror = () => reject();
+                    document.body.appendChild(s);
+                });
+            }
+        };
+
+        const Actions = {
+            toggleLanguage() {
+                const newLang = state.lang === 'ar' ? 'en' : 'ar';
+                state.lang = newLang;
+                SessionManager.setLang(newLang);
+                document.documentElement.setAttribute('lang', newLang);
+                document.documentElement.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr');
+                state.update({});
+                if (state.activeSection === 'overview' && state.view === 'dashboard') Actions.initAnalyticsCharts();
+            },
+            async login() {
+                const t = i18n[state.lang];
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-password').value;
+                if(!email || !pass) return Helpers.toast(t.toastFields, "error");
+                Helpers.toggleLoader(true);
+                try {
+                    const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                    const raw = await res.json();
+                    let result = raw;
+                    if (raw.secure && raw.payload) result = XORCipher.decrypt(raw.payload, SECRET_KEY);
+                    if (result && result.status === 'success') {
+                        SessionManager.create({ ...result.meta, email, password: pass });
+                        state.user = result.meta;
+                        state.blogs = result.blogs || [];
+                        Actions.resolveView(result.meta.status || 'active');
+                        Helpers.toast(t.toastWelcome.replace('{name}', result.meta.name));
+                        setTimeout(() => TourService.start(), 2000);
+                    } else if (result && result.status === 'banned') {
+                        state.update({ view: 'banned' });
+                    } else Helpers.toast(state.lang === 'ar' ? "بيانات الدخول خاطئة" : "Invalid credentials", "error");
+                } catch(e) { Helpers.toast(t.toastError, "error"); }
+                finally { Helpers.toggleLoader(false); }
+            },
+            logout() { document.getElementById('logout-confirm-modal').classList.add('open'); },
+            cancelLogout() { document.getElementById('logout-confirm-modal').classList.remove('open'); },
+            performLogout() {
+                SessionManager.clear();
+                state.view = 'login'; state.user = null; state.update({});
+                document.getElementById('logout-confirm-modal').classList.remove('open');
+            },
+            resolveView(status) {
+                const map = {
+                    'active': 'dashboard', 
+                    'banned': 'banned', 
+                    'inactive': 'inactive', 
+                    'review': 'review',
+                    'pending': 'pending', 
+                    'email_unverified': 'email_unverified', 
+                    'suspended': 'suspended',
+                    'expired': 'expired', 
+                    'payment_required': 'payment_required', 
+                    'trial': 'dashboard',
+                    'trial_expired': 'trial_expired', 
+                    'security_hold': 'security_hold', 
+                    'support_required': 'support_required', 
+                    'maintenance': 'maintenance', 
+                    'restricted': 'restricted',
+                    'locked': 'locked', 
+                    'account_deleted': 'account_deleted', 
+                    'update_required': 'update_required',
+                    'identity_pending': 'identity_pending', 
+                    'payment_failed': 'payment_failed', 
+                    'wait_approval': 'wait_approval',
+                    'compliance_review': 'compliance_review',
+                    'action_required': 'action_needed',
+                    'fraud_detected': 'fraud_detected',
+                    'archived': 'archived',
+                    'canceled': 'canceled'
+                };
+                state.update({ view: map[status] || 'dashboard' });
+            },
+            setSection(sec) { 
+                state.update({ activeSection: sec }); 
+                if(sec === 'overview') setTimeout(() => { Actions.initAnalyticsCharts(); lucide.createIcons(); }, 100);
+            },
+            initAnalyticsCharts() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const t = i18n[state.lang];
+                const textColor = isDark ? '#f1f5f9' : '#475569';
+                const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                const used = state.blogs.length;
+                const total = state.user?.maxActivations || 5;
+                const remaining = Math.max(0, total - used);
+
+                const donutEl = document.querySelector("#chart-license");
+                if (donutEl) {
+                    donutEl.innerHTML = '';
+                    new ApexCharts(donutEl, {
+                        series: [used, remaining],
+                        chart: { type: 'donut', height: 280, animations: { enabled: true }, background: 'transparent' },
+                        labels: [state.lang === 'ar' ? 'مستخدمة' : 'Used', state.lang === 'ar' ? 'متاحة' : 'Available'],
+                        theme: { mode: isDark ? 'dark' : 'light' },
+                        colors: ['#3b82f6', isDark ? '#1e293b' : '#f1f5f9'],
+                        stroke: { show: false },
+                        legend: { position: 'bottom', labels: { colors: textColor } },
+                        plotOptions: { pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: state.lang === 'ar' ? 'الإجمالي' : 'Total', color: textColor } } } } }
+                    }).render();
+                }
+
+                const activityData = used > 0 ? [1, 2, Math.ceil(used/2), used, 0, Math.floor(used/3), 1] : [0,0,0,0,0,0,0];
+                const areaEl = document.querySelector("#chart-activity");
+                if (areaEl) {
+                    areaEl.innerHTML = '';
+                    new ApexCharts(areaEl, {
+                        series: [{ name: state.lang === 'ar' ? 'التفعيلات' : 'Activations', data: activityData }],
+                        chart: { type: 'area', height: 280, toolbar: { show: false }, background: 'transparent' },
+                        theme: { mode: isDark ? 'dark' : 'light' },
+                        colors: ['#6366f1'],
+                        stroke: { curve: 'smooth', width: 3 },
+                        grid: { borderColor: gridColor },
+                        xaxis: { 
+                            categories: state.lang === 'ar' ? ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'] : ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'], 
+                            labels: { style: { colors: textColor } } 
+                        },
+                        yaxis: { labels: { style: { colors: textColor } } }
+                    }).render();
+                }
+            },
+            openProfileModal() {
+                const m = document.getElementById('profile-modal');
+                if (!m) return;
+                const t = i18n[state.lang];
+                document.getElementById('modal-status-label').innerText = t.stInactive.t;
+                document.getElementById('modal-license-label').innerText = t.usageRate;
+                document.getElementById('modal-logout-btn').innerHTML = `<i data-lucide="log-out"></i> ${t.logout}`;
+                
+                document.getElementById('modal-avatar-char').innerText = state.user?.name?.charAt(0).toUpperCase() || 'U';
+                document.getElementById('modal-user-name').innerText = state.user?.name || 'User';
+                document.getElementById('modal-user-email').innerText = Helpers.getUserEmail();
+                document.getElementById('modal-license-count').innerText = state.blogs.length + " / " + (state.user?.maxActivations || 0);
+                document.getElementById('modal-status-badge').innerText = state.user?.status || 'Active';
+                
+                m.classList.add('open');
+                lucide.createIcons();
+            },
+            closeProfileModal() { document.getElementById('profile-modal').classList.remove('open'); },
+            download(link) {
+                if(!link || link === "#") return Helpers.toast(state.lang === 'ar' ? "الرابط غير متاح" : "Link unavailable", "error");
+                state.pendingDownload = link;
+                document.getElementById('download-terms-modal').classList.add('open');
+            },
+            confirmDownload() {
+                if(state.pendingDownload) window.open(state.pendingDownload, '_blank');
+                Actions.closeDownloadModal();
+            },
+            closeDownloadModal() { document.getElementById('download-terms-modal').classList.remove('open'); },
+            deleteBlog(id) {
+                state.pendingDelete = id;
+                document.getElementById('delete-confirm-modal').classList.add('open');
+            },
+            closeDeleteModal() { document.getElementById('delete-confirm-modal').classList.remove('open'); },
+            async confirmDelete() {
+                const id = state.pendingDelete;
+                const s = SessionManager.get();
+                Actions.closeDeleteModal();
+                const l = Helpers.toast(i18n[state.lang].toastDeleting, "loading");
+                try {
+                    await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', blogid: id, userEmail: s.data.email }) });
+                    l.close(); 
+                    Helpers.toast(i18n[state.lang].toastDeleted);
+                    await Actions.refreshData(s.data.email, s.data.password);
+                    window.renderApp();
+                } catch(e) { l.close(); }
+            },
+            async searchBlog() { 
+                const t = i18n[state.lang];
+                const id = document.getElementById('blog-id-input').value;
+                if(!id) return;
+                
+                // Realistic Handles
+                if(!/^\d+$/.test(id)) return Helpers.toast(t.errInvalidId, "error");
+                if(state.blogs.some(b => b.blogid === id)) return Helpers.toast(t.errAlreadyOwned, "info");
+
+                const l = Helpers.toast(t.toastVerifying, "loading");
+                try { 
+                    const d = await Helpers.jsonp(id); 
+                    state.searchResult = { blogid: id, blogname: d.feed.title.$t, blogurl: d.feed.link.find(l=>l.rel==='alternate')?.href }; 
+                    
+                    const domain = new URL(state.searchResult.blogurl).hostname;
+                    const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+                    
+                    document.getElementById('result-favicon').src = faviconUrl;
+                    document.getElementById('result-name').innerText = state.searchResult.blogname; 
+                    document.getElementById('result-url').innerText = state.searchResult.blogurl; 
+                    document.getElementById('search-result-box').classList.remove('hidden');
+                    l.close(); 
+                } catch { l.close(); Helpers.toast(t.toastError, "error"); }
+            },
+            async registerBlog() {
+                const t = i18n[state.lang];
+                const session = SessionManager.get();
+                
+                if(state.blogs.length >= (state.user.maxActivations || 5)) {
+                    return Helpers.toast(t.errMaxReached, "error");
+                }
+
+                const pl = { action: 'add', ...state.searchResult, licenseCode: `PLUGO-${Math.random().toString(36).substr(2,4).toUpperCase()}${Date.now().toString().substr(-2)}`, userName: state.user.name, userEmail: session.data.email };
+                const l = Helpers.toast(t.toastActivating, "loading");
+                try { 
+                    const res = await fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify(pl) }); 
+                    const r = await res.json();
+                    l.close(); 
+                    if(r.result === 'success') {
+                        Helpers.toast(t.toastActivated);
+                        await Actions.refreshData(session.data.email, session.data.password);
+                        window.renderApp();
+                    } else {
+                        Helpers.toast(t.errThirdParty, "error");
+                    }
+                } catch { l.close(); }
+            },
+            async refreshData(email, pass) {
+                const res = await fetch(`${CONFIG.SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+                const raw = await res.json();
+                let result = raw;
+                if (raw.secure && raw.payload) result = XORCipher.decrypt(raw.payload, SECRET_KEY);
+                if(result && result.status === 'success') { 
+                     state.user = result.meta; state.blogs = result.blogs || [];
+                     Actions.resolveView(state.user.status || 'active');
+                }
+            },
+            toggleUserMenu(e) {
+                e.stopPropagation();
+                const d = document.getElementById('user-dropdown');
+                if(d.classList.contains('hidden')) {
+                    d.classList.remove('hidden');
+                    anime({ targets: d, opacity: [0, 1], scale: [0.95, 1], translateY: [10, 0], duration: 400, easing: 'easeOutExpo' });
+                } else d.classList.add('hidden');
+            }
+        };
+
+        const Components = {
+            LoginView: () => {
+                const t = i18n[state.lang];
+                const isRtl = state.lang === 'ar';
+                return `
+                <div class="flex items-center justify-center w-full min-h-[700px] p-4 relative overflow-hidden">
+                    <div class="glass p-12 md:p-16 max-w-lg w-full shadow-premium relative z-10 backdrop-blur-3xl animate-scale-in">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-tr from-blue-600 to-indigo-700 text-white rounded-[2rem] flex items-center justify-center mb-10 shadow-2xl">
+                            <i data-lucide="shield-check" size="48"></i>
+                        </div>
+                        <h2 class="text-4xl font-black mb-4 text-[var(--text-primary)] text-center tracking-tight">${t.loginHeader}</h2>
+                        <div class="space-y-6 mt-10 text-start">
+                            <div class="relative">
+                                <i data-lucide="mail" size="20" class="absolute top-1/2 ${isRtl ? 'right-6' : 'left-6'} -translate-y-1/2 text-slate-400"></i>
+                                <input type="email" id="login-email" placeholder="${t.loginEmail}" class="w-full bg-white/50 dark:bg-slate-800/40 border border-slate-200 dark:border-white/10 rounded-2xl ${isRtl ? 'pr-16 pl-6' : 'pl-16 pr-6'} py-5 text-lg outline-none focus:border-blue-500 transition shadow-inner-light text-[var(--text-primary)]" dir="auto">
+                            </div>
+                            <div class="relative">
+                                <i data-lucide="lock" size="20" class="absolute top-1/2 ${isRtl ? 'right-6' : 'left-6'} -translate-y-1/2 text-slate-400"></i>
+                                <input type="password" id="login-password" placeholder="${t.loginPass}" class="w-full bg-white/50 dark:bg-slate-800/40 border border-slate-200 dark:border-white/10 rounded-2xl ${isRtl ? 'pr-16 pl-6' : 'pl-16 pr-6'} py-5 text-lg outline-none focus:border-blue-500 transition shadow-inner-light text-[var(--text-primary)]" dir="auto">
+                            </div>
+                            <button onclick="Actions.login()" class="btn-premium w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-5 rounded-2xl font-black shadow-2xl transition-all text-xl flex items-center justify-center gap-4">
+                                <span>${t.loginBtn}</span> <i data-lucide="${isRtl ? 'arrow-left' : 'arrow-right'}" size="24"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `; },
+            Dashboard: () => {
+                const t = i18n[state.lang];
+                return `
+                <div class="flex flex-col md:flex-row h-full w-full relative animate-fade-up">
+                    <aside class="plugo-sidebar w-full md:w-80 flex flex-col shrink-0 p-10 hidden md:flex relative z-20">
+                        <div class="flex items-center gap-5 mb-16">
+                            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-black shadow-xl text-2xl">P</div>
+                            <div class="text-start">
+                                <h2 class="text-2xl font-black text-[var(--text-primary)] tracking-tight">Plugo</h2>
+                                <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Management</span>
+                            </div>
+                        </div>
+                        <nav id="tour-nav" class="flex-grow space-y-3">
+                            ${renderNavItem('overview', 'layout-dashboard', t.overview)}
+                            ${renderNavItem('blogs', 'shield-check', t.licenses)}
+                            ${renderNavItem('products', 'download', t.downloads)}
+                        </nav>
+                        <div class="pt-8 mt-auto border-t border-slate-200 dark:border-white/10">
+                            <div id="tour-user" class="relative">
+                                <button onclick="Actions.toggleUserMenu(event)" class="w-full flex items-center gap-4 bg-white/40 dark:bg-black/20 p-4 rounded-2xl backdrop-blur-md hover:bg-white/60 dark:hover:bg-black/40 transition group relative text-start">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-500 text-white flex items-center justify-center text-lg font-black shadow-lg">${state.user?.name?.charAt(0) || 'U'}</div>
+                                    <div class="overflow-hidden flex-1 text-start">
+                                        <p class="text-sm font-black text-[var(--text-primary)] truncate">${state.user?.name || 'User'}</p>
+                                        <p class="text-[10px] text-[var(--text-secondary)] opacity-50 truncate font-mono" dir="ltr">${Helpers.getUserEmail()}</p>
+                                    </div>
+                                    <i data-lucide="chevron-up" size="16" class="text-slate-400 opacity-50"></i>
+                                </button>
+                                <div id="user-dropdown" class="absolute bottom-[115%] left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-premium p-2 hidden origin-bottom z-50 animate-scale-in text-start">
+                                    <button onclick="Actions.openProfileModal()" class="w-full flex items-center gap-3 p-3 text-[var(--text-secondary)] hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl transition text-sm font-bold mb-1 justify-start">
+                                        <i data-lucide="user" size="18"></i> <span>${t.profile}</span>
+                                    </button>
+                                    <div class="h-px bg-slate-100 dark:bg-white/5 my-1 mx-2"></div>
+                                    <button onclick="Actions.logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-sm font-bold justify-start">
+                                        <i data-lucide="log-out" size="18"></i> <span>${t.logout}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main class="flex-grow flex flex-col h-full relative bg-white/10 dark:bg-black/10 backdrop-blur-sm overflow-visible">
+                        <header class="p-6 border-b border-slate-200 dark:border-white/5 md:hidden glass flex justify-between items-center sticky top-0 z-50">
+                            <div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">P</div><h3 class="font-black text-[var(--text-primary)]">Plugo</h3></div>
+                            <button onclick="Actions.logout()" class="text-red-500 p-3 bg-red-50 dark:bg-red-900/10 rounded-xl"><i data-lucide="log-out" size="20"></i></button>
+                        </header>
+                        
+                        <div id="main-scroll-area" class="flex-grow p-6 md:p-10 overflow-visible relative h-auto text-start">
+                            <div class="max-w-6xl mx-auto pb-20 space-y-10 text-start">
+                                ${state.activeSection === 'overview' ? Components.OnlyAnalytics() : 
+                                  state.activeSection === 'blogs' ? Components.OnlyBlogs() : 
+                                  Components.ProductsSection()}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `; },
+            OnlyAnalytics: () => {
+                const t = i18n[state.lang];
+                return `
+                <div class="space-y-12 animate-fade-up text-start">
+                    <div class="flex flex-col md:flex-row justify-between items-end gap-4 text-start">
+                        <div class="text-start">
+                            <h3 class="text-4xl font-black text-[var(--text-primary)] tracking-tight">${t.statsTitle}</h3>
+                            <p class="text-[var(--text-secondary)] mt-2">${t.statsSubtitle}</p>
+                        </div>
+                    </div>
+
+                    <div id="tour-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-start">
+                        ${renderStatBox('shield-check', 'text-blue-600', 'bg-blue-50 dark:bg-blue-900/20', `${state.blogs.length} / ${state.user.maxActivations || 0}`, t.statLicenses)}
+                        ${renderStatBox('globe', 'text-emerald-600', 'bg-emerald-50 dark:bg-emerald-900/20', state.blogs.length, t.statActiveSites)}
+                        ${renderStatBox('mouse-pointer-2', 'text-purple-600', 'bg-purple-50 dark:bg-purple-900/20', SessionManager.getAccessCount(), t.statAccess)}
+                        ${renderStatBox('shopping-cart', 'text-amber-600', 'bg-amber-50 dark:bg-amber-900/20', Helpers.getUniqueProducts().length, t.statProducts)}
+                    </div>
+
+                    <div id="tour-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-8 text-start">
+                        <div class="glass p-8 border border-slate-100 dark:border-white/5 shadow-premium text-start">
+                            <h4 class="text-xl font-black mb-8 flex items-center gap-3 text-blue-500 text-start"><i data-lucide="pie-chart"></i> <span>${t.distTitle}</span></h4>
+                            <div id="chart-license" class="flex justify-center" style="min-height: 280px;"></div>
+                        </div>
+                        <div class="glass p-8 border border-slate-100 dark:border-white/5 shadow-premium text-start">
+                            <h4 class="text-xl font-black mb-8 flex items-center gap-3 text-indigo-500 text-start"><i data-lucide="activity"></i> <span>${t.activityTitle}</span></h4>
+                            <div id="chart-activity" style="min-height: 280px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass p-8 border border-slate-100 dark:border-white/5 shadow-premium text-start">
+                        <div class="flex justify-between items-center mb-10 text-start">
+                            <h4 class="text-xl font-black flex items-center gap-3 text-emerald-500"><i data-lucide="calendar"></i> <span>${t.heatmapTitle}</span></h4>
+                            <div class="flex gap-2 items-center text-[10px] font-black opacity-40 uppercase">
+                                <span>${t.heatmapLess}</span>
+                                <div class="w-3 h-3 level-1"></div>
+                                <div class="w-3 h-3 level-2"></div>
+                                <div class="w-3 h-3 level-3"></div>
+                                <div class="w-3 h-3 level-4"></div>
+                                <span>${t.heatmapMore}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 justify-between">
+                            ${Array.from({length: 52}).map((_, i) => {
+                                const level = Math.floor(Math.random() * 4) + 1;
+                                return `<div class="heatmap-cell level-${level} shadow-sm transition-transform hover:scale-150 cursor-pointer" title="Week ${i+1}"></div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `; },
+            OnlyBlogs: () => {
+                const used = state.blogs.length;
+                const total = state.user?.maxActivations || 5;
+                const percent = Math.round((used / total) * 100);
+                const t = i18n[state.lang];
+
+                return `
+                <div class="space-y-12 animate-fade-up text-start">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-4 text-start">
+                        <div class="text-start">
+                            <h3 class="text-4xl font-black text-[var(--text-primary)] tracking-tight">${t.licenseManagerTitle}</h3>
+                            <p class="text-[var(--text-secondary)] mt-2">${t.licenseManagerSubtitle}</p>
+                        </div>
+                        <div class="glass p-6 border border-blue-500/20 bg-blue-500/5 min-w-[240px] text-start">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-blue-600 font-black">${percent}%</span>
+                                <span class="text-xs font-black opacity-40 uppercase tracking-widest text-[var(--text-secondary)] text-start">${t.usageRate}</span>
+                            </div>
+                            <div class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
+                                <div class="h-full bg-blue-600 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                            </div>
+                            <p class="text-[10px] text-[var(--text-secondary)] font-bold text-start">${t.seatsLeft.replace('{n}', total - used)}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 p-10 rounded-[3rem] text-white shadow-premium relative overflow-hidden group border border-white/10 text-start">
+                        <div class="relative z-10 text-start">
+                            <h4 class="font-black text-2xl mb-8 flex items-center gap-3 justify-start"><i data-lucide="plus-circle" size="28" class="animate-pulse"></i> <span>${t.addNewLicense}</span></h4>
+                            <div class="flex flex-col md:flex-row gap-4 text-start">
+                                <input id="blog-id-input" type="text" placeholder="${t.licensePlaceholder}" class="flex-grow bg-white/10 border border-white/20 rounded-2xl px-8 py-5 text-xl text-white outline-none focus:bg-white/20 transition backdrop-blur-xl placeholder-white/30 text-start" dir="ltr">
+                                <button onclick="Actions.searchBlog()" class="btn-premium bg-white text-blue-700 px-12 py-5 rounded-2xl text-lg font-black shadow-2xl flex items-center justify-center gap-3 transition hover:scale-105 text-start">${t.checkNow} <i data-lucide="shield-check" size="22"></i></button>
+                            </div>
+                            <div id="search-result-box" class="hidden mt-8 p-8 bg-black/20 rounded-[2.5rem] border border-white/10 animate-fade-up text-start">
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-6 text-start w-full">
+                                    <div class="flex items-center gap-6 flex-grow">
+                                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-premium p-2 overflow-hidden border border-white/10">
+                                            <img id="result-favicon" src="" class="w-10 h-10 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=P&background=eff6ff&color=3b82f6&bold=true';">
+                                        </div>
+                                        <div class="overflow-hidden text-start">
+                                            <h5 id="result-name" class="font-black text-2xl text-white truncate text-start"></h5>
+                                            <p id="result-url" class="text-sm opacity-60 text-blue-200 font-mono truncate text-start" dir="ltr"></p>
+                                        </div>
+                                    </div>
+                                    <button onclick="Actions.registerBlog()" class="btn-premium bg-emerald-500 text-white px-10 py-4 rounded-2xl text-base font-black flex items-center gap-3 shadow-xl hover:bg-emerald-400 shrink-0">${state.lang === 'ar' ? 'تفعيل' : 'Activate'} <i data-lucide="zap" size="20"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute -top-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-[100px] pointer-events-none"></div>
+                    </div>
+
+                    <div class="glass overflow-hidden border border-slate-100 dark:border-white/5 shadow-premium text-start">
+                        <div class="p-8 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-white/30 dark:bg-white/5">
+                            <div class="text-start">
+                                <h4 class="text-2xl font-black text-[var(--text-primary)]">${t.activeLicenses}</h4>
+                            </div>
+                            <span class="bg-blue-600/10 text-blue-600 text-[10px] font-black px-4 py-2 rounded-full border border-blue-600/20 uppercase tracking-widest">${used} ${state.lang === 'ar' ? 'مواقع' : 'Sites'}</span>
+                        </div>
+                        <div class="divide-y divide-slate-100 dark:divide-white/5">
+                            ${state.blogs.length > 0 ? state.blogs.map(b => {
+                                const domain = b.blogurl ? new URL(b.blogurl).hostname : '';
+                                const favicon = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+                                return `
+                                <div class="p-8 flex flex-col md:flex-row items-center justify-between group hover:bg-white/60 dark:hover:bg-slate-800/40 transition-all duration-500 gap-6 text-start">
+                                    <div class="flex items-center gap-6 w-full md:w-auto text-start">
+                                        <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shadow-premium border border-slate-100 dark:border-white/10 p-2">
+                                            <img src="${favicon}" class="w-10 h-10 object-contain" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.blogname)}&background=eff6ff&color=3b82f6&bold=true';">
+                                        </div>
+                                        <div class="overflow-hidden text-start">
+                                            <p class="text-2xl font-black text-[var(--text-primary)] truncate transition-colors group-hover:text-blue-600">${b.blogname}</p>
+                                            <div class="flex items-center gap-3 mt-1">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                <p class="text-xs text-slate-400 font-mono" dir="ltr">ID: ${b.blogid}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4 w-full md:w-auto justify-end">
+                                        <button onclick="Helpers.copy('${b.licenseCode}')" class="btn-premium font-mono bg-white dark:bg-slate-800 px-8 py-4 rounded-2xl font-black border border-slate-200 dark:border-white/10 transition flex items-center gap-3 hover:border-blue-500 text-[var(--text-primary)]">
+                                            <span class="text-sm font-black">${b.licenseCode}</span> <i data-lucide="copy" size="18"></i>
+                                        </button>
+                                        <button onclick="Actions.deleteBlog('${b.blogid}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 p-4 rounded-2xl transition-all border border-transparent hover:border-red-200"><i data-lucide="trash-2" size="24"></i></button>
+                                    </div>
+                                </div>
+                            `}).join('') : `<div class="p-24 text-center opacity-40 group text-start text-center"><div class="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 transition-transform group-hover:scale-110"><i data-lucide="inbox" size="64"></i></div><p class="text-2xl font-black tracking-tight text-[var(--text-primary)]">${t.noLicenses}</p></div>`}
+                        </div>
+                    </div>
+                </div>
+            `; },
+            ProductsSection: () => {
+                const t = i18n[state.lang];
+                const uniqueProds = Helpers.getUniqueProducts();
+                return `
+                <div class="space-y-12 animate-fade-up text-start">
+                    <div class="text-start">
+                        <h3 class="text-4xl font-black text-[var(--text-primary)] tracking-tight">${t.productsTitle}</h3>
+                        <p class="text-[var(--text-secondary)] mt-2">${t.productsSubtitle}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-start">
+                        ${uniqueProds.map(p => `
+                            <div class="glass rounded-[3rem] border border-slate-200 dark:border-white/5 overflow-hidden flex flex-col group bg-white/40 dark:bg-white/5 transition-all hover:shadow-premium text-start">
+                                <div class="h-64 bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+                                    <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    <div class="absolute bottom-6 start-6 text-start">
+                                        <h4 class="font-black text-white text-2xl">${p.name}</h4>
+                                    </div>
+                                </div>
+                                <div class="p-8 flex-grow flex flex-col text-start">
+                                    <p class="text-[var(--text-secondary)] text-sm mb-8 opacity-80 leading-relaxed text-start">${p.desc || 'AI powered smart template for Blogger.'}</p>
+                                    
+                                    <div class="mt-auto space-y-4 text-start">
+                                        <div class="flex items-center gap-2 mb-2 text-blue-600 justify-start">
+                                            <i data-lucide="layers" size="16"></i>
+                                            <span class="text-xs font-black uppercase tracking-widest text-start">${t.availableVersions}</span>
+                                        </div>
+                                        <div class="grid grid-cols-1 gap-3">
+                                            ${(p.versions || []).map(v => `
+                                                <button onclick="Actions.download('${v.link}')" class="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-white/5 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group/v">
+                                                    <div class="flex items-center gap-3 flex-row">
+                                                        <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600"><i data-lucide="package" size="20"></i></div>
+                                                        <span class="text-sm font-bold text-[var(--text-primary)] text-start">${v.label}</span>
+                                                    </div>
+                                                    <i data-lucide="download-cloud" size="20" class="text-slate-300 group-hover/v:text-blue-600 transition-colors"></i>
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` }
+        };
+
+        function renderStatBox(icon, color, bg, val, label) {
+            return `<div class="glass p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center shadow-premium relative overflow-hidden group"><div class="w-16 h-16 ${bg} rounded-2xl flex items-center justify-center ${color} mb-4 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-sm"><i data-lucide="${icon}" size="32"></i></div><h5 class="text-3xl font-black text-[var(--text-primary)] tracking-tight text-center">${val}</h5><p class="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest opacity-40 mt-1 text-center">${label}</p></div>`;
+        }
+        
+        function renderNavItem(id, icon, label) {
+            const isActive = state.activeSection === id;
+            return `<button id="nav-${id}" onclick="Actions.setSection('${id}')" class="w-full flex items-center gap-4 px-7 py-5 rounded-2xl transition-all duration-500 group relative overflow-hidden flex-row ${isActive ? 'text-white shadow-premium' : 'text-[var(--text-secondary)] hover:bg-white/50 dark:hover:bg-white/5'} text-start">${isActive ? '<div class="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>' : ''}<i data-lucide="${icon}" size="22" class="relative z-10 ${isActive ? 'text-white scale-110' : 'text-slate-400 group-hover:text-blue-500'} transition-all"></i><span class="text-sm font-black tracking-wide relative z-10 text-start flex-1 text-start">${label}</span></button>`;
+        }
+        
+        function StatusViewFactory(icon, iconColor, bgRing, title, message, ctaHtml) {
+            const t = i18n[state.lang];
+            return `<div class="flex items-center justify-center w-full min-h-[700px] p-6 text-start"><div class="glass p-16 rounded-[3rem] text-center max-w-xl w-full animate-scale-in shadow-premium-dark backdrop-blur-3xl"><div class="w-28 h-28 ${bgRing} rounded-full flex items-center justify-center mx-auto mb-10 shadow-2xl relative"><i data-lucide="${icon}" class="${iconColor}" size="56"></i></div><h3 class="text-4xl font-black text-[var(--text-primary)] mb-6 tracking-tight text-center">${title}</h3><p class="text-[var(--text-secondary)] text-xl mb-12 leading-relaxed font-medium text-center">${message}</p><div class="flex flex-col gap-4">${ctaHtml}<button onclick="Actions.logout()" class="w-full py-5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-[var(--text-primary)] font-black hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center justify-center gap-3"><i data-lucide="log-out" size="20"></i> ${t.logout}</button></div></div></div>`;
+        }
+
+        window.renderApp = function() {
+            const app = document.getElementById('app');
+            const t = i18n[state.lang];
+            
+            // تحديث نصوص الواجهة الثابتة
+            const updateStatics = () => {
+                const elPageTitle = document.getElementById('page-title');
+                const elPageSubText = document.getElementById('page-subtitle-text');
+                const elLangBtn = document.getElementById('lang-btn-text');
+                const elHomeBtn = document.getElementById('home-btn-text');
+                const elTermsTitle = document.getElementById('terms-title');
+                const elTermsSub = document.getElementById('terms-subtitle');
+                const elTermsConf = document.getElementById('terms-confirm');
+                const elTermsCanc = document.getElementById('terms-cancel');
+                const elDelModalTitle = document.getElementById('delete-modal-title');
+                const elDelModalConf = document.getElementById('delete-modal-confirm');
+                const elLogModalTitle = document.getElementById('logout-modal-title');
+                const elLogModalConf = document.getElementById('logout-modal-confirm');
+
+                if(elPageTitle) elPageTitle.innerText = t.pageTitle;
+                if(elPageSubText) elPageSubText.innerText = t.pageSubtitle;
+                if(elLangBtn) elLangBtn.innerText = t.langBtn;
+                if(elHomeBtn) elHomeBtn.innerText = t.homeBtn;
+                if(elTermsTitle) elTermsTitle.innerText = t.termsTitle;
+                if(elTermsSub) elTermsSub.innerText = t.termsSubtitle;
+                if(elTermsConf) elTermsConf.innerText = t.termsConfirm;
+                if(elTermsCanc) elTermsCanc.innerText = t.termsCancel;
+                if(elDelModalTitle) elDelModalTitle.innerText = t.deleteTitle;
+                if(elDelModalConf) elDelModalConf.innerText = t.deleteConfirm;
+                if(elLogModalTitle) elLogModalTitle.innerText = t.logoutConfirm;
+                if(elLogModalConf) elLogModalConf.innerText = t.logoutConfirm;
+                
+                const termsContent = document.getElementById('terms-content');
+                if(termsContent) {
+                    termsContent.innerHTML = `<ul class="space-y-4 list-disc pr-4 text-start">${t.termsList.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                }
+            };
+            updateStatics();
+
+            const viewMap = {
+                'login': Components.LoginView, 
+                'dashboard': Components.Dashboard, 
+                'banned': () => StatusViewFactory('ban','text-red-600','bg-red-100 dark:bg-red-900/30',t.stBanned.t, t.stBanned.m,''),
+                'security_hold': () => StatusViewFactory('shield-alert', 'text-red-600', 'bg-red-100 dark:bg-red-900/30', t.stSecHold.t, t.stSecHold.m, `<button onclick="Helpers.toast('${t.toastActivating}')" class="btn-premium w-full py-5 rounded-2xl bg-red-600 text-white font-black">${state.lang === 'ar' ? 'تأكيد الهوية' : 'Verify ID'}</button>`),
+                'maintenance': () => StatusViewFactory('hammer', 'text-amber-600', 'bg-amber-100 dark:bg-amber-900/30', t.stMaintenance.t, t.stMaintenance.m, `<button onclick="location.reload()" class="btn-premium w-full py-5 rounded-2xl bg-slate-900 text-white font-black">${state.lang === 'ar' ? 'تحديث' : 'Refresh'}</button>`),
+                'restricted': () => StatusViewFactory('alert-octagon', 'text-orange-600', 'bg-orange-100 dark:bg-orange-900/30', t.stRestricted.t, t.stRestricted.m, `<button onclick="state.update({view:'dashboard'})" class="btn-premium w-full py-5 rounded-2xl bg-orange-600 text-white font-black">Continue</button>`),
+                'inactive': () => StatusViewFactory('shield-alert','text-blue-600','bg-blue-100 dark:bg-blue-900/30',t.stInactive.t, t.stInactive.m,`<a href="mailto:support@plugo.com" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black flex items-center justify-center gap-3">${state.lang === 'ar' ? 'تواصل معنا' : 'Contact Us'}</a>`),
+                'trial_expired': () => StatusViewFactory('lock','text-slate-500','bg-slate-200 dark:bg-slate-800',t.stExpired.t, t.stExpired.m,`<button onclick="Helpers.toast('Redirecting...')" class="btn-premium w-full py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center gap-3">Upgrade</button>`),
+                'locked': () => StatusViewFactory('lock', 'text-red-700', 'bg-red-100', t.stLocked.t, t.stLocked.m, `<button onclick="Helpers.toast('Reset link sent')" class="btn-premium w-full py-5 rounded-2xl bg-red-600 text-white font-black">Unlock</button>`),
+                'pending': () => StatusViewFactory('clock', 'text-amber-600', 'bg-amber-100', t.stPending.t, t.stPending.m, ''),
+                'email_unverified': () => StatusViewFactory('mail', 'text-blue-500', 'bg-blue-50', t.stEmail.t, t.stEmail.m, `<button onclick="Helpers.toast('Verification sent')" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black">Resend Email</button>`),
+                'payment_required': () => StatusViewFactory('credit-card', 'text-emerald-600', 'bg-emerald-50', t.stPayment.t, t.stPayment.m, `<button onclick="Helpers.toast('Checkout...')" class="btn-premium w-full py-5 rounded-2xl bg-emerald-600 text-white font-black">Renew Now</button>`),
+                'support_required': () => StatusViewFactory('headphones', 'text-indigo-600', 'bg-indigo-50', t.stSupport.t, t.stSupport.m, `<button onclick="Helpers.toast('Live Chat...')" class="btn-premium w-full py-5 rounded-2xl bg-indigo-600 text-white font-black">Open Chat</button>`),
+                'fraud_detected': () => StatusViewFactory('alert-triangle', 'text-red-600', 'bg-red-50', t.stFraud.t, t.stFraud.m, ''),
+                'archived': () => StatusViewFactory('archive', 'text-slate-500', 'bg-slate-100', t.stArchived.t, t.stArchived.m, ''),
+                'canceled': () => StatusViewFactory('x-circle', 'text-red-500', 'bg-red-50', t.stCanceled.t, t.stCanceled.m, `<button onclick="state.update({view:'dashboard'})" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black">Restore</button>`),
+                'identity_pending': () => StatusViewFactory('user-check', 'text-blue-600', 'bg-blue-50', t.stIdentity.t, t.stIdentity.m, `<button onclick="Helpers.toast('Uploading...')" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black">Upload ID</button>`),
+                'compliance_review': () => StatusViewFactory('shield-check', 'text-purple-600', 'bg-purple-50', t.stCompliance.t, t.stCompliance.m, ''),
+                'update_required': () => StatusViewFactory('download', 'text-blue-600', 'bg-blue-50', t.stUpdate.t, t.stUpdate.m, `<button onclick="Actions.setSection('products')" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black">Go to Downloads</button>`),
+                'action_needed': () => StatusViewFactory('zap', 'text-orange-500', 'bg-orange-50', t.stAction.t, t.stAction.m, `<button onclick="Helpers.toast('Redirecting...')" class="btn-premium w-full py-5 rounded-2xl bg-orange-500 text-white font-black">Take Action</button>`),
+                'wait_approval': () => StatusViewFactory('eye', 'text-amber-500', 'bg-amber-100', t.stWait.t, t.stWait.m, ''),
+                'payment_failed': () => StatusViewFactory('credit-card', 'text-red-600', 'bg-red-50', t.stFailed.t, t.stFailed.m, `<button onclick="Helpers.toast('Retrying...')" class="btn-premium w-full py-5 rounded-2xl bg-red-600 text-white font-black">Retry Payment</button>`),
+                'review': () => StatusViewFactory('search', 'text-blue-600', 'bg-blue-50', 'Under Review', 'Your account is currently under technical review.', ''),
+                'suspended': () => StatusViewFactory('alert-triangle', 'text-red-600', 'bg-red-100', 'Suspended', 'Account suspended temporarily.', ''),
+                'trial_active': () => StatusViewFactory('zap', 'text-blue-500', 'bg-blue-50', 'Trial Active', 'Enjoy your trial period.', `<button onclick="state.update({view:'dashboard'})" class="btn-premium w-full py-5 rounded-2xl bg-blue-600 text-white font-black">Go to Dashboard</button>`),
+                'account_deleted': () => StatusViewFactory('user-x', 'text-slate-500', 'bg-slate-200', t.stArchived.t, t.stArchived.m, ''),
+                'action_required': () => StatusViewFactory('alert-circle', 'text-red-600', 'bg-red-50', 'Action Required', 'Please complete the required actions to continue.', '')
+            };
+            
+            app.innerHTML = (viewMap[state.view] || viewMap['inactive'])();
+            lucide.createIcons();
+            if(state.view === 'dashboard' && state.activeSection === 'overview') setTimeout(Actions.initAnalyticsCharts, 50);
+            anime({ targets: '#app > div', translateY: [30, 0], opacity: [0, 1], duration: 800, easing: 'easeOutCubic' });
+        };
+
+        window.onload = function() {
+            document.documentElement.setAttribute('lang', state.lang);
+            document.documentElement.setAttribute('dir', state.lang === 'ar' ? 'rtl' : 'ltr');
+            
+            const session = SessionManager.get();
+            if(session) {
+                Helpers.toggleLoader(true);
+                Actions.refreshData(session.data.email, session.data.password).then(() => {
+                    Actions.resolveView(state.user?.status || 'active');
+                    if (state.view === 'dashboard') setTimeout(TourService.start, 2500);
+                }).finally(() => Helpers.toggleLoader(false));
+            } else { state.view = 'login'; window.renderApp(); }
+        };
+
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            lucide.createIcons();
+            if(state.activeSection === 'overview' && state.view === 'dashboard') Actions.initAnalyticsCharts();
+        }
+
+        document.addEventListener('click', (e) => {
+            const d = document.getElementById('user-dropdown');
+            const b = e.target.closest('button[onclick*="toggleUserMenu"]');
+            if(d && !d.classList.contains('hidden') && !b && !d.contains(e.target)) {
+                d.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
