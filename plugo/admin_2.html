@@ -1,0 +1,811 @@
+
+<!DOCTYPE html>
+<html data-theme='light' dir='rtl' lang='ar'>
+<head>
+    <meta charset='UTF-8'/>
+    <meta content='width=device-width, initial-scale=1.0' name='viewport'/>
+    <title>Plugo Admin | Grand Imperial Suite V8</title>
+    
+    <!-- الخطوط الملكية المختارة -->
+    <link href='https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;400;600;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap' rel='stylesheet'/>
+    
+    <!-- مكاتب التصميم والحركات -->
+    <script src='https://cdn.tailwindcss.com'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src='https://unpkg.com/lucide@latest'></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        royal: { 50: '#f0f7ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' }
+                    },
+                    animation: { 
+                        'float': 'float 5s ease-in-out infinite',
+                        'spin-slow': 'spin 4s linear infinite',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root { 
+            --bg: #f8fafc; 
+            --glass: rgba(255, 255, 255, 0.95); 
+            --border: rgba(226, 232, 240, 0.9); 
+            --text: #1e293b; 
+        }
+        
+        [data-theme='dark'] { 
+            --bg: #020617; 
+            --glass: rgba(15, 23, 42, 0.85); 
+            --border: rgba(255, 255, 255, 0.1); 
+            --text: #f1f5f9; 
+        }
+
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            font-size: 0.9rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .luxury-canvas {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
+        }
+
+        .glass-panel { 
+            background: var(--glass); 
+            backdrop-filter: blur(40px) saturate(160%); 
+            border: 1px solid var(--border); 
+            border-radius: 2.2rem;
+            box-shadow: 0 10px 40px -15px rgba(0,0,0,0.04);
+        }
+
+        .luxury-input {
+            width: 100%; background: #ffffff; border: 1px solid #e2e8f0; 
+            padding: 0.9rem 1.25rem; border-radius: 1.1rem; outline: none; transition: all 0.3s;
+            color: var(--text);
+        }
+        [data-theme='dark'] .luxury-input { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+        .luxury-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.08); }
+
+        /* Wizard UI */
+        .wiz-pill { width: 35px; height: 35px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; transition: 0.4s; }
+        .p-active { background: #3b82f6; color: white; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); transform: scale(1.1); }
+        .p-inactive { background: rgba(0,0,0,0.05); color: var(--text); opacity: 0.3; }
+
+        .modal-overlay { 
+            opacity: 0; visibility: hidden; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            background: rgba(15, 23, 42, 0.25); position: fixed; inset: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px);
+        } 
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-content { transform: scale(0.9) translateY(40px); opacity: 0; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); opacity: 1; }
+
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.75rem; border-radius: 1.5rem; transition: all 0.3s; font-weight: 800; cursor: pointer; color: #64748b; }
+        .nav-link-active { background: #3b82f6 !important; color: white !important; box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.4); }
+
+        #global-loader {
+            position: fixed; inset: 0; z-index: 99999; background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .toast-box { 
+            padding: 1.1rem 1.6rem; border-radius: 1.5rem; background: var(--glass); backdrop-filter: blur(20px); 
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; 
+            min-width: 320px; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15);
+            margin-bottom: 0.75rem;
+        }
+
+        /* AI Assistant Style */
+        .ai-chat-container { height: 500px; display: flex; flex-direction: column; }
+        .chat-bubble { max-width: 80%; padding: 1rem 1.5rem; border-radius: 1.5rem; margin-bottom: 1rem; font-weight: 500; animation: scaleIn 0.3s ease-out; }
+        .bubble-ai { background: #eff6ff; color: #1e40af; align-self: flex-start; border-bottom-right-radius: 0.5rem; }
+        .bubble-user { background: #3b82f6; color: white; align-self: flex-end; border-bottom-left-radius: 0.5rem; }
+        [data-theme='dark'] .bubble-ai { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @media print { .no-print { display: none !important; } .glass-panel { border: none; background: white; } }
+    </style>
+</head>
+<body class="antialiased text-start selection:bg-blue-600 selection:text-white">
+    
+    <!-- Preloader -->
+    <div id="global-loader">
+        <div class="relative w-20 h-20 mb-8">
+            <div class="absolute inset-0 border-4 border-blue-600/10 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin-slow"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-blue-600"><i data-lucide="command" size="32"></i></div>
+        </div>
+        <p class="font-black text-xs uppercase tracking-[0.6em] text-blue-600 opacity-60">Synchronizing Imperial Assets</p>
+    </div>
+
+    <div class="luxury-canvas"></div>
+    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-[10000] flex flex-col"></div>
+
+    <div class="w-full max-w-[96rem] mx-auto px-4 py-6 md:py-10 flex flex-col min-h-screen">
+        
+        <!-- Navbar -->
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 glass-panel p-6 animate-fade-up no-print">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 via-blue-700 to-indigo-800 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl animate-float">
+                    <i data-lucide="layout-grid" size="32"></i>
+                </div>
+                <div class="text-start">
+                    <h1 class="text-3xl font-black tracking-tighter text-slate-900 dark:text-white" id="ui-title">PLUGO <span class="text-blue-600 italic">IMPERIAL</span></h1>
+                    <p class="text-xs font-bold opacity-40 uppercase tracking-widest italic" id="ui-subtitle">Neural Business Intelligence Suite</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-slate-50 dark:bg-white/5 p-2 rounded-[2rem] border border-slate-100 dark:border-white/10">
+                <div class="flex flex-col items-end px-6 border-l border-slate-200 dark:border-white/10">
+                    <span class="text-[9px] font-black opacity-30 uppercase tracking-[0.2em]">Live Pulse Cloud</span>
+                    <span class="text-xs font-black text-blue-600" id="last-sync-time">00:00:00</span>
+                </div>
+                <button onclick="Actions.loadAll()" class="p-3.5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 text-blue-600 hover:scale-110 transition-all shadow-sm">
+                    <i data-lucide="refresh-cw" size="18"></i>
+                </button>
+                <button onclick="Actions.toggleTheme()" class="p-3.5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 text-amber-500 shadow-sm hover:rotate-12 transition-all">
+                    <i data-lucide="sun-moon" size="18"></i>
+                </button>
+                <button onclick="Actions.toggleLanguage()" class="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl hover:bg-black transition-all">
+                    <i data-lucide="languages" size="16"></i>
+                    <span id="lang-btn-text">--</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-10 flex-grow">
+            <!-- Sidebar -->
+            <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-8 no-print">
+                <div class="glass-panel p-6 flex flex-col gap-2 shadow-sm">
+                    <div id="side-nav" class="space-y-1"></div>
+                </div>
+                
+                <div class="glass-panel p-8 bg-slate-900 text-white relative overflow-hidden group shadow-2xl">
+                    <div class="relative z-10 text-start">
+                        <h4 class="font-black text-sm mb-4 flex items-center gap-3 uppercase opacity-60 tracking-[0.2em]"><i data-lucide="database" size="14"></i> Master Data</h4>
+                        <button onclick="window.open('https://docs.google.com/spreadsheets/d/1wtdnKvosHzvolJn7zYJlRDeOhaH95AEvzvL2BdDlpKQ/edit', '_blank')" class="w-full py-4 rounded-2xl bg-blue-600 text-white font-black text-[10px] hover:bg-blue-500 transition-all flex items-center justify-center gap-3 shadow-lg border border-blue-500/50 uppercase tracking-widest">
+                            فتح جداول البيانات <i data-lucide="external-link" size="12"></i>
+                        </button>
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/20 rounded-full blur-3xl group-hover:scale-150 transition-all duration-700"></div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <main class="flex-grow glass-panel p-8 md:p-12 shadow-premium relative min-h-[800px] overflow-visible">
+                <div id="section-loader" class="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl z-40 rounded-[2.2rem]" style="display:none;">
+                    <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <div id="view-target" class="animate-fade-up"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Setup Wizard Modal -->
+    <div id="wizard-modal" class="modal-overlay">
+        <div class="modal-content glass-panel w-full max-w-4xl p-0 relative m-4 shadow-modal overflow-hidden border-4 border-white dark:border-white/5">
+            <div class="p-8 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
+                <div class="flex items-center gap-5 text-start">
+                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl animate-pulse"><i data-lucide="wand-2" size="24"></i></div>
+                    <div>
+                        <h3 class="font-black text-xl" id="wiz-title">معالج الإعداد الإمبراطوري</h3>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em]" id="wiz-subtitle">Neural Path Configuration</p>
+                    </div>
+                </div>
+                <div class="flex gap-3" id="wiz-pills"></div>
+            </div>
+
+            <div class="p-12 overflow-y-auto max-h-[60vh] text-start" id="wiz-content"></div>
+
+            <div class="p-8 bg-white/50 dark:bg-black/10 border-t border-slate-100 dark:border-white/5 flex justify-between items-center gap-6">
+                <button onclick="Wizard.prev()" id="wiz-prev" class="px-8 py-3.5 rounded-2xl border border-slate-200 dark:border-white/10 font-bold text-xs hover:bg-slate-100 transition-all opacity-0 pointer-events-none">السابق</button>
+                <div class="flex gap-3">
+                    <button onclick="Actions.closeModal('wizard')" class="px-8 py-3.5 rounded-2xl text-slate-400 font-bold text-xs hover:bg-red-50 transition-all">إغلاق</button>
+                    <button onclick="Wizard.next()" id="wiz-next" class="px-12 py-3.5 rounded-2xl bg-blue-600 text-white font-black text-xs shadow-xl hover:bg-blue-700 transition-all">التالي</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unified Feedback & Dialog Modal -->
+    <div id="feedback-modal" class="modal-overlay">
+        <div class="modal-content glass-panel w-full max-w-md p-10 text-center shadow-modal relative m-4 border-t-8 transition-all duration-300" id="feedback-border">
+            <div class="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl" id="feedback-icon-bg">
+                <i id="feedback-icon" size="42"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-4 dark:text-white" id="feedback-title">Title</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-10 leading-relaxed" id="feedback-message">Message body goes here.</p>
+            <div class="flex gap-4" id="feedback-actions">
+                <button id="feedback-no" class="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-white/5 font-bold text-xs hover:bg-slate-200 transition">إلغاء</button>
+                <button id="feedback-yes" class="flex-1 py-4 rounded-2xl text-white font-black text-xs shadow-lg transition">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wizard Finish Loading Overlay -->
+    <div id="master-loading-overlay" class="modal-overlay" style="z-index: 100000;">
+        <div class="modal-content glass-panel w-full max-w-md p-12 text-center shadow-2xl relative m-4">
+            <div class="relative w-24 h-24 mx-auto mb-8">
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-800"></circle>
+                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="251.2" id="loading-circle" class="text-blue-600 transition-all duration-300"></circle>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center font-black text-blue-600 text-lg" id="loading-percent">0%</div>
+            </div>
+            <h4 class="font-black text-xl mb-2 dark:text-white" id="loading-title">جاري اعتماد البيانات...</h4>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest" id="loading-stage">Establishing Secure Sync</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. نظام الترجمة والحالات ---
+        const i18n = {
+            ar: {
+                langName: "English",
+                overview: "لوحة القيادة", users: "قاعدة العملاء", catalog: "كاتالوج الأصول", activations: "سجل التراخيص", reports: "مركز التحليلات", ai: "مساعدك الذكي 🤖",
+                totalUsers: "إجمالي القاعدة", totalActivations: "الأصول النشطة", catalogSize: "منتجات السوق",
+                addUser: "إضافة عميل", addProd: "منتج جديد",
+                email: "البريد", name: "الاسم الكامل", max: "سقف التراخيص", actions: "التحكم", status: "الحالة",
+                blog: "المنصة", user: "العميل", code: "المفتاح", delete: "حذف", edit: "تحرير",
+                syncing: "مزامنة السحابة...", success: "اكتمل بنجاح", error: "فشل الاتصال",
+                reportTitle: "مركز الذكاء التحليلي", reportSubtitle: "تحليل معمق للأداء والنمو وقوة الأصول.",
+                statsActivity: "سيولة النشاط", statsStatus: "توزع الحالات", statsTop: "المنتجات الأكثر طلباً",
+                confirmTitle: "تأكيد الإجراء", confirmDelete: "هل أنت متأكد؟ هذا الإجراء سيقوم بحذف السجل نهائياً من السحابة.",
+                loadingFinalizing: "اعتماد التغييرات", loadingSync: "مزامنة السجلات", loadingDone: "تم بنجاح",
+                aiWelcome: "مرحباً بك في وحدة الذكاء الإمبراطوري. أنا هنا لمساعدتك في تحليل البيانات أو شرح أي ميزة في اللوحة.",
+                aiPlaceholder: "كيف يمكنني مساعدتك اليوم؟...",
+                wizUserAdd: "إضافة حساب جديد", wizUserEdit: "تعديل بيانات المستخدم", wizCatAdd: "إضافة كتالوج", wizCatEdit: "تعديل الكتالوج"
+            },
+            en: {
+                langName: "العربية",
+                overview: "Dashboard Hub", users: "Registry", catalog: "Asset Catalog", activations: "Flux Feed", reports: "Analytics Center", ai: "AI Assistant 🤖",
+                totalUsers: "Client Base", totalActivations: "Active Assets", catalogSize: "Inventory",
+                addUser: "Add Client", addProd: "New Asset",
+                email: "Email", name: "Full Name", max: "License Cap", actions: "Control", status: "Status",
+                blog: "Platform", user: "Client", code: "Key", delete: "Purge", edit: "Config",
+                syncing: "Syncing Master...", success: "Action Committed", error: "Cloud Fail",
+                reportTitle: "Analytical Intelligence", reportSubtitle: "Deep dive into performance metrics and system growth.",
+                statsActivity: "Activity Liquidity", statsStatus: "Security Mix", statsTop: "Top Assets",
+                confirmTitle: "System Confirmation", confirmDelete: "Are you sure? This action will permanently remove the record from cloud.",
+                loadingFinalizing: "Finalizing", loadingSync: "Cloud Syncing", loadingDone: "Completed",
+                aiWelcome: "Welcome to Imperial Intelligence. I'm here to assist you with data analysis or explaining any panel feature.",
+                aiPlaceholder: "How can I help you today?...",
+                wizUserAdd: "Add New User", wizUserEdit: "Update User Data", wizCatAdd: "Add Catalog", wizCatEdit: "Update Catalog"
+            }
+        };
+
+        const statusOptions = ["active", "trial", "banned", "security_hold", "restricted", "inactive", "locked", "pending", "review", "suspended", "expired", "payment_required", "email_unverified", "account_deleted", "update_required", "identity_pending", "payment_failed", "wait_approval", "fraud_detected", "compliance_review"];
+
+        // --- 2. محرك الحالة (State) ---
+        const state = {
+            lang: localStorage.getItem('admin_lang') || 'ar',
+            section: 'overview',
+            theme: localStorage.getItem('admin_theme') || 'light',
+            data: { users: [], catalog: [], activations: [] },
+            wizard: { type: 'user', step: 1, mode: 'add', data: {} },
+            aiHistory: []
+        };
+
+        // --- 3. محرك التواصل (API) ---
+        const API = {
+            url: "https://script.google.com/macros/s/AKfycbyzeJ4JIyfq0vYjMBVCmuuu4uIow6Ho5V5cz3fREDtUfTBXkG3kx5pkNuhe-aO6MczMHw/exec",
+            async call(params, method = 'GET', body = null) {
+                const query = new URLSearchParams(params).toString();
+                const opt = { method };
+                if(body) opt.body = JSON.stringify(body);
+                try {
+                    const res = await fetch(`${API.url}?${query}`, opt);
+                    return await res.json();
+                } catch(e) { return { status: 'error' }; }
+            }
+        };
+
+        // --- 4. المساعدات البصرية الموحدة (Helpers) ---
+        const Helpers = {
+            sectionLoader(s) { const el = document.getElementById('section-loader'); if(el) el.style.display = s ? 'flex' : 'none'; },
+            
+            // نظام الـ Toasts المطور (Multiple Stacking)
+            toast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const t = document.createElement('div');
+                t.className = 'toast-box animate-scale-in';
+                const icons = { success: 'check-circle', error: 'alert-octagon', warning: 'alert-triangle', info: 'info' };
+                const colors = { success: 'bg-emerald-500', error: 'bg-red-500', warning: 'bg-amber-500', info: 'bg-blue-600' };
+                
+                t.innerHTML = `
+                    <div class="w-10 h-10 rounded-2xl ${colors[type]} shadow-lg flex items-center justify-center text-white">
+                        <i data-lucide="${icons[type]}" size="18"></i>
+                    </div>
+                    <div class="flex flex-col text-start">
+                        <span class="text-[9px] font-black uppercase opacity-40 tracking-widest">${type}</span>
+                        <span class="text-xs font-black text-slate-800">${msg}</span>
+                    </div>`;
+                container.appendChild(t);
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    anime({ targets: t, opacity: 0, translateX: 50, duration: 400, easing: 'easeInBack', complete: () => t.remove() });
+                }, 4000);
+            },
+
+            // نظام الحوار الموحد (Feedback Modal)
+            async dialog(type, title, message, showCancel = true) {
+                return new Promise((resolve) => {
+                    const m = document.getElementById('feedback-modal');
+                    const b = document.getElementById('feedback-border');
+                    const iBg = document.getElementById('feedback-icon-bg');
+                    const i = document.getElementById('feedback-icon');
+                    const btnYes = document.getElementById('feedback-yes');
+                    const btnNo = document.getElementById('feedback-no');
+                    
+                    const configs = {
+                        success: { color: 'emerald', icon: 'check-circle' },
+                        warning: { color: 'amber', icon: 'alert-triangle' },
+                        error: { color: 'red', icon: 'alert-octagon' },
+                        info: { color: 'blue', icon: 'info' }
+                    };
+                    
+                    const conf = configs[type] || configs.info;
+                    b.style.borderColor = `var(--tw-color-${conf.color}-500)`;
+                    iBg.className = `w-20 h-20 bg-${conf.color}-50 dark:bg-${conf.color}-900/20 text-${conf.color}-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner transition-all duration-500`;
+                    i.setAttribute('data-lucide', conf.icon);
+                    btnYes.className = `flex-1 py-4 rounded-2xl bg-${conf.color}-600 text-white font-black text-xs shadow-lg hover:bg-${conf.color}-700 transition`;
+                    
+                    document.getElementById('feedback-title').innerText = title;
+                    document.getElementById('feedback-message').innerText = message;
+                    btnNo.style.display = showCancel ? 'block' : 'none';
+                    
+                    m.classList.add('open');
+                    lucide.createIcons();
+                    
+                    btnYes.onclick = () => { m.classList.remove('open'); resolve(true); };
+                    btnNo.onclick = () => { m.classList.remove('open'); resolve(false); };
+                });
+            },
+
+            // معالج التحميل للـ Wizard
+            async runSetupLoading() {
+                const overlay = document.getElementById('master-loading-overlay');
+                const circle = document.getElementById('loading-circle');
+                const percentText = document.getElementById('loading-percent');
+                const stageText = document.getElementById('loading-stage');
+                const t = i18n[state.lang];
+
+                overlay.classList.add('open');
+                const stages = [{ p: 25, s: t.loadingFinalizing }, { p: 65, s: t.loadingSync }, { p: 100, s: t.loadingDone }];
+
+                for (let stage of stages) {
+                    await new Promise(r => setTimeout(r, 600));
+                    stageText.innerText = stage.s;
+                    percentText.innerText = stage.p + "%";
+                    circle.style.strokeDashoffset = 251.2 - (251.2 * stage.p) / 100;
+                }
+                
+                await new Promise(r => setTimeout(r, 400));
+                overlay.classList.remove('open');
+            },
+
+            miniStat(icon, color, bg, val, label) {
+                return `<div class="glass-panel p-6 flex items-center gap-6 group hover:scale-[1.03] bg-white dark:bg-white/5 shadow-sm border-white dark:border-white/5 text-start transition-all">
+                    <div class="w-12 h-12 ${bg} ${color} rounded-2xl flex items-center justify-center border-2 border-white dark:border-white/5 shadow-md"><i data-lucide="${icon}" size="22"></i></div>
+                    <div class="text-start"><p class="text-2xl font-black text-slate-900 dark:text-white text-start">${val}</p><p class="text-[10px] font-black opacity-30 uppercase tracking-widest text-start">${label}</p></div>
+                </div>`;
+            }
+        };
+
+        // --- 5. معالج الإجراءات (Actions) ---
+        const Actions = {
+            toggleLanguage() {
+                state.lang = state.lang === 'ar' ? 'en' : 'ar';
+                localStorage.setItem('admin_lang', state.lang);
+                document.documentElement.setAttribute('lang', state.lang);
+                document.documentElement.setAttribute('dir', state.lang === 'ar' ? 'rtl' : 'ltr');
+                renderAdmin();
+                Helpers.toast(i18n[state.lang].success);
+            },
+            toggleTheme() {
+                state.theme = state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('admin_theme', state.theme);
+                document.documentElement.classList.toggle('dark', state.theme === 'dark');
+                document.documentElement.setAttribute('data-theme', state.theme);
+                renderAdmin();
+                Helpers.toast(i18n[state.lang].success);
+            },
+            setSection(s) { 
+                state.section = s; 
+                renderAdmin(); 
+                anime({ targets: '#view-target', opacity: [0, 1], translateY: [30, 0], scale: [0.98, 1], duration: 800, easing: 'easeOutExpo' });
+            },
+            async loadAll() {
+                Helpers.sectionLoader(true);
+                const res = await API.call({ action: 'admin_get_all' });
+                if(res && res.status === 'success') {
+                    state.data = res;
+                    const preloader = document.getElementById('global-loader');
+                    if(preloader) anime({ targets: preloader, opacity: 0, duration: 600, complete: () => preloader.remove() });
+                }
+                Helpers.sectionLoader(false);
+                renderAdmin();
+            },
+            closeModal(id) { document.getElementById(`${id}-modal`).classList.remove('open'); },
+            async deleteUser(email) {
+                const ok = await Helpers.dialog('warning', i18n[state.lang].confirmTitle, i18n[state.lang].confirmDelete);
+                if(!ok) return;
+                await Helpers.runSetupLoading();
+                await API.call({}, 'POST', { action: 'admin_delete_user', email });
+                Actions.loadAll();
+            }
+        };
+
+        // --- 6. نظام معالج الإعداد الذكي المطور (Context-Aware Wizard) ---
+        const Wizard = {
+            open(type, mode = 'add', existingData = null) {
+                state.wizard = { 
+                    type, 
+                    mode,
+                    step: 1, 
+                    data: existingData ? JSON.parse(JSON.stringify(existingData)) : {},
+                    links: (existingData && type === 'catalog') ? (existingData.link || "").split(',') : [""]
+                };
+                
+                if (type === 'user' && mode === 'add') state.wizard.data = { products: [], max: 5, status: 'active' };
+                if (type === 'catalog' && mode === 'add') state.wizard.data = { versions: ["V1.0"], link: "" };
+                
+                document.getElementById('wizard-modal').classList.add('open');
+                Wizard.render();
+            },
+            render() {
+                const t = i18n[state.lang];
+                const { type, mode, step } = state.wizard;
+                const container = document.getElementById('wiz-content');
+                const pills = document.getElementById('wiz-pills');
+                const wizTitle = document.getElementById('wiz-title');
+                const wizSubtitle = document.getElementById('wiz-subtitle');
+                
+                // تحديث العناوين ديناميكياً حسب السياق
+                if (type === 'user') {
+                    wizTitle.innerText = mode === 'add' ? t.wizUserAdd : t.wizUserEdit;
+                    wizSubtitle.innerText = mode === 'add' ? "New User Provisioning" : "User Data Synchronization";
+                } else {
+                    wizTitle.innerText = mode === 'add' ? t.wizCatAdd : t.wizCatEdit;
+                    wizSubtitle.innerText = mode === 'add' ? "Catalog Asset Deployment" : "Asset Matrix Reconfiguration";
+                }
+
+                pills.innerHTML = [1,2,3].map(s => `<div class="wiz-pill ${s <= step ? 'p-active' : 'p-inactive'}">${s}</div>`).join('');
+                
+                if (type === 'user') Wizard.renderUserSteps(container, step);
+                else Wizard.renderCatalogSteps(container, step);
+                
+                document.getElementById('wiz-prev').style.opacity = step > 1 ? "1" : "0";
+                document.getElementById('wiz-prev').style.pointerEvents = step > 1 ? "auto" : "none";
+                document.getElementById('wiz-next').innerText = step === 3 ? (state.lang === 'ar' ? 'تأكيد وحفظ' : 'Finalize') : (state.lang === 'ar' ? 'التالي' : 'Next');
+                lucide.createIcons();
+            },
+            renderUserSteps(el, step) {
+                const d = state.wizard.data;
+                const t = i18n[state.lang];
+                if(step === 1) el.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-up"><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">${t.name}</label><input type="text" value="${d.name||''}" oninput="state.wizard.data.name=this.value" class="luxury-input"></div><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">${t.email}</label><input type="email" value="${d.email||''}" oninput="state.wizard.data.email=this.value" class="luxury-input" ${state.wizard.mode==='edit'?'disabled opacity-50':''}></div><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">Pass</label><input type="text" value="${d.password||''}" oninput="state.wizard.data.password=this.value" class="luxury-input"></div><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">${t.status}</label><select onchange="state.wizard.data.status=this.value" class="luxury-input">${statusOptions.map(o => `<option value="${o}" ${d.status===o?'selected':''}>${o.toUpperCase()}</option>`).join('')}</select></div></div>`;
+                else if(step === 2) el.innerHTML = `<div class="animate-fade-up text-start"><h4 class="text-[10px] font-black opacity-40 uppercase mb-8 text-start">Select Asset Privileges</h4><div class="grid grid-cols-2 sm:grid-cols-4 gap-4">${state.data.catalog.map(p => `<div onclick="Wizard.toggleUserProduct('${p.id}')" class="p-4 rounded-2xl border-2 cursor-pointer transition-all ${(d.products||[]).some(sp=>sp.id===p.id)?'border-blue-600 bg-blue-50 shadow-md scale-105':'border-slate-100 dark:border-white/5'}"><img src="${p.image}" class="w-full h-10 object-contain mb-3 rounded-lg"><p class="text-[8px] font-black text-center truncate uppercase tracking-widest">${p.name}</p></div>`).join('')}</div><div class="mt-12 text-start"><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">Max Activations Limit</label><input type="number" value="${d.max||5}" oninput="state.wizard.data.max=this.value" class="luxury-input w-28"></div></div>`;
+                else el.innerHTML = `<div class="text-center animate-fade-up"><div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-emerald-100 shadow-inner"><i data-lucide="user-check" size="40"></i></div><h4 class="font-black text-2xl text-slate-800 dark:text-white">تأكيد البيانات</h4><p class="text-xs opacity-40 mt-4 italic text-center">سيتم معالجة بيانات الحساب ومنحه الصلاحيات السحابية فور الحفظ.</p></div>`;
+            },
+            renderCatalogSteps(el, step) {
+                const d = state.wizard.data;
+                const links = state.wizard.links || [""];
+                if(step === 1) el.innerHTML = `<div class="grid grid-cols-1 gap-6 animate-fade-up text-start"><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">Asset Title</label><input type="text" value="${d.name||''}" oninput="state.wizard.data.name=this.value" class="luxury-input font-black"></div><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">Preview Branding URL</label><input type="text" value="${d.image||''}" oninput="state.wizard.data.image=this.value" class="luxury-input"></div><div><label class="text-[9px] font-black opacity-40 uppercase mb-3 block text-start">Asset Description</label><textarea oninput="state.wizard.data.desc=this.value" class="luxury-input h-24">${d.desc||''}</textarea></div></div>`;
+                else if(step === 2) el.innerHTML = `<div class="animate-fade-up text-start"><div class="flex justify-between items-center mb-8 text-start"><h4 class="text-[10px] font-black uppercase text-blue-600 tracking-widest">Version Control Flow</h4><button onclick="Wizard.addVer()" class="bg-blue-600 text-white p-2 rounded-xl shadow-lg hover:scale-110 transition-all"><i data-lucide="plus" size="18"></i></button></div><div class="space-y-4 text-start">${(d.versions||[]).map((v, i) => `<div class="flex gap-3 text-start"><input type="text" value="${v}" oninput="state.wizard.data.versions[${i}]=this.value" class="luxury-input w-24 text-center font-black" placeholder="V1.0"><input type="text" value="${links[i]||''}" oninput="state.wizard.links[${i}]=this.value" class="luxury-input flex-grow" placeholder="CDN Link"><button onclick="Wizard.remVer(${i})" class="p-3 text-red-500 bg-red-50 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash" size="18"></i></button></div>`).join('')}</div></div>`;
+                else el.innerHTML = `<div class="text-center animate-fade-up"><div class="w-20 h-20 bg-purple-50 text-purple-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-purple-100 shadow-inner"><i data-lucide="package" size="40"></i></div><h4 class="font-black text-2xl text-slate-800 dark:text-white">تحديث الكاتالوج</h4><p class="text-xs opacity-40 mt-4 italic text-center text-start">سيتم اعتماد المنتج ${d.name} كأصل متاح في كاتالوج المنصة العالمي.</p></div>`;
+            },
+            toggleUserProduct(pid) {
+                const prod = state.data.catalog.find(p => p.id === pid);
+                if (!state.wizard.data.products) state.wizard.data.products = [];
+                const idx = state.wizard.data.products.findIndex(p => p.id === pid);
+                if(idx === -1) state.wizard.data.products.push(prod); else state.wizard.data.products.splice(idx, 1);
+                Wizard.render();
+            },
+            addVer() { if(!state.wizard.data.versions) state.wizard.data.versions = []; if(!state.wizard.links) state.wizard.links = []; state.wizard.data.versions.push("V1.0"); state.wizard.links.push(""); Wizard.render(); },
+            remVer(i) { state.wizard.data.versions.splice(i, 1); state.wizard.links.splice(i, 1); Wizard.render(); },
+            next() {
+                const { type, step, data } = state.wizard;
+                if(step === 1) {
+                    if(type === 'user' && (!data.email || !data.name)) return Helpers.toast("بيانات أساسية مفقودة", "error");
+                    if(type === 'catalog' && !data.name) return Helpers.toast("اسم المنتج مطلوب", "error");
+                }
+                if(step < 3) { state.wizard.step++; Wizard.render(); } else Wizard.commit();
+            },
+            prev() { if(state.wizard.step > 1) { state.wizard.step--; Wizard.render(); } },
+            async commit() {
+                await Helpers.runSetupLoading();
+                const { type, data, links } = state.wizard;
+                const action = type === 'user' ? 'admin_save_user' : 'admin_save_product';
+                if(type === 'catalog') data.link = (links||[]).join(',');
+                const res = await API.call({}, 'POST', { action, ...data });
+                if(res && res.status === 'success') Helpers.toast(i18n[state.lang].success);
+                Actions.closeModal('wizard');
+                Actions.loadAll();
+            }
+        };
+
+        // --- 7. مكونات العرض المتطورة (Views) ---
+        const Views = {
+            // الصفحة الرئيسية: مركز تحليلات شامل
+            overview: () => {
+                const t = i18n[state.lang];
+                return `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-up text-start">
+                    ${Helpers.miniStat('users', 'text-blue-600', 'bg-blue-50', state.data.users.length, t.totalUsers)}
+                    ${Helpers.miniStat('shield-check', 'text-emerald-600', 'bg-emerald-50', state.data.activations.length, t.totalActivations)}
+                    ${Helpers.miniStat('layers', 'text-purple-600', 'bg-purple-50', state.data.catalog.length, t.catalogSize)}
+                    ${Helpers.miniStat('zap', 'text-amber-600', 'bg-amber-50', state.data.activations.filter(a=>a.blogurl).length, "System Load")}
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10 text-start">
+                    <div class="lg:col-span-2 glass-panel p-8 shadow-sm min-h-[420px] bg-white border-white dark:bg-white/5 dark:border-white/5 text-start"><div id="chart-main"></div></div>
+                    <div class="lg:col-span-1 glass-panel p-8 shadow-sm min-h-[420px] bg-white border-white dark:bg-white/5 dark:border-white/5 text-start"><div id="chart-pie"></div></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10 text-start">
+                    <div class="glass-panel p-8 shadow-sm bg-white border-white dark:bg-white/5 dark:border-white/5 text-start h-[350px]"><div id="chart-bar-weekly"></div></div>
+                    <div class="glass-panel p-8 shadow-sm bg-white border-white dark:bg-white/5 dark:border-white/5 text-start h-[350px]"><div id="chart-radar-status"></div></div>
+                </div>`;
+            },
+            users: () => `
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-12 gap-8 text-start">
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-5 text-start"><i data-lucide="users-2" size="32"></i> ${i18n[state.lang].users}</h3>
+                    <button onclick="Wizard.open('user', 'add')" class="px-10 py-5 bg-blue-600 text-white rounded-[1.25rem] text-xs font-black shadow-xl flex items-center gap-3 transition hover:bg-blue-700 active:scale-95 uppercase tracking-widest"><i data-lucide="plus" size="18"></i> ${i18n[state.lang].addUser}</button>
+                </div>
+                <div class="overflow-x-auto no-scrollbar text-start">
+                    <table class="w-full text-start border-separate border-spacing-y-5">
+                        <tbody>
+                            ${state.data.users.map(u => `
+                                <tr class="glass-panel hover:bg-white dark:hover:bg-white/10 transition-all border-white dark:border-white/5 shadow-sm text-start">
+                                    <td class="p-6 text-start"><div class="flex items-center gap-5 text-start"><div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center border-4 border-white dark:border-slate-700 overflow-hidden shadow-lg"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=eff6ff&color=3b82f6&bold=true&size=128" class="w-full h-full"></div><p class="font-black text-base text-slate-900 dark:text-white text-start">${u.name}</p></div></td>
+                                    <td class="p-6 text-start font-mono text-xs text-blue-600 font-bold opacity-60 text-start">${u.email}</td>
+                                    <td class="p-6 text-start"><span class="px-5 py-2 rounded-2xl text-[10px] font-black bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 uppercase tracking-widest">${u.status}</span></td>
+                                    <td class="p-6 text-end"><div class="flex gap-4 justify-end"><button onclick='Wizard.open("user", "edit", ${JSON.stringify(u)})' class="p-4 text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-600 hover:text-white rounded-2xl transition-all shadow-sm"><i data-lucide="edit-3" size="20"></i></button><button onclick="Actions.deleteUser('${u.email}')" class="p-4 text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-600 hover:text-white rounded-2xl transition-all shadow-sm"><i data-lucide="trash-2" size="20"></i></button></div></td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`,
+            catalog: () => `
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-12 gap-8 text-start">
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-5 text-start"><i data-lucide="layers" size="32"></i> ${i18n[state.lang].catalog}</h3>
+                    <button onclick="Wizard.open('catalog', 'add')" class="px-10 py-5 bg-blue-600 text-white rounded-[1.25rem] text-xs font-black shadow-xl flex items-center gap-3 transition hover:bg-blue-700 active:scale-95 uppercase tracking-widest"><i data-lucide="plus-square" size="18"></i> ${i18n[state.lang].addProd}</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-start">
+                    ${state.data.catalog.map(p => `
+                        <div class="glass-panel p-8 flex gap-8 group hover:border-blue-400 transition-all text-start shadow-sm bg-white/50 dark:bg-white/5 border-white dark:border-white/5">
+                            <div class="w-40 h-40 rounded-[2.5rem] bg-white shrink-0 overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transition-all group-hover:rotate-2"><img src="${p.image}" class="w-full h-full object-cover"></div>
+                            <div class="flex-grow overflow-hidden flex flex-col justify-between text-start">
+                                <div class="flex justify-between items-start text-start"><h4 class="font-black text-2xl text-slate-900 dark:text-white truncate text-start">${p.name}</h4><div class="flex gap-3 text-start"><button onclick='Wizard.open("catalog", "edit", ${JSON.stringify(p)})' class="p-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-2xl transition-all shadow-sm"><i data-lucide="settings" size="18"></i></button><button onclick="Actions.deleteProduct('${p.id}')" class="p-3 text-red-500 dark:bg-red-900/20 rounded-2xl transition-all shadow-sm"><i data-lucide="trash-2" size="18"></i></button></div></div>
+                                <p class="text-xs font-bold opacity-40 mb-8 leading-relaxed line-clamp-2 text-start">${p.desc}</p>
+                                <div class="flex flex-wrap gap-2 text-start">${p.versions.map(v => `<span class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-1.5 rounded-xl text-[10px] font-black border border-indigo-100 dark:border-indigo-800 uppercase tracking-tighter shadow-inner">${v}</span>`).join('')}</div>
+                            </div>
+                        </div>`).join('')}
+                </div>`,
+            activations: () => `
+                <h3 class="text-3xl font-black mb-12 text-slate-900 dark:text-white flex items-center gap-6 text-start"><i data-lucide="shield-check" size="32"></i> ${i18n[state.lang].activations}</h3>
+                <div class="overflow-x-auto no-scrollbar text-start">
+                    <table class="w-full text-start border-separate border-spacing-y-5">
+                        <tbody>
+                            ${state.data.activations.map(a => {
+                                const domain = a.blogurl ? new URL(a.blogurl).hostname : 'blogger.com';
+                                return `<tr class="glass-panel hover:bg-white dark:hover:bg-white/10 transition-all border-white dark:border-white/5 shadow-sm text-start">
+                                    <td class="p-8 text-start"><div class="flex items-center gap-8 text-start"><div class="w-16 h-16 bg-white dark:bg-slate-800 border-4 border-slate-100 dark:border-slate-700 p-3 rounded-[1.5rem] shadow-sm flex items-center justify-center overflow-hidden"><img src="https://www.google.com/s2/favicons?sz=128&domain=${domain}" class="w-full h-full object-contain" onerror="this.src='https://ui-avatars.com/api/?name=B&background=f1f5f9&color=64748b';"></div><div class="overflow-hidden text-start"><p class="font-black text-lg text-slate-900 dark:text-white text-start">${a.blogname}</p><p class="text-[11px] font-bold text-blue-500 truncate max-w-[250px] opacity-60 text-start italic" dir="ltr text-start">${a.blogurl}</p></div></div></td>
+                                    <td class="p-8 text-start"><p class="text-[14px] font-black text-slate-600 dark:text-slate-400 text-start">${a.email}</p><p class="text-[10px] opacity-30 font-bold uppercase mt-2 text-start font-black">${a.userName}</p></td>
+                                    <td class="p-8 text-start font-mono text-[12px] text-indigo-700 dark:text-indigo-400 font-black tracking-tighter text-start">${a.code}</td>
+                                    <td class="p-8 text-end"><button onclick="Actions.deleteActivation('${a.blogid}')" class="p-5 text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-600 hover:text-white rounded-[1.5rem] transition-all shadow-sm"><i data-lucide="unlink-2" size="24"></i></button></td>
+                                </tr>`}).join('')}
+                        </tbody>
+                    </table>
+                </div>`,
+            reports: () => {
+                const t = i18n[state.lang];
+                const stats = { total: state.data.users.length, active: state.data.users.filter(u => u.status==='active').length, alert: state.data.users.filter(u => ['banned','security_hold','restricted','fraud_detected'].includes(u.status)).length };
+                return `
+                <div class="animate-fade-up text-start">
+                    <div class="flex justify-between items-center mb-12 pb-10 border-b border-slate-200 dark:border-white/10 text-start">
+                        <div class="text-start">
+                            <h3 class="text-4xl font-black text-slate-900 dark:text-white text-start">${t.reportTitle}</h3>
+                            <p class="text-sm text-slate-400 font-bold uppercase tracking-widest mt-2 text-start">${t.reportSubtitle}</p>
+                        </div>
+                        <button onclick="window.print()" class="no-print px-12 py-5 bg-slate-900 text-white rounded-[1.5rem] text-[11px] font-black shadow-2xl flex items-center gap-4 transition hover:bg-black uppercase tracking-[0.2em]"><i data-lucide="printer" size="20"></i> Export Imperial Report</button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 text-start">
+                        ${Helpers.miniStat('users', 'text-blue-600', 'bg-blue-50', stats.total, 'Base Intelligence')}
+                        ${Helpers.miniStat('user-check', 'text-emerald-600', 'bg-emerald-50', stats.active, 'Execution Success')}
+                        ${Helpers.miniStat('shield-alert', 'text-red-600', 'bg-red-50', stats.alert, 'Threat Clusters')}
+                        ${Helpers.miniStat('activity', 'text-purple-600', 'bg-purple-50', state.data.activations.length, 'Live Flux Feed')}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 text-start mb-12">
+                        <div class="glass-panel p-12 shadow-sm bg-white/50 dark:bg-white/5 text-start h-[500px] border-white dark:border-white/5">
+                            <h5 class="text-xs font-black uppercase mb-10 opacity-40 tracking-[0.3em] text-blue-600 text-start italic">Asset Mix Dynamics</h5>
+                            <div id="chart-report-bar"></div>
+                        </div>
+                        <div class="glass-panel p-12 shadow-sm bg-white/50 dark:bg-white/5 text-start h-[500px] border-white dark:border-white/5">
+                            <h5 class="text-xs font-black uppercase mb-10 opacity-40 tracking-[0.3em] text-emerald-600 text-start italic">Global Vitality Flow</h5>
+                            <div id="chart-report-radial"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-10 bg-slate-50 dark:bg-white/5 text-start border-white dark:border-white/5">
+                        <h5 class="text-xs font-black uppercase mb-8 opacity-40 tracking-[0.3em] text-start italic">System Security Segment Mix</h5>
+                        <div id="chart-report-donut"></div>
+                    </div>
+                </div>`;
+            },
+            ai: () => {
+                const t = i18n[state.lang];
+                return `
+                <div class="animate-fade-up text-start h-full flex flex-col">
+                    <div class="flex items-center gap-6 mb-10 pb-10 border-b border-slate-200 dark:border-white/10 text-start">
+                        <div class="w-16 h-16 bg-blue-600 text-white rounded-3xl flex items-center justify-center shadow-premium animate-pulse"><i data-lucide="sparkles" size="32"></i></div>
+                        <div>
+                            <h3 class="text-3xl font-black text-slate-900 dark:text-white text-start">${t.aiTitle}</h3>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest text-start">${t.aiTagline}</p>
+                        </div>
+                    </div>
+                    <div id="ai-chat-area" class="flex-grow overflow-y-auto mb-10 pr-4 space-y-4 no-scrollbar min-h-[450px] flex flex-col">
+                        <div class="chat-bubble bubble-ai text-start">
+                            <p class="font-bold text-sm">${t.aiWelcome}</p>
+                        </div>
+                    </div>
+                    <div class="relative glass-panel p-2 flex gap-4 border-2 border-blue-100 dark:border-white/5 shadow-inner">
+                        <input type="text" id="ai-input" placeholder="${t.aiPlaceholder}" class="luxury-input flex-grow border-none bg-transparent">
+                        <button onclick="AI.send()" class="w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-lg flex items-center justify-center hover:bg-blue-700 transition-all"><i data-lucide="send" size="20"></i></button>
+                    </div>
+                </div>`;
+            }
+        };
+
+        const AI = {
+            send() {
+                const input = document.getElementById('ai-input');
+                const area = document.getElementById('ai-chat-area');
+                const text = input.value.trim();
+                if(!text) return;
+                
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-bubble bubble-user text-start';
+                userMsg.innerHTML = `<p class="font-bold text-sm">${text}</p>`;
+                area.appendChild(userMsg);
+                input.value = "";
+                area.scrollTop = area.scrollHeight;
+                
+                // منطق رد المساعد الذكي
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'chat-bubble bubble-ai text-start opacity-0';
+                    let response = "جاري تحليل قواعد البيانات... ";
+                    
+                    if(text.includes("تفعيل") || text.includes("license")) {
+                        response = `لدينا حالياً ${state.data.activations.length} تفعيلاً نشطاً. يمكنك إدارة المزيد من قسم تغذية التراخيص.`;
+                    } else if(text.includes("مستخدم") || text.includes("user")) {
+                        response = `قاعدة البيانات تضم ${state.data.users.length} عملاء. حالة النظام العامة مستقرة.`;
+                    } else {
+                        response = "أفهم استفسارك. للقيام بذلك، توجه إلى القسم المناسب من القائمة الجانبية أو راجع لوحة الإحصائيات العامة.";
+                    }
+
+                    aiMsg.innerHTML = `<p class="font-bold text-sm">${response}</p>`;
+                    area.appendChild(aiMsg);
+                    anime({ targets: aiMsg, opacity: 1, duration: 400 });
+                    area.scrollTop = area.scrollHeight;
+                }, 800);
+            }
+        };
+
+        function initLuxuryCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textC = isDark ? '#f1f5f9' : '#1e293b';
+            const colors = { text: isDark ? '#94a3b8' : '#64748b', grid: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' };
+
+            if(state.section === 'overview') {
+                new ApexCharts(document.querySelector("#chart-main"), {
+                    series: [{ name: 'System Flux', data: [22, 45, 18, 65, 32, 109, state.data.activations.length] }],
+                    chart: { type: 'area', height: 350, toolbar: { show: false } },
+                    colors: ['#3b82f6'], stroke: { curve: 'smooth', width: 5 },
+                    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0 } },
+                    xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Now'], labels: { style: { colors: colors.text, fontWeight: 800 } } },
+                    grid: { borderColor: colors.grid }
+                }).render();
+
+                new ApexCharts(document.querySelector("#chart-pie"), {
+                    series: [state.data.users.length, state.data.activations.length, state.data.catalog.length],
+                    chart: { type: 'donut', height: 350 },
+                    labels: ['Users', 'License', 'Market'], colors: ['#3b82f6', '#10b981', '#8b5cf6'],
+                    legend: { position: 'bottom', labels: { colors: colors.text, fontWeight: 800 } },
+                    stroke: { width: 4, colors: [isDark?'#020617':'#fff'] },
+                    plotOptions: { pie: { donut: { size: '80%', labels: { show: true, total: { show: true, label: 'Core Hub', color: textC, fontWeight: 900 } } } } }
+                }).render();
+
+                new ApexCharts(document.querySelector("#chart-bar-weekly"), {
+                    series: [{ name: 'Velocity', data: [12, 45, 18, 51, 32, 109, 65] }],
+                    chart: { type: 'bar', height: 280, toolbar: { show: false } },
+                    plotOptions: { bar: { borderRadius: 8, columnWidth: '30%' } },
+                    colors: ['#3b82f6'],
+                    xaxis: { categories: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'], labels: { style: { colors: colors.text } } },
+                    grid: { borderColor: colors.grid }
+                }).render();
+
+                new ApexCharts(document.querySelector("#chart-radar-status"), {
+                    series: [{ name: 'Stats', data: [80, 50, 30, 40, 100, 20] }],
+                    chart: { height: 280, type: 'radar', toolbar: { show: false } },
+                    xaxis: { categories: ['Active', 'Locked', 'Banned', 'Review', 'Trial', 'Suspended'], labels: { style: { colors: colors.text } } },
+                    colors: ['#8b5cf6']
+                }).render();
+            }
+
+            if(state.section === 'reports') {
+                new ApexCharts(document.querySelector("#chart-report-bar"), {
+                    series: [{ name: 'Reach', data: state.data.catalog.map(p => state.data.users.filter(u => u.products.some(up=>up.id===p.id)).length) }],
+                    chart: { type: 'bar', height: 400, toolbar: { show: false } },
+                    plotOptions: { bar: { borderRadius: 14, columnWidth: '35%', distributed: true } },
+                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
+                    xaxis: { categories: state.data.catalog.map(p => p.name.split(' ')[0]), labels: { style: { colors: colors.text, fontWeight: 700 } } },
+                    grid: { borderColor: colors.grid },
+                    legend: { show: false }
+                }).render();
+
+                new ApexCharts(document.querySelector("#chart-report-radial"), {
+                    series: [88, 72, 95],
+                    chart: { height: 400, type: 'radialBar' },
+                    plotOptions: { radialBar: { dataLabels: { name: { fontSize: '14px', fontWeight: 900 }, value: { fontSize: '20px', fontWeight: 900 }, total: { show: true, label: 'Imperial Health', color: textC } } } },
+                    labels: ['Success Mix', 'License Flux', 'System Integrity'],
+                    colors: ['#3b82f6', '#10b981', '#fbbf24']
+                }).render();
+
+                new ApexCharts(document.querySelector("#chart-report-donut"), {
+                    series: [44, 55, 13, 33],
+                    chart: { type: 'donut', height: 350 },
+                    labels: ['Active', 'Locked', 'Banned', 'Suspended'],
+                    colors: ['#10b981', '#f59e0b', '#ef4444', '#64748b'],
+                    legend: { position: 'bottom', labels: { colors: colors.text } }
+                }).render();
+            }
+        }
+
+        function renderAdmin() {
+            const t = i18n[state.lang];
+            const navItems = [
+                {id: 'overview', icon: 'pie-chart'}, 
+                {id: 'users', icon: 'users'}, 
+                {id: 'catalog', icon: 'package'}, 
+                {id: 'activations', icon: 'shield-check'}, 
+                {id: 'reports', icon: 'file-bar-chart-2'}, 
+                {id: 'ai', icon: 'sparkles'}
+            ];
+            
+            document.getElementById('side-nav').innerHTML = navItems.map(item => `
+                <button onclick="Actions.setSection('${item.id}')" class="nav-link w-full ${state.section === item.id ? 'nav-link-active' : ''}">
+                    <i data-lucide="${item.icon}" size="20"></i><span class="flex-1 uppercase text-start text-[11px] tracking-widest">${t[item.id]}</span>
+                </button>`).join('');
+            
+            document.getElementById('view-target').innerHTML = (Views[state.section] || Views.overview)();
+            document.getElementById('lang-btn-text').innerText = t.langName;
+            lucide.createIcons();
+            setTimeout(initLuxuryCharts, 50);
+        }
+
+        window.onload = () => {
+            document.documentElement.setAttribute('lang', state.lang);
+            document.documentElement.setAttribute('dir', state.lang === 'ar' ? 'rtl' : 'ltr');
+            Actions.loadAll();
+        };
+    </script>
+</body>
+</html>
