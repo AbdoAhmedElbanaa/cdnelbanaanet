@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal POS - نظام مطعم متكامل</title>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SwiperJS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- QR Code Generator Lib -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: "rgba(255, 255, 255, 0.05)",
+                        glassBorder: "rgba(255, 255, 255, 0.1)",
+                        glassActive: "rgba(255, 255, 255, 0.15)",
+                        primary: "#FF6B6B",
+                        secondary: "#4ECDC4",
+                        dark: "#1A1A2E",
+                        darkGlass: "rgba(26, 26, 46, 0.95)"
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in': 'slideIn 0.5s ease-out forwards',
+                        'slide-out': 'slideOut 0.5s ease-in forwards',
+                        'bounce-in': 'bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .admin-sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            color: #9ca3af;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-sidebar-link:hover, .admin-sidebar-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-right: 3px solid #FF6B6B;
+        }
+
+        /* Timeline Styles */
+        .timeline-item { position: relative; padding-bottom: 2rem; border-right: 2px solid rgba(255,255,255,0.1); margin-right: 1rem; }
+        .timeline-item:last-child { border-right: none; }
+        .timeline-dot { position: absolute; right: -0.6rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background: #333; border: 2px solid #555; }
+        .timeline-dot.active { background: #4ECDC4; border-color: #4ECDC4; box-shadow: 0 0 10px #4ECDC4; }
+        .timeline-dot.completed { background: #10B981; border-color: #10B981; }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; padding: 20px; }
+            .no-print { display: none !important; }
+        }
+        
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
+
+        /* Swiper Custom */
+        .swiper-pagination-bullet { background: white; opacity: 0.5; }
+        .swiper-pagination-bullet-active { background: #FF6B6B; opacity: 1; }
+        .swiper-button-next, .swiper-button-prev { color: #FF6B6B; }
+
+        /* Kitchen Card Stepper */
+        .kds-step {
+            position: relative;
+            flex: 1;
+            text-align: center;
+        }
+        .kds-step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+        .kds-step:first-child::after { display: none; }
+        .kds-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1A1A2E;
+            border: 2px solid rgba(255,255,255,0.2);
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.3s;
+        }
+        .kds-dot.active { border-color: #4ECDC4; background: #4ECDC4; color: black; box-shadow: 0 0 10px rgba(78, 205, 196, 0.5); transform: scale(1.1); }
+        .kds-dot.completed { border-color: #10B981; background: #10B981; color: white; }
+    </style>
+</head>
+<body class="font-sans text-gray-100 antialiased selection:bg-primary selection:text-white">
+
+    <!-- Audio Element for Notifications -->
+    <audio id="notification-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <!-- New Toast Notification Container -->
+    <div id="toast-container" class="fixed top-6 left-6 z-[200] flex flex-col gap-4 pointer-events-none w-80"></div>
+    
+    <!-- Floating Track Button (For Customers) -->
+    <button id="floating-track-btn" onclick="ui.showTrackingModal()" class="hidden fixed bottom-6 left-6 z-50 bg-secondary text-black font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition animate-bounce">
+        <i class="fa-solid fa-stopwatch mr-2"></i> تتبع طلبك
+    </button>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="relative w-full min-h-screen">
+
+        <!-- NAV BAR (Dynamic) -->
+        <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 top-0 glass-panel border-b border-white/10 hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-2 cursor-pointer" onclick="router.navigate('landing')">
+                        <i class="fa-solid fa-utensils text-primary text-2xl"></i>
+                        <span class="font-bold text-xl tracking-wider app-name-display">CRYSTAL<span class="text-primary">POS</span></span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4 space-x-reverse" id="nav-links">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <!-- Customer Order History Button -->
+                        <button id="track-btn-nav" class="hidden bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-md transition border border-white/10" onclick="ui.showOrdersHistory()">
+                            <i class="fa-solid fa-list-check mr-2"></i> طلباتي
+                        </button>
+
+                        <button id="cart-btn" class="hidden relative p-2 rounded-full hover:bg-white/10 transition" onclick="ui.toggleCart()">
+                            <i class="fa-solid fa-cart-shopping text-xl"></i>
+                            <span id="cart-count" class="absolute -top-1 -right-1 bg-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
+                        </button>
+                        <button id="auth-btn" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-md transition border border-white/10" onclick="ui.toggleAuthModal()">
+                            <i class="fa-solid fa-user mr-2"></i> دخول
+                        </button>
+                        <button id="logout-btn" class="hidden bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded-lg transition" onclick="authService.logout()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- VIEWS -->
+
+        <!-- 1. LANDING PAGE -->
+        <section id="view-landing" class="view-section min-h-screen flex flex-col justify-center items-center relative overflow-hidden pt-16">
+            <!-- Hero Background Elements -->
+            <div class="absolute top-20 left-20 w-72 h-72 bg-primary/20 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-20 right-20 w-96 h-96 bg-secondary/20 rounded-full blur-[100px]"></div>
+
+            <div class="text-center z-10 max-w-4xl px-4 fade-in">
+                <span class="text-secondary font-bold tracking-widest text-sm uppercase mb-4 block app-slogan-display">المستقبل في إدارة المطاعم</span>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight app-name-hero">
+                    تذوق الفخامة <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">في كل تفصيل</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto app-desc-display">
+                    نظام إدارة متكامل يجمع بين أناقة التصميم وقوة الأداء. اطلب طعامك المفضل الآن أو قم بإدارة مطعمك بلمسة واحدة.
+                </p>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="router.navigate('menu')" class="bg-gradient-to-r from-primary to-red-600 hover:from-red-600 hover:to-primary text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/50 transition transform hover:-translate-y-1">
+                        قائمة الطعام <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </button>
+                    <button onclick="ui.toggleAuthModal()" class="glass-card px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition">
+                        لوحة الإدارة
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. MENU / ORDERING -->
+        <section id="view-menu" class="view-section hidden pt-24 px-4 pb-12 min-h-screen">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Categories -->
+                <div class="lg:w-1/4">
+                    <div class="glass-panel p-6 rounded-2xl sticky top-24">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-primary"></i> الأقسام
+                        </h2>
+                        <ul id="categories-list" class="space-y-3">
+                            <li class="skeleton h-10 bg-white/5 rounded-lg"></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Products Grid -->
+                <div class="lg:w-3/4">
+                    <div class="flex justify-between items-center mb-6 glass-panel p-4 rounded-xl">
+                        <div>
+                            <h2 class="text-2xl font-bold" id="menu-title">كل الأصناف</h2>
+                            <p class="text-sm text-gray-400" id="table-info-display">طاولة: غير محدد</p>
+                        </div>
+                        <div class="flex gap-2 bg-black/20 p-1 rounded-lg">
+                            <button class="px-4 py-2 rounded-md bg-white/10 text-sm active-type" onclick="orderService.setOrderType('dinein')">محلي</button>
+                            <button class="px-4 py-2 rounded-md hover:bg-white/5 text-sm" onclick="orderService.setOrderType('takeaway')">سفري</button>
+                        </div>
+                    </div>
+                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ADMIN DASHBOARD -->
+        <section id="view-admin" class="view-section hidden min-h-screen">
+            <div class="flex h-screen overflow-hidden">
+                <!-- Admin Sidebar -->
+                <aside class="w-64 glass-panel border-r border-white/10 flex-col hidden md:flex z-20">
+                    <div class="h-16 flex items-center justify-center border-b border-white/10">
+                        <h2 class="font-bold text-xl tracking-wider">ADMIN<span class="text-primary">PANEL</span></h2>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4">
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2">رئيسي</div>
+                        <a onclick="ui.renderAdminDashboard()" id="link-dashboard" class="admin-sidebar-link active"><i class="fa-solid fa-chart-line w-6"></i> لوحة القيادة</a>
+                        <a onclick="ui.renderAdminOrders()" id="link-orders" class="admin-sidebar-link"><i class="fa-solid fa-receipt w-6"></i> الطلبات</a>
+                        <a onclick="ui.renderAdminKanban()" id="link-kanban" class="admin-sidebar-link"><i class="fa-solid fa-list-check w-6"></i> لوحة العمليات</a>
+                        
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 mt-4">إدارة</div>
+                        <a onclick="ui.renderAdminMenu()" id="link-menu-manage" class="admin-sidebar-link"><i class="fa-solid fa-burger w-6"></i> المينيو</a>
+                        <a onclick="ui.renderAdminExtras()" id="link-extras" class="admin-sidebar-link"><i class="fa-solid fa-plus-circle w-6"></i> الإضافات</a>
+                        <a onclick="ui.renderAdminUnits()" id="link-units" class="admin-sidebar-link"><i class="fa-solid fa-weight-scale w-6"></i> الوحدات والأحجام</a>
+                        <a onclick="ui.renderAdminTables()" id="link-tables" class="admin-sidebar-link"><i class="fa-solid fa-chair w-6"></i> الطاولات & QR</a>
+                        <a onclick="ui.renderAdminUsers()" id="link-users" class="admin-sidebar-link"><i class="fa-solid fa-users w-6"></i> المستخدمين</a>
+                        
+                        <div class="text-xs font-bold text-gray-500 uppercase mb-2 mt-4">النظام</div>
+                        <a onclick="ui.renderAdminSettings()" id="link-settings" class="admin-sidebar-link"><i class="fa-solid fa-gear w-6"></i> الإعدادات</a>
+                    </div>
+                    <div class="p-4 border-t border-white/10">
+                        <button onclick="authService.logout()" class="flex items-center text-red-400 hover:text-red-300 w-full p-2 rounded hover:bg-white/5 transition">
+                            <i class="fa-solid fa-right-from-bracket w-6"></i> تسجيل خروج
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Admin Main Content -->
+                <main class="flex-1 flex flex-col relative overflow-hidden bg-gradient-to-br from-dark to-[#0a0a1a]">
+                    <!-- Mobile Header for Admin -->
+                    <header class="h-16 glass-panel border-b border-white/10 flex items-center justify-between px-6 md:hidden">
+                        <span class="font-bold">لوحة التحكم</span>
+                        <button onclick="router.navigate('menu')" class="text-sm bg-white/10 px-3 py-1 rounded">خروج</button>
+                    </header>
+
+                    <!-- Content Scrollable Area -->
+                    <div id="admin-content-area" class="flex-1 overflow-y-auto p-6 md:p-10">
+                        <!-- Dynamic Content injected here -->
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- 4. KITCHEN DISPLAY (KDS) - IMPROVED -->
+        <section id="view-kitchen" class="view-section hidden pt-20 px-4 pb-12 w-full min-h-screen">
+             <div class="max-w-[1920px] mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 glass-panel p-4 rounded-xl">
+                    <h1 class="text-3xl font-bold flex items-center gap-3">
+                        <i class="fa-solid fa-fire-burner text-primary animate-pulse"></i>
+                        <span>شاشة المطبخ (KDS)</span>
+                    </h1>
+                    <div class="flex items-center gap-4">
+                        <div class="text-center">
+                            <span class="text-sm text-gray-400 block">وقت النظام</span>
+                            <span class="font-mono text-xl font-bold update-timer">--:--</span>
+                        </div>
+                        <div class="h-10 w-[1px] bg-white/10"></div>
+                        <div class="flex gap-2">
+                            <span class="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span> استلام
+                            </span>
+                            <span class="flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-bold border border-yellow-500/30">
+                                <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span> تحضير
+                            </span>
+                        </div>
+                        <button onclick="authService.logout()" class="bg-red-500/10 hover:bg-red-500/30 text-red-500 border border-red-500/30 p-2 rounded-lg transition" title="تسجيل خروج">
+                            <i class="fa-solid fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="kitchen-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    <!-- Orders Injected Here -->
+                </div>
+             </div>
+        </section>
+
+        <!-- MODALS -->
+
+        <!-- TRACKING MODAL (SWIPER) -->
+        <div id="tracking-modal" class="fixed inset-0 z-[130] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-2xl rounded-2xl p-0 overflow-hidden shadow-2xl relative h-[600px] flex flex-col">
+                <button onclick="ui.closeModal('tracking-modal')" class="absolute top-4 right-4 z-50 bg-black/20 hover:bg-black/40 text-white rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-times"></i></button>
+                
+                <div class="swiper mySwiper w-full h-full">
+                    <div class="swiper-wrapper" id="tracking-swiper-wrapper">
+                        <!-- Slides -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDERS HISTORY MODAL (NEW) -->
+        <div id="orders-history-modal" class="fixed inset-0 z-[125] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-md rounded-2xl p-6 h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 class="text-xl font-bold">طلباتي السابقة</h2>
+                    <button onclick="ui.closeModal('orders-history-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
+                <div id="orders-history-list" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+                    <!-- Items injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Modal (Client) -->
+        <div id="product-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="glass-panel w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl animate-float" style="animation: none;">
+                <div class="relative h-48 bg-gray-700">
+                    <img id="modal-img" src="" alt="Food" class="w-full h-full object-cover">
+                    <button onclick="ui.closeModal('product-modal')" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 id="modal-name" class="text-2xl font-bold">Burger</h3>
+                        <span id="modal-price" class="text-xl text-primary font-bold">25 SAR</span>
+                    </div>
+                    <p id="modal-desc" class="text-gray-400 text-sm mb-6">وصف الوجبة...</p>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-2 text-gray-300">الحجم</label>
+                        <div class="flex gap-2 flex-wrap" id="modal-sizes"></div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2 text-gray-300">الإضافات</label>
+                        <div class="space-y-2" id="modal-addons"></div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center glass-input rounded-lg">
+                            <button onclick="orderService.updateModalQty(-1)" class="px-3 py-2 hover:bg-white/10">-</button>
+                            <span id="modal-qty" class="px-3">1</span>
+                            <button onclick="orderService.updateModalQty(1)" class="px-3 py-2 hover:bg-white/10">+</button>
+                        </div>
+                        <button onclick="orderService.addToCart()" class="flex-1 bg-primary hover:bg-red-600 text-white py-3 rounded-lg font-bold transition flex justify-center items-center gap-2">
+                            <span>إضافة للسلة</span>
+                            <span id="modal-total-btn" class="bg-black/20 px-2 py-1 rounded text-xs">25 SAR</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Product Modal (Add/Edit) -->
+        <div id="admin-product-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 class="text-2xl font-bold" id="admin-modal-title">إضافة / تعديل صنف</h2>
+                    <button onclick="ui.closeModal('admin-product-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
+                <form id="admin-product-form" class="space-y-4" onsubmit="adminService.saveProduct(event)">
+                    <input type="hidden" name="id" id="admin-prod-id">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-gray-400">اسم الصنف</label>
+                            <input type="text" name="name" id="admin-prod-name" class="w-full glass-input p-2 rounded" required>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400">القسم</label>
+                            <input type="text" name="category" id="admin-prod-category" class="w-full glass-input p-2 rounded" required list="categories-datalist">
+                            <datalist id="categories-datalist"></datalist>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-gray-400">السعر الافتراضي</label>
+                            <input type="number" name="price" id="admin-prod-price" class="w-full glass-input p-2 rounded" required>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400">رابط الصورة</label>
+                            <input type="text" name="image" id="admin-prod-image" class="w-full glass-input p-2 rounded">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">الوصف</label>
+                        <textarea name="description" id="admin-prod-desc" class="w-full glass-input p-2 rounded h-20"></textarea>
+                    </div>
+                    
+                    <!-- Advanced Sizes Section -->
+                    <div class="bg-white/5 p-4 rounded-lg border border-white/10">
+                         <label class="block mb-2 text-sm text-secondary font-bold">نظام التسعير والأحجام</label>
+                         <div class="mb-4">
+                             <label class="text-xs text-gray-400">اختر الوحدة</label>
+                             <select id="admin-prod-unit" class="w-full glass-input p-2 rounded mt-1" onchange="ui.updateProductSizesInputs()">
+                                 <option value="">-- تسعير بسيط (بدون أحجام) --</option>
+                                 <!-- Populated by JS -->
+                             </select>
+                         </div>
+                         <div id="admin-sizes-inputs-container" class="space-y-2">
+                             <!-- Dynamic Size Inputs -->
+                         </div>
+                    </div>
+
+                    <!-- Centralized Extras Section -->
+                    <div class="bg-white/5 p-4 rounded-lg border border-white/10">
+                        <label class="block mb-2 text-sm text-secondary font-bold">الإضافات المتاحة لهذا الصنف</label>
+                        <div id="admin-prod-extras-container" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto custom-scrollbar p-1">
+                            <!-- Checkboxes populated by JS -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-red-600 py-3 rounded-xl font-bold transition shadow-lg">حفظ التغييرات</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Admin Price Modifier Modal -->
+        <div id="admin-price-modifier-modal" class="fixed inset-0 z-[140] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-sm rounded-2xl p-6 relative">
+                 <button onclick="ui.closeModal('admin-price-modifier-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                 <h3 class="text-lg font-bold mb-4 text-center">تعديل السعر للحجم</h3>
+                 <p id="modifier-size-name" class="text-center text-gray-400 mb-6 text-sm"></p>
+                 <div class="mb-6">
+                     <label class="block text-xs text-gray-500 mb-1">السعر الجديد لهذا الصنف فقط</label>
+                     <input type="number" id="modifier-price-input" class="w-full glass-input p-3 rounded-lg text-center text-xl font-bold text-primary">
+                 </div>
+                 <button onclick="ui.applyPriceModifier()" class="w-full bg-secondary hover:bg-teal-600 text-white py-2 rounded-lg font-bold transition">تطبيق</button>
+            </div>
+        </div>
+
+        <!-- Admin Extra Modal (Add/Edit Global Extra) -->
+        <div id="admin-extra-modal" class="fixed inset-0 z-[120] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-md rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 class="text-xl font-bold" id="extra-modal-title">إضافة إضافة جديدة</h2>
+                    <button onclick="ui.closeModal('admin-extra-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <form onsubmit="adminService.saveExtra(event)" class="space-y-4">
+                    <input type="hidden" name="id" id="extra-id">
+                    <div>
+                        <label class="text-xs text-gray-400">اسم الإضافة</label>
+                        <input type="text" name="name" id="extra-name" class="w-full glass-input p-2 rounded" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">السعر الافتراضي</label>
+                        <input type="number" name="price" id="extra-price" class="w-full glass-input p-2 rounded" required>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="active" id="extra-active" class="w-4 h-4 accent-primary" checked>
+                        <label for="extra-active" class="text-sm">مفعلة</label>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-red-600 py-2 rounded-lg font-bold transition">حفظ</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Unit/Size Modal -->
+        <div id="admin-unit-modal" class="fixed inset-0 z-[120] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-md rounded-2xl p-6">
+                 <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 class="text-xl font-bold" id="unit-modal-title">إدارة الوحدة</h2>
+                    <button onclick="ui.closeModal('admin-unit-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <form onsubmit="adminService.saveUnit(event)" class="space-y-4">
+                    <input type="hidden" name="id" id="unit-id">
+                    <div>
+                        <label class="text-xs text-gray-400">اسم الوحدة (مثال: كيلو، قطعة)</label>
+                        <input type="text" name="name" id="unit-name" class="w-full glass-input p-2 rounded" required>
+                    </div>
+                    
+                    <div class="bg-white/5 p-3 rounded-lg border border-white/10">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold">الأحجام التابعة</label>
+                            <button type="button" onclick="ui.addUnitSizeRow()" class="text-xs bg-secondary text-black px-2 py-1 rounded">إضافة حجم</button>
+                        </div>
+                        <div id="unit-sizes-container" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-red-600 py-2 rounded-lg font-bold transition">حفظ الوحدة</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Detail Modal (Admin) -->
+        <div id="order-detail-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-lg rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">تفاصيل الطلب</h2>
+                    <button onclick="ui.closeModal('order-detail-modal')" class="text-gray-400"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div id="order-detail-content" class="max-h-[60vh] overflow-y-auto mb-4"></div>
+                <!-- Timeline Section in Admin -->
+                <div class="bg-white/5 p-4 rounded-lg mb-4">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">سجل التتبع</h4>
+                    <div id="order-timeline-log" class="space-y-3 pl-2 border-r border-white/10"></div>
+                </div>
+                <div class="flex gap-2 pt-4 border-t border-white/10">
+                    <button id="btn-print-invoice" class="flex-1 bg-gray-600 hover:bg-gray-700 py-2 rounded text-white"><i class="fa-solid fa-print"></i> طباعة</button>
+                    <button id="btn-delete-order" class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded text-white"><i class="fa-solid fa-trash"></i> حذف</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart/Checkout Modal -->
+        <div id="cart-modal" class="fixed inset-0 z-[100] hidden flex justify-end bg-black/60 backdrop-blur-sm">
+            <div class="w-full max-w-md bg-[#16213E] h-full shadow-2xl flex flex-col transform transition-transform translate-x-full" id="cart-panel">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                    <h2 class="text-xl font-bold"><i class="fa-solid fa-basket-shopping mr-2 text-primary"></i> السلة</h2>
+                    <button onclick="ui.toggleCart()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
+                <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+                <div class="p-6 bg-black/20 border-t border-white/10">
+                    <div class="flex justify-between mb-2">
+                        <span>المجموع</span>
+                        <span id="cart-subtotal">0.00 SAR</span>
+                    </div>
+                    <div class="flex justify-between mb-4 text-xl font-bold text-primary">
+                        <span>الإجمالي</span>
+                        <span id="cart-total">0.00 SAR</span>
+                    </div>
+                    <button onclick="ui.showPaymentModal()" class="w-full bg-secondary hover:bg-teal-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-secondary/20">إتمام الطلب</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Modal -->
+        <div id="payment-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-md rounded-2xl p-8 text-center">
+                <h2 class="text-2xl font-bold mb-6">اختر طريقة الدفع</h2>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <button onclick="orderService.completeOrder('cash')" class="glass-card p-4 rounded-xl hover:bg-primary/20 hover:border-primary flex flex-col items-center gap-2 group">
+                        <i class="fa-solid fa-money-bill-wave text-3xl text-green-400 group-hover:scale-110 transition"></i>
+                        <span>كاش</span>
+                    </button>
+                    <button onclick="orderService.completeOrder('card')" class="glass-card p-4 rounded-xl hover:bg-primary/20 hover:border-primary flex flex-col items-center gap-2 group">
+                        <i class="fa-brands fa-cc-visa text-3xl text-blue-400 group-hover:scale-110 transition"></i>
+                        <span>بطاقة / مدى</span>
+                    </button>
+                </div>
+                <button onclick="ui.closeModal('payment-modal')" class="text-gray-400 hover:text-white underline">إلغاء</button>
+            </div>
+        </div>
+
+        <!-- Auth Modal -->
+        <div id="auth-modal" class="fixed inset-0 z-[120] hidden flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+            <div class="glass-panel w-full max-w-sm rounded-2xl p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold">تسجيل الدخول</h2>
+                    <p class="text-gray-400 text-sm">للموظفين والإدارة</p>
+                    <p class="text-xs text-primary mt-2">ملاحظة: بريدك كأدمن يجب أن يحتوي على كلمة admin</p>
+                </div>
+                <form onsubmit="authService.login(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm mb-1 text-gray-300">البريد الإلكتروني</label>
+                        <input type="email" id="email" class="w-full glass-input px-4 py-2 rounded-lg focus:outline-none focus:border-primary" placeholder="admin@crystal.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1 text-gray-300">كلمة المرور</label>
+                        <input type="password" id="password" class="w-full glass-input px-4 py-2 rounded-lg focus:outline-none focus:border-primary" placeholder="******">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-red-600 text-white py-2 rounded-lg font-bold transition">دخول</button>
+                </form>
+                <button onclick="ui.toggleAuthModal()" class="w-full mt-4 text-sm text-gray-400 hover:text-white">إغلاق</button>
+            </div>
+        </div>
+
+        <!-- Hidden Printable Receipt -->
+        <div id="printable-area" class="hidden"></div>
+    </div>
+
+    <!-- FIREBASE & APP LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTVwLixTb4SdWPpO1dxMXTp9sF0VnyMGU",
+            authDomain: "rre23-c6685.firebaseapp.com",
+            databaseURL: "https://rre23-c6685-default-rtdb.firebaseio.com",
+            projectId: "rre23-c6685",
+            storageBucket: "rre23-c6685.firebasestorage.app",
+            messagingSenderId: "48480735688",
+            appId: "1:48480735688:web:d515246a1a19ff3aa470fd"
+        };        
+        // App State
+        const state = {
+            user: null,
+            role: 'guest', 
+            cart: [],
+            menu: {},
+            orders: {},
+            previousOrders: {}, // Track for notifications
+            users: {},
+            tables: {},
+            extras: {}, // Centralized Extras
+            units: {},  // Centralized Units/Sizes
+            settings: { defaultPrepTime: 20, currency: 'جنية مصري' }, // Default Currency
+            categories: [],
+            currentTable: null,
+            orderType: 'dinein',
+            activeModalItem: null,
+            lastOrderId: localStorage.getItem('crystal_last_order') || null,
+            activeCategory: 'all',
+            tempPriceModifier: null // For modifying prices
+        };
+
+        let app, auth, db;
+        let appIdRaw = typeof __app_id !== 'undefined' ? __app_id : 'crystal-pos';
+        const appId = appIdRaw.replace(/[.#$[\]]/g, '_'); 
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
+        }
+
+        // --- 2. AUTH SERVICE ---
+        window.authService = {
+            init: async () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tableParam = urlParams.get('table');
+                
+                if (tableParam) {
+                    state.currentTable = tableParam;
+                }
+
+                // Setup listener first to ensure UI updates regardless of auto-sign-in success
+                onAuthStateChanged(auth, (user) => {
+                    state.user = user;
+                    if (user) {
+                        // Check if admin email or saved role
+                        if (user.isAnonymous) {
+                            state.role = 'guest';
+                            router.navigate('menu');
+                            if(state.currentTable) {
+                                ui.showToast(`مرحباً بك في طاولة ${state.currentTable}`, 'success');
+                            }
+                            // Check for active order button
+                            ui.checkActiveOrder();
+                        } else {
+                            // Fetch user role from DB
+                            onValue(ref(db, `artifacts/${appId}/users/${user.uid}/role`), (snapshot) => {
+                                let role = snapshot.val();
+                                
+                                // Auto-admin for demonstration if email contains 'admin'
+                                if (!role && user.email && user.email.toLowerCase().includes('admin')) {
+                                    role = 'admin';
+                                    set(ref(db, `artifacts/${appId}/users/${user.uid}/role`), 'admin');
+                                    ui.showToast('تم منحك صلاحية الأدمن تلقائياً', 'success');
+                                }
+
+                                role = role || 'cashier'; 
+                                state.role = role;
+                                ui.updateNav();
+                                
+                                // DIRECT REDIRECT LOGIC
+                                if(role === 'admin') {
+                                    router.navigate('admin');
+                                    dataService.fetchUsers();
+                                    dataService.fetchTables();
+                                } else if(role === 'kitchen') {
+                                    router.navigate('kitchen');
+                                } else {
+                                    router.navigate('menu');
+                                }
+                            });
+                        }
+                    } else {
+                        state.role = 'guest';
+                        if(!window.location.search.includes('table')) router.navigate('landing');
+                        ui.updateNav();
+                    }
+                });
+
+                // Attempt auto-login safely only if no user is present
+                if (!auth.currentUser) {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.warn("Auto-sign-in failed (User can still login manually):", error);
+                    }
+                }
+            },
+
+            login: async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    ui.toggleAuthModal();
+                    ui.showToast('تم تسجيل الدخول بنجاح', 'success');
+                } catch (error) {
+                    ui.showToast('فشل الدخول: ' + error.message, 'error');
+                }
+            },
+
+            logout: async () => {
+                await signOut(auth);
+                window.location.href = window.location.pathname;
+            }
+        };
+
+        // --- 3. DATA SERVICE ---
+        window.dataService = {
+            fetchMenu: () => {
+                onValue(ref(db, `artifacts/${appId}/public/data/menu`), (snapshot) => {
+                    state.menu = snapshot.val() || {};
+                    const prods = Object.values(state.menu);
+                    state.categories = [...new Set(prods.map(p => p.category))];
+                    
+                    ui.renderMenu();
+                    if(state.role === 'admin' && document.getElementById('link-menu-manage').classList.contains('active')) ui.renderAdminMenu();
+                });
+                
+                // Fetch Extras
+                onValue(ref(db, `artifacts/${appId}/public/data/extras`), (snapshot) => {
+                    state.extras = snapshot.val() || {};
+                    if(state.role === 'admin' && document.getElementById('link-extras').classList.contains('active')) ui.renderAdminExtras();
+                });
+
+                // Fetch Units
+                onValue(ref(db, `artifacts/${appId}/public/data/units`), (snapshot) => {
+                    state.units = snapshot.val() || {};
+                    if(state.role === 'admin' && document.getElementById('link-units').classList.contains('active')) ui.renderAdminUnits();
+                });
+                
+                onValue(ref(db, `artifacts/${appId}/public/data/settings`), (snapshot) => {
+                    const s = snapshot.val() || {};
+                    state.settings = { ...state.settings, ...s };
+                    ui.applySettings(state.settings);
+                });
+            },
+            
+            fetchOrders: () => {
+                onValue(ref(db, `artifacts/${appId}/public/data/orders`), (snapshot) => {
+                    const newOrders = snapshot.val() || {};
+                    
+                    // CHECK FOR NOTIFICATIONS (Compare with previous state)
+                    // Skip notification on first load (empty previousOrders)
+                    if (Object.keys(state.previousOrders).length > 0) {
+                        dataService.checkForNotifications(state.previousOrders, newOrders);
+                    }
+                    
+                    state.previousOrders = { ...newOrders }; // Clone for next comparison
+                    state.orders = newOrders;
+
+                    if(state.role === 'kitchen') ui.renderKitchen(state.orders);
+                    if(state.role === 'admin') {
+                          if(document.getElementById('link-dashboard')?.classList.contains('active')) ui.renderAdminDashboard();
+                          if(document.getElementById('link-orders')?.classList.contains('active')) ui.renderAdminOrders();
+                          if(document.getElementById('link-kanban')?.classList.contains('active')) ui.renderAdminKanban();
+                    }
+                    if(state.role === 'guest') ui.checkActiveOrder();
+                    if(!document.getElementById('tracking-modal').classList.contains('hidden')) ui.showTrackingModal();
+                });
+            },
+
+            checkForNotifications: (prev, current) => {
+                // Logic: 
+                // 1. If key in current but not in prev -> NEW ORDER (Notify Kitchen/Admin)
+                // 2. If status changed -> STATUS UPDATE (Notify Client/Waiter)
+                
+                Object.entries(current).forEach(([key, order]) => {
+                    if (!prev[key]) {
+                        // New Order
+                        if (state.role === 'kitchen' || state.role === 'admin' || state.role === 'cashier') {
+                            ui.showNewToast(`طلب جديد #${key.slice(-4)}`, 'new', 'fa-bell');
+                            ui.playNotificationSound();
+                        }
+                    } else {
+                        // Existing Order
+                        const oldOrder = prev[key];
+                        if (oldOrder.status !== order.status) {
+                            // Status Changed
+                            // Notify if I am the customer OR if I am staff monitoring
+                            const isMyOrder = (state.user && order.customer === state.user.uid) || (state.currentTable && String(order.table) === String(state.currentTable));
+                            
+                            if (isMyOrder) {
+                                ui.showNewToast(`تحديث طلبك #${key.slice(-4)}: ${ui.translateStatus(order.status)}`, 'info', 'fa-utensils');
+                                ui.playNotificationSound();
+                            } else if (state.role !== 'guest') {
+                                // Staff notification for status change (optional, maybe too noisy)
+                                // ui.showNewToast(`Order #${key.slice(-4)} -> ${order.status}`, 'info'); 
+                            }
+                        }
+                    }
+                });
+            },
+
+            fetchUsers: () => {
+                onValue(ref(db, `artifacts/${appId}/users`), (snapshot) => {
+                    state.users = snapshot.val() || {};
+                    if(state.role === 'admin') ui.renderAdminUsers();
+                });
+            },
+
+            fetchTables: () => {
+                onValue(ref(db, `artifacts/${appId}/public/data/tables`), (snapshot) => {
+                    state.tables = snapshot.val() || {};
+                    if(state.role === 'admin') ui.renderAdminTables();
+                });
+            },
+
+            addOrder: async (orderData) => {
+                const newRef = push(ref(db, `artifacts/${appId}/public/data/orders`));
+                const now = Date.now();
+                const prepTime = Number(state.settings.defaultPrepTime || 20) * 60 * 1000;
+                
+                await set(newRef, {
+                    ...orderData,
+                    status: 'received',
+                    timeline: [{ status: 'received', time: now, user: 'Client' }],
+                    eta: { start: now, duration: prepTime, expected: now + prepTime },
+                    timestamp: serverTimestamp(),
+                    id: newRef.key
+                });
+                return newRef.key;
+            },
+
+            updateOrderStage: async (orderId, newStage) => {
+                const order = state.orders[orderId];
+                if(!order) return;
+                
+                const now = Date.now();
+                const history = order.timeline || [];
+                history.push({
+                    status: newStage,
+                    time: now,
+                    user: state.user?.email || 'System'
+                });
+
+                const updates = { status: newStage, timeline: history };
+                if(newStage === 'served') updates.actualFinish = now;
+
+                await update(ref(db, `artifacts/${appId}/public/data/orders/${orderId}`), updates);
+            }
+        };
+
+        // --- 4. ORDER SERVICE ---
+        window.orderService = {
+            setOrderType: (type) => {
+                state.orderType = type;
+                document.querySelectorAll('.active-type').forEach(el => {
+                    el.classList.remove('bg-white/10', 'active-type');
+                    el.classList.add('hover:bg-white/5');
+                });
+                event.target.classList.add('bg-white/10', 'active-type');
+                event.target.classList.remove('hover:bg-white/5');
+            },
+
+            openProductModal: (id) => {
+                const product = state.menu[id];
+                if(!product) return;
+                
+                state.activeModalItem = { 
+                    ...product, 
+                    id, 
+                    selectedSize: null,
+                    selectedAddons: [],
+                    qty: 1
+                };
+
+                let sizesToDisplay = {};
+                if (product.unitId && state.units[product.unitId]) {
+                    const unit = state.units[product.unitId];
+                    if (unit.sizes) {
+                        Object.entries(unit.sizes).forEach(([sizeKey, sizeData]) => {
+                             let overridePrice = sizeData.defaultPrice;
+                             if (product.sizes) {
+                                 if (product.sizes[sizeKey] !== undefined) overridePrice = product.sizes[sizeKey];
+                                 else if (product.sizes[sizeData.name] !== undefined) overridePrice = product.sizes[sizeData.name];
+                             }
+                             sizesToDisplay[sizeData.name] = overridePrice;
+                        });
+                    }
+                } else if (product.sizes) {
+                    sizesToDisplay = product.sizes;
+                } else {
+                    sizesToDisplay = { 'standard': product.price };
+                }
+
+                state.activeModalItem.selectedSize = Object.keys(sizesToDisplay)[0];
+                state.activeModalItem.calculatedSizes = sizesToDisplay; 
+
+                document.getElementById('modal-img').src = product.image || 'https://via.placeholder.com/400';
+                document.getElementById('modal-name').innerText = product.name;
+                document.getElementById('modal-desc').innerText = product.description;
+                
+                const sizesContainer = document.getElementById('modal-sizes');
+                sizesContainer.innerHTML = '';
+                
+                Object.keys(sizesToDisplay).forEach(size => {
+                    const price = sizesToDisplay[size];
+                    const btn = document.createElement('button');
+                    btn.className = `px-4 py-2 rounded border border-white/20 hover:bg-white/10 mb-2 ${state.activeModalItem.selectedSize === size ? 'bg-primary border-primary' : ''}`;
+                    btn.innerText = `${size} (${price})`;
+                    btn.onclick = () => {
+                        state.activeModalItem.selectedSize = size;
+                        orderService.updateModalPrice();
+                        Array.from(sizesContainer.children).forEach(c => c.classList.remove('bg-primary', 'border-primary'));
+                        btn.classList.add('bg-primary', 'border-primary');
+                    };
+                    sizesContainer.appendChild(btn);
+                });
+
+                const addonsContainer = document.getElementById('modal-addons');
+                addonsContainer.innerHTML = '';
+                const currency = state.settings.currency || 'جنية مصري';
+                
+                let addonsList = [];
+                if (product.activeAddonIds && Array.isArray(product.activeAddonIds)) {
+                     product.activeAddonIds.forEach(extraId => {
+                         if (state.extras[extraId] && state.extras[extraId].active) {
+                             addonsList.push({ name: state.extras[extraId].name, price: state.extras[extraId].price });
+                         }
+                     });
+                } else if (product.addons) {
+                     Object.entries(product.addons).forEach(([name, price]) => {
+                         addonsList.push({ name, price });
+                     });
+                }
+
+                if(addonsList.length > 0) {
+                    addonsList.forEach(addon => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center gap-2';
+                        div.innerHTML = `
+                            <input type="checkbox" id="addon-${addon.name}" class="w-4 h-4 accent-primary" onchange="orderService.toggleAddon('${addon.name}', ${addon.price})">
+                            <label for="addon-${addon.name}" class="text-sm text-gray-300">${addon.name} (+${addon.price} ${currency})</label>
+                        `;
+                        addonsContainer.appendChild(div);
+                    });
+                } else {
+                    addonsContainer.innerHTML = '<p class="text-xs text-gray-500">لا توجد إضافات</p>';
+                }
+
+                orderService.updateModalPrice();
+                ui.openModal('product-modal');
+            },
+
+            toggleAddon: (addonName, price) => {
+                const exists = state.activeModalItem.selectedAddons.find(a => a.name === addonName);
+                if(exists) {
+                    state.activeModalItem.selectedAddons = state.activeModalItem.selectedAddons.filter(a => a.name !== addonName);
+                } else {
+                    state.activeModalItem.selectedAddons.push({ name: addonName, price: price });
+                }
+                orderService.updateModalPrice();
+            },
+
+            updateModalQty: (delta) => {
+                let newQty = state.activeModalItem.qty + delta;
+                if(newQty < 1) newQty = 1;
+                state.activeModalItem.qty = newQty;
+                document.getElementById('modal-qty').innerText = newQty;
+                orderService.updateModalPrice();
+            },
+
+            updateModalPrice: () => {
+                const item = state.activeModalItem;
+                const basePrice = Number(item.calculatedSizes ? item.calculatedSizes[item.selectedSize] : item.price);
+                let addonsPrice = item.selectedAddons.reduce((sum, a) => sum + Number(a.price), 0);
+                
+                const total = (basePrice + addonsPrice) * item.qty;
+                const currency = state.settings.currency || 'جنية مصري';
+                document.getElementById('modal-total-btn').innerText = total + ' ' + currency;
+            },
+
+            addToCart: () => {
+                const item = state.activeModalItem;
+                const basePrice = Number(item.calculatedSizes ? item.calculatedSizes[item.selectedSize] : item.price);
+                let addonsPrice = item.selectedAddons.reduce((sum, a) => sum + Number(a.price), 0);
+                
+                state.cart.push({
+                    id: item.id,
+                    name: item.name,
+                    size: item.selectedSize,
+                    addons: item.selectedAddons.map(a => a.name),
+                    qty: item.qty,
+                    unitPrice: basePrice + addonsPrice,
+                    totalPrice: (basePrice + addonsPrice) * item.qty
+                });
+
+                ui.closeModal('product-modal');
+                ui.updateCartUI();
+                ui.showToast('تمت الإضافة للسلة', 'success');
+            },
+
+            removeFromCart: (index) => {
+                state.cart.splice(index, 1);
+                ui.updateCartUI();
+            },
+
+            completeOrder: async (paymentMethod) => {
+                if(state.cart.length === 0) return;
+                const total = state.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+                const order = {
+                    items: state.cart,
+                    total: total,
+                    paymentMethod: paymentMethod,
+                    table: state.currentTable || 'Takeaway',
+                    type: state.orderType,
+                    customer: state.user?.uid || 'Anonymous',
+                    paid: true
+                };
+
+                ui.showLoading(true);
+                try {
+                    const orderId = await dataService.addOrder(order);
+                    state.cart = [];
+                    localStorage.setItem('crystal_last_order', orderId);
+                    state.lastOrderId = orderId;
+                    
+                    ui.updateCartUI();
+                    ui.closeModal('payment-modal');
+                    ui.closeModal('cart-modal');
+                    ui.showTrackingModal();
+                    ui.showToast('تم إرسال الطلب بنجاح!', 'success');
+                } catch (e) {
+                    ui.showToast('حدث خطأ أثناء الطلب', 'error');
+                } finally {
+                    ui.showLoading(false);
+                }
+            }
+        };
+
+        // --- 5. ADMIN SERVICE (ENHANCED) ---
+        window.adminService = {
+            // Enhanced Save Product
+            saveProduct: async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                const id = data.id;
+                delete data.id;
+
+                // Handle Extras (Checkboxes)
+                const checkedExtras = [];
+                document.querySelectorAll('.admin-extra-checkbox:checked').forEach(cb => {
+                    checkedExtras.push(cb.value);
+                });
+                data.activeAddonIds = checkedExtras;
+
+                // Handle Sizes from Unit
+                const unitId = document.getElementById('admin-prod-unit').value;
+                if (unitId) {
+                    data.unitId = unitId;
+                    const sizes = {};
+                    // Collect size price overrides using IDs as keys
+                    document.querySelectorAll('.size-override-input').forEach(input => {
+                        // Use the secure Key (ID) if available, otherwise name (legacy)
+                        const key = input.dataset.sizeKey || input.dataset.sizeName;
+                        sizes[key] = Number(input.value);
+                    });
+                    data.sizes = sizes;
+                } else {
+                    data.unitId = null;
+                    data.sizes = null; // Use base price
+                }
+
+                if(id) {
+                    await update(ref(db, `artifacts/${appId}/public/data/menu/${id}`), data);
+                    ui.showToast('تم تحديث الصنف', 'success');
+                } else {
+                    await push(ref(db, `artifacts/${appId}/public/data/menu`), data);
+                    ui.showToast('تم إضافة الصنف', 'success');
+                }
+                ui.closeModal('admin-product-modal');
+            },
+
+            deleteProduct: (key) => {
+                if(confirm('حذف هذا الصنف نهائياً؟')) {
+                    remove(ref(db, `artifacts/${appId}/public/data/menu/${key}`));
+                    ui.showToast('تم الحذف', 'error');
+                }
+            },
+
+            // Extras Management
+            saveExtra: async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    name: formData.get('name'),
+                    price: Number(formData.get('price')),
+                    active: formData.get('active') === 'on'
+                };
+                const id = document.getElementById('extra-id').value;
+
+                if (id) {
+                      await update(ref(db, `artifacts/${appId}/public/data/extras/${id}`), data);
+                      ui.showToast('تم تحديث الإضافة', 'success');
+                } else {
+                      await push(ref(db, `artifacts/${appId}/public/data/extras`), data);
+                      ui.showToast('تم حفظ الإضافة', 'success');
+                }
+                ui.closeModal('admin-extra-modal');
+            },
+
+            deleteExtra: (key) => {
+                if(confirm('حذف هذه الإضافة؟')) remove(ref(db, `artifacts/${appId}/public/data/extras/${key}`));
+            },
+
+            // Units Management
+            saveUnit: async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('unit-name').value;
+                const id = document.getElementById('unit-id').value;
+                
+                // Collect sizes
+                const sizes = {};
+                document.querySelectorAll('.unit-size-row').forEach(row => {
+                    const sName = row.querySelector('.unit-size-name').value;
+                    const sPrice = row.querySelector('.unit-size-price').value;
+                    if(sName && sPrice) {
+                        const uniqueKey = 'sz_' + Math.random().toString(36).substr(2, 9);
+                        sizes[uniqueKey] = { name: sName, defaultPrice: Number(sPrice) };
+                    }
+                });
+
+                const data = { name, sizes };
+
+                if (id) {
+                    await update(ref(db, `artifacts/${appId}/public/data/units/${id}`), data);
+                    ui.showToast('تم تحديث الوحدة', 'success');
+                } else {
+                    await push(ref(db, `artifacts/${appId}/public/data/units`), data);
+                    ui.showToast('تم حفظ الوحدة', 'success');
+                }
+                ui.closeModal('admin-unit-modal');
+            },
+
+            deleteUnit: (key) => {
+                if(confirm('حذف هذه الوحدة؟ ستتأثر المنتجات المرتبطة بها.')) remove(ref(db, `artifacts/${appId}/public/data/units/${key}`));
+            },
+
+            addTable: async () => {
+                const num = prompt("أدخل رقم/اسم الطاولة:");
+                if(num) {
+                    await push(ref(db, `artifacts/${appId}/public/data/tables`), { name: num, created: serverTimestamp() });
+                }
+            },
+
+            deleteTable: (key) => {
+                if(confirm('حذف الطاولة؟')) remove(ref(db, `artifacts/${appId}/public/data/tables/${key}`));
+            },
+
+            updateUserRole: (uid, role) => {
+                update(ref(db, `artifacts/${appId}/users/${uid}`), { role });
+                ui.showToast('تم تحديث الصلاحية', 'success');
+            },
+
+            saveSettings: async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                await set(ref(db, `artifacts/${appId}/public/data/settings`), Object.fromEntries(formData));
+                ui.showToast('تم حفظ الإعدادات', 'success');
+            },
+
+            deleteOrder: (id) => {
+                if(confirm('حذف الطلب نهائياً؟')) {
+                    remove(ref(db, `artifacts/${appId}/public/data/orders/${id}`));
+                    ui.closeModal('order-detail-modal');
+                }
+            }
+        };
+
+        // --- 6. UI CONTROLLER ---
+        window.ui = {
+            toggleAuthModal: () => document.getElementById('auth-modal').classList.toggle('hidden'),
+            
+            toggleCart: () => {
+                const modal = document.getElementById('cart-modal');
+                const panel = document.getElementById('cart-panel');
+                if (modal.classList.contains('hidden')) {
+                    modal.classList.remove('hidden');
+                    setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                } else {
+                    panel.classList.add('translate-x-full');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                }
+            },
+
+            updateCartUI: () => {
+                const count = state.cart.reduce((acc, item) => acc + item.qty, 0);
+                const currency = state.settings.currency || 'جنية مصري';
+                document.getElementById('cart-count').innerText = count;
+                document.getElementById('cart-btn').style.display = count > 0 ? 'block' : 'none';
+
+                const container = document.getElementById('cart-items');
+                container.innerHTML = '';
+                let subtotal = 0;
+
+                state.cart.forEach((item, idx) => {
+                    subtotal += item.totalPrice;
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg">
+                            <div>
+                                <p class="font-bold">${item.name} <span class="text-xs text-gray-400">(${item.size || 'Standard'})</span></p>
+                                <p class="text-xs text-gray-500">${item.addons.join(', ')}</p>
+                                <p class="text-primary text-sm">${item.totalPrice} ${currency}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold">x${item.qty}</span>
+                                <button onclick="orderService.removeFromCart(${idx})" class="text-red-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('cart-subtotal').innerText = subtotal + ' ' + currency;
+                document.getElementById('cart-total').innerText = subtotal + ' ' + currency;
+            },
+
+            showPaymentModal: () => {
+                if(state.cart.length === 0) return;
+                ui.openModal('payment-modal');
+            },
+
+            openModal: (id) => document.getElementById(id).classList.remove('hidden'),
+            closeModal: (id) => document.getElementById(id).classList.add('hidden'),
+
+            updateNav: () => {
+                const nav = document.getElementById('nav-links');
+                const authBtn = document.getElementById('auth-btn');
+                const logoutBtn = document.getElementById('logout-btn');
+                const trackBtn = document.getElementById('track-btn-nav');
+                nav.innerHTML = '';
+                
+                if (state.role === 'admin') {
+                    nav.innerHTML += `<button onclick="router.navigate('admin')" class="hover:text-primary transition">الادارة</button>`;
+                    nav.innerHTML += `<button onclick="router.navigate('menu')" class="hover:text-primary transition">POS</button>`;
+                    nav.innerHTML += `<button onclick="router.navigate('kitchen')" class="hover:text-primary transition">المطبخ</button>`;
+                    trackBtn.classList.add('hidden'); // Admin doesn't need personal tracking
+                } else if (state.role === 'cashier') {
+                    nav.innerHTML += `<button onclick="router.navigate('menu')" class="hover:text-primary transition">نقطة البيع</button>`;
+                    nav.innerHTML += `<button onclick="router.navigate('kitchen')" class="hover:text-primary transition">المطبخ</button>`;
+                    trackBtn.classList.add('hidden');
+                } else {
+                      nav.innerHTML += `<button onclick="router.navigate('menu')" class="hover:text-primary transition">قائمة الطعام</button>`;
+                      trackBtn.classList.remove('hidden'); // Show for guests
+                }
+
+                if(state.user && !state.user.isAnonymous) {
+                    authBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                } else {
+                    authBtn.classList.remove('hidden');
+                    logoutBtn.classList.add('hidden');
+                }
+            },
+
+            // --- TRACKING UI ---
+            checkActiveOrder: () => {
+                const btn = document.getElementById('floating-track-btn');
+                const lastId = state.lastOrderId;
+                let hasActive = false;
+                
+                // Check local order
+                if(lastId && state.orders[lastId] && state.orders[lastId].status !== 'served' && state.orders[lastId].status !== 'cancelled') {
+                    hasActive = true;
+                }
+                
+                // Check table orders
+                if(!hasActive && state.currentTable) {
+                    const tableHasActive = Object.values(state.orders).some(o => 
+                        String(o.table) === String(state.currentTable) && 
+                        o.status !== 'served' && 
+                        o.status !== 'cancelled'
+                    );
+                    if(tableHasActive) hasActive = true;
+                }
+
+                if(hasActive) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            },
+
+            showOrdersHistory: () => {
+                const list = document.getElementById('orders-history-list');
+                list.innerHTML = '';
+                const currency = state.settings.currency || 'جنية مصري';
+                
+                if (!state.user && !state.currentTable) return;
+
+                const myOrders = Object.values(state.orders)
+                    .filter(o => {
+                        if (state.role === 'guest') {
+                            if (state.currentTable) {
+                                return String(o.table) === String(state.currentTable);
+                            } else {
+                                return o.customer === state.user?.uid;
+                            }
+                        }
+                        const isMyUser = state.user && o.customer === state.user.uid;
+                        const isMyTable = state.currentTable && String(o.table) === String(state.currentTable);
+                        return isMyUser || isMyTable;
+                    })
+                    .sort((a,b) => b.timestamp - a.timestamp);
+
+                if (myOrders.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 mt-10">لا توجد طلبات سابقة لهذه الطاولة</div>';
+                } else {
+                    myOrders.forEach(o => {
+                        const date = new Date(o.timestamp).toLocaleDateString('ar-EG');
+                        const time = new Date(o.timestamp).toLocaleTimeString('ar-EG');
+                        const statusColors = {
+                            'received': 'bg-gray-500', 'accepted': 'bg-blue-500', 'preparing': 'bg-yellow-500',
+                            'ready': 'bg-purple-500', 'served': 'bg-green-500', 'cancelled': 'bg-red-500'
+                        };
+                        
+                        const el = document.createElement('div');
+                        el.className = 'glass-card p-4 rounded-xl cursor-pointer hover:bg-white/10 transition border-l-4 border-transparent hover:border-primary';
+                        el.onclick = () => {
+                            ui.closeModal('orders-history-modal');
+                            ui.showTrackingModal(o.id);
+                        };
+                        el.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-lg">#${o.id.slice(-4)}</span>
+                                <span class="text-xs ${statusColors[o.status] || 'bg-gray-500'} px-2 py-1 rounded font-bold uppercase">${o.status}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span><i class="fa-regular fa-clock ml-1"></i> ${date} ${time}</span>
+                                <span class="font-bold text-primary">${o.total} ${currency}</span>
+                            </div>
+                        `;
+                        list.appendChild(el);
+                    });
+                }
+                
+                ui.openModal('orders-history-modal');
+            },
+
+            // Tracking Modal
+            showTrackingModal: (id = null) => {
+                const wrapper = document.getElementById('tracking-swiper-wrapper');
+                wrapper.innerHTML = '';
+
+                const relevantOrders = Object.values(state.orders).filter(o => {
+                     if (state.role === 'guest') {
+                        if (state.currentTable) {
+                            return String(o.table) === String(state.currentTable);
+                        } else {
+                            return o.customer === state.user?.uid;
+                        }
+                     }
+                     return (state.user && o.customer === state.user.uid) || 
+                            (state.currentTable && String(o.table) === String(state.currentTable));
+                }).sort((a,b) => b.timestamp - a.timestamp);
+
+                if (relevantOrders.length === 0) {
+                    wrapper.innerHTML = '<div class="swiper-slide flex items-center justify-center h-full"><div class="text-center text-gray-500">لا توجد طلبات نشطة لهذه الطاولة</div></div>';
+                } else {
+                    relevantOrders.forEach(order => {
+                        wrapper.innerHTML += ui.generateTrackingSlideHTML(order);
+                    });
+                }
+
+                ui.openModal('tracking-modal');
+
+                if (window.trackingSwiper) {
+                    window.trackingSwiper.destroy(true, true);
+                }
+                
+                window.trackingSwiper = new Swiper(".mySwiper", {
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+                    observer: true,
+                    observeParents: true
+                });
+
+                const targetId = id || state.lastOrderId;
+                if (targetId) {
+                    const index = relevantOrders.findIndex(o => o.id === targetId);
+                    if (index !== -1) {
+                        setTimeout(() => window.trackingSwiper.slideTo(index, 0), 100);
+                    }
+                }
+            },
+
+            generateTrackingSlideHTML: (order) => {
+                const stages = ['received', 'accepted', 'preparing', 'ready', 'served'];
+                const currentIdx = stages.indexOf(order.status || 'received');
+                const percent = (currentIdx / (stages.length - 1)) * 100;
+
+                const getIconClass = (stepIdx) => {
+                    if (stepIdx <= currentIdx) return "bg-secondary border-secondary text-black shadow-lg shadow-secondary/50 scale-110";
+                    return "bg-dark border-white/20 text-gray-400";
+                };
+                
+                const getLabelClass = (stepIdx) => {
+                    if (stepIdx <= currentIdx) return "text-secondary font-bold";
+                    return "text-gray-400 font-bold";
+                };
+
+                return `
+                <div class="swiper-slide h-full" data-id="${order.id}">
+                    <div class="h-full flex flex-col">
+                        <div class="bg-gradient-to-r from-primary to-secondary p-6 text-center">
+                            <h2 class="text-2xl font-bold mb-1">متابعة الطلب</h2>
+                            <p class="text-sm opacity-90 font-mono">#${order.id.slice(-6)}</p>
+                            ${order.table ? `<span class="inline-block mt-1 px-3 py-1 bg-black/20 rounded-full text-xs">طاولة: ${order.table}</span>` : ''}
+                        </div>
+                        
+                        <div class="p-8 flex-1 flex flex-col justify-center">
+                            <div class="flex justify-between items-center mb-12 relative track-status-icons">
+                                <div class="absolute top-1/2 right-0 left-0 h-1 bg-white/10 -z-10 transform -translate-y-1/2"></div>
+                                <div class="absolute top-1/2 right-0 h-1 bg-green-500 -z-10 transform -translate-y-1/2 transition-all duration-1000 track-top-progress" style="width: ${percent}%"></div>
+
+                                ${stages.map((step, idx) => `
+                                    <div class="flex flex-col items-center gap-2 track-step-icon" data-step="${step}">
+                                        <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center z-10 transition-all duration-500 ${getIconClass(idx)} ${idx === currentIdx ? 'animate-pulse' : ''}">
+                                            <i class="fa-solid ${step === 'received' ? 'fa-receipt' : step === 'accepted' ? 'fa-thumbs-up' : step === 'preparing' ? 'fa-fire-burner' : step === 'ready' ? 'fa-bell-concierge' : 'fa-check'}"></i>
+                                        </div>
+                                        <span class="text-xs ${getLabelClass(idx)}">${step === 'received' ? 'استلام' : step === 'accepted' ? 'قبول' : step === 'preparing' ? 'تحضير' : step === 'ready' ? 'جاهز' : 'تم'}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="text-center mb-8">
+                                <h3 class="text-4xl font-bold text-secondary mb-2 track-eta-timer">--:--</h3>
+                                <p class="text-gray-400 text-sm track-status-msg">جاري التحديث...</p>
+                            </div>
+
+                            <div class="bg-white/10 rounded-full h-4 w-full overflow-hidden relative">
+                                <div class="h-full bg-primary progress-bar-striped transition-all duration-1000 track-time-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            },
+
+            updateAllTrackers: () => {
+                const slides = document.querySelectorAll('.swiper-slide[data-id]');
+                if(slides.length === 0) return;
+
+                slides.forEach(slide => {
+                    const id = slide.dataset.id;
+                    const order = state.orders[id];
+                    if(!order) return;
+
+                    const now = Date.now();
+                    const timerEl = slide.querySelector('.track-eta-timer');
+                    const msgEl = slide.querySelector('.track-status-msg');
+                    const barEl = slide.querySelector('.track-time-bar');
+                    const topProg = slide.querySelector('.track-top-progress');
+
+                    const stages = ['received', 'accepted', 'preparing', 'ready', 'served'];
+                    const currentIdx = stages.indexOf(order.status || 'received');
+                    const percent = (currentIdx / (stages.length - 1)) * 100;
+                    
+                    if(topProg) topProg.style.width = `${percent}%`;
+
+                    const iconSteps = slide.querySelectorAll('.track-step-icon');
+                    iconSteps.forEach((el, idx) => {
+                        const dot = el.querySelector('div');
+                        const label = el.querySelector('span');
+                        
+                        if(idx <= currentIdx) {
+                            dot.className = "w-12 h-12 rounded-full border-2 flex items-center justify-center z-10 transition-all duration-500 bg-secondary border-secondary text-black shadow-lg shadow-secondary/50 scale-110";
+                            label.className = "text-xs font-bold text-secondary";
+                        } else {
+                            dot.className = "w-12 h-12 rounded-full bg-dark border-2 border-white/20 flex items-center justify-center text-gray-400 z-10 transition-all duration-500";
+                            label.className = "text-xs font-bold text-gray-400";
+                        }
+                        
+                        if(idx === currentIdx) dot.classList.add('animate-pulse');
+                        else dot.classList.remove('animate-pulse');
+                    });
+
+                    if(order.status === 'served') {
+                        if(timerEl) timerEl.innerText = "تم التقديم";
+                        if(msgEl) msgEl.innerText = "شكراً لزيارتكم!";
+                        if(barEl) {
+                            barEl.style.width = '100%';
+                            barEl.classList.remove('bg-primary');
+                            barEl.classList.add('bg-green-500');
+                        }
+                        return;
+                    }
+
+                    if(order.eta) {
+                        const remaining = order.eta.expected - now;
+                        const elapsed = now - order.eta.start;
+                        const totalDuration = order.eta.expected - order.eta.start;
+                        
+                        let progress = (elapsed / totalDuration) * 100;
+                        if(progress > 100) progress = 100;
+
+                        if(barEl) barEl.style.width = `${progress}%`;
+                        
+                        if(remaining > 0) {
+                            const mins = Math.floor(remaining / 60000);
+                            const secs = Math.floor((remaining % 60000) / 1000);
+                            if(timerEl) timerEl.innerText = `${mins}:${secs < 10 ? '0'+secs : secs}`;
+                            if(msgEl) msgEl.innerText = "الوقت المتبقي المتوقع";
+                        } else {
+                            if(timerEl) timerEl.innerText = "قريباً جداً";
+                            if(msgEl) msgEl.innerText = "نعتذر عن التأخير، طلبك على وشك الانتهاء";
+                        }
+                    } else {
+                        if(timerEl) timerEl.innerText = "--:--";
+                    }
+                });
+            },
+
+            // --- ADMIN UI METHODS ---
+            
+            setAdminSidebarActive: (id) => {
+                document.querySelectorAll('.admin-sidebar-link').forEach(el => el.classList.remove('active'));
+                const link = document.getElementById(id);
+                if(link) link.classList.add('active');
+            },
+
+            renderAdminDashboard: () => {
+                ui.setAdminSidebarActive('link-dashboard');
+                const content = document.getElementById('admin-content-area');
+                const currency = state.settings.currency || 'جنية مصري';
+                
+                let totalSales = 0;
+                let pendingOrders = 0;
+                let completedOrders = 0;
+                const ordersArr = Object.values(state.orders);
+                ordersArr.forEach(o => {
+                    totalSales += o.total;
+                    if(o.status === 'served') completedOrders++;
+                    else if(o.status !== 'cancelled') pendingOrders++;
+                });
+
+                content.innerHTML = `
+                    <h2 class="text-3xl font-bold mb-6">نظرة عامة</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="glass-card p-6 rounded-xl flex items-center justify-between">
+                            <div><p class="text-gray-400">إجمالي المبيعات</p><h3 class="text-3xl font-bold">${totalSales.toLocaleString()} ${currency}</h3></div>
+                            <div class="w-14 h-14 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-coins"></i></div>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl flex items-center justify-between">
+                            <div><p class="text-gray-400">الطلبات النشطة</p><h3 class="text-3xl font-bold">${pendingOrders}</h3></div>
+                            <div class="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-bell"></i></div>
+                        </div>
+                         <div class="glass-card p-6 rounded-xl flex items-center justify-between">
+                            <div><p class="text-gray-400">الطلبات المكتملة</p><h3 class="text-3xl font-bold">${completedOrders}</h3></div>
+                            <div class="w-14 h-14 bg-purple-500/20 text-purple-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-check-circle"></i></div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderAdminOrders: () => {
+                ui.setAdminSidebarActive('link-orders');
+                const content = document.getElementById('admin-content-area');
+                const currency = state.settings.currency || 'جنية مصري';
+                const orders = Object.entries(state.orders).map(([k,v]) => ({id:k, ...v})).sort((a,b) => b.timestamp - a.timestamp);
+
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">إدارة الطلبات</h2>
+                    </div>
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-white/10 text-xs uppercase">
+                                <tr>
+                                    <th class="p-4">الطلب</th>
+                                    <th class="p-4">العميل/الطاولة</th>
+                                    <th class="p-4">النوع</th>
+                                    <th class="p-4">السعر</th>
+                                    <th class="p-4">الحالة</th>
+                                    <th class="p-4">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                ${orders.map(o => `
+                                    <tr class="hover:bg-white/5 transition cursor-pointer" onclick="ui.showOrderDetail('${o.id}')">
+                                        <td class="p-4 font-bold">#${o.id.slice(-5)}</td>
+                                        <td class="p-4">${o.table}</td>
+                                        <td class="p-4">${o.type === 'dinein' ? '<i class="fa-solid fa-utensils"></i> محلي' : '<i class="fa-solid fa-bag-shopping"></i> سفري'}</td>
+                                        <td class="p-4 font-bold text-primary">${o.total} ${currency}</td>
+                                        <td class="p-4">
+                                            <select onclick="event.stopPropagation()" onchange="dataService.updateOrderStage('${o.id}', this.value)" class="bg-black/30 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-primary w-24">
+                                                <option value="received" ${o.status==='received'?'selected':''}>استلام</option>
+                                                <option value="accepted" ${o.status==='accepted'?'selected':''}>قبول</option>
+                                                <option value="preparing" ${o.status==='preparing'?'selected':''}>تحضير</option>
+                                                <option value="ready" ${o.status==='ready'?'selected':''}>جاهز</option>
+                                                <option value="served" ${o.status==='served'?'selected':''}>تقديم</option>
+                                                <option value="cancelled" ${o.status==='cancelled'?'selected':''}>إلغاء</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-4">
+                                            <button class="text-blue-400 hover:text-white"><i class="fa-solid fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            },
+
+            // --- KANBAN BOARD ---
+            renderAdminKanban: () => {
+                ui.setAdminSidebarActive('link-kanban');
+                const content = document.getElementById('admin-content-area');
+                const currency = state.settings.currency || 'جنية مصري';
+                const orders = Object.entries(state.orders).map(([k,v]) => ({id:k, ...v}));
+                
+                const columns = {
+                    'received': { title: 'استلام', color: 'border-gray-500' },
+                    'accepted': { title: 'مقبول', color: 'border-blue-500' },
+                    'preparing': { title: 'تحضير', color: 'border-yellow-500' },
+                    'ready': { title: 'جاهز', color: 'border-purple-500' },
+                    'served': { title: 'تم التقديم', color: 'border-green-500' }
+                };
+
+                let kanbanHtml = `<div class="flex gap-4 overflow-x-auto pb-4 h-full">`;
+                
+                Object.entries(columns).forEach(([key, col]) => {
+                    const colOrders = orders.filter(o => o.status === key).sort((a,b) => b.timestamp - a.timestamp);
+                    kanbanHtml += `
+                        <div class="min-w-[280px] w-1/5 bg-white/5 rounded-xl flex flex-col h-full border-t-4 ${col.color}">
+                            <div class="p-3 border-b border-white/10 flex justify-between items-center bg-black/20 rounded-t-lg">
+                                <h3 class="font-bold text-sm uppercase">${col.title}</h3>
+                                <span class="bg-white/10 px-2 rounded-full text-xs">${colOrders.length}</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+                                ${colOrders.map(o => `
+                                    <div class="bg-glass border border-white/10 p-3 rounded-lg hover:bg-white/10 transition cursor-pointer" onclick="ui.showOrderDetail('${o.id}')">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-bold text-xs">#${o.id.slice(-4)}</span>
+                                            <span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                        </div>
+                                        <div class="text-sm mb-2 text-gray-300">
+                                            ${o.table ? `<i class="fa-solid fa-chair text-primary mr-1"></i> ${o.table}` : ''}
+                                            <span class="float-left font-bold">${o.total} ${currency}</span>
+                                        </div>
+                                        <div class="flex gap-1 mt-2">
+                                            ${key !== 'received' ? `<button onclick="event.stopPropagation(); ui.moveOrder('${o.id}', '${key}', -1)" class="flex-1 bg-white/5 hover:bg-white/10 py-1 rounded text-xs"><i class="fa-solid fa-arrow-right"></i></button>` : ''}
+                                            ${key !== 'served' ? `<button onclick="event.stopPropagation(); ui.moveOrder('${o.id}', '${key}', 1)" class="flex-1 bg-primary/20 hover:bg-primary py-1 rounded text-xs text-primary hover:text-white transition"><i class="fa-solid fa-arrow-left"></i></button>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                kanbanHtml += `</div>`;
+                
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4">لوحة العمليات (Kanban)</h2>
+                    <div class="h-[calc(100vh-180px)]">
+                        ${kanbanHtml}
+                    </div>
+                `;
+            },
+
+            moveOrder: (id, currentStatus, direction) => {
+                const stages = ['received', 'accepted', 'preparing', 'ready', 'served'];
+                const idx = stages.indexOf(currentStatus);
+                const nextIdx = idx + direction;
+                if(nextIdx >= 0 && nextIdx < stages.length) {
+                    dataService.updateOrderStage(id, stages[nextIdx]);
+                }
+            },
+
+            showOrderDetail: (id) => {
+                const order = state.orders[id];
+                if(!order) return;
+                const content = document.getElementById('order-detail-content');
+                const timelineContent = document.getElementById('order-timeline-log');
+                const currency = state.settings.currency || 'جنية مصري';
+                
+                const items = Array.isArray(order.items) ? order.items : [];
+
+                content.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                        <div><p class="text-gray-400">رقم الطلب</p><p>#${id}</p></div>
+                        <div><p class="text-gray-400">التاريخ</p><p>${new Date(order.timestamp).toLocaleString()}</p></div>
+                        <div><p class="text-gray-400">الطاولة</p><p>${order.table}</p></div>
+                        <div><p class="text-gray-400">طريقة الدفع</p><p>${order.paymentMethod}</p></div>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 space-y-2">
+                        ${items.length > 0 ? items.map(item => `
+                            <div class="flex justify-between items-center border-b border-white/10 pb-2 last:border-0">
+                                <div>
+                                    <p class="font-bold">${item.name} x${item.qty}</p>
+                                    <p class="text-xs text-gray-400">${item.size} ${(item.addons && item.addons.length) ? '+ ' + item.addons.join(',') : ''}</p>
+                                </div>
+                                <span class="text-primary">${item.totalPrice} ${currency}</span>
+                            </div>
+                        `).join('') : '<p class="text-gray-400">لا توجد عناصر</p>'}
+                    </div>
+                    <div class="flex justify-between items-center mt-4 text-xl font-bold">
+                        <span>الإجمالي</span>
+                        <span class="text-primary">${order.total} ${currency}</span>
+                    </div>
+                `;
+
+                // Render Timeline Log
+                timelineContent.innerHTML = '';
+                if(order.timeline && order.timeline.length) {
+                    order.timeline.forEach(log => {
+                        const date = new Date(log.time);
+                        timelineContent.innerHTML += `
+                            <div class="timeline-item text-xs">
+                                <div class="timeline-dot ${log.status === order.status ? 'active' : 'completed'}"></div>
+                                <p class="font-bold text-secondary uppercase">${log.status}</p>
+                                <p class="text-gray-500">${date.toLocaleTimeString()} - ${log.user}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    timelineContent.innerHTML = '<p class="text-gray-500 text-xs">لا يوجد سجل تاريخي</p>';
+                }
+                
+                document.getElementById('btn-print-invoice').onclick = () => ui.printReceipt(order, id);
+                document.getElementById('btn-delete-order').onclick = () => adminService.deleteOrder(id);
+
+                ui.openModal('order-detail-modal');
+            },
+
+            // --- ADDED MISSING ADMIN METHODS ---
+            renderAdminMenu: () => {
+                ui.setAdminSidebarActive('link-menu-manage');
+                const content = document.getElementById('admin-content-area');
+                const currency = state.settings.currency || 'جنية مصري';
+                const products = Object.entries(state.menu).map(([k,v]) => ({id:k, ...v}));
+
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">إدارة المينيو</h2>
+                        <button onclick="ui.openProductEditor()" class="bg-primary hover:bg-red-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
+                            <i class="fa-solid fa-plus mr-2"></i> إضافة صنف
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${products.map(p => `
+                            <div class="glass-card p-4 rounded-xl flex gap-4 items-center">
+                                <img src="${p.image || 'https://via.placeholder.com/100'}" class="w-20 h-20 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-bold">${p.name}</h4>
+                                    <p class="text-xs text-gray-400 mb-1">${p.category}</p>
+                                    <p class="text-primary font-bold">${p.price} ${currency}</p>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <button onclick="ui.openProductEditor('${p.id}')" class="bg-blue-500/20 text-blue-400 p-2 rounded hover:bg-blue-500 hover:text-white transition"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="adminService.deleteProduct('${p.id}')" class="bg-red-500/20 text-red-400 p-2 rounded hover:bg-red-500 hover:text-white transition"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            },
+
+            openProductEditor: (id = null) => {
+                const form = document.getElementById('admin-product-form');
+                form.reset();
+                const currency = state.settings.currency || 'جنية مصري';
+                
+                // Populate Unit Dropdown
+                const unitSelect = document.getElementById('admin-prod-unit');
+                unitSelect.innerHTML = '<option value="">-- تسعير بسيط (بدون أحجام) --</option>';
+                Object.entries(state.units).forEach(([k, u]) => {
+                    unitSelect.innerHTML += `<option value="${k}">${u.name}</option>`;
+                });
+
+                // Populate Extras Checkboxes
+                const extrasContainer = document.getElementById('admin-prod-extras-container');
+                extrasContainer.innerHTML = '';
+                Object.entries(state.extras).forEach(([k, e]) => {
+                    if(e.active) {
+                        extrasContainer.innerHTML += `
+                            <div class="flex items-center gap-2 bg-white/5 p-2 rounded">
+                                <input type="checkbox" id="pe-${k}" value="${k}" class="admin-extra-checkbox w-4 h-4 accent-primary">
+                                <label for="pe-${k}" class="text-xs cursor-pointer select-none">${e.name} (${e.price} ${currency})</label>
+                            </div>
+                        `;
+                    }
+                });
+
+                // Populate Datalist
+                const dl = document.getElementById('categories-datalist');
+                dl.innerHTML = state.categories.map(c => `<option value="${c}">`).join('');
+
+                if(id) {
+                    const p = state.menu[id];
+                    document.getElementById('admin-modal-title').innerText = "تعديل صنف";
+                    document.getElementById('admin-prod-id').value = id;
+                    document.getElementById('admin-prod-name').value = p.name;
+                    document.getElementById('admin-prod-category').value = p.category;
+                    document.getElementById('admin-prod-price').value = p.price;
+                    document.getElementById('admin-prod-image').value = p.image || '';
+                    document.getElementById('admin-prod-desc').value = p.description || '';
+
+                    // Set Unit
+                    if (p.unitId) {
+                        unitSelect.value = p.unitId;
+                    }
+                    
+                    ui.updateProductSizesInputs(p.sizes); 
+
+                    // Set Extras
+                    if(p.activeAddonIds) {
+                        p.activeAddonIds.forEach(eid => {
+                            const cb = document.getElementById(`pe-${eid}`);
+                            if(cb) cb.checked = true;
+                        });
+                    }
+                } else {
+                    document.getElementById('admin-modal-title').innerText = "إضافة صنف جديد";
+                    document.getElementById('admin-prod-id').value = '';
+                    ui.updateProductSizesInputs(); // Clear
+                }
+
+                ui.openModal('admin-product-modal');
+            },
+
+            updateProductSizesInputs: (existingSizesOverrides = {}) => {
+                const unitId = document.getElementById('admin-prod-unit').value;
+                const container = document.getElementById('admin-sizes-inputs-container');
+                container.innerHTML = '';
+
+                if (!unitId) {
+                    container.innerHTML = '<p class="text-xs text-gray-500">سيتم استخدام السعر الافتراضي أعلاه كصنف واحد.</p>';
+                    return;
+                }
+
+                const unit = state.units[unitId];
+                if (!unit || !unit.sizes) {
+                     container.innerHTML = '<p class="text-xs text-red-400">هذه الوحدة لا تحتوي على أحجام معرفة.</p>';
+                     return;
+                }
+
+                Object.entries(unit.sizes).forEach(([key, size]) => {
+                    let currentPrice = size.defaultPrice;
+                    if (existingSizesOverrides) {
+                        if (existingSizesOverrides[key] !== undefined) currentPrice = existingSizesOverrides[key];
+                        else if (existingSizesOverrides[size.name] !== undefined) currentPrice = existingSizesOverrides[size.name];
+                    }
+                    
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center bg-black/20 p-2 rounded border border-white/5';
+                    div.innerHTML = `
+                        <span class="text-sm font-bold w-1/3">${size.name}</span>
+                        <div class="flex items-center gap-2 w-2/3 justify-end">
+                            <span class="text-xs text-gray-400">السعر:</span>
+                            <input type="number" readonly value="${currentPrice}" id="price-display-${key}" class="size-override-input bg-transparent text-center w-16 text-primary font-bold border-none focus:ring-0" data-size-name="${size.name}" data-size-key="${key}">
+                            <button type="button" onclick="ui.openPriceModifier('${key}', '${currentPrice}', '${size.name}')" class="bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-xs transition">تعديل السعر</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            openPriceModifier: (sizeKey, currentPrice, sizeName) => {
+                state.tempPriceModifier = { sizeKey, sizeName };
+                document.getElementById('modifier-size-name').innerText = `الحجم: ${sizeName}`;
+                document.getElementById('modifier-price-input').value = currentPrice;
+                ui.openModal('admin-price-modifier-modal');
+            },
+
+            applyPriceModifier: () => {
+                const newPrice = document.getElementById('modifier-price-input').value;
+                const sizeKey = state.tempPriceModifier.sizeKey;
+                
+                const input = document.getElementById(`price-display-${sizeKey}`);
+                if(input) input.value = newPrice;
+                
+                ui.closeModal('admin-price-modifier-modal');
+            },
+
+            // --- ADMIN EXTRAS RENDER ---
+            renderAdminExtras: () => {
+                ui.setAdminSidebarActive('link-extras');
+                const content = document.getElementById('admin-content-area');
+                const currency = state.settings.currency || 'جنية مصري';
+                const extras = Object.entries(state.extras).map(([k,v]) => ({id:k, ...v}));
+
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">إدارة الإضافات المركزية</h2>
+                        <button onclick="ui.openExtraEditor()" class="bg-secondary text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
+                            <i class="fa-solid fa-plus mr-2"></i> إضافة جديدة
+                        </button>
+                    </div>
+                    <div class="glass-panel overflow-hidden rounded-xl">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-white/10 text-xs uppercase">
+                                <tr>
+                                    <th class="p-4">الاسم</th>
+                                    <th class="p-4">السعر</th>
+                                    <th class="p-4">الحالة</th>
+                                    <th class="p-4">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                ${extras.map(e => `
+                                    <tr class="hover:bg-white/5">
+                                        <td class="p-4 font-bold">${e.name}</td>
+                                        <td class="p-4 text-primary">${e.price} ${currency}</td>
+                                        <td class="p-4"><span class="px-2 py-1 rounded text-xs ${e.active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${e.active ? 'نشط' : 'غير نشط'}</span></td>
+                                        <td class="p-4 flex gap-2">
+                                            <button onclick="ui.openExtraEditor('${e.id}')" class="text-blue-400 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+                                            <button onclick="adminService.deleteExtra('${e.id}')" class="text-red-400 hover:text-white"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            },
+
+            openExtraEditor: (id = null) => {
+                const form = document.querySelector('#admin-extra-modal form');
+                form.reset();
+                if(id) {
+                    const e = state.extras[id];
+                    document.getElementById('extra-modal-title').innerText = "تعديل إضافة";
+                    document.getElementById('extra-id').value = id;
+                    document.getElementById('extra-name').value = e.name;
+                    document.getElementById('extra-price').value = e.price;
+                    document.getElementById('extra-active').checked = e.active;
+                } else {
+                    document.getElementById('extra-modal-title').innerText = "إضافة جديدة";
+                    document.getElementById('extra-id').value = '';
+                }
+                ui.openModal('admin-extra-modal');
+            },
+
+            // --- ADMIN UNITS RENDER ---
+            renderAdminUnits: () => {
+                ui.setAdminSidebarActive('link-units');
+                const content = document.getElementById('admin-content-area');
+                const units = Object.entries(state.units).map(([k,v]) => ({id:k, ...v}));
+
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">الوحدات والأحجام</h2>
+                        <button onclick="ui.openUnitEditor()" class="bg-secondary text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
+                            <i class="fa-solid fa-plus mr-2"></i> إضافة وحدة
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${units.map(u => {
+                            const sizes = u.sizes ? Object.values(u.sizes) : [];
+                            return `
+                                <div class="glass-card p-6 rounded-xl relative group">
+                                     <button onclick="adminService.deleteUnit('${u.id}')" class="absolute top-4 left-4 text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                                     <div class="flex justify-between items-center mb-4">
+                                         <h3 class="text-xl font-bold">${u.name}</h3>
+                                         <button onclick="ui.openUnitEditor('${u.id}')" class="text-sm text-blue-400 hover:underline">تعديل</button>
+                                     </div>
+                                     <div class="bg-black/20 rounded-lg p-3">
+                                         <p class="text-xs text-gray-400 mb-2">الأحجام المعرفة:</p>
+                                         <div class="flex flex-wrap gap-2">
+                                             ${sizes.length > 0 
+                                                 ? sizes.map(s => `<span class="bg-white/10 px-2 py-1 rounded text-xs border border-white/10">${s.name} (${s.defaultPrice})</span>`).join('') 
+                                                 : '<span class="text-gray-500 text-xs">لا يوجد أحجام</span>'}
+                                         </div>
+                                     </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            },
+
+            openUnitEditor: (id = null) => {
+                const form = document.querySelector('#admin-unit-modal form');
+                form.reset();
+                const container = document.getElementById('unit-sizes-container');
+                container.innerHTML = '';
+
+                if(id) {
+                    const u = state.units[id];
+                    document.getElementById('unit-modal-title').innerText = "تعديل الوحدة";
+                    document.getElementById('unit-id').value = id;
+                    document.getElementById('unit-name').value = u.name;
+                    if(u.sizes) {
+                        Object.values(u.sizes).forEach(s => ui.addUnitSizeRow(s.name, s.defaultPrice));
+                    }
+                } else {
+                    document.getElementById('unit-modal-title').innerText = "إضافة وحدة جديدة";
+                    document.getElementById('unit-id').value = '';
+                    ui.addUnitSizeRow(); // Add one empty row
+                }
+                ui.openModal('admin-unit-modal');
+            },
+
+            addUnitSizeRow: (name = '', price = '') => {
+                const container = document.getElementById('unit-sizes-container');
+                const div = document.createElement('div');
+                div.className = 'flex gap-2 unit-size-row';
+                div.innerHTML = `
+                    <input type="text" placeholder="اسم الحجم" value="${name}" class="unit-size-name w-1/2 glass-input p-2 rounded text-sm border border-white/10">
+                    <input type="number" placeholder="سعر افتراضي" value="${price}" class="unit-size-price w-1/3 glass-input p-2 rounded text-sm border border-white/10">
+                    <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            },
+
+            renderAdminTables: () => {
+                ui.setAdminSidebarActive('link-tables');
+                const content = document.getElementById('admin-content-area');
+                const tables = Object.entries(state.tables).map(([k,v]) => ({id:k, ...v}));
+
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">إدارة الطاولات</h2>
+                        <button onclick="adminService.addTable()" class="bg-secondary text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
+                            <i class="fa-solid fa-plus mr-2"></i> إضافة طاولة
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        ${tables.map(t => {
+                            const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?table=${t.name}`;
+                            return `
+                            <div class="glass-card p-4 rounded-xl text-center relative group">
+                                <button onclick="adminService.deleteTable('${t.id}')" class="absolute top-2 right-2 text-red-400 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                                <div class="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-bold">${t.name}</div>
+                                <button onclick="ui.showQR('${url}', '${t.name}')" class="text-xs bg-primary px-3 py-1 rounded mt-2">عرض QR</button>
+                            </div>
+                        `}).join('')}
+                    </div>
+                    <div id="qr-modal-container" class="mt-8 bg-white/5 p-4 rounded-xl text-center hidden">
+                        <div id="qrcode" class="flex justify-center mb-4 bg-white p-4 w-fit mx-auto rounded"></div>
+                        <p id="qr-url-text" class="text-sm text-gray-400 mb-2"></p>
+                        <button onclick="window.print()" class="text-primary underline">طباعة QR Code</button>
+                    </div>
+                `;
+            },
+
+            showQR: (url, name) => {
+                const container = document.getElementById('qr-modal-container');
+                container.classList.remove('hidden');
+                document.getElementById('qr-url-text').innerText = `Table: ${name} - ${url}`;
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), { text: url, width: 150, height: 150 });
+            },
+
+            renderAdminUsers: () => {
+                ui.setAdminSidebarActive('link-users');
+                const content = document.getElementById('admin-content-area');
+                const users = Object.entries(state.users).map(([k,v]) => ({id:k, ...v}));
+
+                content.innerHTML = `
+                    <h2 class="text-3xl font-bold mb-6">المستخدمين والصلاحيات</h2>
+                    <div class="glass-panel overflow-hidden rounded-xl">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-white/10 text-xs uppercase">
+                                <tr><th class="p-4">User ID</th><th class="p-4">الدور الحالي</th><th class="p-4">تغيير الصلاحية</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                ${users.map(u => `
+                                    <tr class="hover:bg-white/5">
+                                        <td class="p-4 font-mono text-xs">${u.id}</td>
+                                        <td class="p-4"><span class="px-2 py-1 rounded bg-white/10 text-xs uppercase font-bold">${u.role}</span></td>
+                                        <td class="p-4">
+                                            <select onchange="adminService.updateUserRole('${u.id}', this.value)" class="bg-black/30 border border-white/10 rounded px-2 py-1 text-xs">
+                                                <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+                                                <option value="cashier" ${u.role==='cashier'?'selected':''}>Cashier</option>
+                                                <option value="kitchen" ${u.role==='kitchen'?'selected':''}>Kitchen</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            },
+
+            // --- SETTINGS ---
+            renderAdminSettings: () => {
+                ui.setAdminSidebarActive('link-settings');
+                const content = document.getElementById('admin-content-area');
+                const s = state.settings;
+
+                content.innerHTML = `
+                    <h2 class="text-3xl font-bold mb-6">إعدادات الموقع</h2>
+                    <form onsubmit="adminService.saveSettings(event)" class="glass-panel p-6 rounded-xl max-w-2xl">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-2 text-sm text-gray-400">اسم المطعم</label>
+                                <input type="text" name="appName" value="${s.appName || 'CRYSTAL POS'}" class="w-full glass-input p-2 rounded">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm text-gray-400">الشعار (نصي)</label>
+                                <input type="text" name="slogan" value="${s.slogan || 'المستقبل في إدارة المطاعم'}" class="w-full glass-input p-2 rounded">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm text-gray-400">عملة المتجر</label>
+                                <input type="text" name="currency" value="${s.currency || 'جنية مصري'}" class="w-full glass-input p-2 rounded" placeholder="مثال: SAR, EGP, $">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm text-gray-400">الوصف</label>
+                                <textarea name="description" class="w-full glass-input p-2 rounded h-24">${s.description || ''}</textarea>
+                            </div>
+                            <div class="border-t border-white/10 pt-4">
+                                <label class="block mb-2 text-sm text-secondary font-bold">متوسط وقت التحضير (دقائق)</label>
+                                <input type="number" name="defaultPrepTime" value="${s.defaultPrepTime || 20}" class="w-full glass-input p-2 rounded">
+                                <p class="text-xs text-gray-500 mt-1">يستخدم لحساب الوقت المتوقع للانتهاء تلقائياً.</p>
+                            </div>
+                            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-bold w-full hover:bg-red-600 transition">حفظ الإعدادات</button>
+                        </div>
+                    </form>
+                `;
+            },
+            
+            applySettings: (s) => {
+                if(s.appName) document.querySelectorAll('.app-name-display').forEach(el => el.innerHTML = s.appName);
+                if(s.appName) document.querySelector('.app-name-hero').innerHTML = s.appName; 
+                if(s.slogan) document.querySelector('.app-slogan-display').innerText = s.slogan;
+                if(s.description) document.querySelector('.app-desc-display').innerText = s.description;
+            },
+
+            renderMenu: () => {
+                const grid = document.getElementById('products-grid');
+                const catsList = document.getElementById('categories-list');
+                const currency = state.settings.currency || 'جنية مصري';
+                grid.innerHTML = '';
+                catsList.innerHTML = '';
+
+                const products = Object.entries(state.menu).map(([key, val]) => ({id: key, ...val}));
+                const categories = [...new Set(products.map(p => p.category))];
+
+                // "All" Button
+                const isAllActive = state.activeCategory === 'all';
+                const allBtnClass = isAllActive ? 'bg-primary/20 text-primary font-bold' : 'hover:bg-white/10 text-gray-300';
+                catsList.innerHTML += `<li class="cursor-pointer px-4 py-2 rounded-lg transition ${allBtnClass}" onclick="ui.filterMenu('all')">الكل</li>`;
+
+                // Category Buttons
+                categories.forEach(cat => {
+                    const isActive = state.activeCategory === cat;
+                    const btnClass = isActive ? 'bg-primary/20 text-primary font-bold' : 'hover:bg-white/10 text-gray-300';
+                    catsList.innerHTML += `<li class="cursor-pointer px-4 py-2 rounded-lg transition ${btnClass}" onclick="ui.filterMenu('${cat}')">${cat}</li>`;
+                });
+
+                // Filter Products
+                const filtered = state.activeCategory === 'all' 
+                    ? products 
+                    : products.filter(p => p.category === state.activeCategory);
+
+                if(filtered.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">لا توجد عناصر في هذا القسم</div>';
+                }
+
+                filtered.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = 'glass-card rounded-xl overflow-hidden group product-item animate-fade-in';
+                    el.innerHTML = `
+                        <div class="h-48 overflow-hidden relative">
+                            <img src="${p.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="${p.name}">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <button onclick="orderService.openProductModal('${p.id}')" class="bg-primary text-white px-6 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition">اضافة</button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg">${p.name}</h3>
+                                <span class="text-primary font-bold">${p.price} ${currency}</span>
+                            </div>
+                            <p class="text-gray-400 text-xs mt-1 line-clamp-2">${p.description}</p>
+                        </div>
+                    `;
+                    grid.appendChild(el);
+                });
+
+                if(state.currentTable) {
+                    document.getElementById('table-info-display').innerText = `طاولة رقم: ${state.currentTable}`;
+                }
+            },
+
+            filterMenu: (cat) => {
+                state.activeCategory = cat;
+                ui.renderMenu();
+            },
+
+            // --- KDS RENDER (IMPROVED - WITH STEPPER & ALL STATUSES) ---
+            renderKitchen: (orders) => {
+                const grid = document.getElementById('kitchen-orders-grid');
+                grid.innerHTML = '';
+                
+                // Sort by Active First, Then Status, Then Time
+                const activeStatuses = ['received', 'accepted', 'preparing', 'ready'];
+                const sortedOrders = Object.entries(orders).map(([k,v]) => ({id:k, ...v})).sort((a,b) => {
+                    // Priority 1: Status Group (Active vs Finished)
+                    const aActive = activeStatuses.includes(a.status);
+                    const bActive = activeStatuses.includes(b.status);
+                    if (aActive && !bActive) return -1; 
+                    if (!aActive && bActive) return 1;
+                    
+                    // Priority 2: Within Active (Urgency: Received > Accepted > Ready > Preparing)
+                    if(aActive && bActive) {
+                        return a.timestamp - b.timestamp; // Oldest first
+                    }
+                    // Priority 3: Within Finished (Newest first)
+                    return b.timestamp - a.timestamp;
+                });
+
+                if(sortedOrders.length === 0) {
+                     grid.innerHTML = '<div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50"><i class="fa-solid fa-check-circle text-6xl mb-4"></i><p class="text-xl">لا توجد طلبات حالياً</p></div>';
+                     return;
+                }
+
+                sortedOrders.forEach(o => {
+                    const time = o.timestamp ? new Date(o.timestamp).toLocaleTimeString('ar-EG') : 'Now';
+                    const items = Array.isArray(o.items) ? o.items : [];
+                    
+                    // Stepper Logic
+                    const stages = ['received', 'accepted', 'preparing', 'ready', 'served'];
+                    const currentIdx = stages.indexOf(o.status);
+                    
+                    let stepperHtml = '<div class="flex justify-between items-center mb-4 mt-2 px-1 relative">';
+                    stages.forEach((s, idx) => {
+                         let dotClass = 'kds-dot';
+                         let labelClass = 'hidden'; // Hide labels to save space or show minimal
+                         
+                         if(idx <= currentIdx) dotClass += ' active';
+                         if(o.status === 'served' && idx === stages.length-1) dotClass += ' completed';
+
+                         // Simplified Icons
+                         let icon = '';
+                         if(s==='received') icon = '<i class="fa-solid fa-receipt"></i>';
+                         if(s==='accepted') icon = '<i class="fa-solid fa-thumbs-up"></i>';
+                         if(s==='preparing') icon = '<i class="fa-solid fa-fire"></i>';
+                         if(s==='ready') icon = '<i class="fa-solid fa-bell-concierge"></i>';
+                         if(s==='served') icon = '<i class="fa-solid fa-check"></i>';
+
+                         stepperHtml += `
+                            <div class="kds-step">
+                                <div class="${dotClass}" title="${s}">${icon}</div>
+                            </div>
+                         `;
+                    });
+                    stepperHtml += '</div>';
+
+                    // Actions Logic
+                    let nextActionBtn = '';
+                    let cardBorder = 'border-t-4 border-gray-600';
+                    let bgClass = '';
+
+                    if(o.status === 'received') {
+                         cardBorder = 'border-t-4 border-blue-500';
+                         nextActionBtn = `<button onclick="dataService.updateOrderStage('${o.id}', 'accepted')" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg text-sm font-bold animate-pulse shadow-lg shadow-blue-900/50">قبول الطلب <i class="fa-solid fa-arrow-left mr-1"></i></button>`;
+                    } else if (o.status === 'accepted') {
+                         cardBorder = 'border-t-4 border-yellow-500';
+                         nextActionBtn = `<button onclick="dataService.updateOrderStage('${o.id}', 'preparing')" class="w-full bg-yellow-600 hover:bg-yellow-700 py-3 rounded-lg text-sm font-bold shadow-lg shadow-yellow-900/50">بدء التحضير <i class="fa-solid fa-fire mr-1"></i></button>`;
+                    } else if (o.status === 'preparing') {
+                         cardBorder = 'border-t-4 border-purple-500';
+                         nextActionBtn = `<button onclick="dataService.updateOrderStage('${o.id}', 'ready')" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg text-sm font-bold shadow-lg shadow-purple-900/50">جاهز للتقديم <i class="fa-solid fa-bell mr-1"></i></button>`;
+                    } else if (o.status === 'ready') {
+                         cardBorder = 'border-t-4 border-green-500';
+                         nextActionBtn = `<button onclick="dataService.updateOrderStage('${o.id}', 'served')" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg text-sm font-bold shadow-lg shadow-green-900/50">تم التقديم <i class="fa-solid fa-check mr-1"></i></button>`;
+                    } else if (o.status === 'served') {
+                        cardBorder = 'border-t-4 border-green-800';
+                        bgClass = 'opacity-70 grayscale-[0.5]';
+                        nextActionBtn = `<div class="w-full bg-white/5 py-2 rounded text-center text-sm font-bold text-green-500"><i class="fa-solid fa-check-circle"></i> مكتمل</div>`;
+                    } else if (o.status === 'cancelled') {
+                        cardBorder = 'border-t-4 border-red-800';
+                        bgClass = 'opacity-50';
+                        nextActionBtn = `<div class="w-full bg-white/5 py-2 rounded text-center text-sm font-bold text-red-500"><i class="fa-solid fa-ban"></i> ملغي</div>`;
+                    }
+
+                    // Card HTML
+                    const div = document.createElement('div');
+                    div.className = `glass-card p-4 rounded-xl relative flex flex-col h-full ${cardBorder} ${bgClass}`;
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="bg-white/10 px-3 py-1 rounded-lg text-lg font-bold font-mono tracking-wider">#${o.table || 'Takeaway'}</span>
+                                <span class="block text-xs text-gray-400 mt-1">ID: ${o.id.slice(-4)}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-sm font-bold text-white block"><i class="fa-regular fa-clock"></i> ${time}</span>
+                                <span class="text-xs text-gray-400 block">${o.type === 'takeaway' ? 'سفري' : 'محلي'}</span>
+                            </div>
+                        </div>
+
+                        ${stepperHtml}
+
+                        <div class="flex-1 overflow-y-auto custom-scrollbar min-h-[120px] mb-3 bg-black/20 rounded-lg p-2">
+                            ${items.length > 0 ? items.map(i => `
+                                <div class="border-b border-white/10 pb-2 mb-2 last:border-0 last:mb-0 last:pb-0">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-lg">${i.qty}x ${i.name}</span>
+                                    </div>
+                                    ${i.size || i.addons.length ? `
+                                        <div class="text-xs text-yellow-500 mt-1">
+                                            ${i.size ? `<span class="bg-yellow-500/10 px-1 rounded ml-1">${i.size}</span>` : ''}
+                                            ${i.addons.map(a => `+ ${a}`).join(', ')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('') : '<p class="text-red-400">خطأ في البيانات</p>'}
+                        </div>
+
+                        <div class="mt-auto">
+                           ${nextActionBtn}
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            },
+
+            // --- HELPER ---
+            showLoading: (isLoading) => {
+                if(isLoading) ui.showToast('جاري المعالجة...', 'info');
+            },
+
+            showToast: (msg, type = 'info') => {
+                ui.showNewToast(msg, type); // Use new system
+            },
+
+            // NEW NOTIFICATION SYSTEM (Glassmorphism + Tailwind)
+            showNewToast: (msg, type = 'info', iconName = null) => {
+                const container = document.getElementById('toast-container');
+                
+                let bgColor = 'bg-gray-800/90';
+                let borderColor = 'border-gray-600';
+                let icon = iconName || 'fa-info-circle';
+                let textColor = 'text-white';
+
+                if (type === 'success') {
+                    bgColor = 'bg-green-900/90'; borderColor = 'border-green-500'; icon = iconName || 'fa-check-circle'; textColor = 'text-green-100';
+                } else if (type === 'error') {
+                    bgColor = 'bg-red-900/90'; borderColor = 'border-red-500'; icon = iconName || 'fa-exclamation-circle'; textColor = 'text-red-100';
+                } else if (type === 'new') {
+                    bgColor = 'bg-blue-900/90'; borderColor = 'border-blue-500'; icon = iconName || 'fa-bell'; textColor = 'text-blue-100';
+                }
+
+                const div = document.createElement('div');
+                div.className = `glass-card p-4 rounded-xl border-r-4 ${borderColor} ${bgColor} shadow-2xl flex items-center gap-4 animate-slide-in relative overflow-hidden group`;
+                
+                div.innerHTML = `
+                    <div class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 animate-bounce-in">
+                        <i class="fa-solid ${icon} text-xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm ${textColor}">${msg}</p>
+                        <p class="text-[10px] text-gray-400 mt-1">${new Date().toLocaleTimeString('ar-EG')}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-white/50 hover:text-white"><i class="fa-solid fa-times"></i></button>
+                    <!-- Progress bar for auto-dismiss -->
+                    <div class="absolute bottom-0 left-0 h-1 bg-white/30 w-full animate-[progress-bar-stripes_3s_linear_forwards]"></div>
+                `;
+
+                container.appendChild(div);
+
+                // Play sound if 'new' or critical
+                if(type === 'new' || type === 'error') {
+                    // Handled by logic calling this, but ensure here too just in case
+                }
+
+                setTimeout(() => {
+                    div.classList.replace('animate-slide-in', 'animate-slide-out');
+                    setTimeout(() => div.remove(), 500);
+                }, 4000);
+            },
+
+            playNotificationSound: () => {
+                const audio = document.getElementById('notification-sound');
+                if(audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => console.log("Audio play failed (interaction needed):", e));
+                }
+            },
+
+            translateStatus: (s) => {
+                const map = {
+                    'received': 'تم الاستلام',
+                    'accepted': 'تم القبول',
+                    'preparing': 'جاري التحضير',
+                    'ready': 'جاهز للاستلام',
+                    'served': 'تم التقديم',
+                    'cancelled': 'ملغي'
+                };
+                return map[s] || s;
+            },
+
+            printReceipt: (order, id) => {
+                const currency = state.settings.currency || 'جنية مصري';
+                const area = document.getElementById('printable-area');
+                
+                const items = Array.isArray(order.items) ? order.items : [];
+                
+                if (items.length === 0) {
+                    alert("لا يمكن طباعة فاتورة فارغة أو بها خطأ في البيانات");
+                    return;
+                }
+
+                area.innerHTML = `
+                    <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+                        <h2 style="margin:0">Crystal Restaurant</h2>
+                        <p style="margin:0">Order #${id.slice(-4)}</p>
+                        <p style="margin:0">${new Date().toLocaleString()}</p>
+                        <p style="margin:0">Table: ${order.table}</p>
+                    </div>
+                    <table style="width: 100%; font-size: 12px;">
+                        ${items.map(i => `
+                            <tr>
+                                <td>${i.name} x${i.qty}</td>
+                                <td style="text-align: right;">${i.totalPrice}</td>
+                            </tr>
+                            ${(i.addons && i.addons.length) ? `<tr><td colspan="2" style="font-size:10px; color:#555">+ ${i.addons.join(',')}</td></tr>` : ''}
+                        `).join('')}
+                    </table>
+                    <div style="text-align: right; border-top: 1px solid #000; margin-top: 10px; padding-top: 5px;">
+                        <h3>Total: ${order.total} ${currency}</h3>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">Thank You!</div>
+                `;
+                window.print();
+            }
+        };
+
+        // --- GLOBAL TIMER INTERVAL ---
+        setInterval(() => {
+            // Update Kitchen Timers
+            if(state.role === 'kitchen') {
+                 // Safe DOM check
+                 const timerEl = document.querySelector('.update-timer');
+                 if(timerEl) timerEl.innerText = new Date().toLocaleTimeString('ar-EG');
+            }
+            // Update all active trackers in the slider
+            ui.updateAllTrackers();
+        }, 1000); 
+
+        // --- 7. ROUTER ---
+        window.router = {
+            navigate: (viewId) => {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                
+                if(viewId === 'menu') {
+                    document.getElementById('view-menu').classList.remove('hidden');
+                    document.getElementById('navbar').classList.remove('hidden');
+                } else if(viewId === 'admin') {
+                     if(state.role !== 'admin') { ui.showToast('غير مصرح', 'error'); router.navigate('landing'); return; }
+                    document.getElementById('view-admin').classList.remove('hidden');
+                    document.getElementById('navbar').classList.add('hidden'); // Admin has own sidebar
+                    ui.renderAdminDashboard();
+                } else if(viewId === 'kitchen') {
+                    document.getElementById('view-kitchen').classList.remove('hidden');
+                    // Hide navbar for pure kitchen display mode as requested
+                    if(state.role === 'kitchen') {
+                        document.getElementById('navbar').classList.add('hidden'); 
+                    } else {
+                        document.getElementById('navbar').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('view-landing').classList.remove('hidden');
+                    document.getElementById('navbar').classList.add('hidden');
+                }
+                window.scrollTo(0,0);
+            }
+        };
+
+        // --- INIT ---
+        authService.init();
+        dataService.fetchMenu();
+        dataService.fetchOrders();
+
+    </script>
+</body>
+</html>
