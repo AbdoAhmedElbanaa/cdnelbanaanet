@@ -1,0 +1,57 @@
+[
+    {
+        "sidebar":{
+            "title": "ملف شرح القالب",
+            "items": [
+                {
+                    "type": "doc",
+                    "id": "introduction",
+                    "label": "Introduction"
+                },
+                {
+                    "type": "doc",
+                    "id": "getting-started",
+                    "label": "Getting Started"
+                },
+                {
+                    "type": "category",
+                    "label": "Guides",
+                    "items": [
+                        {
+                            "type": "doc",
+                            "id": "installation",
+                            "label": "Installation Guide"
+                        },
+                        {
+                            "type": "doc",
+                            "id": "configuration",
+                            "label": "Configuration Guide"
+                        }
+                    ]
+                }
+            ]
+        },
+        "content": {
+            "introduction": {
+                "id": "introduction",
+                "title": "Introduction",
+                "body": "Welcome to the documentation for our template. This guide will help you get started and make the most out of it."
+            },
+            "getting-started": {
+                "id": "getting-started",
+                "title": "Getting Started",
+                "body": "This section will walk you through the initial setup and basic usage of the template."
+            },
+            "installation": {  
+                "id": "installation",
+                "title": "Installation Guide",
+                "body": "Follow these steps to install the template on your system."
+            },
+            "configuration": {
+                "id": "configuration",
+                "title": "Configuration Guide",
+                "body": "Learn how to configure the template to suit your needs."
+            }
+        }
+    }
+]
