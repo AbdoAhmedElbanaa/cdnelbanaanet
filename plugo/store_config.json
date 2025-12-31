@@ -26,6 +26,14 @@
       "features": ["استخدام غير محدود", "حقوق المطور"],
       "buttonText": "تواصل معنا",
       "isFeatured": false
+    },{
+      "id": "dev",
+      "title": "رخصة المطور",
+      "subtitle": "للاستخدام في مواقع متعددة",
+      "price": "25$",
+      "features": ["استخدام غير محدود", "حقوق المطور"],
+      "buttonText": "تواصل معنا",
+      "isFeatured": false
     }
   ],
   "paymentMethods": {
