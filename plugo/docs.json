@@ -1,6 +1,6 @@
 [
     {
-        "sidebar":{
+        "sidebar": {
             "title": "ملف شرح القالب",
             "items": [
                 {
@@ -9,13 +9,9 @@
                     "label": "Introduction"
                 },
                 {
-                    "type": "doc",
-                    "id": "getting-started",
-                    "label": "Getting Started"
-                },
-                {
                     "type": "category",
                     "label": "Guides",
+                    "id": "cat-guides",
                     "items": [
                         {
                             "type": "doc",
@@ -26,6 +22,18 @@
                             "type": "doc",
                             "id": "configuration",
                             "label": "Configuration Guide"
+                        },
+                        {
+                            "type": "category",
+                            "id": "cat-1767208519726",
+                            "label": "قسم جديد",
+                            "items": [
+                                {
+                                    "type": "doc",
+                                    "id": "doc-1767208523019",
+                                    "label": "صفحة جديدة"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -35,22 +43,22 @@
             "introduction": {
                 "id": "introduction",
                 "title": "Introduction",
-                "body": "<div id=\"doc-intro\" class=\"docs-content-pane active\"> <h1 class=\"text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-8\">مرحباً بك في SeoWriting V2.0</h1> <p class=\"text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed mb-12\"> شكراً لثقتك بنا. هذا القالب تم تصميمه بعناية فائقة ليمنحك أفضل أداء ممكن مع مظهر جمالي لا يضاهى. في هذا القسم ستجد كل ما تحتاجه للبدء. </p> <div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 mb-12\"> <div class=\"glass p-8 rounded-[2rem] border-purple-200 dark:border-purple-900/50\"> <i data-lucide=\"zap\" class=\"text-purple-500 mb-6\" size=\"40\"></i> <h3 class=\"font-bold text-2xl mb-3 text-[var(--text-primary)]\">أداء عالي</h3> <p class=\"text-base text-[var(--text-secondary)] leading-relaxed\">أكواد محسنة لسرعة تحميل خيالية.</p> </div> <div class=\"glass p-8 rounded-[2rem] border-blue-200 dark:border-blue-900/50\"> <i data-lucide=\"shield\" class=\"text-blue-500 mb-6\" size=\"40\"></i> <h3 class=\"font-bold text-2xl mb-3 text-[var(--text-primary)]\">أمان وموثوقية</h3> <p class=\"text-base text-[var(--text-secondary)] leading-relaxed\">تحديثات أمنية مستمرة ودعم فني.</p> </div> </div> </div>"
+                "body": "<div id=\"doc-intro\" class=\"docs-content-pane active\"> <h1 class=\"text-4xl md:text-5xl font-black text-purple-600 mb-8\">مرحباً بك في SeoWriting V2.0</h1> <p class=\"text-lg md:text-xl text-gray-600 leading-relaxed mb-12\"> شكراً لثقتك بنا. </p> </div>"
             },
-            "getting-started": {
-                "id": "getting-started",
-                "title": "Getting Started",
-                "body": "This section will walk you through the initial setup and basic usage of the template."
-            },
-            "installation": {  
+            "installation": {
                 "id": "installation",
                 "title": "Installation Guide",
-                "body": "Follow these steps to install the template on your system."
+                "body": "<h2>دليل التثبيت</h2><p>اتبع الخطوات التالية لتثبيت القالب...</p>"
             },
             "configuration": {
                 "id": "configuration",
                 "title": "Configuration Guide",
-                "body": "Learn how to configure the template to suit your needs."
+                "body": "<h2>الإعدادات</h2><p>كيفية تهيئة القالب ليناسب احتياجاتك...</p>"
+            },
+            "doc-1767208523019": {
+                "id": "doc-1767208523019",
+                "title": "صفحة جديدة",
+                "body": "<h1>صفحة جديدة</h1>\n<p>ابدأ الكتابة هنا...</p>"
             }
         }
     }
