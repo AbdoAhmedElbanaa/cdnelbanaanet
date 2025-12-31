@@ -3,7 +3,7 @@
 <head>
 <meta charset='UTF-8'/>
 <meta content='width=device-width, initial-scale=1.0' name='viewport'/>
-<title>SeoWriting - القالب والخدمات</title>
+<title>Plugo AI - القالب والخدمات</title>
 
 <!-- مكتبات القالب -->
 <link href='https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700&display=swap' rel='stylesheet'/>
@@ -92,748 +92,35 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 
 <style>
-    :root {
-        --primary-color: #3b82f6;
-        --secondary-color: #64748b;
-        
-        /* Light Mode - High Contrast Text */
-        --bg-body: #f8fafc;
-        --bg-glass: rgba(255, 255, 255, 0.75);
-        --bg-glass-hover: rgba(255, 255, 255, 0.9);
-        --border-glass: rgba(255, 255, 255, 0.5);
-        --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-        
-        --text-primary: #0f172a;
-        --text-secondary: #475569;
-        --accent-glow: rgba(59, 130, 246, 0.2);
-        
-        --radius-xl: 2rem;
-    }
-
-    [data-theme='dark'] {
-        /* Dark Mode - High Contrast Text */
-        --bg-body: #020617;
-        --bg-glass: rgba(15, 23, 42, 0.7);
-        --bg-glass-hover: rgba(30, 41, 59, 0.8);
-        --border-glass: rgba(255, 255, 255, 0.1);
-        --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
-        
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --accent-glow: rgba(59, 130, 246, 0.3);
-    }
-
-    body {
-        font-family: 'Tajawal', sans-serif;
-        background-color: var(--bg-body);
-        color: var(--text-primary);
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
-        position: relative;
-        line-height: 1.6;
-    }
-    
-    /* خلفية جمالية */
-    .bg-blobs {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        overflow: hidden;
-        pointer-events: none;
-    }
-    .blob {
-        position: absolute;
-        filter: blur(100px);
-        opacity: 0.5;
-        animation: float 15s infinite alternate ease-in-out;
-        mix-blend-mode: screen;
-    }
-    [data-theme='dark'] .blob { mix-blend-mode: normal; opacity: 0.25; }
-
-    .blob-1 { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--accent-glow), transparent); }
-    .blob-2 { bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent); animation-delay: -7s; }
-
-    @keyframes float {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(40px, 60px) scale(1.1); }
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    /* Luxury Glassmorphism Utilities */
-    .glass {
-        background: var(--bg-glass);
-        backdrop-filter: blur(24px) saturate(180%);
-        -webkit-backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid var(--border-glass);
-        box-shadow: var(--shadow-glass), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-        border-radius: 1.5rem;
-    }
-    
-    .glass-hover {
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-hover:hover {
-        background: var(--bg-glass-hover);
-        transform: translateY(-5px) scale(1.01);
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 15px var(--accent-glow);
-        border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    /* تنسيقات الهيدر */
-    .header-main {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(30px) saturate(180%);
-        -webkit-backdrop-filter: blur(30px) saturate(180%);
-        border-bottom: 1px solid var(--border-glass);
-        transition: all 0.4s ease;
-    }
-    [data-theme='dark'] .header-main {
-        background: rgba(2, 6, 23, 0.8);
-    }
-
-    .nav-link {
-        color: var(--text-secondary);
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 1rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        display: inline-block;
-        text-decoration: none;
-        position: relative;
-        overflow: hidden;
-    }
-    .nav-link:hover, .nav-link.active {
-        color: var(--primary-color);
-        background: rgba(59, 130, 246, 0.1);
-        font-weight: 700;
-    }
-    .nav-link::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 2px;
-        background: var(--primary-color);
-        transition: width 0.3s ease;
-        border-radius: 2px;
-    }
-    .nav-link:hover::after, .nav-link.active::after {
-        width: 70%;
-    }
-
-    /* منطق التبديل (Views Logic) */
-    .view-section {
-        display: none;
-        animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        min-height: calc(100vh - 96px);
-    }
-
-    .view-section.active-view {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* تنسيقات قسم الشرح التفاعلي */
-    .explainer-btn {
-        width: 100%;
-        text-align: right;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid transparent;
-        cursor: pointer;
-        color: var(--text-secondary);
-    }
-    .explainer-btn.active {
-        background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
-        border-right: 4px solid var(--primary-color);
-        color: var(--primary-color);
-        transform: translateX(-8px);
-    }
-    .explainer-content-item {
-        display: none;
-        opacity: 0;
-        transform: translateY(15px);
-        transition: all 0.5s ease-out;
-        width: 100%;
-        height: 100%;
-    }
-    .explainer-content-item.active {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* زر الصعود للأعلى */
-    #scrollTopBtn {
-        position: fixed;
-        bottom: 40px;
-        right: 40px;
-        z-index: 99;
-        border: none;
-        outline: none;
-        background: linear-gradient(135deg, var(--primary-color), #4f46e5);
-        color: white;
-        cursor: pointer;
-        padding: 18px;
-        border-radius: 50%;
-        box-shadow: 0 12px 35px rgba(79, 70, 229, 0.4);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(30px);
-        backdrop-filter: blur(4px);
-    }
-    #scrollTopBtn.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-    #scrollTopBtn:hover {
-        transform: translateY(-8px) rotate(360deg);
-        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.6);
-    }
-
-    /* نافذة الإصدارات */
-    .version-modal-overlay, .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(2, 6, 23, 0.9);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.4s ease;
-    }
-    .version-modal-overlay.open, .modal-overlay.open {
-        opacity: 1;
-        visibility: visible;
-    }
-    .version-modal-content {
-        background: var(--bg-body); 
-        padding: 3rem;
-        border-radius: 2.5rem;
-        max-width: 600px;
-        width: 90%;
-        position: relative;
-        transform: scale(0.9) translateY(20px);
-        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
-        border: 1px solid var(--border-glass);
-        color: var(--text-primary);
-        background: linear-gradient(to bottom right, var(--bg-body), rgba(255,255,255,0.03));
-    }
-    .version-modal-overlay.open .version-modal-content {
-        transform: scale(1) translateY(0);
-    }
-
-
-    .toast-card {
-        pointer-events: auto;
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--text-primary);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 25px rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(25px) saturate(200%);
-        -webkit-backdrop-filter: blur(25px) saturate(200%);
-        padding: 20px 32px;
-        border-radius: 1.75rem;
-        display: flex; 
-        align-items: center; 
-        gap: 18px;
-        min-width: 350px;
-        animation: toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        transform-origin: top center;
-    }
-    [data-theme='dark'] .toast-card { 
-        background: rgba(15, 23, 42, 0.9); 
-        border-color: rgba(255, 255, 255, 0.1);
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-    }
-    
-    .toast-card.success { border-right: 5px solid #10b981; }
-    .toast-card.error { border-right: 5px solid #ef4444; }
-    .toast-card.loading { border-right: 5px solid #3b82f6; }
-
-    @keyframes toastIn { 
-        from { opacity: 0; transform: translateY(-40px) scale(0.9); filter: blur(12px); } 
-        to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
-    }
-
-    /* UI Toggle Switch */
-    .ui-toggle-btn {
-        background: rgba(0,0,0,0.05);
-        border: 1px solid var(--border-glass);
-        padding: 0.6rem;
-        border-radius: 999px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-    .ui-toggle-btn:hover {
-        background: rgba(0,0,0,0.1);
-        transform: rotate(15deg);
-    }
-    [data-theme='dark'] .ui-toggle-btn {
-        background: rgba(255,255,255,0.1);
-    }
-    [data-theme='dark'] .ui-toggle-btn:hover {
-        background: rgba(255,255,255,0.2);
-    }
-
-    /* Mobile Menu Drawer */
-    .mobile-menu-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.7);
-        backdrop-filter: blur(10px);
-        z-index: 999;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.4s;
-    }
-    .mobile-menu-overlay.active {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .mobile-drawer {
-        position: fixed;
-        top: 0;
-        right: -340px;
-        width: 320px;
-        height: 100%;
-        background: var(--bg-glass);
-        backdrop-filter: blur(35px) saturate(180%);
-        -webkit-backdrop-filter: blur(35px) saturate(180%);
-        border-left: 1px solid var(--border-glass);
-        z-index: 1000;
-        transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        padding: 3rem;
-        display: flex;
-        flex-direction: column;
-        box-shadow: -30px 0 60px rgba(0,0,0,0.3);
-    }
-    .mobile-drawer.active {
-        right: 0;
-    }
-    html[dir="ltr"] .mobile-drawer {
-        right: auto;
-        left: -340px;
-        border-left: none;
-        border-right: 1px solid var(--border-glass);
-    }
-    html[dir="ltr"] .mobile-drawer.active {
-        left: 0;
-    }
-
-    h1, h2, h3, h4, h5, h6 { 
-        color: var(--text-primary) !important; 
-        letter-spacing: -0.025em; 
-        line-height: 1.3;
-    }
-    p, span, li, div { color: inherit; }
-    
-    .glass-card {
-        background: var(--bg-glass);
-        border: 1px solid var(--border-glass);
-        box-shadow: var(--shadow-glass);
-    }
-
-    /* تنسيقات Swiper */
-    .swiper {
-        width: 100%;
-        padding-top: 80px;
-        padding-bottom: 80px;
-    }
-    .swiper-slide {
-        background-position: center;
-        background-size: cover;
-        width: 700px;
-        height: 420px;
-        border-radius: 2.5rem;
-        overflow: hidden;
-        filter: blur(6px) opacity(0.6) grayscale(30%);
-        transform: scale(0.85);
-        transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        border: 1px solid var(--border-glass);
-    }
-    @media (max-width: 768px) {
-        .swiper-slide {
-            width: 320px;
-            height: 220px;
-        }
-    }
-    .swiper-slide-active {
-        filter: blur(0) opacity(1) grayscale(0%);
-        transform: scale(1);
-        z-index: 10;
-        box-shadow: 0 40px 80px -20px rgba(59, 130, 246, 0.4);
-        border-color: rgba(59, 130, 246, 0.4);
-    }
-    .swiper-pagination-bullet {
-        background: var(--primary-color) !important;
-        width: 12px;
-        height: 12px;
-        transition: all 0.3s;
-    }
-    .swiper-pagination-bullet-active {
-        width: 36px;
-        border-radius: 6px;
-    }
-    
-    /* تنسيقات المودال الإضافي (الدفع) */
-    .payment-modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(2, 6, 23, 0.9);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        z-index: 2000;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-    .payment-modal-overlay.open {
-        display: flex;
-        opacity: 1;
-    }
-    .payment-option-card {
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid var(--border-glass);
-        position: relative;
-        overflow: hidden;
-    }
-    .payment-option-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    .payment-option-card:hover, .payment-option-card.selected {
-        border-color: var(--primary-color);
-        background: rgba(59, 130, 246, 0.05);
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
-    }
-    .payment-option-card:hover::before { opacity: 1; }
-
-    /* تنسيقات منطقة الشرح (Documentation) */
-    .docs-sidebar-link {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 20px;
-        border-radius: 14px;
-        color: var(--text-secondary);
-        transition: all 0.3s;
-        border: 1px solid transparent;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .docs-sidebar-link:hover, .docs-sidebar-link.active {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--primary-color);
-        border-color: rgba(59, 130, 246, 0.2);
-    }
-    .docs-content-pane {
-        display: none;
-        animation: fadeIn 0.4s ease-out;
-    }
-    .docs-content-pane.active {
-        display: block;
-    }
-
-    /* تنسيقات إضافية لمنطقة العملاء */
-    .btn-premium {
-        position: relative;
-        overflow: hidden;
-    }
-    .btn-premium::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: 0.5s;
-    }
-    .btn-premium:hover::after {
-        left: 100%;
-    }
-    .heatmap-cell {
-        width: 12px;
-        height: 12px;
-        border-radius: 3px;
-        background-color: rgba(226, 232, 240, 0.2);
-    }
-    .heatmap-cell.level-1 { background-color: #bbdefb; }
-    .heatmap-cell.level-2 { background-color: #64b5f6; }
-    .heatmap-cell.level-3 { background-color: #1e88e5; }
-    .heatmap-cell.level-4 { background-color: #0d47a1; }
-    [data-theme='dark'] .heatmap-cell { background-color: rgba(255,255,255,0.05); }
-    [data-theme='dark'] .heatmap-cell.level-1 { background-color: #0d47a1; }
-    [data-theme='dark'] .heatmap-cell.level-2 { background-color: #1565c0; }
-    [data-theme='dark'] .heatmap-cell.level-3 { background-color: #42a5f5; }
-    [data-theme='dark'] .heatmap-cell.level-4 { background-color: #90caf9; }
-    
-    /* مودال منطقة العملاء */
-    .modal-content.glass {
-        background: var(--bg-glass);
-        backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid var(--border-glass);
-    }
-        :root { 
-            --primary-color: #3b82f6; 
-            --bg-body: #f8fafc; 
-            --bg-glass: rgba(255, 255, 255, 0.75); 
-            --border-glass: rgba(255, 255, 255, 0.5); 
-            --text-primary: #0f172a; 
-            --text-secondary: #475569; 
-            --sidebar-bg: rgba(255, 255, 255, 0.4);
-        }
-        
-        [data-theme='dark'] { 
-            --bg-body: #020617; 
-            --bg-glass: rgba(15, 23, 42, 0.7); 
-            --border-glass: rgba(255, 255, 255, 0.08); 
-            --text-primary: #f1f5f9; 
-            --text-secondary: #94a3b8; 
-            --sidebar-bg: rgba(15, 23, 42, 0.5);
-        }
-
-        body { 
-            font-family: 'Tajawal', sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-primary); 
-            margin: 0; 
-            padding: 0; 
-            transition: background-color 0.5s ease, color 0.5s ease; 
-            min-height: 100vh; 
-        }
-        
-        .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; filter: blur(120px); opacity: 0.45; }
-        .blob-1 { top: -10%; left: -5%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent); animation: float 10s infinite alternate; }
-        .blob-2 { bottom: -10%; right: -5%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent); animation: float 12s infinite alternate-reverse; }
-
-        .glass { 
-            background: var(--bg-glass); 
-            backdrop-filter: blur(24px) saturate(180%); 
-            -webkit-backdrop-filter: blur(24px) saturate(180%); 
-            border: 1px solid var(--border-glass); 
-            border-radius: 1.5rem; 
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; 
-        }
-        
-        .plugo-container { 
-            background: var(--bg-glass); 
-            border-radius: 3rem; 
-            border: 1px solid var(--border-glass); 
-            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08); 
-            backdrop-filter: blur(30px); 
-            min-height: 750px; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-
-        .plugo-sidebar { 
-            background: var(--sidebar-bg); 
-            border-left: 1px solid var(--border-glass); 
-            border-right: 1px solid var(--border-glass);
-            backdrop-filter: blur(15px); 
-        }
-
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 15px; pointer-events: none; }
-        .toast-card { 
-            pointer-events: auto; 
-            background: var(--bg-glass); 
-            color: var(--text-primary); 
-            border: 1px solid var(--border-glass); 
-            backdrop-filter: blur(25px); 
-            padding: 18px 28px; 
-            border-radius: 1.5rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            min-width: 320px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-        }
-        
-        ::-webkit-scrollbar { width: 6px; } 
-        ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.2); border-radius: 20px; }
-        
-        .dev-theme-toggle { 
-            position: fixed; 
-            bottom: 30px; 
-            left: 30px; 
-            z-index: 9999; 
-            background: var(--bg-glass); 
-            border: 1px solid var(--border-glass); 
-            padding: 12px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            transition: all 0.3s ease; 
-        }
-        
-        .modal-overlay { 
-            opacity: 0; 
-            visibility: hidden; 
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-            background: rgba(0,0,0,0.4); 
-            position: fixed; 
-            inset: 0; 
-            z-index: 1000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            backdrop-filter: blur(8px); 
-        } 
-        .modal-overlay.open { opacity: 1; visibility: visible; }
-        .modal-content { transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); } 
-        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
-
-        .btn-premium { position: relative; overflow: hidden; transition: all 0.3s ease; }
-        .btn-premium::after { 
-            content: ''; 
-            position: absolute; 
-            top: -50%; 
-            left: -50%; 
-            width: 200%; 
-            height: 200%; 
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); 
-            transform: rotate(45deg); 
-            transition: 0.5s; 
-        }
-        .btn-premium:hover::after { left: 120%; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Heatmap Styling */
-        .heatmap-cell { width: 12px; height: 12px; border-radius: 2px; }
-        .level-0 { background: #ebedf0; }
-        .level-1 { background: #9be9a8; }
-        .level-2 { background: #40c463; }
-        .level-3 { background: #30a14e; }
-        .level-4 { background: #216e39; }
-        [data-theme='dark'] .level-0 { background: #1e293b; }
-
-        /* Driver.js Custom Style */
-        .driver-popover {
-            background: var(--bg-glass) !important;
-            backdrop-filter: blur(20px) !important;
-            border: 1px solid var(--border-glass) !important;
-            border-radius: 2rem !important;
-            padding: 25px !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important;
-            color: var(--text-primary) !important;
-            font-family: 'Tajawal', sans-serif !important;
-            max-width: 320px !important;
-        }
-                /* Unique Glassmorphism Styles for this slider only */
-        .t-glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .t-glass-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-        }
-
-        /* Unique Pagination Styles */
-        .swiper-pagination-custom-bullet {
-            background: #94a3b8;
-            opacity: 0.5;
-        }
-        .swiper-pagination-bullet-active.swiper-pagination-custom-bullet-active {
-            background: #3b82f6;
-            opacity: 1;
-            width: 20px;
-            border-radius: 5px;
-            transition: width 0.3s;
-        }
-        
-        /* Ensure slides have equal height */
-        .testimonialsSwiper .swiper-slide {
-            height: auto;
-            display: flex;
-        }
-        .testimonialsSwiper .swiper-slide > div {
-            width: 100%;
-        }
-
-        /* --- تأثير التركيز (Blur Effect) --- */
-        /* الحالة الافتراضية لجميع الشرائح (غير النشطة) */
-        .testimonialsSwiper .swiper-slide {
-            transition: all 0.5s ease;
-            opacity: 0.4;         /* شفافية أقل */
-            filter: blur(3px);    /* تمويه */
-            transform: scale(0.9); /* تصغير حجم الشرائح الجانبية قليلاً */
-        }
-
-        /* الحالة للشريحة النشطة (في المنتصف) */
-        .testimonialsSwiper .swiper-slide-active {
-            opacity: 1;           /* شفافية كاملة */
-            filter: blur(0);      /* إلغاء التمويه */
-            transform: scale(1);  /* حجم طبيعي */
-            z-index: 10;
-        }
+   :root{--primary-color:#3b82f6;--secondary-color:#64748b;--bg-body:#f8fafc;--bg-glass:rgba(255,255,255,0.75);--bg-glass-hover:rgba(255,255,255,0.9);--border-glass:rgba(255,255,255,0.5);--shadow-glass:0 10px 40px -10px rgba(0,0,0,0.08);--text-primary:#0f172a;--text-secondary:#475569;--accent-glow:rgba(59,130,246,0.2);--radius-xl:2rem;--sidebar-bg:rgba(255,255,255,0.6)}[data-theme='dark']{--bg-body:#020617;--bg-glass:rgba(15,23,42,0.7);--bg-glass-hover:rgba(30,41,59,0.8);--border-glass:rgba(255,255,255,0.1);--shadow-glass:0 10px 40px -10px rgba(0,0,0,0.6);--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--accent-glow:rgba(59,130,246,0.3);--sidebar-bg:rgba(15,23,42,0.6)}html{scroll-behavior:smooth}body{font-family:'Tajawal',sans-serif;background-color:var(--bg-body);color:var(--text-primary);margin:0;padding:0;overflow-x:hidden;transition:background-color .5s cubic-bezier(0.4,0,0.2,1),color .5s ease;position:relative;line-height:1.6}h1,h2,h3,h4,h5,h6{color:var(--text-primary)!important;letter-spacing:-0.025em;line-height:1.3}p,span,li,div{color:inherit}.bg-blobs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;overflow:hidden;pointer-events:none}.blob{position:absolute;filter:blur(120px);opacity:.45;animation:float 15s infinite alternate ease-in-out;mix-blend-mode:screen}[data-theme='dark'] .blob{mix-blend-mode:normal;opacity:.25}.blob-1{top:-10%;left:-5%;width:60vw;height:60vw;background:radial-gradient(circle,var(--accent-glow),transparent);animation:float 10s infinite alternate}.blob-2{bottom:-10%;right:-5%;width:60vw;height:60vw;background:radial-gradient(circle,rgba(168,85,247,0.2),transparent);animation:float 12s infinite alternate-reverse}@keyframes float{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,60px) scale(1.1)}}.glass{background:var(--bg-glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--border-glass);box-shadow:var(--shadow-glass),inset 0 1px 0 0 rgba(255,255,255,0.1);border-radius:1.5rem;transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s ease}.glass-hover{transition:all .4s cubic-bezier(0.4,0,0.2,1)}.glass-hover:hover{background:var(--bg-glass-hover);transform:translateY(-5px) scale(1.01);box-shadow:0 25px 50px -12px rgba(0,0,0,0.15),0 0 15px var(--accent-glow);border-color:rgba(255,255,255,0.6)}.glass-card{background:var(--bg-glass);border:1px solid var(--border-glass);box-shadow:var(--shadow-glass)}.header-main{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.85);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-bottom:1px solid var(--border-glass);transition:all .4s ease}[data-theme='dark'] .header-main{background:rgba(2,6,23,0.8)}.nav-link{color:var(--text-secondary);font-weight:600;padding:.75rem 1.5rem;border-radius:1rem;transition:all .3s ease;cursor:pointer;display:inline-block;text-decoration:none;position:relative;overflow:hidden}.nav-link:hover,.nav-link.active{color:var(--primary-color);background:rgba(59,130,246,0.1);font-weight:700}.nav-link::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--primary-color);transition:width .3s ease;border-radius:2px}.nav-link:hover::after,.nav-link.active::after{width:70%}.view-section{display:none;animation:fadeIn .6s cubic-bezier(0.22,1,0.36,1) forwards;min-height:calc(100vh - 96px)}.view-section.active-view{display:block}@keyframes fadeIn{from{opacity:0;transform:translateY(20px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}.explainer-btn{width:100%;text-align:right;transition:all .4s cubic-bezier(0.4,0,0.2,1);border:1px solid transparent;cursor:pointer;color:var(--text-secondary)}.explainer-btn.active{background:linear-gradient(90deg,rgba(59,130,246,0.08),transparent);border-right:4px solid var(--primary-color);color:var(--primary-color);transform:translateX(-8px)}.explainer-content-item{display:none;opacity:0;transform:translateY(15px);transition:all .5s ease-out;width:100%;height:100%}.explainer-content-item.active{display:block;opacity:1;transform:translateY(0)}#scrollTopBtn{position:fixed;bottom:40px;right:40px;z-index:99;border:none;outline:none;background:linear-gradient(135deg,var(--primary-color),#4f46e5);color:#fff;cursor:pointer;padding:18px;border-radius:50%;box-shadow:0 12px 35px rgba(79,70,229,0.4);transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);opacity:0;visibility:hidden;transform:translateY(30px);backdrop-filter:blur(4px)}#scrollTopBtn.show{opacity:1;visibility:visible;transform:translateY(0)}#scrollTopBtn:hover{transform:translateY(-8px) rotate(360deg);box-shadow:0 20px 45px rgba(79,70,229,0.6)}.modal-overlay,.version-modal-overlay,.payment-modal-overlay{position:fixed;inset:0;background:rgba(2, 6, 23, 0.212);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:1000;display:flex;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:all .4s ease}.modal-overlay.open,.version-modal-overlay.open,.payment-modal-overlay.open{opacity:1;visibility:visible;display:flex}.modal-content,.version-modal-content{background:var(--bg-body);padding:3rem;border-radius:2.5rem;max-width:600px;width:90%;position:relative;transform:scale(0.9) translateY(20px);transition:all .4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 50px 100px -20px rgba(0,0,0,0.7);border:1px solid var(--border-glass);color:var(--text-primary);background:linear-gradient(to bottom right,var(--bg-body),rgba(255,255,255,0.03))}.modal-overlay.open .modal-content,.version-modal-overlay.open .version-modal-content{transform:scale(1) translateY(0)}.modal-content.glass{background:var(--bg-glass);backdrop-filter:blur(24px) saturate(180%)}#toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:15px;pointer-events:none}.toast-card{pointer-events:auto;background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border-glass);box-shadow:0 25px 50px -12px rgba(0,0,0,0.15),0 0 25px rgba(255,255,255,0.3);backdrop-filter:blur(25px) saturate(200%);-webkit-backdrop-filter:blur(25px) saturate(200%);padding:18px 28px;border-radius:1.75rem;display:flex;align-items:center;gap:18px;min-width:320px;animation:toastIn .5s cubic-bezier(0.34,1.56,0.64,1) forwards;transform-origin:top center}[data-theme='dark'] .toast-card{background:rgba(15,23,42,0.9);border-color:rgba(255,255,255,0.1);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5)}.toast-card.success{border-right:5px solid #10b981}.toast-card.error{border-right:5px solid #ef4444}.toast-card.loading{border-right:5px solid #3b82f6}@keyframes toastIn{from{opacity:0;transform:translateY(-40px) scale(0.9);filter:blur(12px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}.ui-toggle-btn{background:rgba(0,0,0,0.05);border:1px solid var(--border-glass);padding:.6rem;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s ease}.ui-toggle-btn:hover{background:rgba(0,0,0,0.1);transform:rotate(15deg)}[data-theme='dark'] .ui-toggle-btn{background:rgba(255,255,255,0.1)}[data-theme='dark'] .ui-toggle-btn:hover{background:rgba(255,255,255,0.2)}.mobile-menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);z-index:999;opacity:0;pointer-events:none;transition:opacity .4s}.mobile-menu-overlay.active{opacity:1;pointer-events:auto}.mobile-drawer{position:fixed;top:0;right:-340px;width:320px;height:100%;background:var(--bg-glass);backdrop-filter:blur(35px) saturate(180%);-webkit-backdrop-filter:blur(35px) saturate(180%);border-left:1px solid var(--border-glass);z-index:1000;transition:right .5s cubic-bezier(0.16,1,0.3,1);padding:3rem;display:flex;flex-direction:column;box-shadow:-30px 0 60px rgba(0,0,0,0.3)}.mobile-drawer.active{right:0}html[dir="ltr"] .mobile-drawer{right:auto;left:-340px;border-left:none;border-right:1px solid var(--border-glass)}html[dir="ltr"] .mobile-drawer.active{left:0}.swiper{width:100%;padding-top:80px;padding-bottom:80px}.swiper-slide{background-position:center;background-size:cover;width:700px;height:420px;border-radius:2.5rem;overflow:hidden;filter:blur(6px) opacity(.6) grayscale(30%);transform:scale(0.85);transition:all .7s cubic-bezier(0.4,0,0.2,1);box-shadow:0 15px 40px rgba(0,0,0,0.15);border:1px solid var(--border-glass)}@media (max-width:768px){.swiper-slide{width:320px;height:220px}}.swiper-slide-active{filter:blur(0) opacity(1) grayscale(0%);transform:scale(1);z-index:10;box-shadow:0 40px 80px -20px rgba(59,130,246,0.4);border-color:rgba(59,130,246,0.4)}.swiper-pagination-bullet{background:var(--primary-color)!important;width:12px;height:12px;transition:all .3s}.swiper-pagination-bullet-active{width:36px;border-radius:6px}.payment-option-card{cursor:pointer;transition:all .3s cubic-bezier(0.4,0,0.2,1);border:1px solid var(--border-glass);position:relative;overflow:hidden}.payment-option-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,0.1),transparent);opacity:0;transition:opacity .3s}.payment-option-card:hover,.payment-option-card.selected{border-color:var(--primary-color);background:rgba(59,130,246,0.05);transform:translateY(-5px);box-shadow:0 20px 40px -10px rgba(59,130,246,0.2)}.payment-option-card:hover::before{opacity:1}.docs-sidebar-link{display:flex;align-items:center;gap:14px;padding:14px 20px;border-radius:14px;color:var(--text-secondary);transition:all .3s;border:1px solid transparent;font-weight:600;cursor:pointer}.docs-sidebar-link:hover,.docs-sidebar-link.active{background:rgba(59,130,246,0.1);color:var(--primary-color);border-color:rgba(59,130,246,0.2)}.docs-content-pane{display:none;animation:fadeIn .4s ease-out}.docs-content-pane.active{display:block}.btn-premium{position:relative;overflow:hidden;transition:all .3s ease}.btn-premium::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.1),transparent);transform:rotate(45deg);transition:.5s}.btn-premium:hover::after{left:120%}.heatmap-cell{width:12px;height:12px;border-radius:3px;background-color:rgba(226,232,240,0.2)}.heatmap-cell.level-1{background-color:#bbdefb}.heatmap-cell.level-2{background-color:#64b5f6}.heatmap-cell.level-3{background-color:#1e88e5}.heatmap-cell.level-4{background-color:#0d47a1}[data-theme='dark'] .heatmap-cell{background-color:rgba(255,255,255,0.05)}[data-theme='dark'] .heatmap-cell.level-1{background-color:#0d47a1}[data-theme='dark'] .heatmap-cell.level-2{background-color:#1565c0}[data-theme='dark'] .heatmap-cell.level-3{background-color:#42a5f5}[data-theme='dark'] .heatmap-cell.level-4{background-color:#90caf9}.plugo-container{background:var(--bg-glass);border-radius:3rem;border:1px solid var(--border-glass);box-shadow:0 40px 80px -20px rgba(0,0,0,0.08);backdrop-filter:blur(30px);min-height:750px;overflow:hidden;display:flex;flex-direction:column;transition:all .5s cubic-bezier(0.4,0,0.2,1)}.plugo-sidebar{background:var(--sidebar-bg);border-left:1px solid var(--border-glass);border-right:1px solid var(--border-glass);backdrop-filter:blur(15px)}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(100,116,139,0.2);border-radius:20px}.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.dev-theme-toggle{position:fixed;bottom:30px;left:30px;z-index:9999;background:var(--bg-glass);border:1px solid var(--border-glass);padding:12px;border-radius:50%;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,0.1);transition:all .3s ease}.driver-popover{background:var(--bg-glass)!important;backdrop-filter:blur(20px)!important;border:1px solid var(--border-glass)!important;border-radius:2rem!important;padding:25px!important;box-shadow:0 25px 50px -12px rgba(0,0,0,0.2)!important;color:var(--text-primary)!important;font-family:'Tajawal',sans-serif!important;max-width:320px!important}.t-glass-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);box-shadow:0 4px 30px rgba(0,0,0,0.1)}.t-glass-card:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);transform:translateY(-5px)}.swiper-pagination-custom-bullet{background:#94a3b8;opacity:.5}.swiper-pagination-bullet-active.swiper-pagination-custom-bullet-active{background:#3b82f6;opacity:1;width:20px;border-radius:5px;transition:width .3s}.testimonialsSwiper .swiper-slide{height:auto;display:flex;transition:all .5s ease;opacity:.4;filter:blur(3px);transform:scale(0.9)}.testimonialsSwiper .swiper-slide>div{width:100%}.testimonialsSwiper .swiper-slide-active{opacity:1;filter:blur(0);transform:scale(1);z-index:10}@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.animate-spin-slow{animation:spin-slow 3s linear infinite}
 </style>
 </head>
 <body class="selection:bg-blue-500 selection:text-white antialiased">
 
     <!-- Global Loader -->
-    <div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 dark:bg-[#020617]/95 backdrop-blur-3xl transition-opacity duration-700 ease-out">
-        <div class="relative flex flex-col items-center">
-            <div class="absolute inset-0 -m-10 rounded-full border-4 border-transparent border-t-blue-600 border-r-indigo-600 animate-spin-slow opacity-80"></div>
-            <div class="absolute inset-0 -m-10 rounded-full border-4 border-transparent border-b-purple-500 border-l-cyan-500 animate-spin-reverse opacity-60"></div>
-            <div class="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-6xl shadow-2xl shadow-blue-500/40 animate-pulse-slow relative z-10">S</div>
-            <div class="mt-20 text-center">
-                <p class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 font-bold text-xl tracking-[0.4em] animate-pulse">SEOWRITING</p>
-                <div class="h-1.5 w-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mt-6 animate-shine"></div>
+<div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 dark:bg-[#020617]/95 backdrop-blur-3xl transition-opacity duration-700 ease-out">
+    <div class="relative flex flex-col items-center">
+        
+        
+        <div class="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-6xl shadow-2xl shadow-blue-500/40 relative z-10">
+            P
+        </div>
+
+        <div class="mt-16 text-center relative z-20">
+            <p class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 font-bold text-xl tracking-[0.4em] animate-pulse">
+                Plugo AI
+            </p>
+            
+            <div class="h-1.5 w-24 bg-gray-200 rounded-full mx-auto mt-6 overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-purple-600 w-0 transition-all duration-75 ease-out"></div>
             </div>
+
+            <p id="loading-percentage" class="mt-2 text-sm font-semibold text-gray-500 dark:text-gray-400 font-mono">
+                0%
+            </p>
         </div>
     </div>
+</div>
 
     <!-- Background Decoration -->
     <div class="bg-blobs">
@@ -862,7 +149,7 @@
         <div class="flex justify-between items-center mb-12">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 text-2xl">S</div>
-                <span class="font-bold text-3xl tracking-tight">SeoWriting</span>
+                <span class="font-bold text-3xl tracking-tight">Plugo AI</span>
             </div>
             <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-red-500 transition p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                 <i data-lucide="x" size="28"></i>
@@ -911,7 +198,7 @@
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-3xl shadow-xl shadow-blue-600/20 group-hover:scale-110 group-hover:rotate-3 transition duration-500 ease-out border border-white/10">
                         S
                     </div>
-                    <span class="font-bold text-2xl tracking-tight text-[var(--text-primary)] group-hover:text-blue-600 transition-colors">SeoWriting</span>
+                    <span class="font-bold text-2xl tracking-tight text-[var(--text-primary)] group-hover:text-blue-600 transition-colors">Plugo AI</span>
                 </div>
 
                 <!-- Desktop Menu -->
@@ -940,7 +227,7 @@
                     <!-- زر الشرح - مخفي افتراضياً -->
                     <button onclick="openDocs()" id="desktop-docs-btn" class="ml-6 nav-link flex items-center gap-3 text-purple-600 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 px-6 py-3 rounded-2xl transition-all border border-purple-200 dark:border-purple-800 hidden">
                         <i data-lucide="book-open" size="20"></i>
-                        <span class="font-bold">الشرح</span>
+                        <span class="font-bold">شرح القالب</span>
                     </button>
 
                     <!-- زر منطقة العملاء -->
@@ -1012,7 +299,7 @@
                                     <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                                 </div>
                                 <div class="relative overflow-hidden rounded-t-xl">
-                                    <img src="https://placehold.co/800x500/1e293b/ffffff?text=SeoWriting+V2.0+Preview" 
+                                    <img src="https://placehold.co/800x500/1e293b/ffffff?text=Plugo AI+V2.0+Preview" 
                                          alt="معاينة القالب" 
                                          class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-700 ease-in-out opacity-90 group-hover:opacity-100">
                                     <div class="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg border border-white/20 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-pulse-slow">
@@ -1151,7 +438,7 @@
                 <div class="text-center mb-24" data-aos="fade-up">
                     <span class="text-blue-600 font-bold tracking-wider text-base uppercase mb-4 block animate-pulse" data-i18n="explore_title">اكتشف الإمكانيات</span>
                     <h2 class="text-5xl md:text-6xl font-black text-[var(--text-primary)] mb-8" data-i18n="tour_title">جولة تفاعلية داخل القالب</h2>
-                    <p class="text-[var(--text-secondary)] text-xl max-w-3xl mx-auto" data-i18n="tour_desc">تنقل بين الخصائص وشاهد كيف يمكن لقالب SeoWriting أن يغير شكل ومضمون مدونتك.</p>
+                    <p class="text-[var(--text-secondary)] text-xl max-w-3xl mx-auto" data-i18n="tour_desc">تنقل بين الخصائص وشاهد كيف يمكن لقالب Plugo AI أن يغير شكل ومضمون مدونتك.</p>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-12 glass rounded-[3rem] p-6 lg:p-8 shadow-2xl border border-white/40 dark:border-white/5" data-aos="zoom-in" data-aos-duration="800">
@@ -1394,7 +681,7 @@
                     <div class="col-span-1 md:col-span-2">
                         <div class="flex items-center gap-5 mb-8">
                              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl">S</div>
-                            <span class="font-bold text-3xl text-white tracking-tight">SeoWriting</span>
+                            <span class="font-bold text-3xl text-white tracking-tight">Plugo AI</span>
                         </div>
                         <p class="text-lg text-slate-400 max-w-md leading-relaxed" data-i18n="footer_desc">
                             نحن نقدم أفضل الحلول الرقمية للمدونين وصناع المحتوى. هدفنا هو تبسيط عملية التدوين وجعلها أكثر احترافية.
@@ -1411,13 +698,13 @@
                     <div>
                         <div class="text-white font-bold mb-8 text-xl">تواصل معنا</div>
                         <ul class="space-y-5 text-lg">
-                            <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3"><i data-lucide="mail" size="20"></i> support@seowriting.com</a></li>
+                            <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3"><i data-lucide="mail" size="20"></i> support@Plugo AI.com</a></li>
                             <li><a href="#" class="hover:text-blue-400 transition flex items-center gap-3"><i data-lucide="twitter" size="20"></i> Twitter</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="border-t border-slate-800 pt-12 text-center text-base text-slate-500 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <p>&copy; 2025 SeoWriting. جميع الحقوق محفوظة.</p>
+                    <p>&copy; 2025 Plugo AI. جميع الحقوق محفوظة.</p>
                     <p class="flex items-center gap-3">تم التصميم والتطوير بواسطة <span class="text-slate-200 font-bold bg-slate-800 px-4 py-1.5 rounded-xl">Dev Team</span></p>
                 </div>
             </div>
@@ -1522,8 +809,76 @@
         const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";     // ضع معرف الشات هنا
 
         // --- Localization & Theme Logic ---
-        const translations = {
+        const i18n = {
+            ar: {
+                pageTitle: "منطقة العملاء", pageSubtitle: "إدارة ذكية لتراخيصك ومنتجاتك", langBtn: "English", homeBtn: "الرئيسية",
+                loginHeader: "الدخول الآمن", loginEmail: "البريد الإلكتروني", loginPass: "كلمة المرور", loginBtn: "دخول المنصة",
+                overview: "الرئيسية", licenses: "التراخيص", downloads: "التحميلات", profile: "الملف الشخصي", logout: "خروج آمن",
+                statsTitle: "التحليلات الذكية", statsSubtitle: "مراقبة حية لنشاط حسابك واستهلاك الموارد.",
+                statLicenses: "التراخيص", statActiveSites: "المواقع النشطة", statAccess: "مرات الوصول", statProducts: "المنتجات",
+                distTitle: "توزيع الاستهلاك", activityTitle: "النشاط الأسبوعي الحقيقي", heatmapTitle: "كثافة استخدام المنصة",
+                heatmapLess: "أقل", heatmapMore: "أكثر", usageRate: "معدل الاستهلاك", seatsLeft: "متبقي لديك {n} مقاعد متاحة",
+                addNewLicense: "تفعيل ترخيص جديد", licensePlaceholder: "أدخل معرف المدونة (Blog ID)...", checkNow: "تحقق الآن",
+                activeLicenses: "المواقع المرخصة", activeLicenseTag: "الرخصة النشطة", licenseManagerSubtitle: "إدارة تراخيصك المرتبطة بحسابك بسهولة.",
+                licenseManagerTitle: "مدير التراخيص", noLicenses: "لا توجد تراخيص نشطة حالياً", productsTitle: "مركز التحميل",
+                productsSubtitle: "احصل على أحدث إصدارات القوالب المعتمدة والمستقرة.", availableVersions: "الإصدارات المتاحة",
+                termsTitle: "سياسات الاستخدام", termsSubtitle: "يرجى قراءة الشروط قبل تحميل الملف", termsConfirm: "موافق، ابدأ التحميل",
+                termsCancel: "غير موافق", deleteTitle: "حذف الترخيص؟", deleteConfirm: "تأكيد الحذف", logoutConfirm: "تأكيد الخروج",
+                tourNavTitle: "روابط التنقل", tourNavDesc: "من هنا يمكنك التنقل بين لوحة التحليلات، إدارة التراخيص، ومركز التحميلات.",
+                tourStatsTitle: "نظرة سريعة", tourStatsDesc: "تابع استهلاك تراخيصك وعدد مرات الوصول لحسابك فوراً.",
+                tourChartsTitle: "الرسوم البيانية", tourChartsDesc: "تحليلات بصرية ذكية توضح توزيع استهلاكك ونشاطك الأسبوعي.",
+                tourUserTitle: "حسابك الشخصي", tourUserDesc: "من هنا يمكنك تعديل ملفك الشخصي أو تسجيل الخروج الآمن من المنصة.",
+                toastSync: "جارى مراجعة بعض البيانات ...", toastWelcome: "أهلاً بك مجدداً، {name}", toastFields: "يرجى ملء كافة الحقول",
+                toastError: "حدث خطأ في معالجة البيانات، تأكد من اتصالك", toastCopied: "تم النسخ بنجاح", toastVerifying: "جاري التحقق من هوية الموقع...",
+                toastActivating: "جاري ربط الترخيص بالخادم...", toastActivated: "تم التفعيل بنجاح!", toastDeleting: "جاري حذف التفعيل...",
+                toastDeleted: "تم حذف التفعيل بنجاح", errInvalidId: "المعرف غير صالح (أرقام فقط)", errAlreadyOwned: "هذا الموقع مسجل مسبقاً في حسابك الحالي",
+                errThirdParty: "هذا الموقع مسجل في حساب مستخدم آخر", errMaxReached: "لقد وصلت للحد الأقصى من التفعيلات",
+                termsList: [ "يلتزم العميل باستخدام القالب على النطاقات المرخصة له فقط.", "يمنع منعاً باتاً إعادة بيع القالب أو توزيعه لأي جهة أخرى.", "يمنع إزالة حقوق الملكية الخاصة بـ Plugo من الكود المصدري." ],
+                stBanned: {t: "حظر الوصول", m: "لقد تم حظر حسابك لمخالفة القوانين."}, stSecHold: {t: "تعليق أمني", m: "هوية المستخدم تتطلب مراجعة أمنية."},
+                stMaintenance: {t: "صيانة دورية", m: "النظام تحت التحديث حالياً."}, stRestricted: {t: "وصول مقيد", m: "لديك صلاحيات محدودة حالياً."},
+                stInactive: {t: "الحساب غير نشط", m: "يرجى التواصل لتفعيل حسابك."}, stExpired: {t: "انتهت الفترة", m: "يرجى ترقية حسابك للاستمرار."},
+                stLocked: {t: "حساب مقفل", m: "تم قفل الحساب لكثرة المحاولات."}, stPending: {t: "قيد المراجعة", m: "طلبك تحت الدراسة الآن."},
+                stEmail: {t: "بريد غير مؤكد", m: "يرجى تأكيد بريدك الإلكتروني."}, stPayment: {t: "يتطلب دفع", m: "يرجى إتمام عملية الدفع."},
+                stSupport: {t: "يتطلب دعم", m: "يرجى مراسلة فريق الدعم."}, stFraud: {t: "رصد احتيال", m: "تم رصد نشاط مريب على حسابك."},
+                stArchived: {t: "حساب مؤرشف", m: "هذا الحساب لم يعد نشطاً."}, stCanceled: {t: "اشتراك ملغي", m: "لقد قمت بإلغاء اشتراكك."},
+                stIdentity: {t: "انتظار هوية", m: "يرجى رفع صورة الهوية."}, stCompliance: {t: "مراجعة امتثال", m: "نراجع مدى توافقك مع الشروط."},
+                stUpdate: {t: "تحديث مطلوب", m: "يجب تحديث نسخة القالب."}, stAction: {t: "إجراء مطلوب", m: "يرجى إتمام الإجراءات المطلوبة."},
+                stWait: {t: "انتظار موافقة", m: "ننتظر موافقة القسم المختص."}, stFailed: {t: "فشل دفع", m: "فشلت عملية التجديد التلقائي."}
+            },
             en: {
+                pageTitle: "Client Area", pageSubtitle: "Smart management for your licenses and products", langBtn: "العربية", homeBtn: "Home",
+                loginHeader: "Secure Access", loginEmail: "Email Address", loginPass: "Password", loginBtn: "Sign In",
+                overview: "Overview", licenses: "Licenses", downloads: "Downloads", profile: "Profile", logout: "Logout",
+                statsTitle: "Smart Analytics", statsSubtitle: "Live monitoring of your account activity and resource consumption.",
+                statLicenses: "Licenses", statActiveSites: "Active Sites", statAccess: "Access Count", statProducts: "Products",
+                distTitle: "Consumption Distribution", activityTitle: "Real Weekly Activity", heatmapTitle: "Platform Usage Intensity",
+                heatmapLess: "Less", heatmapMore: "More", usageRate: "Usage Rate", seatsLeft: "{n} seats remaining",
+                addNewLicense: "Activate New License", licensePlaceholder: "Enter Blog ID...", checkNow: "Verify Now",
+                activeLicenses: "Licensed Sites", activeLicenseTag: "Active License", licenseManagerTitle: "License Manager",
+                licenseManagerSubtitle: "Manage and monitor all your active licenses from one place.", noLicenses: "No active licenses currently",
+                productsTitle: "Download Center", productsSubtitle: "Get the latest certified and stable template versions.",
+                availableVersions: "Available Versions", termsTitle: "Usage Policy", termsSubtitle: "Please read terms before downloading",
+                termsConfirm: "Agree, Start Download", termsCancel: "Decline", deleteTitle: "Delete License?", deleteConfirm: "Confirm Delete",
+                logoutConfirm: "Confirm Logout", tourNavTitle: "Navigation Links", tourNavDesc: "Navigate between Analytics, Licenses, and Download center.",
+                tourStatsTitle: "Quick Stats", tourStatsDesc: "Monitor your license usage and access count instantly.",
+                tourChartsTitle: "Visual Analytics", tourChartsDesc: "Smart charts showing your consumption distribution and weekly activity.",
+                tourUserTitle: "Your Profile", tourUserDesc: "Edit your profile or logout securely from the platform.",
+                toastSync: "📡 Syncing...", toastWelcome: "Welcome back, {name}", toastFields: "Please fill all fields",
+                toastError: "Data processing error, check your connection", toastCopied: "Copied successfully", toastVerifying: "Verifying site identity...",
+                toastActivating: "Linking license to server...", toastActivated: "Activated successfully!", toastDeleting: "Deleting activation...",
+                toastDeleted: "Activation deleted successfully", errInvalidId: "Invalid ID (Numbers only)", errAlreadyOwned: "This site is already registered in your account",
+                errThirdParty: "This site is registered to another user account", errMaxReached: "Maximum activations reached",
+                termsList: [ "Client must use the template only on licensed domains.", "Reselling or distributing the template is strictly forbidden.", "Removing Plugo copyrights from source code is prohibited." ],
+                stBanned: {t: "Banned Access", m: "Your access has been suspended due to violations."}, stSecHold: {t: "Security Hold", m: "Account requires security verification."},
+                stMaintenance: {t: "Maintenance", m: "System is currently under maintenance."}, stRestricted: {t: "Restricted", m: "Your account has limited permissions."},
+                stInactive: {t: "Inactive", m: "Please contact us to activate account."}, stExpired: {t: "Expired", m: "Please upgrade your account to continue."},
+                stLocked: {t: "Locked", m: "Account locked due to many attempts."}, stPending: {t: "Pending", m: "Your request is under review."},
+                stEmail: {t: "Verify Email", m: "Please verify your email address."}, stPayment: {t: "Payment Required", m: "Please complete your payment."},
+                stSupport: {t: "Support Required", m: "Please contact our support team."}, stFraud: {t: "Fraud Detected", m: "Suspicious activity detected."},
+                stArchived: {t: "Archived", m: "This account is no longer active."}, stCanceled: {t: "Canceled", m: "Your subscription was canceled."},
+                stIdentity: {t: "Identity Pending", m: "Please upload your ID document."}, stCompliance: {t: "Compliance Review", m: "Reviewing term compliance."},
+                stUpdate: {t: "Update Required", m: "Please update your template version."}, stAction: {t: "Action Required", m: "Please complete required actions."},
+                stWait: {t: "Wait Approval", m: "Waiting for department approval."}, stFailed: {t: "Payment Failed", m: "Auto-renewal process failed."},
                 nav_home: "Home",
                 nav_about: "About",
                 nav_tour: "Template Tour",
@@ -1538,7 +893,7 @@
                 data_desc: "Technical details",
                 explore_title: "Discover Possibilities",
                 tour_title: "Interactive Template Tour",
-                tour_desc: "Navigate through features and see how SeoWriting can transform your blog.",
+                tour_desc: "Navigate through features and see how Plugo AI can transform your blog.",
                 cp_title: "Control Panel",
                 cp_sub: "Code-free customization",
                 seo_title: "SEO Tools",
@@ -1578,34 +933,61 @@
 
         let currentLang = 'ar';
 
-        function toggleLang() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            const html = document.documentElement;
-            const indicator = document.getElementById('lang-indicator');
-            
-            // Toggle direction and lang attribute
-            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-            html.setAttribute('lang', currentLang);
-            
-            // Update button text
-            if(indicator) indicator.innerText = currentLang === 'ar' ? 'EN' : 'AR';
-            
-            // Update text content
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (!el.hasAttribute('data-original')) {
-                    el.setAttribute('data-original', el.innerText);
-                }
-
-                if (currentLang === 'en' && translations.en[key]) {
-                    el.innerText = translations.en[key];
-                } else {
-                    el.innerText = el.getAttribute('data-original');
-                }
-            });
+function toggleLang() {
+    // 1. تغيير المتغير العام
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    
+    // 2. تحديث الـ DOM (اتجاه الصفحة والنصوص)
+    const html = document.documentElement;
+    const indicator = document.getElementById('lang-indicator');
+    
+    html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    html.setAttribute('lang', currentLang);
+    
+    // تحديث نص الزر
+    if(indicator) indicator.innerText = currentLang === 'ar' ? 'EN' : 'AR';
+    
+    // تحديث النصوص المترجمة (data-i18n)
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!el.hasAttribute('data-original')) {
+            el.setAttribute('data-original', el.innerText);
         }
 
+        if (currentLang === 'en' && typeof i18n !== 'undefined' && i18n.en[key]) {
+            el.innerText = i18n.en[key];
+        } else {
+            el.innerText = el.getAttribute('data-original');
+        }
+    });
+
+    // ============================================================
+    // 3. الجزء الجديد: دمج منطق منطقة العملاء (Dashboard Logic)
+    // ============================================================
+    
+    // نتحقق أولاً مما إذا كانت كائنات منطقة العملاء موجودة (لتجنب الأخطاء في الصفحات الأخرى)
+    if (typeof state !== 'undefined' && typeof Actions !== 'undefined') {
+        
+        // تحديث حالة النظام (State) لتطابق اللغة الجديدة
+        state.lang = currentLang; 
+        
+        // حفظ اللغة في الـ Session إذا كان متاحاً
+        if (typeof SessionManager !== 'undefined') {
+            SessionManager.setLang(currentLang);
+        }
+        
+        // عمل Update للواجهة الخاصة بمنطقة العملاء
+        if (typeof state.update === 'function') {
+            state.update({}); 
+        }
+
+        // إعادة رسم الرسوم البيانية إذا كنا في صفحة الداشبورد
+        if (state.activeSection === 'overview' && state.view === 'dashboard') {
+            Actions.initAnalyticsCharts();
+        }
+    }
+}
     
 
         // Initialize Theme on Load
@@ -2217,7 +1599,7 @@
 <b>📦 الخطة:</b> ${plan}
 <b>💳 طريقة الدفع:</b> ${method}
 ---------------------------
-<i>SeoWriting Store</i>
+<i>Plugo AI Store</i>
             `;
 
             try {
@@ -2330,38 +1712,66 @@
             });
         }
 
-        // --- Init Logic ---
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                setTimeout(() => {
-                    loader.classList.add('opacity-0', 'scale-105', 'pointer-events-none');
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 700);
-                }, 800);
+// --- Init Logic ---
+window.addEventListener('load', () => {
+    const loader = document.getElementById('global-loader');
+    const percentageText = document.getElementById('loading-percentage');
+    const progressBar = document.getElementById('progress-bar');
+
+    // دالة لإخفاء اللودر (تُستدعى عند اكتمال العداد)
+    const hideLoader = () => {
+        loader.classList.add('opacity-0', 'scale-105', 'pointer-events-none');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 700);
+    };
+
+    if (loader) {
+        // --- 1. منطق العداد والتحميل الوهمي ---
+        let progress = 0;
+        
+        // بدأنا العداد فور تحميل الصفحة
+        const interval = setInterval(() => {
+            // زيادة عشوائية للرقم ليعطي شعوراً بالتحميل الحقيقي
+            progress += Math.floor(Math.random() * 5) + 2; 
+
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
                 
-                // Initialize modules
-                versionsManager.init();
-                storeConfig.fetchConfig();
-                
-                // Init Swiper (after load)
-                initSwiper();
+                // عند الوصول لـ 100% نخفي اللودر
+                hideLoader();
             }
-            
-            // Check session for docs button & Explainer
-            const session = SessionManager.get();
-            if(session) {
-                document.getElementById('desktop-docs-btn')?.classList.remove('hidden');
-                document.getElementById('mobile-docs-btn')?.classList.remove('hidden');
-                document.getElementById('details-docs-btn')?.classList.remove('hidden');
-                // Unlock explainer if logged in
-                updateExplainerState(true);
-            } else {
-                // Ensure locked if not logged in
-                updateExplainerState(false);
-            }
-        });
+
+            // تحديث الواجهة (النص والشريط)
+            if (percentageText) percentageText.innerText = `${progress}%`;
+            if (progressBar) progressBar.style.width = `${progress}%`;
+
+        }, 40); // سرعة التحديث
+
+        // --- 2. تهيئة الموديولز (Initialize modules) ---
+        // نقوم بتشغيلها في الخلفية بينما العداد يعمل
+        if (typeof versionsManager !== 'undefined') versionsManager.init();
+        if (typeof storeConfig !== 'undefined') storeConfig.fetchConfig();
+        
+        // Init Swiper
+        if (typeof initSwiper === 'function') initSwiper();
+    }
+
+    // --- 3. Check session logic (كما في كودك الأصلي) ---
+    const session = typeof SessionManager !== 'undefined' ? SessionManager.get() : null;
+    
+    if (session) {
+        document.getElementById('desktop-docs-btn')?.classList.remove('hidden');
+        document.getElementById('mobile-docs-btn')?.classList.remove('hidden');
+        document.getElementById('details-docs-btn')?.classList.remove('hidden');
+        // Unlock explainer if logged in
+        if (typeof updateExplainerState === 'function') updateExplainerState(true);
+    } else {
+        // Ensure locked if not logged in
+        if (typeof updateExplainerState === 'function') updateExplainerState(false);
+    }
+});
 
         // --- Helpers ---
         const Helpers = {
@@ -2458,81 +1868,6 @@
 
         lucide.createIcons();
 
-        // ----------------------------------------------------
-        // --- CLIENT AREA LOGIC (Integrated from your code) ---
-        // ----------------------------------------------------
-        const i18n = {
-            ar: {
-                pageTitle: "منطقة العملاء", pageSubtitle: "إدارة ذكية لتراخيصك ومنتجاتك", langBtn: "English", homeBtn: "الرئيسية",
-                loginHeader: "الدخول الآمن", loginEmail: "البريد الإلكتروني", loginPass: "كلمة المرور", loginBtn: "دخول المنصة",
-                overview: "الرئيسية", licenses: "التراخيص", downloads: "التحميلات", profile: "الملف الشخصي", logout: "خروج آمن",
-                statsTitle: "التحليلات الذكية", statsSubtitle: "مراقبة حية لنشاط حسابك واستهلاك الموارد.",
-                statLicenses: "التراخيص", statActiveSites: "المواقع النشطة", statAccess: "مرات الوصول", statProducts: "المنتجات",
-                distTitle: "توزيع الاستهلاك", activityTitle: "النشاط الأسبوعي الحقيقي", heatmapTitle: "كثافة استخدام المنصة",
-                heatmapLess: "أقل", heatmapMore: "أكثر", usageRate: "معدل الاستهلاك", seatsLeft: "متبقي لديك {n} مقاعد متاحة",
-                addNewLicense: "تفعيل ترخيص جديد", licensePlaceholder: "أدخل معرف المدونة (Blog ID)...", checkNow: "تحقق الآن",
-                activeLicenses: "المواقع المرخصة", activeLicenseTag: "الرخصة النشطة", licenseManagerSubtitle: "إدارة تراخيصك المرتبطة بحسابك بسهولة.",
-                licenseManagerTitle: "مدير التراخيص", noLicenses: "لا توجد تراخيص نشطة حالياً", productsTitle: "مركز التحميل",
-                productsSubtitle: "احصل على أحدث إصدارات القوالب المعتمدة والمستقرة.", availableVersions: "الإصدارات المتاحة",
-                termsTitle: "سياسات الاستخدام", termsSubtitle: "يرجى قراءة الشروط قبل تحميل الملف", termsConfirm: "موافق، ابدأ التحميل",
-                termsCancel: "غير موافق", deleteTitle: "حذف الترخيص؟", deleteConfirm: "تأكيد الحذف", logoutConfirm: "تأكيد الخروج",
-                tourNavTitle: "روابط التنقل", tourNavDesc: "من هنا يمكنك التنقل بين لوحة التحليلات، إدارة التراخيص، ومركز التحميلات.",
-                tourStatsTitle: "نظرة سريعة", tourStatsDesc: "تابع استهلاك تراخيصك وعدد مرات الوصول لحسابك فوراً.",
-                tourChartsTitle: "الرسوم البيانية", tourChartsDesc: "تحليلات بصرية ذكية توضح توزيع استهلاكك ونشاطك الأسبوعي.",
-                tourUserTitle: "حسابك الشخصي", tourUserDesc: "من هنا يمكنك تعديل ملفك الشخصي أو تسجيل الخروج الآمن من المنصة.",
-                toastSync: "📡 جاري المزامنة...", toastWelcome: "أهلاً بك مجدداً، {name}", toastFields: "يرجى ملء كافة الحقول",
-                toastError: "حدث خطأ في معالجة البيانات، تأكد من اتصالك", toastCopied: "تم النسخ بنجاح", toastVerifying: "جاري التحقق من هوية الموقع...",
-                toastActivating: "جاري ربط الترخيص بالخادم...", toastActivated: "تم التفعيل بنجاح!", toastDeleting: "جاري حذف التفعيل...",
-                toastDeleted: "تم حذف التفعيل بنجاح", errInvalidId: "المعرف غير صالح (أرقام فقط)", errAlreadyOwned: "هذا الموقع مسجل مسبقاً في حسابك الحالي",
-                errThirdParty: "هذا الموقع مسجل في حساب مستخدم آخر", errMaxReached: "لقد وصلت للحد الأقصى من التفعيلات",
-                termsList: [ "يلتزم العميل باستخدام القالب على النطاقات المرخصة له فقط.", "يمنع منعاً باتاً إعادة بيع القالب أو توزيعه لأي جهة أخرى.", "يمنع إزالة حقوق الملكية الخاصة بـ Plugo من الكود المصدري." ],
-                stBanned: {t: "حظر الوصول", m: "لقد تم حظر حسابك لمخالفة القوانين."}, stSecHold: {t: "تعليق أمني", m: "هوية المستخدم تتطلب مراجعة أمنية."},
-                stMaintenance: {t: "صيانة دورية", m: "النظام تحت التحديث حالياً."}, stRestricted: {t: "وصول مقيد", m: "لديك صلاحيات محدودة حالياً."},
-                stInactive: {t: "الحساب غير نشط", m: "يرجى التواصل لتفعيل حسابك."}, stExpired: {t: "انتهت الفترة", m: "يرجى ترقية حسابك للاستمرار."},
-                stLocked: {t: "حساب مقفل", m: "تم قفل الحساب لكثرة المحاولات."}, stPending: {t: "قيد المراجعة", m: "طلبك تحت الدراسة الآن."},
-                stEmail: {t: "بريد غير مؤكد", m: "يرجى تأكيد بريدك الإلكتروني."}, stPayment: {t: "يتطلب دفع", m: "يرجى إتمام عملية الدفع."},
-                stSupport: {t: "يتطلب دعم", m: "يرجى مراسلة فريق الدعم."}, stFraud: {t: "رصد احتيال", m: "تم رصد نشاط مريب على حسابك."},
-                stArchived: {t: "حساب مؤرشف", m: "هذا الحساب لم يعد نشطاً."}, stCanceled: {t: "اشتراك ملغي", m: "لقد قمت بإلغاء اشتراكك."},
-                stIdentity: {t: "انتظار هوية", m: "يرجى رفع صورة الهوية."}, stCompliance: {t: "مراجعة امتثال", m: "نراجع مدى توافقك مع الشروط."},
-                stUpdate: {t: "تحديث مطلوب", m: "يجب تحديث نسخة القالب."}, stAction: {t: "إجراء مطلوب", m: "يرجى إتمام الإجراءات المطلوبة."},
-                stWait: {t: "انتظار موافقة", m: "ننتظر موافقة القسم المختص."}, stFailed: {t: "فشل دفع", m: "فشلت عملية التجديد التلقائي."}
-            },
-            en: {
-                pageTitle: "Client Area", pageSubtitle: "Smart management for your licenses and products", langBtn: "العربية", homeBtn: "Home",
-                loginHeader: "Secure Access", loginEmail: "Email Address", loginPass: "Password", loginBtn: "Sign In",
-                overview: "Overview", licenses: "Licenses", downloads: "Downloads", profile: "Profile", logout: "Logout",
-                statsTitle: "Smart Analytics", statsSubtitle: "Live monitoring of your account activity and resource consumption.",
-                statLicenses: "Licenses", statActiveSites: "Active Sites", statAccess: "Access Count", statProducts: "Products",
-                distTitle: "Consumption Distribution", activityTitle: "Real Weekly Activity", heatmapTitle: "Platform Usage Intensity",
-                heatmapLess: "Less", heatmapMore: "More", usageRate: "Usage Rate", seatsLeft: "{n} seats remaining",
-                addNewLicense: "Activate New License", licensePlaceholder: "Enter Blog ID...", checkNow: "Verify Now",
-                activeLicenses: "Licensed Sites", activeLicenseTag: "Active License", licenseManagerTitle: "License Manager",
-                licenseManagerSubtitle: "Manage and monitor all your active licenses from one place.", noLicenses: "No active licenses currently",
-                productsTitle: "Download Center", productsSubtitle: "Get the latest certified and stable template versions.",
-                availableVersions: "Available Versions", termsTitle: "Usage Policy", termsSubtitle: "Please read terms before downloading",
-                termsConfirm: "Agree, Start Download", termsCancel: "Decline", deleteTitle: "Delete License?", deleteConfirm: "Confirm Delete",
-                logoutConfirm: "Confirm Logout", tourNavTitle: "Navigation Links", tourNavDesc: "Navigate between Analytics, Licenses, and Download center.",
-                tourStatsTitle: "Quick Stats", tourStatsDesc: "Monitor your license usage and access count instantly.",
-                tourChartsTitle: "Visual Analytics", tourChartsDesc: "Smart charts showing your consumption distribution and weekly activity.",
-                tourUserTitle: "Your Profile", tourUserDesc: "Edit your profile or logout securely from the platform.",
-                toastSync: "📡 Syncing...", toastWelcome: "Welcome back, {name}", toastFields: "Please fill all fields",
-                toastError: "Data processing error, check your connection", toastCopied: "Copied successfully", toastVerifying: "Verifying site identity...",
-                toastActivating: "Linking license to server...", toastActivated: "Activated successfully!", toastDeleting: "Deleting activation...",
-                toastDeleted: "Activation deleted successfully", errInvalidId: "Invalid ID (Numbers only)", errAlreadyOwned: "This site is already registered in your account",
-                errThirdParty: "This site is registered to another user account", errMaxReached: "Maximum activations reached",
-                termsList: [ "Client must use the template only on licensed domains.", "Reselling or distributing the template is strictly forbidden.", "Removing Plugo copyrights from source code is prohibited." ],
-                stBanned: {t: "Banned Access", m: "Your access has been suspended due to violations."}, stSecHold: {t: "Security Hold", m: "Account requires security verification."},
-                stMaintenance: {t: "Maintenance", m: "System is currently under maintenance."}, stRestricted: {t: "Restricted", m: "Your account has limited permissions."},
-                stInactive: {t: "Inactive", m: "Please contact us to activate account."}, stExpired: {t: "Expired", m: "Please upgrade your account to continue."},
-                stLocked: {t: "Locked", m: "Account locked due to many attempts."}, stPending: {t: "Pending", m: "Your request is under review."},
-                stEmail: {t: "Verify Email", m: "Please verify your email address."}, stPayment: {t: "Payment Required", m: "Please complete your payment."},
-                stSupport: {t: "Support Required", m: "Please contact our support team."}, stFraud: {t: "Fraud Detected", m: "Suspicious activity detected."},
-                stArchived: {t: "Archived", m: "This account is no longer active."}, stCanceled: {t: "Canceled", m: "Your subscription was canceled."},
-                stIdentity: {t: "Identity Pending", m: "Please upload your ID document."}, stCompliance: {t: "Compliance Review", m: "Reviewing term compliance."},
-                stUpdate: {t: "Update Required", m: "Please update your template version."}, stAction: {t: "Action Required", m: "Please complete required actions."},
-                stWait: {t: "Wait Approval", m: "Waiting for department approval."}, stFailed: {t: "Payment Failed", m: "Auto-renewal process failed."}
-            }
-        };
 
         const SECRET_KEY = "AbdoABDOelbanaELBANAbassantBASSANT29920051102004";
         const CONFIG = {
@@ -2549,7 +1884,7 @@
 
         const SessionManager = {
             key: 'plugo_session', accessKey: 'plugo_access_count', tourKey: 'plugo_tour_completed', langKey: 'plugo_lang',
-            genToken: () => { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'; let res = ''; for (let i = 0; i < 150; i++) res += chars.charAt(Math.floor(Math.random() * chars.length)); return res; },
+            genToken: () => { const chars = 'AbdoABDOelbanaELBANAbassantBASSANT29920051102004-_'; let res = ''; for (let i = 0; i < 150; i++) res += chars.charAt(Math.floor(Math.random() * chars.length)); return res; },
             create: (userData) => {
                 const now = Date.now();
                 const payload = { email: userData.email, password: userData.password, name: userData.name, status: userData.status, trialEndsAt: userData.trialEndsAt || (now + (3 * 24 * 60 * 60 * 1000)), issuedAt: now };
@@ -2594,14 +1929,6 @@
         };
 
         const Actions = {
-            toggleLanguage() {
-                const newLang = state.lang === 'ar' ? 'en' : 'ar';
-                state.lang = newLang; SessionManager.setLang(newLang);
-                // We handle lang attribute in renderApp or init
-                // document.documentElement.setAttribute('lang', newLang); 
-                // document.documentElement.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr');
-                state.update({}); if (state.activeSection === 'overview' && state.view === 'dashboard') Actions.initAnalyticsCharts();
-            },
             async login() {
                 const t = i18n[state.lang];
                 const email = document.getElementById('login-email').value; const pass = document.getElementById('login-password').value;
@@ -2735,10 +2062,6 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-4">
-                        <button onclick="Actions.toggleLanguage()" class="btn-premium flex items-center gap-3 text-sm font-black bg-blue-600/10 text-blue-600 px-6 py-4 rounded-full border border-blue-600/20 hover:bg-blue-600 hover:text-white transition-all">
-                            <i data-lucide="languages" size="18"></i>
-                            <span id="lang-btn-text">English</span>
-                        </button>
                         <button onclick="switchView('home')" class="btn-premium group text-[var(--text-secondary)] hover:text-white flex items-center gap-4 text-sm md:text-base font-bold bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 px-8 py-4 rounded-full transition-all duration-300 hover:bg-blue-600 hover:border-blue-600 hover:shadow-2xl shadow-premium backdrop-blur-md">
                             <i data-lucide="home" class="group-hover:scale-110 transition-transform"></i><span id="home-btn-text">الرئيسية</span>
                         </button>
@@ -3172,3 +2495,4 @@
     </script>
 </body>
 </html>
+
