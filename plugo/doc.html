@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منشئ ملفات الشرح | Glassmorphism Admin</title>
+    
+    <!-- الخطوط العربية -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CodeMirror (محرر الأكواد) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    
+    <!-- TinyMCE (محرر النصوص - نسخة Community المفتوحة عبر cdnjs لتجنب مشاكل API Key) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: rgb(29,29,31);
+            background: linear-gradient(90deg, rgba(29,29,31,1) 0%, rgba(56,15,66,1) 50%, rgba(20,40,70,1) 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .glass-panel {
+            @apply glass rounded-2xl transition-all duration-300;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Editor Overrides */
+        .CodeMirror {
+            height: 500px !important;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            direction: ltr; /* Code is LTR */
+        }
+        
+        .tox-tinymce {
+            border-radius: 0.5rem !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-6 glass-panel p-4 fade-in">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-purple-600 rounded-lg shadow-lg">
+                <i data-lucide="layout" class="text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold">محرر التوثيق الذكي</h1>
+                <p class="text-xs text-gray-300 opacity-70">إدارة وإنشاء ملفات الشرح JSON</p>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="previewContent()" class="glass-btn px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+                <i data-lucide="eye" size="16"></i> معاينة حية
+            </button>
+            <button onclick="downloadJson()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow-lg transition-all transform hover:scale-105">
+                <i data-lucide="download" size="18"></i> تحميل JSON
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-col md:flex-row gap-6 flex-1 overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-full md:w-1/4 glass-panel p-4 flex flex-col overflow-hidden fade-in" style="animation-delay: 0.1s;">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                <h2 class="font-bold flex items-center gap-2">
+                    <i data-lucide="folder-tree" class="text-purple-400" size="18"></i>
+                    هيكل الملف
+                </h2>
+                <button onclick="addNewItem()" class="p-1 hover:bg-white/10 rounded text-green-400" title="إضافة عنصر جديد">
+                    <i data-lucide="plus-circle" size="18"></i>
+                </button>
+            </div>
+            
+            <div id="sidebar-content" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                <!-- Items will be injected here via JS -->
+            </div>
+        </aside>
+
+        <!-- Editor Area -->
+        <main class="flex-1 glass-panel p-6 flex flex-col overflow-y-auto fade-in relative" style="animation-delay: 0.2s;">
+            
+            <div id="editor-container">
+                <!-- Metadata Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm text-gray-300">عنوان الصفحة (Label)</label>
+                        <input type="text" id="page-label" class="bg-black/20 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-purple-500 transition-colors">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm text-gray-300">المعرف الفريد (ID)</label>
+                        <input type="text" id="page-id" readonly class="bg-black/40 border border-white/10 rounded-lg p-2 text-gray-400 cursor-not-allowed">
+                    </div>
+                </div>
+
+                <!-- Editor Tabs -->
+                <div class="flex gap-1 mb-0 border-b border-white/10">
+                    <button onclick="switchTab('visual')" id="tab-visual" class="px-4 py-2 bg-white/10 rounded-t-lg text-sm border-t border-r border-l border-white/10 text-purple-300 font-bold">
+                        محرر مرئي (TinyMCE)
+                    </button>
+                    <button onclick="switchTab('code')" id="tab-code" class="px-4 py-2 hover:bg-white/5 rounded-t-lg text-sm text-gray-400 transition-colors">
+                        محرر الكود (CodeMirror)
+                    </button>
+                </div>
+
+                <!-- Editors -->
+                <div class="relative bg-white/5 p-1 rounded-b-lg rounded-tr-lg border border-white/10 min-h-[500px]">
+                    
+                    <!-- Visual Editor Container -->
+                    <div id="visual-editor-wrapper" class="block">
+                        <textarea id="tinymce-editor"></textarea>
+                    </div>
+
+                    <!-- Code Editor Container -->
+                    <div id="code-editor-wrapper" class="hidden h-full">
+                        <textarea id="codemirror-editor"></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Action Bar -->
+                <div class="mt-4 flex justify-end gap-3">
+                    <button onclick="saveCurrentPage()" class="glass-btn bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 px-6 py-2 rounded-lg flex items-center gap-2">
+                        <i data-lucide="save" size="16"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden h-full flex flex-col items-center justify-center text-center opacity-50">
+                <i data-lucide="mouse-pointer-click" size="64" class="mb-4"></i>
+                <h3 class="text-2xl font-bold">اختر عنصراً للتعديل</h3>
+                <p>قم باختيار صفحة من القائمة الجانبية للبدء في تحرير المحتوى.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white text-gray-900 w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-lg">معاينة المحتوى الحالي</h3>
+                <button onclick="closePreview()" class="text-gray-500 hover:text-red-500">
+                    <i data-lucide="x" size="24"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-auto p-8 bg-white" id="preview-content-area">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Initial Data Structure ---
+        // This matches the user's requested JSON structure
+        let projectData = [
+            {
+                "sidebar": {
+                    "title": "ملف شرح القالب",
+                    "items": [
+                        { "type": "doc", "id": "introduction", "label": "Introduction" },
+                        { "type": "doc", "id": "getting-started", "label": "Getting Started" },
+                        {
+                            "type": "category",
+                            "label": "Guides",
+                            "items": [
+                                { "type": "doc", "id": "installation", "label": "Installation Guide" },
+                                { "type": "doc", "id": "configuration", "label": "Configuration Guide" }
+                            ]
+                        }
+                    ]
+                },
+                "content": {
+                    "introduction": {
+                        "id": "introduction",
+                        "title": "Introduction",
+                        "body": "<div id=\"doc-intro\" class=\"docs-content-pane active\"> <h1 class=\"text-4xl md:text-5xl font-black text-purple-600 mb-8\">مرحباً بك في SeoWriting V2.0</h1> <p class=\"text-lg md:text-xl text-gray-600 leading-relaxed mb-12\"> شكراً لثقتك بنا. هذا القالب تم تصميمه بعناية فائقة ليمنحك أفضل أداء ممكن مع مظهر جمالي لا يضاهى. </p> <div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 mb-12\"> <div class=\"p-8 rounded-[2rem] border border-purple-200 bg-purple-50\"> <h3 class=\"font-bold text-2xl mb-3 text-purple-700\">أداء عالي</h3> <p class=\"text-base text-gray-600\">أكواد محسنة لسرعة تحميل خيالية.</p> </div> <div class=\"p-8 rounded-[2rem] border border-blue-200 bg-blue-50\"> <h3 class=\"font-bold text-2xl mb-3 text-blue-700\">أمان وموثوقية</h3> <p class=\"text-base text-gray-600\">تحديثات أمنية مستمرة.</p> </div> </div> </div>"
+                    },
+                    "getting-started": {
+                        "id": "getting-started",
+                        "title": "Getting Started",
+                        "body": "<h2>البدء في الاستخدام</h2><p>هذا القسم يشرح الخطوات الأولية...</p>"
+                    },
+                    "installation": {  
+                        "id": "installation",
+                        "title": "Installation Guide",
+                        "body": "<h2>دليل التثبيت</h2><p>اتبع الخطوات التالية لتثبيت القالب...</p>"
+                    },
+                    "configuration": {
+                        "id": "configuration",
+                        "title": "Configuration Guide",
+                        "body": "<h2>الإعدادات</h2><p>كيفية تهيئة القالب ليناسب احتياجاتك...</p>"
+                    }
+                }
+            }
+        ];
+
+        // Global State Variables
+        let activeDocId = 'introduction';
+        let codeMirrorInstance = null;
+        let activeTab = 'visual';
+
+        // --- 2. Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initCodeMirror();
+            initTinyMCE().then(() => {
+                renderSidebar();
+                loadDocContent(activeDocId);
+            });
+        });
+
+        // Initialize CodeMirror
+        function initCodeMirror() {
+            const textarea = document.getElementById('codemirror-editor');
+            codeMirrorInstance = CodeMirror.fromTextArea(textarea, {
+                mode: 'xml',
+                htmlMode: true,
+                theme: 'dracula',
+                lineNumbers: true,
+                autoCloseTags: true,
+                lineWrapping: true
+            });
+            
+            codeMirrorInstance.on('change', (instance) => {
+                // Optional: Auto sync logic could go here
+            });
+        }
+
+        // Initialize TinyMCE
+        function initTinyMCE() {
+            return tinymce.init({
+                selector: '#tinymce-editor',
+                height: 500,
+                plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount code',
+                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat | code',
+                skin: 'oxide-dark',
+                content_css: 'dark',
+                directionality: 'rtl',
+                promotion: false, // Disable upgrade button
+                branding: false,  // Disable TinyMCE branding
+                setup: function (editor) {
+                    editor.on('change', function () {
+                        // Optional: Auto sync logic
+                    });
+                }
+            });
+        }
+
+        // --- 3. Sidebar Logic ---
+        function renderSidebar() {
+            const container = document.getElementById('sidebar-content');
+            container.innerHTML = '';
+            const items = projectData[0].sidebar.items;
+
+            items.forEach(item => {
+                if (item.type === 'category') {
+                    // Category Header
+                    const categoryEl = document.createElement('div');
+                    categoryEl.className = 'mt-4 mb-2 px-3 text-xs font-bold text-gray-400 uppercase tracking-wider';
+                    categoryEl.textContent = item.label;
+                    container.appendChild(categoryEl);
+
+                    // Category Items
+                    if(item.items) {
+                        item.items.forEach(subItem => {
+                            container.appendChild(createSidebarItem(subItem));
+                        });
+                    }
+                } else {
+                    // Root Items
+                    container.appendChild(createSidebarItem(item));
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function createSidebarItem(item) {
+            const div = document.createElement('div');
+            const isActive = item.id === activeDocId;
+            
+            div.className = `flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all mb-1 ${
+                isActive 
+                ? 'bg-purple-600/30 border border-purple-500/50 text-white shadow-lg' 
+                : 'text-gray-300 hover:bg-white/5 hover:text-white'
+            }`;
+            
+            div.onclick = () => loadDocContent(item.id);
+
+            div.innerHTML = `
+                <i data-lucide="file-text" size="16" class="${isActive ? 'text-purple-300' : 'text-gray-500'}"></i>
+                <span class="text-sm font-medium">${item.label}</span>
+            `;
+            return div;
+        }
+
+        // --- 4. Content Loading & Switching ---
+        function loadDocContent(id) {
+            // 1. Save previous if needed (optional logic)
+            // saveCurrentPage(); 
+
+            activeDocId = id;
+            const contentData = projectData[0].content[id];
+
+            if (!contentData) {
+                console.error("Content not found for ID:", id);
+                return;
+            }
+
+            // Update UI
+            document.getElementById('page-label').value = getLabelFromSidebar(id);
+            document.getElementById('page-id').value = contentData.id;
+
+            // Set content to editors
+            const htmlContent = contentData.body || '';
+            
+            if (tinymce.get('tinymce-editor')) {
+                tinymce.get('tinymce-editor').setContent(htmlContent);
+            }
+            if (codeMirrorInstance) {
+                codeMirrorInstance.setValue(htmlContent);
+            }
+
+            renderSidebar(); // Re-render to update active state styling
+        }
+
+        function getLabelFromSidebar(id) {
+            let label = '';
+            const items = projectData[0].sidebar.items;
+            
+            const findLabel = (arr) => {
+                for (let item of arr) {
+                    if (item.id === id) return item.label;
+                    if (item.items) {
+                        const found = findLabel(item.items);
+                        if(found) return found;
+                    }
+                }
+                return null;
+            };
+            
+            return findLabel(items) || id;
+        }
+
+        // --- 5. Editor Synchronization & Tabs ---
+        function switchTab(tab) {
+            activeTab = tab;
+            const visualBtn = document.getElementById('tab-visual');
+            const codeBtn = document.getElementById('tab-code');
+            const visualWrapper = document.getElementById('visual-editor-wrapper');
+            const codeWrapper = document.getElementById('code-editor-wrapper');
+
+            if (tab === 'visual') {
+                // Sync CodeMirror -> TinyMCE
+                const currentCode = codeMirrorInstance.getValue();
+                tinymce.get('tinymce-editor').setContent(currentCode);
+
+                visualBtn.className = "px-4 py-2 bg-white/10 rounded-t-lg text-sm border-t border-r border-l border-white/10 text-purple-300 font-bold";
+                codeBtn.className = "px-4 py-2 hover:bg-white/5 rounded-t-lg text-sm text-gray-400 transition-colors";
+                
+                visualWrapper.classList.remove('hidden');
+                codeWrapper.classList.add('hidden');
+            } else {
+                // Sync TinyMCE -> CodeMirror
+                const currentHtml = tinymce.get('tinymce-editor').getContent();
+                codeMirrorInstance.setValue(currentHtml);
+
+                codeBtn.className = "px-4 py-2 bg-white/10 rounded-t-lg text-sm border-t border-r border-l border-white/10 text-purple-300 font-bold";
+                visualBtn.className = "px-4 py-2 hover:bg-white/5 rounded-t-lg text-sm text-gray-400 transition-colors";
+
+                visualWrapper.classList.add('hidden');
+                codeWrapper.classList.remove('hidden');
+                
+                // Refresh CodeMirror layout
+                setTimeout(() => codeMirrorInstance.refresh(), 100);
+            }
+        }
+
+        // --- 6. Saving Logic ---
+        function saveCurrentPage() {
+            // Get content based on active tab
+            let content = '';
+            if (activeTab === 'visual') {
+                content = tinymce.get('tinymce-editor').getContent();
+                // Sync to CodeMirror just in case
+                codeMirrorInstance.setValue(content);
+            } else {
+                content = codeMirrorInstance.getValue();
+                // Sync to TinyMCE just in case
+                tinymce.get('tinymce-editor').setContent(content);
+            }
+
+            const label = document.getElementById('page-label').value;
+
+            // Update Body Content
+            if (projectData[0].content[activeDocId]) {
+                projectData[0].content[activeDocId].body = content;
+                projectData[0].content[activeDocId].title = label; // Sync title with label usually
+            } else {
+                // Create if missing (rare case in this simplified flow)
+                projectData[0].content[activeDocId] = {
+                    id: activeDocId,
+                    title: label,
+                    body: content
+                };
+            }
+
+            // Update Sidebar Label
+            updateSidebarLabel(activeDocId, label);
+            
+            // Visual Feedback
+            const btn = document.querySelector('button[onclick="saveCurrentPage()"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" size="16"></i> تم الحفظ!`;
+            btn.classList.add('bg-green-500/20', 'text-green-300');
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-green-500/20', 'text-green-300');
+                lucide.createIcons();
+                renderSidebar();
+            }, 1500);
+        }
+
+        function updateSidebarLabel(id, newLabel) {
+            const items = projectData[0].sidebar.items;
+            const updateRec = (arr) => {
+                for (let item of arr) {
+                    if (item.id === id) {
+                        item.label = newLabel;
+                        return true;
+                    }
+                    if (item.items) {
+                        if(updateRec(item.items)) return true;
+                    }
+                }
+                return false;
+            };
+            updateRec(items);
+        }
+
+        // --- 7. Features (Add, Preview, Download) ---
+
+        function addNewItem() {
+            const id = 'new-page-' + Date.now();
+            const label = 'صفحة جديدة';
+            
+            // Add to sidebar (adding to root for simplicity)
+            projectData[0].sidebar.items.push({
+                type: 'doc',
+                id: id,
+                label: label
+            });
+
+            // Add to content
+            projectData[0].content[id] = {
+                id: id,
+                title: label,
+                body: '<h1>صفحة جديدة</h1><p>ابدأ الكتابة هنا...</p>'
+            };
+
+            renderSidebar();
+            loadDocContent(id);
+        }
+
+        function previewContent() {
+            const modal = document.getElementById('preview-modal');
+            const contentArea = document.getElementById('preview-content-area');
+            
+            // Get current content directly from editor to ensure latest version
+            let currentContent = '';
+             if (activeTab === 'visual') {
+                currentContent = tinymce.get('tinymce-editor').getContent();
+            } else {
+                currentContent = codeMirrorInstance.getValue();
+            }
+
+            contentArea.innerHTML = currentContent;
+            modal.classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('preview-modal').classList.add('hidden');
+        }
+
+        function downloadJson() {
+            // Save current state first
+            saveCurrentPage();
+
+            const dataStr = JSON.stringify(projectData, null, 4);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'documentation_data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+    </script>
+</body>
+</html>
