@@ -1,0 +1,32 @@
+[
+  {
+    "name": "أحمد علي",
+    "avatar": "https://ui-avatars.com/api/?name=Ahmed+Ali&background=3b82f6&color=fff",
+    "review": "قالب ممتاز جداً، الدعم الفني سريع ومتجاوب، وسرعة الموقع تحسنت بشكل ملحوظ بعد التركيب.",
+    "rating": 5
+  },
+  {
+    "name": "سارة محمد",
+    "avatar": "https://ui-avatars.com/api/?name=Sarah+M&background=ec4899&color=fff",
+    "review": "التصميم أنيق جداً والوضع الليلي مريح للعين. لوحة التحكم سهلت علي الكثير من الوقت.",
+    "rating": 5
+  },
+  {
+    "name": "عمر خالد",
+    "avatar": "https://ui-avatars.com/api/?name=Omar+K&background=10b981&color=fff",
+    "review": "أفضل استثمار لمدونتي التقنية. أنصح به بشدة لأي شخص يريد بداية احترافية.",
+    "rating": 5
+  },
+  {
+    "name": "ليلى محمود",
+    "avatar": "https://ui-avatars.com/api/?name=Laila+M&background=8b5cf6&color=fff",
+    "review": "التعامل معكم كان قمة في الاحترافية، والنتائج فاقت توقعاتي.",
+    "rating": 4
+  },
+  {
+    "name": "خالد يوسف",
+    "avatar": "https://ui-avatars.com/api/?name=Khaled+Y&background=f59e0b&color=fff",
+    "review": "سهولة في الاستخدام ومرونة عالية في التخصيص. شكراً لفريق العمل.",
+    "rating": 5
+  }
+]
