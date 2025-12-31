@@ -766,6 +766,58 @@
             font-family: 'Tajawal', sans-serif !important;
             max-width: 320px !important;
         }
+                /* Unique Glassmorphism Styles for this slider only */
+        .t-glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .t-glass-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Unique Pagination Styles */
+        .swiper-pagination-custom-bullet {
+            background: #94a3b8;
+            opacity: 0.5;
+        }
+        .swiper-pagination-bullet-active.swiper-pagination-custom-bullet-active {
+            background: #3b82f6;
+            opacity: 1;
+            width: 20px;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        
+        /* Ensure slides have equal height */
+        .testimonialsSwiper .swiper-slide {
+            height: auto;
+            display: flex;
+        }
+        .testimonialsSwiper .swiper-slide > div {
+            width: 100%;
+        }
+
+        /* --- تأثير التركيز (Blur Effect) --- */
+        /* الحالة الافتراضية لجميع الشرائح (غير النشطة) */
+        .testimonialsSwiper .swiper-slide {
+            transition: all 0.5s ease;
+            opacity: 0.4;         /* شفافية أقل */
+            filter: blur(3px);    /* تمويه */
+            transform: scale(0.9); /* تصغير حجم الشرائح الجانبية قليلاً */
+        }
+
+        /* الحالة للشريحة النشطة (في المنتصف) */
+        .testimonialsSwiper .swiper-slide-active {
+            opacity: 1;           /* شفافية كاملة */
+            filter: blur(0);      /* إلغاء التمويه */
+            transform: scale(1);  /* حجم طبيعي */
+            z-index: 10;
+        }
 </style>
 </head>
 <body class="selection:bg-blue-500 selection:text-white antialiased">
@@ -1307,7 +1359,31 @@
                 </div>
             </div>
         </section>
+    <!-- قسم آراء العملاء (معرف فريد) -->
+    <section id="unique-testimonials-section" class="py-32 bg-gradient-to-b from-blue-50/5 to-white/0 dark:from-slate-900/30 dark:to-slate-950/0 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Header -->
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-black text-[var(--t-text-primary)] mb-6">ماذا يقول عملاؤنا</h2>
+                <p class="text-[var(--t-text-secondary)] text-xl">نفتخر بثقة عملائنا وآرائهم المميزة.</p>
+            </div>
 
+            <!-- Swiper Container (فئة فريدة) -->
+            <div class="swiper testimonialsSwiper w-full px-4 pb-14" data-aos="fade-up" data-aos-delay="100">
+                <div class="swiper-wrapper" id="unique-testimonials-wrapper">
+                    <!-- سيتم حقن البطاقات هنا -->
+                    <div class="text-center w-full text-white py-10" id="unique-loading-indicator">
+                        جاري تحميل الآراء...
+                    </div>
+                </div>
+                
+                <!-- Pagination (فئة فريدة) -->
+                <div class="swiper-pagination unique-swiper-pagination"></div>
+            </div>
+
+        </div>
+    </section>
         <!-- Footer -->
         <footer class="bg-[#020617] text-slate-300 py-32 border-t border-slate-800 relative overflow-hidden">
              <div class="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-blue-900/20 rounded-full blur-[100px] -ml-20 -mb-20 pointer-events-none"></div>
@@ -1439,6 +1515,7 @@
         const VERSIONS_API_URL = "https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/vers.json";
         // [تحديث] رابط ملف الكونفج الجديد (الأسعار وطرق الدفع)
         const STORE_CONFIG_URL = "https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/store_config.json";
+        const TESTIMONIALS_DATA_URL = "https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/clints_options.json";
 
         // [تحديث] إعدادات تيليجرام
         const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"; // ضع التوكن هنا
@@ -2977,6 +3054,121 @@
             }
         });
         
+
+        // دالة فريدة لجلب البيانات
+        async function loadTestimonialsV2() {
+            const wrapperV2 = document.getElementById('unique-testimonials-wrapper');
+            const loadingV2 = document.getElementById('unique-loading-indicator');
+
+            try {
+                const response = await fetch(TESTIMONIALS_DATA_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                // إخفاء التحميل
+                loadingV2.style.display = 'none';
+
+                // تنظيف الحاوية
+                wrapperV2.innerHTML = '';
+
+                data.forEach((client) => {
+                    const rating = client.rating || 5;
+                    let starsHTML = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (i < rating) {
+                            starsHTML += `<i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>`;
+                        } else {
+                            starsHTML += `<i data-lucide="star" class="w-4 h-4 text-gray-500"></i>`;
+                        }
+                    }
+
+                    const avatarUrl = client.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name || 'User')}&background=random&color=fff`;
+
+                    // استخدام الكلاسات الجديدة t-glass-card
+                    const slideHTML = `
+                        <div class="swiper-slide">
+                            <div class="t-glass-card p-8 md:p-10 rounded-[2.5rem] hover:shadow-glass-hover transition duration-500 w-full flex flex-col justify-between h-full">
+                                <div>
+                                    <div class="flex items-center gap-5 mb-6">
+                                        <div class="relative flex-shrink-0">
+                                            <img src="${avatarUrl}" alt="${client.name}" class="w-16 h-16 rounded-full shadow-md ring-4 ring-white/10 object-cover">
+                                            <div class="absolute -bottom-1 -right-1 bg-blue-500 text-white rounded-full p-1.5 flex items-center justify-center shadow-lg">
+                                                <i data-lucide="quote" class="w-3 h-3"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-[var(--t-text-primary)] text-xl">${client.name || 'عميل مميز'}</h4>
+                                            <div class="flex mt-1 gap-0.5">
+                                                ${starsHTML}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-[var(--t-text-secondary)] text-lg leading-relaxed italic text-right">
+                                        "${client.review || client.comment || 'لا يوجد تعليق متاح.'}"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    wrapperV2.innerHTML += slideHTML;
+                });
+
+                // تحديث الأيقونات
+                lucide.createIcons();
+
+                // تهيئة السلايدر الخاص بهذا القسم فقط
+                initUniqueSwiper();
+
+            } catch (error) {
+                console.error('Error fetching testimonials V2:', error);
+                wrapperV2.innerHTML = `<div class="text-center text-red-400 w-full">عذراً، حدث خطأ أثناء تحميل الآراء.</div>`;
+            }
+        }
+
+        function initUniqueSwiper() {
+            // نستخدم كلاس .testimonialsSwiper بدلاً من .mySwiper
+            new Swiper(".testimonialsSwiper", {
+                slidesPerView: 1.5, // عرض جزء من الشرائح الجانبية في الموبايل ليظهر التأثير
+                centeredSlides: true, // تفعيل التمركز (يجعل الشريحة النشطة في الوسط)
+                spaceBetween: 30,
+                loop: true,
+                grabCursor: true,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false,
+                },
+                // تحديد عنصر التنقل الخاص بهذا السلايدر فقط
+                pagination: {
+                    el: ".unique-swiper-pagination",
+                    clickable: true,
+                    // استخدام كلاسات مخصصة للنقاط لتجنب التعارض
+                    bulletClass: 'swiper-pagination-bullet swiper-pagination-custom-bullet',
+                    bulletActiveClass: 'swiper-pagination-bullet-active swiper-pagination-custom-bullet-active',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 1.5,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                        spaceBetween: 30,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 40,
+                    },
+                },
+            });
+        }
+
+        // تشغيل الكود
+        document.addEventListener('DOMContentLoaded', loadTestimonialsV2);
     </script>
 </body>
 </html>
