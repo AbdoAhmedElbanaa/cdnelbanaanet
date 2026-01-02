@@ -331,7 +331,7 @@
                 <div class="hidden md:flex items-center gap-2">
                     <div class="flex items-center bg-slate-100/50 dark:bg-slate-800/50 p-2 rounded-2xl backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 mx-6">
                         <button onclick="switchView('home')" class="nav-link active" id="nav-home" data-i18n="nav_home">الرئيسية</button>
-                        <a href="#template-details" class="nav-link hover:text-blue-600" data-i18n="nav_about">عن القالب</a>
+                        <a href="#template-ecosystem" class="nav-link hover:text-blue-600" data-i18n="nav_about">عن القالب</a>
                         <a href="#explainer" class="nav-link hover:text-purple-600" data-i18n="nav_tour">جولة تفاعلية</a>
                         <a href="#features" class="nav-link hover:text-emerald-600" data-i18n="nav_features">المميزات</a>
                         <a href="#versions" class="nav-link hover:text-orange-600" data-i18n="nav_versions">الإصدارات</a>
@@ -809,9 +809,9 @@
 
     </div>
 </section>
+
         <!-- Explainer Section (Dynamic Lock/Unlock) -->
         <section id="explainer" class="py-32 overflow-hidden">
-            
             <div class="max-auto mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-24" data-aos="fade-up">
                     <span class="text-blue-600 font-bold tracking-wider text-base uppercase mb-4 block animate-pulse" data-i18n="explore_title">اكتشف الإمكانيات</span>
@@ -916,7 +916,6 @@
                 </div>
             </div>
         </section>
-
         <!-- Features Grid Section -->
         <section id="features" class="py-32">
             <div class="max-auto mx-auto px-4 sm:px-6 lg:px-8">
@@ -2451,7 +2450,6 @@ window.addEventListener('load', () => {
     if (session) {
         document.getElementById('desktop-docs-btn')?.classList.remove('hidden');
         document.getElementById('mobile-docs-btn')?.classList.remove('hidden');
-        document.getElementById('details-docs-btn')?.classList.remove('hidden');
         // Unlock explainer if logged in
         if (typeof updateExplainerState === 'function') updateExplainerState(true);
     } else {
@@ -2632,7 +2630,6 @@ window.addEventListener('load', () => {
                         // Show Docs Button on successful login
                         document.getElementById('desktop-docs-btn').classList.remove('hidden');
                         document.getElementById('mobile-docs-btn').classList.remove('hidden');
-                        document.getElementById('details-docs-btn').classList.remove('hidden');
                         
                         // Unlock Explainer
                         updateExplainerState(true);
@@ -2653,7 +2650,6 @@ window.addEventListener('load', () => {
                 // Hide Docs Button on logout
                 document.getElementById('desktop-docs-btn').classList.add('hidden');
                 document.getElementById('mobile-docs-btn').classList.add('hidden');
-                document.getElementById('details-docs-btn').classList.add('hidden');
                 
                 // Lock Explainer
                 updateExplainerState(false);
@@ -2671,7 +2667,7 @@ window.addEventListener('load', () => {
                 state.update({ view: map[status] || 'dashboard' });
             },
             setSection(sec) { state.update({ activeSection: sec }); if(sec === 'overview') setTimeout(() => { Actions.initAnalyticsCharts(); lucide.createIcons(); }, 100); },
-             initAnalyticsCharts() {
+            initAnalyticsCharts() {
     // التحقق من الوضع الحالي بدقة
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark');
     const t = i18n[state.lang];
