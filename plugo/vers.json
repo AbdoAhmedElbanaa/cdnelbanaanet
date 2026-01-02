@@ -7,17 +7,19 @@
         "desc": "هذه هي النسخة الأولى المستقرة من القالب.",
         "badge": "V1.0",
         "theme": "basic",
-        "image": "" 
+        "image": "",
+        "priv_url": "" 
     },
     "v2": {
         "id": "v2",
         "title": "الإصدار الثاني (المطور)",
         "date": "مايو 2025",
         "features": ["نظام إعلانات ذكي", "تحسينات سيو ضخمة"],
-        "desc": "تحديث شامل يركز على زيادة الأرباح.",
+        "desc": "تحديث شامل يركز على زيادة الأرباح مع واجهة مستخدم جديدة كلياً.",
         "badge": "V2.0",
         "tag": "الأحدث",
         "theme": "pro",
-        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop"
+        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
+        "priv_url": "https://example.com/v2-preview"
     }
 }
