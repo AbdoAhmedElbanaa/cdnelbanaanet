@@ -1,25 +1,68 @@
 {
     "v1": {
-        "id": "v1",
-        "title": "الإصدار الأول (الأساسي)",
+        "id": "v1_news",
+        "title": "النسخة الإخبارية (Magazine)",
         "date": "يناير 2024",
-        "features": ["تصميم متجاوب", "يدعم الوضع المظلم", "لوحة تحكم أساسية"],
-        "desc": "هذه هي النسخة الأولى المستقرة من القالب.",
+        "features": [
+            "شريط أخبار عاجلة متحرك",
+            "دعم كامل لمقالات AMP",
+            "تخطيطات متعددة (شبكة/قائمة)",
+            "مساحات إعلانية ذكية"
+        ],
+        "desc": "تصميم مخصص للمواقع الإخبارية والمجلات، يركز على عرض المحتوى الغزير بسرعة فائقة مع أماكن استراتيجية للإعلانات لزيادة الأرباح.",
         "badge": "V1.0",
-        "theme": "basic",
-        "image": "",
-        "priv_url": "" 
+        "tag": "الأكثر طلباً",
+        "theme": "news",
+        "image": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2400&auto=format&fit=crop",
+        "priv_url": "https://example.com/news-preview"
     },
     "v2": {
-        "id": "v2",
-        "title": "الإصدار الثاني (المطور)",
-        "date": "مايو 2025",
-        "features": ["نظام إعلانات ذكي", "تحسينات سيو ضخمة"],
-        "desc": "تحديث شامل يركز على زيادة الأرباح مع واجهة مستخدم جديدة كلياً.",
+        "id": "v2_store",
+        "title": "نسخة متجر التطبيقات (App Store)",
+        "date": "مارس 2024",
+        "features": [
+            "جداول معلومات التطبيق (APK)",
+            "أزرار تحميل مباشرة وآمنة",
+            "نظام تقييم ومراجعات متطور",
+            "معرض صور (Screenshots) للتطبيقات"
+        ],
+        "desc": "قالب متكامل لتحويل موقعك إلى متجر تطبيقات وألعاب احترافي، يدعم عرض تفاصيل الإصدارات والملفات التقنية بشكل تلقائي ومنظم.",
         "badge": "V2.0",
-        "tag": "الأحدث",
-        "theme": "pro",
-        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
-        "priv_url": "https://example.com/v2-preview"
+        "theme": "store",
+        "image": "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?q=80&w=2400&auto=format&fit=crop",
+        "priv_url": "https://example.com/store-preview"
+    },
+    "v3": {
+        "id": "v3_tech",
+        "title": "النسخة التقنية الشاملة (Tech Pro)",
+        "date": "يونيو 2024",
+        "features": [
+            "أكواد برمجية ملونة (Syntax Highlight)",
+            "نظام مراجعة الأجهزة والمنتجات",
+            "وضع مظلم حقيقي (OLED)",
+            "واجهة عصرية للمدونين"
+        ],
+        "desc": "الخيار الأمثل للمدونين التقنيين والمراجعين. يجمع بين الأناقة والوظائف المتقدمة لعرض الشروحات والأكواد ومراجعات الأجهزة.",
+        "badge": "V3.0",
+        "theme": "tech",
+        "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2400&auto=format&fit=crop",
+        "priv_url": "https://example.com/tech-preview"
+    },
+    "v4": {
+        "id": "v4_tools",
+        "title": "نسخة أدوات الويب (SaaS Tools)",
+        "date": "سبتمبر 2024",
+        "features": [
+            "واجهة استخدام خالية من التشتت",
+            "سرعة تحميل قصوى للأدوات",
+            "دعم السكربتات البرمجية (JS/PHP)",
+            "تصميم بملء الشاشة (Full Width)"
+        ],
+        "desc": "نسخة مخصصة لمواقع الخدمات والأدوات (مثل أدوات السيو، التحويل، والحاسبات). تركز كلياً على الوظيفة وسهولة استخدام الأداة.",
+        "badge": "V4.0",
+        "tag": "جديد",
+        "theme": "tools",
+        "image": "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=2400&auto=format&fit=crop",
+        "priv_url": "https://example.com/tools-preview"
     }
 }
