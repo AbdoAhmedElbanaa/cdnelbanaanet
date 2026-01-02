@@ -979,10 +979,12 @@
                     <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6" data-i18n="ver_head">إصدارات القالب</h2>
                     <p class="text-[var(--text-secondary)] max-w-2xl mx-auto text-xl" data-i18n="ver_desc">تطور مستمر لتلبية كافة الاحتياجات.</p>
                 </div>
-
-                <div id="versions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    <!-- Dynamic Versions Will Be Injected Here -->
-                </div>
+<div id="versions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 py-12" dir="rtl">
+    <div class="col-span-full flex flex-col justify-center items-center py-20 gap-4 opacity-50">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-600"></div>
+        <span class="text-slate-500 text-sm font-medium">جاري جلب الإصدارات...</span>
+    </div>
+</div>
             </div>
         </section>
 
@@ -1833,296 +1835,315 @@ function toggleLang() {
 
 class VersionsManager {
     constructor() {
-        this.versionsData = null;
         this.gridContainer = document.getElementById('versions-grid');
-    }
-
-    async fetchVersions() {
-        try {
-            // تأكد من أن المتغير VERSIONS_API_URL معرف في ملفك
-            const response = await fetch(VERSIONS_API_URL);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error("Failed to fetch versions:", error);
-            // إرجاع بيانات فارغة لتجنب توقف الكود
-            return {}; 
-        }
-    }
-
-renderGrid() {
-    if (!this.gridContainer || !this.versionsData) return;
-    
-    const versionsArray = Array.isArray(this.versionsData) ? this.versionsData : Object.values(this.versionsData);
-
-    this.gridContainer.innerHTML = versionsArray.map(ver => {
-        const isPro = ver.theme === 'pro';
-        const hasImage = ver.image && ver.image.trim() !== "";
-        const hasPreview = ver.priv_url && ver.priv_url.trim() !== "";
-
-        // --- تعريف الستايلات المتغيرة (Variables for dynamic styles) ---
-
-        // 1. ستايل الأيقونات الدائرية (الميزة الجديدة الرئيسية)
-        // هذا الستايل ينشئ دائرة مع حد وخلفية، ويتفاعل مع تحويم الماوس على الكارد الأب (group-hover)
-        const iconCircleBase = "flex items-center justify-center rounded-full border transition-all duration-500";
-        const iconCircleStyle = isPro
-            ? `${iconCircleBase} w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 text-indigo-600 dark:text-indigo-300 group-hover:border-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40`
-            : `${iconCircleBase} w-8 h-8 bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 group-hover:border-slate-300 group-hover:bg-slate-100 dark:group-hover:bg-slate-800`;
-
-        // ستايل مصغر للأيقونات داخل قائمة المميزات
-        const smallIconCircleStyle = isPro
-            ? `${iconCircleBase} w-5 h-5 bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-100/50 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 group-hover:border-indigo-200`
-            : `${iconCircleBase} w-5 h-5 bg-slate-50/50 dark:bg-slate-800/30 border-slate-100/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 group-hover:border-slate-200`;
-
-
-        // 2. ستايل الكارد الخارجي (احترافي وتفاعلي)
-        const cardClasses = isPro 
-            ? 'group relative flex flex-col bg-white dark:bg-slate-900 rounded-[2rem] border border-indigo-200/50 dark:border-indigo-900/50 shadow-lg shadow-indigo-900/5 hover:shadow-2xl hover:shadow-indigo-900/10 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/10 transition-all duration-500 overflow-hidden' 
-            : 'group relative flex flex-col bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all duration-500 overflow-hidden';
-
-        // 3. ستايل الأزرار
-        const primaryBtnClass = isPro && hasPreview
-            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 border border-transparent'
-            : 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200 shadow-sm border border-transparent';
-
-        const secondaryBtnClass = isPro
-            ? 'border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800';
-
-
-        // --- بناء المحتوى ---
-
-        // 1. المميزات (Tags) باستخدام الأيقونات الدائرية الجديدة
-        const featuresPreview = ver.features && ver.features.length > 0 
-            ? ver.features.slice(0, 2).map(f => `
-                <div class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full text-[11px] font-semibold ${isPro ? 'bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-700 dark:text-indigo-300' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400'} border ${isPro ? 'border-indigo-100 dark:border-indigo-800' : 'border-slate-100 dark:border-slate-700'} transition-colors duration-500 group-hover:border-opacity-100">
-                    <div class="${smallIconCircleStyle}">
-                        <i data-lucide="check" class="w-3 h-3"></i>
-                    </div>
-                    ${f}
-                </div>
-              `).join('')
-            : '';
-
-        // 2. تصميم الهيدر (منطقة الصورة)
-        let visualHeader;
+        this.versionsData = null;
         
-        // الشارات العائمة على الصورة (Badges)
-        const tagsOverlay = `
-            <div class="absolute top-4 left-4 flex items-center gap-2 z-20">
-                ${isPro ? `
-                <div class="flex items-center gap-2 pl-1.5 pr-3 py-1.5 bg-indigo-600/95 backdrop-blur-md text-white rounded-full shadow-lg ring-1 ring-white/20">
-                    <div class="flex items-center justify-center w-5 h-5 rounded-full bg-white/20">
-                        <i data-lucide="crown" class="w-3 h-3 fill-current"></i>
-                    </div>
-                    <span class="text-[10px] font-bold tracking-wider uppercase">PRO</span>
-                </div>` : ''}
-                
-                ${ver.tag ? `
-                <div class="flex items-center gap-2 pl-1.5 pr-3 py-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-800 dark:text-white rounded-full shadow-sm ring-1 ring-slate-200/50 dark:ring-slate-700/50">
-                     <div class="flex items-center justify-center w-5 h-5 rounded-full ${isPro ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}">
-                        <i data-lucide="sparkles" class="w-3 h-3"></i>
-                    </div>
-                    <span class="text-[10px] font-bold tracking-wider uppercase">${ver.tag}</span>
-                </div>` : ''}
-            </div>
+        // رابط البيانات من GitHub
+        this.API_URL = VERSIONS_API_URL;
+        
+        // معرفات عناصر المودال
+        this.modalId = 'dynamic-version-modal';
+        this.backdropId = 'dynamic-modal-backdrop';
+        this.contentId = 'dynamic-modal-content';
+    }
 
-             <div class="absolute bottom-4 right-4 z-20">
-                 <div class="px-3 py-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md text-slate-900 dark:text-white rounded-xl shadow-sm border border-white/20 dark:border-slate-800/20">
-                    <span class="text-xs font-black font-mono tracking-tighter">${ver.badge}</span>
+    // 1. دالة بناء هيكل المودال (Inject HTML)
+    injectModalHTML() {
+        if (document.getElementById(this.modalId)) return;
+
+        const modalHTML = `
+            <div id="${this.modalId}" class="fixed inset-0 z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div id="${this.backdropId}" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 cursor-pointer"></div>
+
+                <div class="fixed inset-0 z-10 overflow-y-auto pointer-events-none">
+                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                        <div id="${this.contentId}" class="relative transform overflow-hidden rounded-3xl bg-white dark:bg-slate-900 text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl scale-95 opacity-0 duration-300 pointer-events-auto">
+                             </div>
+                    </div>
                 </div>
             </div>
         `;
 
-        if (hasImage) {
-            visualHeader = `
-                <div class="relative h-60 rounded-[1.8rem] overflow-hidden bg-slate-100 dark:bg-slate-800">
-                    ${tagsOverlay}
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent z-10 pointer-events-none"></div>
-                    <img src="${ver.image}" alt="${ver.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out">
-                </div>
-            `;
-        } else {
-            // تصميم احترافي للنسخ بدون صور باستخدام الأيقونة الدائرية الكبيرة
-            visualHeader = `
-                <div class="relative h-60 rounded-[1.8rem] overflow-hidden bg-slate-50/80 dark:bg-slate-800/30 border border-slate-100/80 dark:border-slate-700/30 flex items-center justify-center group-hover:bg-slate-100/50 dark:group-hover:bg-slate-800/50 transition-colors duration-500">
-                    ${tagsOverlay}
-                    <div class="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" style="background-image: radial-gradient(circle at 2px 2px, ${isPro ? '#6366f1' : '#64748b'} 1px, transparent 0); background-size: 24px 24px;"></div>
-                    
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="${iconCircleStyle.replace('w-8 h-8', 'w-20 h-20')} mb-4 shadow-sm">
-                            <i data-lucide="${isPro ? 'layers' : 'box'}" class="w-8 h-8"></i>
-                        </div>
-                        <span class="text-xs font-bold ${isPro ? 'text-indigo-400' : 'text-slate-400'} uppercase tracking-[0.2em]">
-                            ${isPro ? 'Premium Build' : 'Standard Build'}
-                        </span>
-                    </div>
-                </div>
-            `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // إغلاق المودال عند الضغط على الخلفية
+        document.getElementById(this.backdropId).addEventListener('click', () => this.closeModal());
+    }
+
+    // 2. دالة جلب البيانات من GitHub
+    async fetchVersions() {
+        try {
+            const response = await fetch(this.API_URL);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch versions:", error);
+            // عرض رسالة خطأ في الصفحة في حال فشل الاتصال
+            if (this.gridContainer) {
+                this.gridContainer.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <p class="text-red-500 font-bold">فشل تحميل الإصدارات. يرجى التحقق من الاتصال.</p>
+                    </div>`;
+            }
+            return null;
         }
+    }
 
-        // --- الهيكل النهائي للكارد ---
-        return `
-        <article class="${cardClasses}" data-aos="fade-up">
+    // 3. دالة رسم الشبكة (Grid)
+    renderGrid() {
+        if (!this.gridContainer || !this.versionsData) return;
+        
+        // تحويل البيانات لمصفوفة (سواء كانت Object أو Array في ملف JSON)
+        const versionsArray = Array.isArray(this.versionsData) ? this.versionsData : Object.values(this.versionsData);
+
+        // ترتيب الإصدارات (اختياري: الأحدث أولاً)
+        // versionsArray.reverse(); 
+
+        this.gridContainer.innerHTML = versionsArray.map(ver => {
+            const hasImage = ver.image && ver.image.trim() !== "";
+            const hasPreview = ver.priv_url && ver.priv_url.trim() !== "";
+
+            // إعدادات الثيمات
+            const themeConfig = {
+                news: { color: 'rose', icon: 'newspaper', label: 'Magazine', bgIcon: 'rss' },
+                store: { color: 'blue', icon: 'shopping-bag', label: 'App Store', bgIcon: 'layout-grid' },
+                tech: { color: 'violet', icon: 'cpu', label: 'Tech Pro', bgIcon: 'code-2' },
+                tools: { color: 'emerald', icon: 'wrench', label: 'SaaS Tools', bgIcon: 'settings-2' },
+                default: { color: 'slate', icon: 'box', label: 'Basic', bgIcon: 'box' }
+            };
             
-            <div class="p-4 pb-0">
-                ${visualHeader}
-            </div>
+            // استخدام الثيم الافتراضي إذا لم يكن معرفاً
+            const t = themeConfig[ver.theme] || themeConfig.default;
+            const c = t.color;
 
-            <div class="px-6 py-6 flex flex-col flex-1">
-                
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="${iconCircleStyle}">
-                        <i data-lucide="calendar" class="w-4 h-4"></i>
-                    </div>
-                    <span class="text-xs font-bold ${isPro ? 'text-indigo-900 dark:text-indigo-200' : 'text-slate-700 dark:text-slate-200'}">
-                        ${ver.date}
-                    </span>
+            // كلاسات التنسيق (Styles)
+            const btnPrimary = `flex-[2] flex items-center justify-center gap-2 h-11 rounded-xl bg-${c}-600 hover:bg-${c}-700 text-white font-bold text-sm shadow-lg shadow-${c}-500/20 hover:-translate-y-0.5 transition-all duration-300`;
+            const btnSecondary = `flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-${c}-200 dark:hover:border-${c}-800 bg-white dark:bg-slate-800 hover:bg-${c}-50 dark:hover:bg-${c}-900/10 text-slate-600 dark:text-slate-300 hover:text-${c}-600 font-semibold text-sm transition-all duration-300`;
+            const cardClasses = `group relative bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 hover:border-${c}-200 dark:hover:border-${c}-800 shadow-sm hover:shadow-2xl hover:shadow-${c}-900/10 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col`;
+            const nodeIconStyle = `relative z-10 flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full border-2 bg-white dark:bg-slate-900 border-${c}-100 dark:border-${c}-900 text-${c}-600 dark:text-${c}-400 group-hover:border-${c}-300 group-hover:scale-110 group-hover:bg-${c}-50 dark:group-hover:bg-${c}-900/20 transition-all duration-500 ease-out shadow-sm`;
+            const timelineLine = `absolute left-[35px] top-8 bottom-28 w-px border-l-2 border-dashed border-${c}-200/60 dark:border-${c}-900/30 z-0`;
+            //  تصميم الأزرار الجديد والمميز
+            // ==========================================
+
+            // 1. زر المعاينة (Gradient Shine Button)
+            const btnPreviewActive = `
+                group/btn flex-[1.5] relative overflow-hidden rounded-2xl 
+                bg-gradient-to-br from-${c}-600 to-${c}-500 
+                p-[1px] shadow-lg shadow-${c}-500/25 
+                transition-all duration-300 
+                hover:shadow-${c}-500/50 hover:scale-[1.02] hover:-translate-y-1
+            `;
+            
+            const btnPreviewInner = `
+                relative flex items-center justify-center gap-2 w-full h-12 bg-transparent rounded-xl
+                text-white font-bold tracking-wide z-10
+            `;
+
+            // تأثير اللمعان المتحرك داخل الزر
+            const btnShineEffect = `
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out z-0"></div>
+            `;
+
+            // 2. زر التفاصيل (Tech Outline Button)
+            const btnDetails = `
+                group/details flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl 
+                bg-slate-50 dark:bg-slate-800/50 
+                border-2 border-slate-100 dark:border-slate-700
+                text-slate-600 dark:text-slate-300 font-bold 
+                hover:border-${c}-200 dark:hover:border-${c}-800 
+                hover:bg-white dark:hover:bg-slate-800
+                hover:text-${c}-600 dark:hover:text-${c}-400
+                transition-all duration-300
+            `;
+
+
+            // باقي العناصر (Card Styling)
+            // بناء الهيدر (صورة أو أيقونة)
+            const badges = `
+                <div class="absolute top-3 left-3 flex gap-2 z-20">
+                    <div class="flex items-center gap-1.5 px-2.5 py-1 bg-${c}-600 text-white text-[10px] font-bold rounded-lg shadow-lg tracking-wider uppercase"><i data-lucide="${t.icon}" class="w-3 h-3"></i> ${t.label}</div>
+                    ${ver.tag ? `<span class="px-2.5 py-1 bg-white/90 text-slate-800 text-[10px] font-bold rounded-lg shadow-sm border border-slate-200">${ver.tag}</span>` : ''}
                 </div>
+                <div class="absolute bottom-3 right-3 z-20"><span class="px-2.5 py-1 bg-black/40 backdrop-blur-md text-white text-xs font-mono font-bold rounded-lg border border-white/10 ring-1 ring-white/5">${ver.badge}</span></div>
+            `;
+            
+            const visualHeader = hasImage 
+                ? `<div class="relative h-52 rounded-[1.8rem] overflow-hidden shadow-sm group-hover:shadow-md transition-all duration-500">${badges}<div class="absolute inset-0 bg-gradient-to-t from-${c}-900/40 to-transparent z-10 mix-blend-multiply"></div><img src="${ver.image}" alt="${ver.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"></div>`
+                : `<div class="relative h-52 rounded-[1.8rem] overflow-hidden border border-${c}-100 dark:border-${c}-900/50 flex flex-col items-center justify-center bg-${c}-50/30 dark:bg-${c}-900/10">${badges}<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(var(--tw-colors-${c}-500) 1.5px, transparent 1.5px); background-size: 20px 20px;"></div><div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center relative z-10 group-hover:-translate-y-1 transition-transform border border-${c}-100 dark:border-${c}-800"><i data-lucide="${t.bgIcon}" class="w-8 h-8 text-${c}-500"></i></div></div>`;
 
-                <h3 class="text-2xl font-extrabold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-${isPro ? 'indigo-600' : 'blue-600'} dark:group-hover:text-${isPro ? 'indigo-400' : 'blue-400'} transition-colors">
-                    ${ver.title}
-                </h3>
-                
-                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-6">
-                    ${ver.desc}
-                </p>
+            // معالجة الميزات للعرض المختصر
+            const featuresHTML = ver.features && ver.features.length > 0 
+                ? ver.features.slice(0, 2).map(f => `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-${c}-50 dark:bg-${c}-900/20 text-${c}-700 dark:text-${c}-300 border border-${c}-100 dark:border-${c}-800/50">${f}</span>`).join('') 
+                : '';
 
-                <div class="flex flex-wrap gap-2.5 mb-8 mt-auto">
-                    ${featuresPreview}
-                </div>
-
-                <div class="pt-5 border-t border-slate-100 dark:border-slate-800/50 flex items-center gap-3">
+            return `
+            <article class="${cardClasses}" data-aos="fade-up">
+                <div class="p-4 pb-2">${visualHeader}</div>
+                <div class="relative p-4 pt-2 flex-1 flex flex-col">
+                    <div class="${timelineLine}"></div>
                     
-                    ${hasPreview ? `
-                    <a href="${ver.priv_url}" target="_blank" class="flex-1 h-12 flex items-center justify-center gap-2.5 rounded-2xl font-bold text-[13px] transition-all active:scale-[0.98] group/btn ${primaryBtnClass}">
-                        <span>معاينة مباشرة</span>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
-                    </a>` : `
-                    <button disabled class="flex-1 h-12 flex items-center justify-center gap-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold text-[13px] cursor-not-allowed border border-transparent">
-                         <i data-lucide="lock" class="w-4 h-4"></i>
-                         <span>غير متاح حالياً</span>
-                    </button>
-                    `}
+                    <div class="flex gap-4 mb-4 relative group/item">
+                        <div class="${nodeIconStyle}"><i data-lucide="calendar" class="w-4 h-4"></i></div>
+                        <div class="pt-2"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover/item:text-${c}-600 transition-colors">تاريخ الإصدار</span><div class="text-xs font-bold text-slate-700 dark:text-slate-200 mt-0.5">${ver.date}</div></div>
+                    </div>
+                    <div class="flex gap-4 mb-4 relative group/item">
+                        <div class="${nodeIconStyle}"><i data-lucide="${t.bgIcon}" class="w-4 h-4"></i></div>
+                        <div class="pt-1"><h3 class="text-lg font-black text-slate-800 dark:text-white leading-tight mb-1 group-hover:text-${c}-600 transition-colors">${ver.title}</h3><p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">${ver.desc}</p></div>
+                    </div>
+                    <div class="flex gap-4 mb-4 relative group/item">
+                        <div class="${nodeIconStyle}"><i data-lucide="list-checks" class="w-4 h-4"></i></div>
+                        <div class="pt-1.5 flex flex-wrap gap-2">${featuresHTML}</div>
+                    </div>
 
-                    <button onclick="openVersionModal('${ver.id}')" class="h-12 px-6 rounded-2xl border transition-all active:scale-[0.98] font-bold text-[13px] ${secondaryBtnClass}" aria-label="التفاصيل">
-                        تفاصيل
-                    </button>
+                    <div class="mt-auto pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                        ${hasPreview ? `
+                        <a href="${ver.priv_url}" target="_blank" class="${btnPreviewActive}">
+                            ${btnShineEffect}
+                            <div class="${btnPreviewInner}">
+                                <span>معاينة حية</span>
+                                <i data-lucide="monitor-play" class="w-5 h-5 group-hover/btn:translate-x-[-2px] transition-transform"></i>
+                            </div>
+                        </a>` : `
+                        <button disabled class="flex-[1.5] h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center gap-2 font-bold cursor-not-allowed grayscale opacity-70">
+                            <span>قريباً</span>
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                        </button>
+                        `}
+
+                        <button onclick="window.openVersionModal('${ver.id}')" class="${btnDetails}">
+                            <span>التفاصيل</span>
+                            <i data-lucide="scan-line" class="w-5 h-5 group-hover/details:text-${c}-500 transition-colors"></i>
+                        </button>
+                        
+                    </div>
+                </div>
+            </article>`;
+        }).join('');
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // 4. دالة فتح المودال
+    openModal(id) {
+        const versionsArray = Array.isArray(this.versionsData) ? this.versionsData : Object.values(this.versionsData);
+        const data = versionsArray.find(v => v.id === id);
+        if (!data) return;
+
+        const themeConfig = {
+            news: { color: 'rose', icon: 'newspaper' },
+            store: { color: 'blue', icon: 'shopping-bag' },
+            tech: { color: 'violet', icon: 'cpu' },
+            tools: { color: 'emerald', icon: 'wrench' },
+            default: { color: 'slate', icon: 'box' }
+        };
+        const t = themeConfig[data.theme] || themeConfig.default;
+        const c = t.color;
+
+        const modal = document.getElementById(this.modalId);
+        const backdrop = document.getElementById(this.backdropId);
+        const content = document.getElementById(this.contentId);
+
+        // محتوى المودال
+        content.innerHTML = `
+            <button onclick="window.closeVersionModal()" class="absolute top-5 left-5 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white transition-all shadow-lg hover:scale-110">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="relative w-full bg-${c}-600 p-8 md:p-12 overflow-hidden">
+                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                 <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+                 
+                 <div class="relative z-10 flex flex-col items-center text-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-bold mb-4">
+                        <i data-lucide="${t.icon}" class="w-3 h-3"></i> ${data.theme.toUpperCase()} VERSION
+                    </div>
+                    <h3 class="text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-sm">${data.title}</h3>
+                    <p class="text-white/80 text-lg max-w-2xl leading-relaxed">${data.desc}</p>
+                 </div>
+            </div>
+            
+            <div class="p-8 bg-white dark:bg-slate-950">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+                     <h4 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-lg">
+                        <span class="bg-${c}-100 dark:bg-${c}-900/30 text-${c}-600 p-1.5 rounded-lg"><i data-lucide="layers" class="w-5 h-5"></i></span>
+                        مميزات الإصدار
+                    </h4>
+                    <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">${data.badge}</span>
                 </div>
 
-            </div>
-        </article>`;
-    }).join('');
-
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-    // ... (openModal and init methods remain similar but check below for modal enhancement) ...
-    
-    openModal(id) {
-    let data;
-    if (Array.isArray(this.versionsData)) {
-        data = this.versionsData.find(v => v.id === id);
-    } else {
-        data = this.versionsData[id];
-    }
-    if (!data) return;
-
-    const modalContent = document.getElementById('modalContent');
-    const isPro = data.theme === 'pro';
-
-    // تحديد الألوان بناءً على نوع النسخة
-    const accentColor = isPro ? 'indigo' : 'slate';
-    const accentGradient = isPro ? 'from-indigo-600 to-violet-600' : 'from-slate-700 to-slate-500';
-
-    modalContent.innerHTML = `
-        <div class="relative w-full bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-8 mb-8 overflow-hidden border border-slate-100 dark:border-slate-700">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${accentGradient}"></div>
-            <div class="absolute -right-10 -top-10 w-40 h-40 bg-${accentColor}-500/10 rounded-full blur-3xl"></div>
-            
-            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="px-3 py-1 rounded-full bg-${accentColor}-100 dark:bg-${accentColor}-900/30 text-${accentColor}-600 dark:text-${accentColor}-300 text-xs font-bold border border-${accentColor}-200 dark:border-${accentColor}-800 flex items-center gap-1.5">
-                            <i data-lucide="tag" class="w-3 h-3"></i> ${data.badge}
-                        </span>
-                        <span class="text-slate-400 text-xs font-medium flex items-center gap-1">
-                            <i data-lucide="calendar" class="w-3 h-3"></i> ${data.date}
-                        </span>
-                    </div>
-                    <h3 class="text-3xl font-black text-slate-900 dark:text-white leading-tight">${data.title}</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    ${data.features.map(f => `
+                        <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-${c}-200 dark:hover:border-${c}-800 transition-colors group">
+                            <div class="mt-0.5 bg-white dark:bg-slate-800 rounded-full p-1 text-${c}-500 shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                            </div>
+                            <span class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">${f}</span>
+                        </div>
+                    `).join('')}
                 </div>
 
                 ${data.priv_url ? `
-                <a href="${data.priv_url}" target="_blank" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r ${accentGradient} text-white font-bold shadow-lg shadow-${accentColor}-500/20 hover:shadow-${accentColor}-500/40 hover:-translate-y-0.5 transition-all text-sm shrink-0">
-                    <span>معاينة حية</span>
-                    <i data-lucide="external-link" class="w-4 h-4"></i>
-                </a>` : ''}
+                <div class="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+                    <a href="${data.priv_url}" target="_blank" class="group relative inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl bg-${c}-600 hover:bg-${c}-700 text-white font-bold shadow-xl shadow-${c}-500/20 hover:-translate-y-1 transition-all overflow-hidden">
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <span class="relative">بدء المعاينة الآن</span> 
+                        <i data-lucide="arrow-up-left" class="relative w-5 h-5 group-hover:-translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                    </a>
+                </div>` : ''}
             </div>
-        </div>
+        `;
 
-        <div class="px-2 mb-10">
-            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <i data-lucide="align-left" class="w-4 h-4"></i> نبذة عن الإصدار
-            </h4>
-            <p class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-                ${data.desc}
-            </p>
-        </div>
+        modal.classList.remove('hidden');
+        lucide.createIcons();
 
-        <div class="px-2">
-            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-8 flex items-center gap-2">
-                <i data-lucide="layers" class="w-4 h-4"></i> سجل التغييرات والمميزات
-            </h4>
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
 
-            <div class="relative border-r-2 border-slate-100 dark:border-slate-800 mr-3 space-y-8">
-                ${data.features.map((feature, index) => `
-                    <div class="relative pr-8 group">
-                        <div class="absolute -right-[9px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 bg-${accentColor}-200 dark:bg-${accentColor}-900 ring-2 ring-${accentColor}-500/20 group-hover:bg-${accentColor}-500 transition-colors duration-300"></div>
-                        
-                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-${accentColor}-200 dark:hover:border-${accentColor}-900 transition-all duration-300">
-                            <div class="mt-1 min-w-[32px] h-8 rounded-full bg-${accentColor}-50 dark:bg-${accentColor}-900/20 flex items-center justify-center text-${accentColor}-600">
-                                <i data-lucide="${index === 0 ? 'sparkles' : 'check'}" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">ميزة جديدة</h5>
-                                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">${feature}</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-                
-                <div class="relative pr-8 opacity-50">
-                     <div class="absolute -right-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-                     <span class="text-xs text-slate-400">نهاية القائمة</span>
-                </div>
-            </div>
-        </div>
-    `;
+    // 5. دالة إغلاق المودال
+    closeModal() {
+        const modal = document.getElementById(this.modalId);
+        const backdrop = document.getElementById(this.backdropId);
+        const content = document.getElementById(this.contentId);
+        
+        if (!modal) return;
 
-    document.getElementById('versionModal').classList.add('open');
-    lucide.createIcons();
-}
+        backdrop.classList.add('opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // دالة البدء
     async init() {
-        try {
-            this.versionsData = await this.fetchVersions();
-            this.renderGrid();
-        } catch(e) {
-            console.error("Error fetching versions", e);
-        }
+        this.injectModalHTML();
+        this.versionsData = await this.fetchVersions();
+        this.renderGrid();
     }
 }
 
+// ============================================
+// Global Setup
+// ============================================
 const versionsManager = new VersionsManager();
 
-function openVersionModal(versionKey) {
-    versionsManager.openModal(versionKey);
-}
+window.openVersionModal = (id) => versionsManager.openModal(id);
+window.closeVersionModal = () => versionsManager.closeModal();
 
-function closeVersionModal() {
-    document.getElementById('versionModal').classList.remove('open');
-}
+document.addEventListener('DOMContentLoaded', () => {
+    versionsManager.init();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') versionsManager.closeModal();
+});
 
         // --- Number Counter Animation ---
         const counters = document.querySelectorAll('.counter');
