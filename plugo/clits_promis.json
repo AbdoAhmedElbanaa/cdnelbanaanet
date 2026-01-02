@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "name": "مدونة التقنية الحديثة",
+        "url": "tech-example.com",
+        "avatar": "https://i.pravatar.cc/150?img=11",
+        "badge": "VIP"
+    },
+    {
+        "id": 2,
+        "name": "متجر الأزياء",
+        "url": "fashion-store.net",
+        "avatar": "https://i.pravatar.cc/150?img=5",
+        "badge": "PRO"
+    },
+    {
+        "id": 3,
+        "name": "مجلة السيارات",
+        "url": "cars-mag.org",
+        "avatar": "https://i.pravatar.cc/150?img=3",
+        "badge": "NEW"
+    }
+]
