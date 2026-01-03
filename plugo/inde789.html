@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html data-theme='light' dir='rtl' lang='ar'>
 <head>
@@ -218,10 +219,154 @@
     width: 36px; background: #3b82f6; opacity: 1;
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
 }
+/* أنيميشن الطفو للأيقونات الخلفية */ @keyframes float-slow { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } } @keyframes float-medium { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.05); } } @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } } .animate-float-1 { animation: float-slow 8s ease-in-out infinite; } .animate-float-2 { animation: float-medium 6s ease-in-out infinite; animation-delay: 1s; } .animate-float-3 { animation: float-slow 7s ease-in-out infinite; animation-delay: 2s; } .btn-glow { animation: pulse-ring 2s infinite; } /* إخفاء السكرول بار للمظهر الجمالي */ .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; } /* انتقالات ناعمة للمحتوى */ .explainer-content-item { display: none; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; } .explainer-content-item.active { display: block; opacity: 1; transform: translateY(0); }
+/* تنسيق صورة المستخدم في الهيدر */
+.user-header-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5); /* حدود شفافة */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    object-fit: cover;
+    background-color: rgba(255,255,255,0.2);
+}
+
+/* حركة بسيطة عند تمرير الماوس */
+#header-client-btn:hover .user-header-avatar {
+    border-color: #fff;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+/* أنيميشن عام */
+    @keyframes float-y {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .feature-card {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .dark .feature-card {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* تأثير الـ Spotlight */
+    .spotlight-overlay {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
+        background: radial-gradient(600px circle at var(--x) var(--y), rgba(59, 130, 246, 0.1), transparent 40%);
+        z-index: 10;
+        border-radius: inherit;
+    }
+
+    .feature-card:hover .spotlight-overlay {
+        opacity: 1;
+    }
+
+    /* زخارف الخلفية داخل البطاقات */
+    .card-decoration {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 40%;
+        background: linear-gradient(to top, rgba(59, 130, 246, 0.05), transparent);
+        z-index: 0;
+        pointer-events: none;
+    }
+    
+    .icon-box {
+        animation: float-y 6s ease-in-out infinite;
+    }
+        .widget-card {
+        backface-visibility: hidden;
+    }
+    
+    /* عند التحويم، نقوم بتفعيل بعض الحركات داخل الـ SVG إذا وجدت كلاسات معينة */
+    .widget-card:hover .animate-on-hover {
+        animation-play-state: running;
+    }
+    
+    /* تخصيص السكرول بار إذا كان المحتوى طويل */
+    .visual-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    .visual-content::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.2);
+        border-radius: 4px;
+    }
+    .perspective-2000 { perspective: 2000px; }
+    @keyframes float-simple {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+    .animate-float-slow { animation: float-simple 6s ease-in-out infinite; }
+    .animate-float-delayed { animation: float-simple 7s ease-in-out infinite 2s; }
+        /* تحسينات CSS للأنيميشن */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+/* تأثير الطفو المستمر للأيقونات */
+@keyframes float-icon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.flying-icon-wrapper {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1; /* جعلها فوق الخلفية مباشرة */
+    overflow: hidden;
+}
+
+.flying-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5); /* تبدأ صغيرة وفي المنتصف */
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* حركة "نطاطة" جذابة */
+}
+
+/* عند تمرير الماوس على الكارد الأب (group) */
+.group:hover .flying-icon {
+    opacity: 1; /* تظهر */
+    /* التحرك سيتم تحديده في الجافاسكريبت لكل أيقونة */
+}
 </style>
 </head>
 <body class="selection:bg-blue-500 selection:text-white antialiased">
+<div id="global-mouse-container" class="fixed inset-0 z-[1] overflow-hidden pointer-events-none">
+    
+    <div id="global-spotlight" class="absolute inset-0 opacity-0 transition-opacity duration-500" 
+         style="background: radial-gradient(600px circle at var(--x) var(--y), rgba(59, 130, 246, 0.15), transparent 40%); mix-blend-mode: screen;">
+    </div>
 
+    <div data-speed="4" class="parallax-element absolute top-[10%] left-[10%] animate-float-1 opacity-20">
+        <div class="w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+    </div>
+
+    <div data-speed="-3" class="parallax-element absolute top-[40%] right-[10%] animate-float-2 opacity-20">
+        <div class="w-32 h-32 bg-purple-500/10 rounded-full blur-xl"></div>
+    </div>
+
+    <div data-speed="2" class="parallax-element absolute bottom-[10%] left-[20%] animate-float-3 opacity-20">
+        <div class="w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+    </div>
+
+    <div data-speed="-2" class="parallax-element absolute bottom-[30%] right-[20%] animate-float-1 opacity-20">
+        <div class="w-28 h-28 bg-orange-500/10 rounded-full blur-xl"></div>
+    </div>
+
+</div>
     <!-- Global Loader -->
 <div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 dark:bg-[#020617]/95 backdrop-blur-3xl transition-opacity duration-700 ease-out">
     <div class="relative flex flex-col items-center">
@@ -356,7 +501,7 @@
                     </button>
 
                     <!-- زر منطقة العملاء -->
-                     <button onclick="switchView('client-area')" class="nav-link ml-4 flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 font-bold">
+                     <button id="header-client-btn" onclick="switchView('client-area')" class="nav-link ml-4 flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-6 py-2.5 rounded-2xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 font-bold min-w-[160px] justify-center">
                         <i data-lucide="user-circle" size="20"></i>
                         <span class="font-bold">منطقة العملاء</span>
                     </button>
@@ -741,15 +886,6 @@
     </div>
 </section>
 
-<style>
-    .perspective-2000 { perspective: 2000px; }
-    @keyframes float-simple {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-    .animate-float-slow { animation: float-simple 6s ease-in-out infinite; }
-    .animate-float-delayed { animation: float-simple 7s ease-in-out infinite 2s; }
-</style>
         <!-- Slider Section -->
 <section id="pg-gallery-section" class="py-24 relative overflow-hidden bg-slate-50 dark:bg-[#0B1120]">
     
@@ -810,165 +946,226 @@
 </section>
 
         <!-- Explainer Section (Dynamic Lock/Unlock) -->
-        <section id="explainer" class="py-32 overflow-hidden">
-            <div class="max-auto mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-24" data-aos="fade-up">
-                    <span class="text-blue-600 font-bold tracking-wider text-base uppercase mb-4 block animate-pulse" data-i18n="explore_title">اكتشف الإمكانيات</span>
-                    <h2 class="text-5xl md:text-6xl font-black text-[var(--text-primary)] mb-8" data-i18n="tour_title">جولة تفاعلية داخل القالب</h2>
-                    <p class="text-[var(--text-secondary)] text-xl max-w-3xl mx-auto" data-i18n="tour_desc">تنقل بين الخصائص وشاهد كيف يمكن لقالب Plugo AI أن يغير شكل ومضمون مدونتك.</p>
-                </div>
+<section id="explainer" class="relative py-32 overflow-hidden bg-slate-50 dark:bg-[#0f172a]">
+    
+    <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+        <div class="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-float-1"></div>
+        <div class="absolute -bottom-[20%] -left-[10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-float-2"></div>
+        
+        <div class="absolute top-20 left-[10%] text-blue-300/40 dark:text-blue-500/20 animate-float-3">
+            <i data-lucide="code-2" size="48"></i>
+        </div>
+        <div class="absolute bottom-40 right-[5%] text-purple-300/40 dark:text-purple-500/20 animate-float-1">
+            <i data-lucide="settings" size="64"></i>
+        </div>
+        <div class="absolute top-1/2 left-[5%] text-emerald-300/40 dark:text-emerald-500/20 animate-float-2">
+            <i data-lucide="zap" size="32"></i>
+        </div>
+    </div>
 
-                <div class="flex flex-col lg:flex-row gap-12 glass rounded-[3rem] p-6 lg:p-8 shadow-2xl border border-white/40 dark:border-white/5" data-aos="zoom-in" data-aos-duration="800">
+    <div class="relative max-auto mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        
+        <div class="text-center mb-20 relative" data-aos="fade-up">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 mb-6 backdrop-blur-sm">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                </span>
+                <span class="text-blue-600 dark:text-blue-400 font-bold text-sm tracking-wide uppercase" data-i18n="explore_title">اكتشف الإمكانيات</span>
+            </div>
+            <h2 class="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight" data-i18n="tour_title">
+                جولة <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">تفاعلية</span>
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed" data-i18n="tour_desc">
+                استكشف قوة القالب من الداخل. تحكم كامل، سرعة فائقة، وأدوات سيو مدمجة لضمان نجاح مدونتك.
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] p-4 lg:p-6 shadow-2xl border border-white/50 dark:border-slate-700/50 ring-1 ring-black/5" data-aos="zoom-in" data-aos-duration="800">
+            
+            <div class="lg:w-1/4 flex flex-col gap-3 p-2" id="explainer-sidebar">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-4 mb-2">القائمة الرئيسية</div>
+                
+                <button onclick="switchExplainer('cp-content', this)" class="explainer-btn active group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg overflow-hidden text-right w-full">
+                    <div class="absolute inset-0 bg-blue-600/5 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 rounded-l-full scale-y-0 group-[.active]:scale-y-100 transition-transform"></div>
                     
-                    <div class="lg:w-1/3 flex flex-col gap-4 p-6 transition-all duration-300 opacity-50 pointer-events-none" id="explainer-sidebar">
-                        <button onclick="switchExplainer('cp-content', this)" class="explainer-btn active flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
-                            <div class="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
-                                <i data-lucide="sliders-horizontal" size="28"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-blue-600 transition-colors" data-i18n="cp_title">لوحة التحكم</h4>
-                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="cp_sub">تخصيص شامل بلا أكواد</p>
-                            </div>
-                        </button>
-
-                        <button onclick="switchExplainer('seo-content', this)" class="explainer-btn flex items-center gap-6 p-6 rounded-3xl text-right group hover:bg-white/40 dark:hover:bg-slate-700/40">
-                            <div class="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm">
-                                <i data-lucide="search" size="28"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-[var(--text-primary)] text-2xl group-hover:text-purple-600 transition-colors" data-i18n="seo_title">أدوات السيو</h4>
-                                <p class="text-base text-[var(--text-secondary)] mt-2" data-i18n="seo_sub">تصدر نتائج البحث الأولى</p>
-                            </div>
-                        </button>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform shadow-sm ring-1 ring-blue-500/20">
+                        <i data-lucide="sliders-horizontal" size="22"></i>
                     </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800 dark:text-white text-lg group-hover:text-blue-600 transition-colors" data-i18n="cp_title">لوحة التحكم</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">تخصيص شامل بلا أكواد</p>
+                    </div>
+                </button>
 
-                    <div class="lg:w-2/3 bg-white/60 dark:bg-slate-800/60 rounded-[2.5rem] p-3 border border-white/50 dark:border-slate-700 shadow-inner relative overflow-hidden min-h-[550px] flex items-center justify-center" id="explainer-content-wrapper">
-                        
-                        <!-- Locked View -->
-                        <div id="explainer-locked-view" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/60 dark:bg-slate-800/60 backdrop-blur-md transition-all duration-500">
-                            <div class="text-center max-w-md p-10">
-                                <div class="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/20 animate-pulse">
-                                    <i data-lucide="lock" size="48"></i>
-                                </div>
-                                <h3 class="text-3xl font-black text-[var(--text-primary)] mb-4">محتوى حصري للعملاء</h3>
-                                <p class="text-[var(--text-secondary)] text-xl leading-relaxed mb-10">
-                                    هذه الجولة التفاعلية متاحة فقط لعملاء القالب المسجلين. يرجى تسجيل الدخول للوصول الكامل.
-                                </p>
-                                <button onclick="switchView('client-area')" class="btn-premium w-full py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3">
-                                    <span>دخول منطقة العملاء</span>
-                                    <i data-lucide="arrow-left" size="20"></i>
-                                </button>
+                <button onclick="switchExplainer('seo-content', this)" class="explainer-btn group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg overflow-hidden text-right w-full">
+                    <div class="absolute inset-0 bg-purple-600/5 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-600 rounded-l-full scale-y-0 group-[.active]:scale-y-100 transition-transform"></div>
+
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-sm ring-1 ring-purple-500/20">
+                        <i data-lucide="search" size="22"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800 dark:text-white text-lg group-hover:text-purple-600 transition-colors" data-i18n="seo_title">أدوات السيو</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">تصدر نتائج البحث الأولى</p>
+                    </div>
+                </button>
+                
+                </div>
+
+            <div class="lg:w-3/4 relative min-h-[500px] bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden group/display" id="explainer-content-wrapper">
+                
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div id="explainer-locked-view" class="absolute inset-0 z-30 flex flex-col items-center justify-center backdrop-blur-md bg-white/30 dark:bg-slate-900/40 transition-all duration-700">
+                    <div class="relative p-10 text-center max-w-md bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-600 transform transition-transform hover:scale-105 duration-500">
+                        <div class="absolute -top-10 left-1/2 -translate-x-1/2">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl shadow-xl shadow-blue-500/30 flex items-center justify-center transform rotate-3 animate-float-2 border-4 border-white dark:border-slate-800">
+                                <i data-lucide="lock" size="36"></i>
                             </div>
                         </div>
 
-                        <!-- Unlocked Content View (Hidden by default) -->
-                        <div id="explainer-unlocked-view" class="relative w-full h-full p-8 opacity-0 transition-opacity duration-500 pointer-events-none">
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-3">محتوى حصري للمشتركين</h3>
+                            <p class="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed text-sm">
+                                هذه الميزة التفاعلية متاحة فقط لعملاء القالب. <br> قم بتسجيل الدخول لتجربة لوحة التحكم الحية.
+                            </p>
                             
-                            <!-- Control Panel Content -->
-                            <div id="cp-content" class="explainer-content-item active">
-                                <div class="bg-slate-900 rounded-3xl p-2 shadow-2xl mb-8 border border-slate-700 overflow-hidden group">
-                                    <div class="relative overflow-hidden rounded-2xl">
-                                         <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                                         <img src="https://placehold.co/800x400/1e293b/ffffff?text=Advanced+Control+Panel" class="w-full h-64 object-cover group-hover:scale-105 transition duration-700">
-                                         <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3">
-                                             <div class="bg-blue-600 text-white p-2 rounded-lg shadow-lg animate-bounce"><i data-lucide="mouse-pointer-2" size="20"></i></div>
-                                             <span class="text-white font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded-lg border border-white/20">تخصيص مباشر</span>
-                                         </div>
-                                    </div>
-                                </div>
-                                <h3 class="text-3xl font-black text-[var(--text-primary)] mb-4">تحكم كامل دون أكواد</h3>
-                                <p class="text-lg text-[var(--text-secondary)] leading-relaxed mb-6">
-                                    قم بتخصيص كل جزء من مدونتك بسهولة تامة. يمكنك تغيير الألوان، الخطوط، وتخطيط الصفحة الرئيسية بضغطة زر واحدة من خلال لوحة تحكم بلوجر المتقدمة.
-                                </p>
-                                <div class="flex flex-wrap gap-3">
-                                    <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl font-bold text-sm border border-blue-100 dark:border-blue-800">تغيير الألوان</span>
-                                    <span class="px-4 py-2 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl font-bold text-sm border border-purple-100 dark:border-purple-800">إدارة الأقسام</span>
-                                    <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 rounded-xl font-bold text-sm border border-emerald-100 dark:border-emerald-800">رفع الشعار</span>
-                                </div>
-                            </div>
-
-                            <!-- SEO Content -->
-                            <div id="seo-content" class="explainer-content-item">
-                                <div class="grid grid-cols-2 gap-6 mb-8">
-                                    <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm text-center">
-                                        <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4"><i data-lucide="bar-chart-2" size="32"></i></div>
-                                        <div class="text-4xl font-black text-[var(--text-primary)] mb-1">100%</div>
-                                        <div class="text-sm font-bold text-[var(--text-secondary)] uppercase">PageSpeed</div>
-                                    </div>
-                                    <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm text-center">
-                                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4"><i data-lucide="search-check" size="32"></i></div>
-                                        <div class="text-4xl font-black text-[var(--text-primary)] mb-1">A+</div>
-                                        <div class="text-sm font-bold text-[var(--text-secondary)] uppercase">SEO Rank</div>
-                                    </div>
-                                </div>
-                                <h3 class="text-3xl font-black text-[var(--text-primary)] mb-4">تصدر نتائج البحث الأولى</h3>
-                                <p class="text-lg text-[var(--text-secondary)] leading-relaxed mb-6">
-                                    تم بناء القالب وفق أحدث معايير محركات البحث (SEO). دعم كامل لبيانات Schema.org، وسرعة تحميل فائقة تضمن تجربة مستخدم ممتازة وتصنيف أعلى.
-                                </p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center gap-3 text-[var(--text-primary)] font-medium"><i data-lucide="check-circle" class="text-green-500" size="20"></i> توافق تام مع Core Web Vitals</li>
-                                    <li class="flex items-center gap-3 text-[var(--text-primary)] font-medium"><i data-lucide="check-circle" class="text-green-500" size="20"></i> أكواد ميتا تاغ ذكية وتلقائية</li>
-                                </ul>
-                            </div>
+                            <button onclick="switchView('client-area')" class="btn-glow w-full py-4 rounded-xl bg-slate-900 dark:bg-blue-600 text-white font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-3 group/btn">
+                                <span>فتح القفل الآن</span>
+                                <i data-lucide="arrow-left" size="20" class="group-hover/btn:-translate-x-1 transition-transform"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <!-- Features Grid Section -->
-        <section id="features" class="py-32">
-            <div class="max-auto mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-24" data-aos="fade-up">
-                    <h2 class="text-5xl font-black text-[var(--text-primary)] mb-6" data-i18n="feat_head">مميزات إضافية</h2>
-                    <p class="text-[var(--text-secondary)] max-w-2xl mx-auto text-xl" data-i18n="feat_desc">كل ما تحتاجه للنجاح موجود هنا.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="100">
-                        <div class="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-blue-500/50 group-hover:scale-110">
-                            <i data-lucide="zap" size="40"></i>
+                <div id="explainer-unlocked-view" class="relative w-full h-full p-8 lg:p-10 opacity-0 pointer-events-none transition-opacity duration-500 overflow-y-auto hide-scrollbar">
+                    
+                    <div id="cp-content" class="explainer-content-item active">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h3 class="text-3xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-3">
+                                    <span class="w-3 h-8 bg-blue-600 rounded-full inline-block"></span>
+                                    تحكم كامل (No-Code)
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 max-w-lg">
+                                    غيّر هوية موقعك بالكامل بضغطة زر. لا حاجة لخبرة برمجية.
+                                </p>
+                            </div>
+                            <div class="hidden sm:block">
+                                <span class="px-3 py-1 rounded-lg bg-green-100 text-green-700 text-xs font-bold border border-green-200">Ver 3.0</span>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f1_title">سرعة تحميل فائقة</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f1_desc">أكواد نظيفة ومضغوطة تضمن تحميل مدونتك في أجزاء من الثانية.</p>
-                    </div>
-                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="200">
-                        <div class="w-20 h-20 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-purple-500/50 group-hover:scale-110">
-                            <i data-lucide="search" size="40"></i>
+
+                        <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600 shadow-lg mb-8 group/img">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent z-10 translate-y-[-100%] group-hover/img:translate-y-[100%] transition-transform duration-1000"></div>
+                            <img src="https://placehold.co/800x400/1e293b/ffffff?text=Interactive+Control+Panel+UI" class="w-full object-cover h-56 lg:h-64 hover:scale-105 transition-transform duration-700">
+                            
+                            <div class="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 border border-slate-100 dark:border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                Live Preview
+                            </div>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f2_title">صديق لمحركات البحث</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f2_desc">هيكلية البيانات (Schema) مدمجة بشكل صحيح.</p>
-                    </div>
-                    <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="300">
-                        <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-emerald-500/50 group-hover:scale-110">
-                            <i data-lucide="layout" size="40"></i>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600 hover:border-blue-500/50 transition-colors group/feat">
+                                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 flex items-center justify-center mb-3 group-hover/feat:scale-110 transition-transform"><i data-lucide="palette" size="20"></i></div>
+                                <h5 class="font-bold text-slate-800 dark:text-white">ألوان غير محدودة</h5>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600 hover:border-blue-500/50 transition-colors group/feat">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 flex items-center justify-center mb-3 group-hover/feat:scale-110 transition-transform"><i data-lucide="layout-template" size="20"></i></div>
+                                <h5 class="font-bold text-slate-800 dark:text-white">تخطيط مرن</h5>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600 hover:border-blue-500/50 transition-colors group/feat">
+                                <div class="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900/50 text-teal-600 flex items-center justify-center mb-3 group-hover/feat:scale-110 transition-transform"><i data-lucide="type" size="20"></i></div>
+                                <h5 class="font-bold text-slate-800 dark:text-white">خطوط عربية</h5>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f3_title">تصميم متجاوب</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f3_desc">يظهر القالب بشكل مثالي على جميع الأجهزة.</p>
                     </div>
-                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="400">
-                        <div class="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 text-orange-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-orange-500/50 group-hover:scale-110">
-                            <i data-lucide="moon" size="40"></i>
+
+                    <div id="seo-content" class="explainer-content-item">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h3 class="text-3xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-3">
+                                    <span class="w-3 h-8 bg-purple-600 rounded-full inline-block"></span>
+                                    تصدر محركات البحث
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 max-w-lg">
+                                    بنية برمجية نظيفة متوافقة تماماً مع معايير Google Core Vitals.
+                                </p>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f4_title">وضع مظلم ذكي</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f4_desc">دعم كامل للوضع المظلم يريح عين القارئ.</p>
-                    </div>
-                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="500">
-                        <div class="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-pink-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-pink-500/50 group-hover:scale-110">
-                            <i data-lucide="settings" size="40"></i>
+
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div class="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-slate-700 dark:to-slate-800 p-6 rounded-[2rem] border border-green-200 dark:border-slate-600 text-center group">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="zap" size="80"></i></div>
+                                <div class="text-5xl font-black text-emerald-600 dark:text-emerald-400 mb-2">99%</div>
+                                <div class="text-xs font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-widest">Speed Score</div>
+                                <div class="w-full bg-emerald-200/50 h-1.5 rounded-full mt-4 overflow-hidden">
+                                    <div class="bg-emerald-500 h-full w-[99%] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-800 p-6 rounded-[2rem] border border-blue-200 dark:border-slate-600 text-center group">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="search" size="80"></i></div>
+                                <div class="text-5xl font-black text-blue-600 dark:text-blue-400 mb-2">A+</div>
+                                <div class="text-xs font-bold text-blue-800 dark:text-blue-200 uppercase tracking-widest">SEO Structure</div>
+                                <div class="w-full bg-blue-200/50 h-1.5 rounded-full mt-4 overflow-hidden">
+                                    <div class="bg-blue-500 h-full w-[100%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f5_title">لوحة تحكم قوية</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f5_desc">تخصيص الألوان، الخطوط، والأقسام بسهولة تامة.</p>
-                    </div>
-                     <div class="glass-card hover:glass-hover p-12 rounded-[2.5rem] transition duration-500 group border border-white/50 dark:border-white/5" data-aos="fade-up" data-aos-delay="600">
-                        <div class="w-20 h-20 bg-sky-100 dark:bg-sky-900/30 text-sky-600 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-sky-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-sky-500/50 group-hover:scale-110">
-                            <i data-lucide="headphones" size="40"></i>
+
+                        <div class="bg-slate-50 dark:bg-slate-700/30 rounded-2xl p-6 border border-slate-100 dark:border-slate-700">
+                            <ul class="space-y-4">
+                                <li class="flex items-center gap-4">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0"><i data-lucide="check" size="14"></i></div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200">دعم كامل لبيانات Schema.org المنظمة</span>
+                                </li>
+                                <li class="flex items-center gap-4">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0"><i data-lucide="check" size="14"></i></div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200">أكواد Meta Tags ذكية وتلقائية لكل مقال</span>
+                                </li>
+                                <li class="flex items-center gap-4">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0"><i data-lucide="check" size="14"></i></div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200">متوافق مع الأجهزة المحمولة (Mobile First)</span>
+                                </li>
+                            </ul>
                         </div>
-                        <h3 class="font-bold text-2xl mb-5 text-[var(--text-primary)]" data-i18n="f6_title">دعم فني متميز</h3>
-                        <p class="text-[var(--text-secondary)] leading-relaxed text-lg" data-i18n="f6_desc">فريق دعم فني جاهز للإجابة على استفساراتك.</p>
                     </div>
+
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
+
+
+<section id="features-pro" class="py-24 relative overflow-hidden bg-slate-50 dark:bg-[#0b1120]">
+    
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/20 via-slate-50/0 to-slate-50/0 dark:from-blue-900/10"></div>
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+    </div>
+
+    <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h2 class="text-5xl md:text-6xl font-black text-slate-900 dark:text-white mb-6">
+                مكتبة <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">الإمكانيات</span>
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-2xl mx-auto">
+                تصميمات ذكية تتفاعل معك. مرر الماوس لاكتشاف التفاصيل.
+            </p>
+        </div>
+
+        <div id="magic-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+            </div>
+
+    </div>
+</section>
 
         <!-- Versions Section -->
         <section id="versions" class="py-32">
@@ -1310,6 +1507,7 @@
         const CLIENT_JSON_URL = 'https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/clits_promis.json'; 
         const PREVIEW_URL = 'http://elbana.net/'; 
         const PG_GALLERY_URL = 'https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/gallery.json';
+        const FEATURES_API_PRO = "https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/opt.json"; 
 
 
 
@@ -2195,34 +2393,49 @@ document.addEventListener('keydown', (e) => {
             }
         }
 
-        function switchExplainer(targetId, btn) {
-            // Update Buttons State
-            document.querySelectorAll('.explainer-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
+    function switchExplainer(targetId, btn) {
+        // 1. التعامل مع الأزرار (Sidebar)
+        const buttons = document.querySelectorAll('.explainer-btn');
+        buttons.forEach(b => {
+            b.classList.remove('active', 'bg-white', 'shadow-md', 'dark:bg-slate-800'); // إزالة ستايل النشط
             
-            // Hide all content items first
-            document.querySelectorAll('.explainer-content-item').forEach(item => {
-                item.classList.remove('active');
-                // Ensure opacity transition works by managing display property if needed
-                item.style.opacity = '0';
-                setTimeout(() => {
-                    if(!item.classList.contains('active')) item.style.display = 'none';
-                }, 300);
-            });
-
-            // Show target content
-            const target = document.getElementById(targetId);
-            if(target) {
-                target.style.display = 'block';
-                // Small timeout to allow display:block to render before changing opacity
-                setTimeout(() => {
-                    target.classList.add('active');
-                    target.style.opacity = '1';
-                }, 50);
+            // إعادة أيقونات الأزرار غير النشطة للوضع الطبيعي
+            const iconContainer = b.querySelector('div:first-child');
+            if(iconContainer) {
+                iconContainer.classList.remove('bg-blue-600', 'text-white', 'rotate-3', 'scale-110');
             }
+        });
+
+        // تفعيل الزر المضغوط
+        btn.classList.add('active');
+
+        // 2. التعامل مع المحتوى (Content)
+        const items = document.querySelectorAll('.explainer-content-item');
+        
+        // إخفاء جميع العناصر أولاً
+        items.forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                item.classList.remove('active');
+                item.style.display = 'none';
+            }, 300);
+        });
+
+        // إظهار العنصر المطلوب بتأخير بسيط للأنيميشن
+        const target = document.getElementById(targetId);
+        if (target) {
+            setTimeout(() => {
+                target.style.display = 'block';
+                // Trigger reflow
+                void target.offsetWidth; 
+                target.classList.add('active');
+                target.style.opacity = '1';
+                target.style.transform = 'translateY(0)';
+            }, 300);
         }
+    }
+
 
         // --- View Switcher Logic ---
         function switchView(viewName) {
@@ -2247,6 +2460,7 @@ document.addEventListener('keydown', (e) => {
                 if(window.renderApp && state.view !== 'login' && SessionManager.get()) {
                     setTimeout(() => TourService.start(), 500);
                 }
+                
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2451,6 +2665,7 @@ window.addEventListener('load', () => {
         document.getElementById('mobile-docs-btn')?.classList.remove('hidden');
         // Unlock explainer if logged in
         if (typeof updateExplainerState === 'function') updateExplainerState(true);
+        updateHeaderButtonUI();
     } else {
         // Ensure locked if not logged in
         if (typeof updateExplainerState === 'function') updateExplainerState(false);
@@ -2625,7 +2840,7 @@ window.addEventListener('load', () => {
                         SessionManager.create({ ...result.meta, email, password: pass });
                         state.user = result.meta; state.blogs = result.blogs || [];
                         Actions.resolveView(result.meta.status || 'active'); Helpers.toast(t.toastWelcome.replace('{name}', result.meta.name));
-                        
+                        updateHeaderButtonUI();
                         // Show Docs Button on successful login
                         document.getElementById('desktop-docs-btn').classList.remove('hidden');
                         document.getElementById('mobile-docs-btn').classList.remove('hidden');
@@ -2645,7 +2860,7 @@ window.addEventListener('load', () => {
                 state.user = null; 
                 state.update({}); 
                 document.getElementById('logout-confirm-modal').classList.remove('open');
-                
+                updateHeaderButtonUI();
                 // Hide Docs Button on logout
                 document.getElementById('desktop-docs-btn').classList.add('hidden');
                 document.getElementById('mobile-docs-btn').classList.add('hidden');
@@ -3882,6 +4097,223 @@ function startPgSwiper() {
         }
     });
 }
+        (function() {
+            var script = document.createElement("script");
+            script.src = "https://cdn.elbana.net/SmoothScroll.min.js";
+            script.onload = function() {
+                SmoothScroll({
+                    animationTime: 450, // مدة التمرير بالمللي ثانية
+                    stepSize: 90, // مقدار التمرير في كل مرة
+                    accelerationDelta: 50, // التسارع في الحركة
+                    accelerationMax: 3, // الحد الأقصى للتسارع
+                    touchpadSupport: true, // دعم التمرير في شاشات اللمس
+                    arrowScroll: 50,
+					frameRate: 150
+               });
+            };
+            document.documentElement.appendChild(script);
+        })();
+
+/**
+ * دالة تحديث زر الهيدر بناءً على حالة تسجيل الدخول
+ */
+function updateHeaderButtonUI() {
+    const btn = document.getElementById('header-client-btn');
+    if (!btn) return;
+
+    // التحقق من وجود جلسة أو بيانات مستخدم
+    const session = SessionManager.get();
+    const user = state.user || (session ? session.data : null);
+
+    if (user) {
+        // --- حالة تسجيل الدخول: عرض الاسم والصورة ---
+        
+        // جلب أول حرف من الاسم أو استخدام صورة رمزية
+        const name = user.name || 'User';
+        const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffffff&color=2563eb&bold=true&length=1`;
+
+        // تغيير محتوى الزر (HTML Injection)
+        btn.innerHTML = `
+            <img src="${avatarUrl}" class="user-header-avatar animate-scale-in" alt="${name}">
+            <span class="font-bold truncate max-w-[100px] animate-fade-in">${name}</span>
+            <i data-lucide="chevron-down" size="16" class="opacity-70"></i>
+        `;
+        
+        // إضافة تلميح (Tooltip)
+        btn.title = "الذهاب إلى لوحة التحكم";
+
+    } else {
+        // --- حالة الزائر: عرض الزر الافتراضي ---
+        btn.innerHTML = `
+            <i data-lucide="user-circle" size="20"></i>
+            <span class="font-bold">منطقة العملاء</span>
+        `;
+        btn.title = "تسجيل الدخول";
+    }
+
+    // إعادة تفعيل الأيقونات للعناصر الجديدة
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+(function initGlobalMouseEffects() {
+    
+    const container = document.getElementById('global-mouse-container');
+    const spotlight = document.getElementById('global-spotlight');
+    const parallaxElements = document.querySelectorAll('.parallax-element');
+
+    if (container && spotlight) {
+        
+        // استماع للحركة على كامل الصفحة
+        document.addEventListener('mousemove', (e) => {
+            
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // 1. تحديث تأثير الضوء (Spotlight)
+            spotlight.style.opacity = '1';
+            spotlight.style.setProperty('--x', `${x}px`);
+            spotlight.style.setProperty('--y', `${y}px`);
+
+            // تحديث لون الضوء ديناميكياً بناءً على الموقع (اختياري لجمالية أكثر)
+            // يغير اللون بين الأزرق والبنفسجي حسب العرض
+            const xPercent = x / window.innerWidth;
+            const hue = 200 + (xPercent * 60); 
+            spotlight.style.background = `radial-gradient(600px circle at var(--x) var(--y), hsla(${hue}, 80%, 60%, 0.15), transparent 40%)`;
+
+            // 2. تحديث العناصر العائمة (Parallax)
+            requestAnimationFrame(() => {
+                parallaxElements.forEach(el => {
+                    const speed = parseFloat(el.getAttribute('data-speed')) || 2;
+                    
+                    // الحركة عكس اتجاه الماوس لعمل عمق
+                    const xPos = (window.innerWidth - x * speed) / 100; 
+                    const yPos = (window.innerHeight - y * speed) / 100;
+                    
+                    el.style.transform = `translate(${xPos}px, ${yPos}px)`;
+                });
+            });
+        });
+
+        // إخفاء الضوء عند مغادرة النافذة
+        document.addEventListener('mouseleave', () => {
+            spotlight.style.opacity = '0';
+        });
+    }
+
+})();
+
+function handleSpotlight(e) {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // تمرير المتغيرات إلى CSS
+        card.style.setProperty('--x', `${x}px`);
+        card.style.setProperty('--y', `${y}px`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initMagicCards();
+    });
+
+    async function initMagicCards() {
+        const grid = document.getElementById('magic-grid');
+        if (!grid) return;
+
+        // Skeleton Loading
+        grid.innerHTML = Array(4).fill(0).map(() => `
+            <div class="h-[380px] rounded-[2.5rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 animate-pulse">
+                <div class="w-14 h-14 bg-slate-200 dark:bg-slate-700 rounded-2xl mb-6"></div>
+                <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded w-2/3 mb-4"></div>
+                <div class="flex-1 bg-slate-100 dark:bg-slate-700/50 rounded-2xl"></div>
+            </div>
+        `).join('');
+
+        try {
+            const response = await fetch(FEATURES_API_PRO);
+            const data = await response.json();
+            grid.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const visualContent = item.visual || '';
+                
+                // توليد الـ Tags
+                const tagsHTML = item.tags ? item.tags.map(tag => 
+                    `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-${item.color}-50 dark:bg-${item.color}-900/20 text-${item.color}-600 dark:text-${item.color}-300 border border-${item.color}-100 dark:border-${item.color}-800/30 shadow-sm relative z-20">${tag}</span>`
+                ).join('') : '';
+
+                const card = document.createElement('div');
+                // لاحظ: الخلفية (bg-white) الآن في العنصر الرئيسي
+                card.className = `group relative h-[400px] bg-white dark:bg-[#151e32] rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-${item.color}-500/20 hover:border-${item.color}-500/40 transition-all duration-500 overflow-hidden`;
+                card.setAttribute('data-aos', 'fade-up');
+                card.setAttribute('data-aos-delay', index * 50);
+
+                card.innerHTML = `
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-${item.color}-500/5 rounded-full blur-[60px] group-hover:bg-${item.color}-500/10 transition-all duration-500 z-0"></div>
+
+                    <div class="flying-icon-wrapper">
+                        <div class="flying-icon group-hover:-translate-x-12 group-hover:-translate-y-12 group-hover:rotate-[-12deg] text-${item.color}-400/40 dark:text-${item.color}-500/30">
+                            <i data-lucide="${item.icon}" size="32"></i>
+                        </div>
+                        
+                        <div class="flying-icon group-hover:translate-x-14 group-hover:-translate-y-10 group-hover:rotate-[12deg] delay-75 text-${item.color}-400/40 dark:text-${item.color}-500/30">
+                            <i data-lucide="sparkles" size="24"></i>
+                        </div>
+                        
+                        <div class="flying-icon group-hover:-translate-x-10 group-hover:translate-y-14 group-hover:rotate-[-20deg] delay-100 text-${item.color}-400/40 dark:text-${item.color}-500/30">
+                            <i data-lucide="zap" size="20"></i>
+                        </div>
+                        
+                        <div class="flying-icon group-hover:translate-x-12 group-hover:translate-y-12 group-hover:rotate-[15deg] delay-150 text-${item.color}-400/40 dark:text-${item.color}-500/30">
+                            <i data-lucide="star" size="18"></i>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 flex flex-col justify-between h-full p-6">
+                        
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-100 dark:border-slate-700 text-${item.color}-500 flex items-center justify-center shadow-lg shadow-${item.color}-500/10 group-hover:scale-110 group-hover:shadow-${item.color}-500/30 transition-all duration-500 relative z-20">
+                                    <i data-lucide="${item.icon}" size="26" stroke-width="1.5"></i>
+                                </div>
+                                
+                                <div class="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 group-hover:bg-${item.color}-500 group-hover:text-white transition-all duration-300 transform group-hover:rotate-45 relative z-20">
+                                    <i data-lucide="arrow-up-left" size="16"></i>
+                                </div>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-${item.color}-600 dark:group-hover:text-${item.color}-400 transition-colors relative z-20">
+                                ${item.title}
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4 line-clamp-2 relative z-20">
+                                ${item.desc}
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-2 mb-4 relative z-20">
+                                ${tagsHTML}
+                            </div>
+                        </div>
+
+                        <div class="relative flex-1 bg-slate-50 dark:bg-[#0f1623] rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden group-hover:border-${item.color}-200 dark:group-hover:border-${item.color}-900 transition-colors duration-500 z-20">
+                             <div class="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(60,60,60,0.03)_50%,transparent_75%,transparent_100%)] bg-[length:8px_8px]"></div>
+                             
+                             <div class="w-full h-full flex items-center justify-center p-4 relative z-10 transform group-hover:scale-105 transition-transform duration-700">
+                                ${visualContent}
+                             </div>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     </script>
 </body>
 </html>
