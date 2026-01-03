@@ -4,7 +4,7 @@
     "color": "blue",
     "title": "30 تخطيط للصفحة الرئيسية",
     "desc": "صمم موقعك كما تحب: سلايدرات 3D، واجهة متجر، مجلة ألعاب. القالب يتشكل حسب رغبتك.",
-    "visual": "<div class='grid grid-cols-2 gap-2 h-full p-4'><div class='bg-blue-100 dark:bg-blue-900/30 rounded-lg h-16 animate-pulse'></div><div class='bg-slate-100 dark:bg-slate-700 rounded-lg h-16'></div><div class='bg-slate-100 dark:bg-slate-700 rounded-lg h-24 col-span-2'></div></div>"
+    "visual": "<div class='flex justify-center items-end gap-2 transform group-hover:translate-y-[-3px] transition-transform'> <div class='w-6 h-10 border-2 border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800'></div> <div class='w-10 h-14 border-2 border-slate-400 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-800'></div> <div class='w-16 h-10 border-2 border-blue-400 dark:border-blue-500 rounded-lg bg-white dark:bg-slate-800 mb-2'></div> </div>"
   },
   {
     "icon": "bot",
