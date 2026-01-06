@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محمود علي | مهندس برمجيات ومصمم تجارب رقمية</title>
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Font: Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6', // Royal Blue
+                        secondary: '#06b6d4', // Cyan
+                        accent: '#8b5cf6', // Violet
+                        dark: '#020617', // Slate 950
+                        surface: '#0f172a', // Slate 900
+                    },
+                    fontFamily: {
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    },
+                    animation: {
+                        'float-slow': 'float 8s ease-in-out infinite',
+                        'float-medium': 'float 5s ease-in-out infinite',
+                        'float-fast': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(5deg)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.2)' },
+                            '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.6)' },
+                        },
+                        spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Tajawal', sans-serif; overflow-x: hidden; }
+        
+        /* Premium Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .glass-card-hover:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px -5px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Tech Background Grid */
+        .tech-grid {
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #3b82f6, #06b6d4); border-radius: 4px; }
+
+        /* Loader */
+        #loader {
+            position: fixed; inset: 0; z-index: 9999; background: #020617;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .loader-ring {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 4px solid transparent; border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Scroll Progress Button */
+        .progress-wrap {
+            position: fixed; right: 30px; bottom: 30px;
+            height: 50px; width: 50px; cursor: pointer; display: block;
+            border-radius: 50px; box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.2);
+            z-index: 100; opacity: 0; visibility: hidden;
+            transform: translateY(15px); transition: all 200ms linear;
+            background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(5px);
+        }
+        .progress-wrap.active-progress {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        .progress-wrap svg path {
+            fill: none;
+        }
+        .progress-wrap svg.progress-circle path {
+            stroke: #3b82f6; stroke-width: 4; box-sizing: border-box; transition: all 200ms linear;
+        }
+
+        /* 3D Perspective Utils */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+    </style>
+</head>
+<body class="bg-dark text-slate-100 selection:bg-primary selection:text-white">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="relative">
+            <div class="loader-ring"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-bold text-primary text-xl">&lt;/&gt;</div>
+        </div>
+    </div>
+
+    <!-- Scroll To Top Button -->
+    <div class="progress-wrap" id="progress-wrap">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center text-primary text-lg">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    </div>
+
+    <!-- Navigation (Glass) -->
+    <nav class="fixed w-full z-50 glass-panel top-0 border-b-0 border-b-white/5 transition-all duration-300 transform translate-y-0" id="navbar" data-aos="fade-down" data-aos-duration="1000">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-black tracking-tighter flex items-center gap-2 group">
+                <span class="text-4xl text-primary group-hover:rotate-12 transition-transform duration-300">&lt;</span>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">MAHMOUD</span>
+                <span class="text-4xl text-secondary group-hover:-rotate-12 transition-transform duration-300">/&gt;</span>
+            </a>
+            
+            <div class="hidden lg:flex gap-8 text-sm font-bold text-slate-300">
+                <a href="#about" class="hover:text-primary transition-colors relative group py-2">من أنا</a>
+                <a href="#projects" class="hover:text-primary transition-colors relative group py-2">المشاريع</a>
+                <a href="#services" class="hover:text-primary transition-colors relative group py-2">الخدمات</a>
+                <a href="#skills" class="hover:text-primary transition-colors relative group py-2">الخبرات</a>
+                <a href="#testimonials" class="hover:text-primary transition-colors relative group py-2">أراء العملاء</a>
+                <a href="#contact" class="hover:text-primary transition-colors relative group py-2">تواصل معي</a>
+            </div>
+
+            <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-slate-200"><i class="fas fa-bars"></i></button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden glass-panel border-t border-white/5 absolute w-full p-4 flex flex-col gap-4 text-center font-bold" data-aos="fade-down">
+            <a href="#about" class="block py-2">من أنا</a>
+            <a href="#projects" class="block py-2">المشاريع</a>
+            <a href="#testimonials" class="block py-2">العملاء</a>
+            <a href="#contact" class="block py-2">تواصل</a>
+        </div>
+    </nav>
+
+    <!-- 1️⃣ Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 tech-grid opacity-20 pointer-events-none"></div>
+        
+        <!-- Animated Background Orbs -->
+        <div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse" data-aos="zoom-in" data-aos-duration="2000"></div>
+        <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] animate-pulse delay-1000" data-aos="zoom-in" data-aos-duration="2000" data-aos-delay="500"></div>
+
+        <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+            
+            <!-- Text Content -->
+            <div class="text-center lg:text-right space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border-primary/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]" data-aos="fade-down" data-aos-delay="200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-xs font-bold tracking-wider text-slate-300">متاح لاستلام مشاريع جديدة</span>
+                </div>
+
+                <h1 class="text-5xl lg:text-7xl font-black leading-tight text-white" data-aos="fade-up" data-aos-delay="400">
+                    نحول الخيال إلى <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent" id="typewriter"></span>
+                </h1>
+
+                <p class="text-lg text-slate-400 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0" data-aos="fade-up" data-aos-delay="600">
+                    أنا مهندس برمجيات شغوف، أبني حلولاً رقمية معقدة بلمسة فنية. أدمج بين <span class="text-white font-bold">الأداء العالي</span> و <span class="text-white font-bold">التصميم التفاعلي</span> لخلق تجربة مستخدم لا تُنسى.
+                </p>
+
+                <div class="flex flex-wrap justify-center lg:justify-start gap-4" data-aos="fade-up" data-aos-delay="800">
+                    <a href="#contact" class="relative px-8 py-4 bg-primary rounded-xl font-bold text-white overflow-hidden group shadow-lg shadow-primary/25 hover:-translate-y-1 transition-transform duration-300">
+                        <span class="relative z-10 flex items-center gap-2">ابدأ مشروعك <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i></span>
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    </a>
+                    <a href="#projects" class="px-8 py-4 glass-panel rounded-xl font-bold text-slate-300 hover:text-white hover:border-white/20 transition-all hover:-translate-y-1">
+                        تصفح الأعمال
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3D Parallax Image -->
+            <div class="relative hidden lg:block h-[600px] perspective-container" data-aos="fade-left" data-aos-duration="1500">
+                <!-- Floating Icons -->
+                <div class="absolute top-10 right-10 glass-panel p-4 rounded-2xl animate-float-slow z-20" data-aos="zoom-in" data-aos-delay="1000">
+                    <i class="fab fa-react text-4xl text-sky-400"></i>
+                </div>
+                <div class="absolute bottom-20 left-10 glass-panel p-4 rounded-2xl animate-float-medium z-20" data-aos="zoom-in" data-aos-delay="1200">
+                    <i class="fab fa-python text-4xl text-yellow-400"></i>
+                </div>
+                <div class="absolute top-1/2 left-0 glass-panel p-4 rounded-2xl animate-float-fast z-20" data-aos="zoom-in" data-aos-delay="1400">
+                    <i class="fas fa-code text-3xl text-accent"></i>
+                </div>
+
+                <!-- Main Image Card -->
+                <div id="hero-card" class="relative w-full h-full flex items-center justify-center transform-style-3d">
+                    <div class="w-[450px] h-[550px] glass-panel rounded-[30px] p-3 relative overflow-hidden group transform transition-transform duration-500 hover:rotate-y-12 hover:rotate-x-12">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
+                        <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Coding" class="w-full h-full object-cover rounded-[20px] filter brightness-75 group-hover:brightness-100 transition-all duration-500">
+                        
+                        <!-- Floating Badge -->
+                        <div class="absolute bottom-8 right-8 bg-black/80 backdrop-blur-md p-4 rounded-xl border border-white/10 z-20 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl font-bold text-white">5+</div>
+                                <div class="text-xs text-slate-400 uppercase font-bold">سنوات<br>خبرة</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce opacity-50" id="scroll-indicator" data-aos="fade-up" data-aos-delay="1600" data-aos-offset="0">
+            <span class="text-[10px] uppercase tracking-[0.2em]">تصفح المزيد</span>
+            <div class="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-1">
+                <div class="w-1 h-2 bg-primary rounded-full animate-ping"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2️⃣ About Section -->
+    <section id="about" class="py-32 relative bg-surface overflow-hidden min-h-screen flex items-center">
+        <!-- Dynamic Background -->
+        <div class="absolute inset-0 bg-dark pointer-events-none">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-dark to-accent/5 opacity-50"></div>
+            <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent"></div>
+        </div>
+
+        <!-- Floating Particles -->
+        <div class="absolute top-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-72 h-72 bg-secondary/10 rounded-full blur-[100px] animate-pulse delay-700"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                
+                <!-- Left: Text & Creative Cards -->
+                <div class="space-y-10">
+                    <div class="relative" data-aos="fade-right">
+                        <!-- Decorative Abstract Shape behind title -->
+                        <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none"></div>
+                        
+                        <div class="flex items-center gap-4 mb-6" data-aos="fade-left" data-aos-delay="100">
+                            <div class="h-px w-12 bg-accent"></div>
+                            <span class="text-accent text-sm font-bold tracking-[0.2em] uppercase">About Me</span>
+                        </div>
+
+                        <h2 class="text-5xl lg:text-7xl font-black text-white leading-tight relative z-10" data-aos="fade-up" data-aos-delay="200">
+                            ليست مجرد برمجة، <br>
+                            <span class="relative inline-block">
+                                <span class="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-accent blur-xl opacity-30"></span>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent relative z-10">بل هندسة رقمية</span>
+                            </span>
+                        </h2>
+                    </div>
+
+                    <div class="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm group hover:border-primary/30 transition-all duration-500" data-aos="fade-up" data-aos-delay="300">
+                        <div class="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-primary to-accent rounded-r-2xl"></div>
+                        <p class="text-lg text-slate-300 leading-loose text-justify relative z-10">
+                            في عالم مليء بالأكواد، أسعى لنسج <span class="text-white font-bold decoration-accent decoration-2 underline-offset-4">قصص رقمية</span>. شغفي لا يتوقف عند كتابة الوظائف، بل يمتد لبناء أنظمة بيئية متكاملة تتسم بالذقة الهندسية والجمال الفني. أنا أحول التعقيد إلى بساطة، والأفكار المجردة إلى واقع تفاعلي ملموس.
+                        </p>
+                    </div>
+
+                    <!-- Creative Feature Cards Reimagined -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Card 1 -->
+                        <div class="relative group p-6 rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300" data-aos="zoom-in-up" data-aos-delay="400">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="relative z-10">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center text-primary text-2xl mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                                    <i class="fas fa-cubes"></i>
+                                </div>
+                                <h4 class="font-bold text-white text-xl mb-1 group-hover:text-primary transition-colors">هندسة النظم</h4>
+                                <p class="text-xs text-slate-400 font-mono">Scalable Architecture</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="relative group p-6 rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300" data-aos="zoom-in-up" data-aos-delay="500">
+                            <div class="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="relative z-10">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 flex items-center justify-center text-accent text-2xl mb-4 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-[0_0_15px_rgba(139,92,246,0.2)]">
+                                    <i class="fas fa-magic"></i>
+                                </div>
+                                <h4 class="font-bold text-white text-xl mb-1 group-hover:text-accent transition-colors">سحر الواجهة</h4>
+                                <p class="text-xs text-slate-400 font-mono">Immersive UX/UI</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="relative group p-6 rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300" data-aos="zoom-in-up" data-aos-delay="600">
+                            <div class="absolute inset-0 bg-gradient-to-br from-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="relative z-10">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/20 flex items-center justify-center text-secondary text-2xl mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h4 class="font-bold text-white text-xl mb-1 group-hover:text-secondary transition-colors">أداء خارق</h4>
+                                <p class="text-xs text-slate-400 font-mono">Ultra Performance</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="relative group p-6 rounded-2xl bg-surface border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300" data-aos="zoom-in-up" data-aos-delay="700">
+                            <div class="absolute inset-0 bg-gradient-to-br from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="relative z-10">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/5 border border-green-500/20 flex items-center justify-center text-green-400 text-2xl mb-4 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h4 class="font-bold text-white text-xl mb-1 group-hover:text-green-400 transition-colors">حماية قصوى</h4>
+                                <p class="text-xs text-slate-400 font-mono">Secure Core</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: 3D Layout Photos Visualization -->
+                <div class="relative perspective-1000 h-[600px] flex items-center justify-center" data-aos="zoom-in-left" data-aos-duration="1500">
+                    <div class="relative w-80 h-96 transform-style-3d group hover:rotate-y-12 transition-transform duration-700">
+                        
+                        <!-- Back Layer: Abstract/Code -->
+                        <div class="absolute top-0 right-0 w-full h-full bg-dark border border-white/10 rounded-3xl transform translate-x-12 translate-y-12 -translate-z-10 opacity-60 group-hover:translate-x-16 group-hover:translate-y-16 transition-all duration-500 p-4 overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent"></div>
+                            <div class="font-mono text-[8px] text-accent/50 opacity-50 leading-tight">
+                                import { Future } from 'life';<br>
+                                class Dev extends Human {<br>
+                                &nbsp;&nbsp;constructor() {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;this.passion = Infinity;<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;this.coffee = true;<br>
+                                &nbsp;&nbsp;}<br>
+                                &nbsp;&nbsp;build() {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;return Awesome.create();<br>
+                                &nbsp;&nbsp;}<br>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Middle Layer: Main Profile Photo -->
+                        <div class="absolute inset-0 glass-panel p-2 rounded-[2.5rem] transform rotate-3 transition-all duration-500 group-hover:rotate-6 z-20 shadow-2xl">
+                            <div class="relative w-full h-full rounded-[2rem] overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Profile" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-dark/90 via-transparent to-transparent"></div>
+                                <div class="absolute bottom-6 right-6 text-right">
+                                    <h3 class="text-2xl font-black text-white">محمود علي</h3>
+                                    <p class="text-primary font-mono text-xs tracking-widest">FULL STACK DEV</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Front Layer: Floating Project/Badge Card -->
+                        <div class="absolute -bottom-10 -left-10 w-48 h-32 glass-panel rounded-2xl transform translate-z-20 animate-float-medium z-30 p-4 border-l-4 border-l-secondary flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                            <div class="flex justify-between items-start">
+                                <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary text-sm">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-400">Awarded</span>
+                            </div>
+                            <div>
+                                <h5 class="text-white font-bold text-sm">أفضل تصميم</h5>
+                                <p class="text-[10px] text-slate-500">مسابقة المطورين 2023</p>
+                            </div>
+                        </div>
+
+                        <!-- Floating Icons Around -->
+                        <div class="absolute -top-10 -left-8 w-16 h-16 glass-panel rounded-full flex items-center justify-center text-3xl text-sky-400 animate-float-slow z-30 shadow-lg shadow-sky-500/20 border border-white/10">
+                            <i class="fab fa-react"></i>
+                        </div>
+                        <div class="absolute top-1/2 -right-16 w-14 h-14 glass-panel rounded-full flex items-center justify-center text-2xl text-yellow-400 animate-float-medium z-10 shadow-lg shadow-yellow-500/20 border border-white/10">
+                            <i class="fab fa-js"></i>
+                        </div>
+                        <div class="absolute -bottom-4 right-8 w-12 h-12 glass-panel rounded-full flex items-center justify-center text-xl text-green-500 animate-float-fast z-30 shadow-lg shadow-green-500/20 border border-white/10">
+                            <i class="fab fa-node"></i>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3️⃣ Certificates Section -->
+    <section id="certificates" class="py-24 relative overflow-hidden group/section">
+        <!-- Floating Icons Background (Visible on Hover) -->
+        <div class="absolute inset-0 pointer-events-none opacity-0 group-hover/section:opacity-100 transition-opacity duration-700">
+            <i class="fab fa-aws text-6xl text-orange-500/10 absolute top-20 left-20 animate-float-slow"></i>
+            <i class="fab fa-google text-6xl text-blue-500/10 absolute bottom-20 right-20 animate-float-medium"></i>
+            <i class="fas fa-certificate text-8xl text-white/5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow"></i>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="mb-12 flex justify-between items-end">
+                <div data-aos="fade-right">
+                    <h2 class="text-3xl font-black mb-2 border-r-4 border-accent pr-4">معرض الشهادات</h2>
+                    <p class="text-slate-400">توثيق رحلة التعلم المستمر والاعتمادات الدولية</p>
+                </div>
+                <!-- Navigation -->
+                <div class="flex gap-4" data-aos="fade-left">
+                    <button class="swiper-btn-prev w-12 h-12 rounded-full glass-panel hover:bg-primary hover:text-white transition flex items-center justify-center border border-white/10"><i class="fas fa-arrow-right"></i></button>
+                    <button class="swiper-btn-next w-12 h-12 rounded-full glass-panel hover:bg-primary hover:text-white transition flex items-center justify-center border border-white/10"><i class="fas fa-arrow-left"></i></button>
+                </div>
+            </div>
+
+            <!-- Swiper Container -->
+            <div class="swiper cert-swiper w-full py-10" data-aos="zoom-in-up" data-aos-delay="200">
+                <div class="swiper-wrapper" id="cert-wrapper">
+                    <!-- Images Injected via JS -->
+                </div>
+                <div class="swiper-pagination mt-8"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4️⃣ Projects Section -->
+    <section id="projects" class="py-24 bg-surface/30 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-down">
+                <h2 class="text-4xl font-black mb-4">أحدث الأعمال <span class="text-primary">.</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">مجموعة مختارة من المشاريع التي تعكس خبرتي في تحويل الأفكار إلى منتجات رقمية متكاملة.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+                <!-- Populated via JS with AOS animations -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 5️⃣ Services Section -->
+    <section id="services" class="py-32 relative overflow-hidden bg-dark">
+        <!-- Animated Background Grid -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-20" data-aos="fade-down" data-aos-duration="1200">
+                <span class="text-accent font-bold tracking-[0.3em] uppercase text-sm mb-4 block">Services</span>
+                <h2 class="text-5xl lg:text-6xl font-black text-white mb-6">
+                    حلول تقنية <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">متكاملة</span>
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">نقدم مجموعة شاملة من الخدمات البرمجية المصممة خصيصاً لتلبية احتياجاتك الرقمية بأعلى معايير الجودة.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10" id="services-grid">
+                <!-- Services Cards Populated via JS with stagger AOS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 6️⃣ Skills & Languages -->
+    <section id="skills" class="py-32 bg-surface relative overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-secondary/10 rounded-full blur-[150px]"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[200px]"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-down">
+                <span class="text-secondary font-bold tracking-widest text-sm uppercase">الخبرات والكفاءات</span>
+                <h2 class="text-4xl font-black text-white mt-2">النظام البيئي التقني</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-12">
+                <!-- Left: Interactive Tech Graph -->
+                <div class="lg:col-span-7" data-aos="fade-left" data-aos-duration="1200">
+                    <div class="glass-panel p-6 rounded-3xl h-full border border-white/5 relative group">
+                        <div class="absolute top-4 right-4 z-20 bg-black/40 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 text-xs text-slate-400 font-mono">
+                            <i class="fas fa-network-wired mr-2"></i> Tech Relationship Graph
+                        </div>
+                        <div id="tech-graph" class="w-full h-[500px] lg:h-[600px]"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Proficiency & Tools -->
+                <div class="lg:col-span-5 space-y-8" data-aos="fade-right" data-aos-duration="1200" data-aos-delay="200">
+                    
+                    <!-- Language Proficiency -->
+                    <div class="glass-panel p-6 rounded-3xl border border-white/5">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="fas fa-code text-accent"></i> لغات البرمجة الأساسية
+                        </h3>
+                        <div id="languages-chart" class="w-full h-[250px]"></div>
+                    </div>
+
+                    <!-- Tools Grid -->
+                    <div class="glass-panel p-6 rounded-3xl border border-white/5">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="fas fa-toolbox text-secondary"></i> أدوات وتقنيات مفضلة
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="tools-grid">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7️⃣ Testimonials Section -->
+    <section id="testimonials" class="py-24 relative overflow-hidden bg-dark">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-primary font-bold tracking-widest text-sm uppercase">قصص نجاح</span>
+                <h2 class="text-4xl font-black text-white mt-2">ماذا يقول عملاؤنا</h2>
+            </div>
+
+            <div class="swiper testimonials-swiper pb-12" data-aos="zoom-in" data-aos-duration="1200">
+                <div class="swiper-wrapper" id="testimonials-wrapper">
+                    <!-- JS Populated -->
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9️⃣ Contact Section -->
+    <section id="contact" class="py-24 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="glass-panel rounded-[3rem] p-8 lg:p-16 border border-white/10 shadow-2xl relative overflow-hidden" data-aos="flip-up" data-aos-duration="1000">
+                <!-- Background Decoration -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-[80px]"></div>
+
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Contact Info -->
+                    <div data-aos="fade-right" data-aos-delay="200">
+                        <h2 class="text-4xl font-black mb-6 text-white">لنصنع شيئاً <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">استثنائياً معاً</span></h2>
+                        <p class="text-slate-400 mb-10 leading-relaxed">أنا مهتم دائماً بمناقشة المشاريع الجديدة أو فرص العمل أو الشراكات. تواصل معي عبر النموذج أو وسائل التواصل.</p>
+                        
+                        <div class="space-y-6">
+                            <a href="#" class="flex items-center gap-4 group p-4 rounded-xl hover:bg-white/5 transition" data-aos="fade-up" data-aos-delay="300">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition"><i class="fas fa-envelope"></i></div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-bold">البريد الإلكتروني</p>
+                                    <p class="text-lg font-bold text-white">contact@mahmoud.dev</p>
+                                </div>
+                            </a>
+                            <a href="#" class="flex items-center gap-4 group p-4 rounded-xl hover:bg-white/5 transition" data-aos="fade-up" data-aos-delay="400">
+                                <div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary group-hover:scale-110 transition"><i class="fab fa-telegram"></i></div>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-bold">تليجرام</p>
+                                    <p class="text-lg font-bold text-white">@mahmoud_dev</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Map -->
+                        <div class="mt-8 h-48 rounded-2xl overflow-hidden glass-panel border border-white/10 grayscale hover:grayscale-0 transition-all duration-500" data-aos="zoom-in" data-aos-delay="500">
+                             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.163776269666!2d31.23333431511456!3d30.06093898187642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDAzJzM5LjQiTiAzMcKwMTQnMDcuOSJF!5e0!3m2!1sen!2seg!4v1635000000000!5m2!1sen!2seg" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="relative" data-aos="fade-left" data-aos-delay="200">
+                        <form id="contact-form" class="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/5 shadow-inner">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-400 uppercase">الاسم</label>
+                                    <input type="text" required class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition text-white placeholder-slate-600" placeholder="اسمك الكريم">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-400 uppercase">البريد</label>
+                                    <input type="email" required class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition text-white placeholder-slate-600" placeholder="email@example.com">
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-400 uppercase">الموضوع</label>
+                                <select class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 focus:border-primary focus:outline-none transition text-white appearance-none">
+                                    <option>طلب مشروع جديد</option>
+                                    <option>استشارة تقنية</option>
+                                    <option>عرض عمل</option>
+                                    <option>أخرى</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-400 uppercase">الرسالة</label>
+                                <textarea rows="4" required class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition text-white placeholder-slate-600" placeholder="تفاصيل مشروعك..."></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 bg-gradient-to-r from-primary to-accent rounded-xl font-bold text-white text-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all transform hover:-translate-y-1 relative overflow-hidden group">
+                                <span class="relative z-10 flex items-center justify-center gap-2">إرسال الرسالة <i class="fas fa-paper-plane"></i></span>
+                                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🔟 Footer -->
+    <footer class="glass-panel border-t border-white/10 pt-16 pb-8 mt-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 mb-12 border-b border-white/5 pb-12" data-aos="fade-up">
+                <div class="col-span-2">
+                    <a href="#" class="text-3xl font-black flex items-center gap-2 mb-6">
+                        <span class="text-primary">&lt;</span>
+                        <span class="text-white">MAHMOUD</span>
+                        <span class="text-secondary">/&gt;</span>
+                    </a>
+                    <p class="text-slate-400 max-w-sm leading-relaxed">
+                        أساعد الشركات والناشئين على بناء منتجات رقمية قابلة للتوسع ومصممة بعناية فائقة.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">روابط سريعة</h4>
+                    <ul class="space-y-4 text-slate-400">
+                        <li><a href="#about" class="hover:text-primary transition flex items-center gap-2"><i class="fas fa-chevron-left text-xs"></i> عني</a></li>
+                        <li><a href="#projects" class="hover:text-primary transition flex items-center gap-2"><i class="fas fa-chevron-left text-xs"></i> المشاريع</a></li>
+                        <li><a href="#services" class="hover:text-primary transition flex items-center gap-2"><i class="fas fa-chevron-left text-xs"></i> الخدمات</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">تواصل اجتماعي</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-black hover:text-white transition"><i class="fab fa-github"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-sky-500 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-slate-500 text-sm flex flex-col md:flex-row justify-between items-center" data-aos="fade-up" data-aos-delay="200">
+                <p>&copy; 2024 جميع الحقوق محفوظة.</p>
+                <p>صنع بكل <i class="fas fa-heart text-red-500 animate-pulse mx-1"></i> باستخدام Tailwind & GSAP</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Universal Project Modal -->
+    <div id="project-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="glass-panel w-full max-w-5xl h-[85vh] rounded-2xl relative z-10 shadow-2xl flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300 border border-white/10" id="modal-content">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
+                <h3 id="modal-title" class="text-xl font-bold text-white">Project Title</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-red-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="flex-1 overflow-y-auto p-0" id="modal-body">
+                <!-- Injected Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+    <script>
+        // --- 1. MOCK DATA (JSON Simulation) ---
+        const DB = {
+            certificates: [
+                { title: "AWS Solutions Architect", org: "Amazon Web Services", date: "2023", img: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", desc: "تصميم أنظمة سحابية قابلة للتوسع وآمنة." },
+                { title: "Google Cloud Professional", org: "Google", date: "2022", img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", desc: "إدارة البنية التحتية والبيانات الضخمة." },
+                { title: "Meta Front-End Developer", org: "Meta", date: "2021", img: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", desc: "احتراف React وتصميم الواجهات." },
+                { title: "Cybersecurity Analyst", org: "IBM", date: "2020", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", desc: "حماية الأنظمة واختبار الاختراق." },
+                { title: "Advanced UI/UX", org: "Udemy", date: "2019", img: "https://images.unsplash.com/photo-1586717791821-3f44a5638d0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", desc: "مبادئ تصميم تجربة المستخدم المتقدمة." }
+            ],
+            projects: [
+                { 
+                    id: 1, 
+                    title: "Crypto Fintech Dashboard", 
+                    cat: "Web App", 
+                    img: "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    desc: "لوحة تحكم مالية متطورة لمتابعة العملات الرقمية وتحليل السوق.",
+                    tech: ["Next.js", "Tailwind", "Recharts", "Node.js"],
+                    features: ["Real-time Data via WebSocket", "Dark Mode Advanced", "Secure Auth with JWT"]
+                },
+                { 
+                    id: 2, 
+                    title: "E-Commerce Mega Store", 
+                    cat: "E-Commerce", 
+                    img: "https://images.unsplash.com/photo-1557821552-17105176677c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    desc: "متجر إلكتروني متكامل متعدد البائعين مع بوابة دفع.",
+                    tech: ["React", "Redux", "Stripe API", "Firebase"],
+                    features: ["سلة تسوق ديناميكية", "لوحة تحكم للبائعين", "نظام تقييم"]
+                },
+                { 
+                    id: 3, 
+                    title: "AI Medical Assistant", 
+                    cat: "AI / ML", 
+                    img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    desc: "تطبيق يستخدم الذكاء الاصطناعي لتشخيص الأمراض الجلدية.",
+                    tech: ["Python", "TensorFlow", "FastAPI", "React Native"],
+                    features: ["تحليل الصور بالذكاء الاصطناعي", "تقارير طبية PDF", "حجز مواعيد"]
+                }
+            ],
+            services: [
+                { 
+                    id: 1,
+                    title: "تطوير الويب المتكامل", 
+                    icon: "fas fa-globe", 
+                    desc: "بناء مواقع وتطبيقات ويب سريعة وآمنة باستخدام أحدث التقنيات مثل React و Next.js مع التركيز على الأداء.",
+                    details: "نقدم حلول ويب متكاملة (Full Stack) تشمل الواجهات الأمامية التفاعلية ولوحات التحكم الخلفية القوية، مع ضمان توافق كامل مع جميع الأجهزة ومحركات البحث."
+                },
+                { 
+                    id: 2,
+                    title: "تطبيقات الهواتف", 
+                    icon: "fas fa-mobile-alt", 
+                    desc: "تصميم وتطوير تطبيقات تعمل على iOS و Android بكفاءة عالية وأداء Native باستخدام تقنيات Cross-Platform.",
+                    details: "تطوير تطبيقات موبايل باستخدام Flutter أو React Native لضمان كود واحد يعمل بكفاءة على النظامين، مع تكامل كامل مع خدمات الموقع، الإشعارات، والدفع الإلكتروني."
+                },
+                { 
+                    id: 3,
+                    title: "تصميم واجهات UI/UX", 
+                    icon: "fas fa-pencil-ruler", 
+                    desc: "تصاميم عصرية تركز على سهولة الاستخدام والجمالية، تحول الزوار إلى عملاء دائمين.",
+                    details: "نبدأ بدراسة رحلة المستخدم (User Journey) ونقوم بعمل Wireframes ثم نماذج أولية (Prototypes) وصولاً للتصميم النهائي الجذاب، مع مراعاة قواعد الوصول (Accessibility)."
+                },
+                { 
+                    id: 4,
+                    title: "حلول سحابية & DevOps", 
+                    icon: "fas fa-cloud", 
+                    desc: "إدارة الخوادم والنشر الآلي على AWS و Google Cloud لضمان استقرار وتوسع تطبيقك.",
+                    details: "إعداد بيئات العمل السحابية، تفعيل خطوط النشر المستمر (CI/CD)، إدارة الحاويات (Docker & Kubernetes)، وضمان أعلى مستويات الأمان والنسخ الاحتياطي."
+                },
+                { 
+                    id: 5,
+                    title: "استشارات تقنية", 
+                    icon: "fas fa-lightbulb", 
+                    desc: "تحليل المشاكل البرمجية وتقديم أفضل الحلول المعمارية للمشاريع الناشئة والكبيرة.",
+                    details: "مراجعة الكود، تحسين الأداء، اختيار التقنيات المناسبة للمشروع (Tech Stack Selection)، وتقديم خطط تطوير استراتيجية."
+                },
+                { 
+                    id: 6,
+                    title: "تحسين محركات البحث", 
+                    icon: "fas fa-search", 
+                    desc: "تحسين هيكلية الكود وسرعة الموقع لتصدر نتائج البحث وجلب المزيد من الزيارات العضوية.",
+                    details: "تدقيق تقني شامل (Technical Audit)، تحسين السرعة (Core Web Vitals)، وضبط العلامات الوصفية (Meta Tags) لضمان ظهور موقعك في الصفحات الأولى."
+                },
+                { 
+                    id: 7,
+                    title: "الأمن السيبراني", 
+                    icon: "fas fa-shield-alt", 
+                    desc: "حماية تطبيقاتك وبياناتك من الهجمات الإلكترونية وضمان الامتثال للمعايير الأمنية العالمية.",
+                    details: "إجراء اختبارات الاختراق (Penetration Testing)، تأمين واجهات برمجة التطبيقات (API Security)، وتشفير البيانات الحساسة."
+                },
+                { 
+                    id: 8,
+                    title: "الذكاء الاصطناعي", 
+                    icon: "fas fa-brain", 
+                    desc: "دمج حلول الذكاء الاصطناعي وتعلم الآلة لتحليل البيانات وأتمتة العمليات المعقدة.",
+                    details: "بناء نماذج تعلم الآلة (ML Models)، دمج Chatbots ذكية، وتحليل البيانات الكبيرة لاستخراج رؤى قيمة تساعد في اتخاذ القرار."
+                }
+            ],
+            // Updated Structure for Graph and Charts
+            techStack: {
+                categories: [
+                    { name: 'Core', itemStyle: { color: '#3b82f6' } },
+                    { name: 'Frontend', itemStyle: { color: '#06b6d4' } },
+                    { name: 'Backend', itemStyle: { color: '#8b5cf6' } },
+                    { name: 'DevOps', itemStyle: { color: '#f59e0b' } },
+                    { name: 'Tools', itemStyle: { color: '#10b981' } }
+                ],
+                nodes: [
+                    // Core
+                    { name: 'Full Stack', category: 0, symbolSize: 60, value: 100 },
+                    // Frontend
+                    { name: 'Frontend', category: 1, symbolSize: 40, value: 90 },
+                    { name: 'React', category: 1, symbolSize: 30, value: 95 },
+                    { name: 'Vue', category: 1, symbolSize: 25, value: 80 },
+                    { name: 'Tailwind', category: 1, symbolSize: 25, value: 95 },
+                    { name: 'Next.js', category: 1, symbolSize: 30, value: 90 },
+                    // Backend
+                    { name: 'Backend', category: 2, symbolSize: 40, value: 85 },
+                    { name: 'Node.js', category: 2, symbolSize: 30, value: 90 },
+                    { name: 'Python', category: 2, symbolSize: 30, value: 85 },
+                    { name: 'PostgreSQL', category: 2, symbolSize: 25, value: 80 },
+                    // DevOps
+                    { name: 'DevOps', category: 3, symbolSize: 40, value: 75 },
+                    { name: 'Docker', category: 3, symbolSize: 25, value: 70 },
+                    { name: 'AWS', category: 3, symbolSize: 30, value: 75 },
+                    // Tools
+                    { name: 'Git', category: 4, symbolSize: 20, value: 90 },
+                    { name: 'Figma', category: 4, symbolSize: 20, value: 85 }
+                ],
+                links: [
+                    { source: 'Full Stack', target: 'Frontend' },
+                    { source: 'Full Stack', target: 'Backend' },
+                    { source: 'Full Stack', target: 'DevOps' },
+                    { source: 'Frontend', target: 'React' },
+                    { source: 'Frontend', target: 'Vue' },
+                    { source: 'Frontend', target: 'Tailwind' },
+                    { source: 'Frontend', target: 'Next.js' },
+                    { source: 'Backend', target: 'Node.js' },
+                    { source: 'Backend', target: 'Python' },
+                    { source: 'Backend', target: 'PostgreSQL' },
+                    { source: 'DevOps', target: 'Docker' },
+                    { source: 'DevOps', target: 'AWS' },
+                    { source: 'Frontend', target: 'Figma' },
+                    { source: 'Backend', target: 'Git' }
+                ]
+            },
+            languages: [
+                { name: "JavaScript", value: 95, color: "#facc15" },
+                { name: "TypeScript", value: 90, color: "#3b82f6" },
+                { name: "Python", value: 85, color: "#38bdf8" },
+                { name: "C++", value: 70, color: "#f472b6" },
+                { name: "SQL", value: 80, color: "#4ade80" }
+            ],
+            tools: [
+                { name: "VS Code", icon: "fas fa-code", link: "#" },
+                { name: "Postman", icon: "fas fa-rocket", link: "#" },
+                { name: "GitHub", icon: "fab fa-github", link: "#" },
+                { name: "Jira", icon: "fab fa-jira", link: "#" },
+                { name: "Figma", icon: "fab fa-figma", link: "#" },
+                { name: "Slack", icon: "fab fa-slack", link: "#" }
+            ],
+            testimonials: [
+                { name: "أحمد سليم", role: "CEO, TechStart", text: "العمل مع محمود كان تجربة رائعة. احترافية عالية وتسليم في الموعد.", image: "https://randomuser.me/api/portraits/men/32.jpg" },
+                { name: "سارة محمد", role: "Project Manager", text: "جودة الكود والتصميم فاقت توقعاتنا. أنصح بشدة بالتعامل معه.", image: "https://randomuser.me/api/portraits/women/44.jpg" },
+                { name: "خالد عمر", role: "Founder, E-Shop", text: "حول أفكارنا إلى واقع ملموس بتصميم جذاب وأداء سريع.", image: "https://randomuser.me/api/portraits/men/86.jpg" },
+                { name: "ليلى حسن", role: "CTO, FinTech", text: "خبرة تقنية واسعة وحلول مبتكرة للمشاكل المعقدة.", image: "https://randomuser.me/api/portraits/women/68.jpg" }
+            ]
+        };
+
+        // --- 2. INITIALIZATION ---
+        window.addEventListener('load', () => {
+            // Remove Loader
+            gsap.to('#loader', { opacity: 0, duration: 0.5, onComplete: () => document.getElementById('loader').style.display = 'none' });
+
+            // Initialize AOS with Mirror to show/hide on scroll up/down
+            AOS.init({ 
+                duration: 1000, 
+                once: false, // Animation triggers every time
+                mirror: true, // Animation triggers on scroll up
+                offset: 100,
+                easing: 'ease-in-out',
+            });
+            
+            initTyped();
+            renderContent();
+            initCharts();
+            initSwipers();
+            initGSAPAnimations();
+            initScrollProgress();
+        });
+
+        // --- 3. RENDER FUNCTIONS ---
+        function renderContent() {
+            // Certificates (Image Centric Slider)
+            const certWrapper = document.getElementById('cert-wrapper');
+            DB.certificates.forEach(c => {
+                certWrapper.innerHTML += `
+                    <div class="swiper-slide cursor-grab">
+                        <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden group shadow-2xl glass-panel p-2">
+                            <div class="w-full h-full rounded-xl overflow-hidden relative">
+                                <img src="${c.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                    <h3 class="text-white font-bold text-xl">${c.title}</h3>
+                                    <p class="text-slate-300 text-sm">${c.org}</p>
+                                    <span class="inline-block mt-2 px-3 py-1 bg-primary/80 rounded-full text-xs text-white w-fit">${c.date}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Projects
+            const projGrid = document.getElementById('projects-grid');
+            DB.projects.forEach((p, index) => {
+                projGrid.innerHTML += `
+                    <div class="glass-panel rounded-2xl overflow-hidden group relative" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="${p.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:blur-sm">
+                            <div class="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center flex-col gap-3">
+                                <h3 class="text-xl font-bold text-white translate-y-4 group-hover:translate-y-0 transition duration-500">${p.title}</h3>
+                                <button onclick="openProject(${p.id})" class="px-6 py-2 bg-primary rounded-full text-white font-bold hover:bg-blue-600 transition transform hover:scale-105 shadow-lg">التفاصيل</button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <span class="text-xs font-bold text-secondary uppercase tracking-wider">${p.cat}</span>
+                            <div class="flex gap-2 mt-3 flex-wrap">
+                                ${p.tech.map(t => `<span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/5">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Services Render
+            const servGrid = document.getElementById('services-grid');
+            DB.services.forEach((s, i) => {
+                servGrid.innerHTML += `
+                    <div class="relative group p-1 rounded-2xl bg-gradient-to-br from-white/5 to-transparent hover:from-primary/50 hover:to-secondary/50 transition-all duration-500 cursor-pointer" onclick="openService(${s.id})" data-aos="fade-up" data-aos-delay="${i*100}">
+                        <div class="absolute inset-0 bg-dark/90 rounded-2xl m-[1px] p-8 overflow-hidden relative z-10 h-full flex flex-col">
+                            <!-- Floating BG Icon inside -->
+                            <i class="${s.icon} absolute -right-6 -bottom-6 text-9xl text-white/5 group-hover:text-white/10 group-hover:scale-125 group-hover:-rotate-12 transition duration-700"></i>
+                            
+                            <!-- Main Icon -->
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent border border-white/10 flex items-center justify-center text-3xl text-white mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition duration-500">
+                                <i class="${s.icon}"></i>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-white mb-3 group-hover:translate-x-2 transition duration-300">${s.title}</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6 group-hover:text-slate-200 transition duration-300 line-clamp-3">${s.desc}</p>
+                            
+                            <div class="mt-auto">
+                                <span class="text-primary text-xs font-bold uppercase tracking-widest group-hover:text-white flex items-center gap-2">
+                                    اقرأ المزيد <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Exterior Particles -->
+                        <div class="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full blur-sm opacity-0 group-hover:opacity-100 transition duration-500 animate-pulse"></div>
+                        <div class="absolute -bottom-2 -left-2 w-3 h-3 bg-secondary rounded-full blur-sm opacity-0 group-hover:opacity-100 transition duration-500 animate-pulse delay-75"></div>
+                    </div>
+                `;
+            });
+
+            // Tools Grid Render
+            const toolsGrid = document.getElementById('tools-grid');
+            DB.tools.forEach((t, i) => {
+                toolsGrid.innerHTML += `
+                    <a href="${t.link}" target="_blank" class="flex flex-col items-center justify-center p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition group" data-aos="zoom-in" data-aos-delay="${i * 50}">
+                        <i class="${t.icon} text-2xl text-slate-300 group-hover:text-white group-hover:scale-110 transition mb-2"></i>
+                        <span class="text-xs font-bold text-slate-400 group-hover:text-white">${t.name}</span>
+                    </a>
+                `;
+            });
+
+            // Testimonials Render
+            const testWrapper = document.getElementById('testimonials-wrapper');
+            DB.testimonials.forEach(t => {
+                testWrapper.innerHTML += `
+                    <div class="swiper-slide h-auto">
+                        <div class="glass-panel p-8 rounded-2xl h-full relative flex flex-col justify-between hover:border-primary/30 transition duration-500">
+                            <i class="fas fa-quote-right text-4xl text-primary/10 absolute top-6 right-6"></i>
+                            <p class="text-slate-300 leading-loose mb-6 relative z-10 text-lg">"${t.text}"</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 rounded-full border-2 border-primary/30 p-0.5">
+                                    <img src="${t.image}" class="w-full h-full rounded-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">${t.name}</h4>
+                                    <p class="text-xs text-primary font-mono">${t.role}</p>
+                                </div>
+                                <div class="mr-auto flex text-yellow-500 text-xs">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 4. LOGIC & LIBRARIES ---
+        function initTyped() {
+            new Typed('#typewriter', {
+                strings: ['تجربة رقمية مذهلة', 'كود نظيف وقوي', 'مستقبل الويب'],
+                typeSpeed: 60,
+                backSpeed: 30,
+                loop: true,
+                cursorChar: '_'
+            });
+        }
+
+        function initSwipers() {
+            new Swiper(".cert-swiper", {
+                effect: "coverflow",
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: "auto",
+                coverflowEffect: {
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                },
+                navigation: { nextEl: ".swiper-btn-next", prevEl: ".swiper-btn-prev" },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                breakpoints: {
+                    640: { slidesPerView: 2, coverflowEffect: { rotate: 20 } },
+                    1024: { slidesPerView: 3, coverflowEffect: { rotate: 20 } },
+                }
+            });
+
+            new Swiper(".testimonials-swiper", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false,
+                },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                breakpoints: {
+                    768: { slidesPerView: 2 },
+                    1024: { slidesPerView: 2 }, // Adjusted for better view
+                }
+            });
+        }
+
+        function initCharts() {
+            // 1. Tech Graph (Force Directed)
+            const graphDom = document.getElementById('tech-graph');
+            const graphChart = echarts.init(graphDom);
+            const graphOption = {
+                tooltip: {},
+                legend: [{
+                    data: DB.techStack.categories.map(function (a) { return a.name; }),
+                    textStyle: { color: '#ccc' }
+                }],
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    data: DB.techStack.nodes,
+                    links: DB.techStack.links,
+                    categories: DB.techStack.categories,
+                    roam: true,
+                    label: { show: true, position: 'right', formatter: '{b}', color: '#fff' },
+                    labelLayout: { hideOverlap: true },
+                    scaleLimit: { min: 0.4, max: 2 },
+                    lineStyle: { color: 'source', curveness: 0.3 },
+                    force: { repulsion: 200, edgeLength: 50 }
+                }]
+            };
+            graphChart.setOption(graphOption);
+
+            // 2. Languages Bar Chart
+            const langDom = document.getElementById('languages-chart');
+            const langChart = echarts.init(langDom);
+            const langOption = {
+                grid: { top: 10, bottom: 20, left: 80, right: 20 },
+                xAxis: { type: 'value', show: false },
+                yAxis: { 
+                    type: 'category', 
+                    data: DB.languages.map(l => l.name),
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    axisLabel: { color: '#fff', fontWeight: 'bold' }
+                },
+                series: [{
+                    type: 'bar',
+                    data: DB.languages.map(l => ({
+                        value: l.value,
+                        itemStyle: { color: l.color, borderRadius: [0, 10, 10, 0] }
+                    })),
+                    barWidth: 15,
+                    showBackground: true,
+                    backgroundStyle: { color: 'rgba(255, 255, 255, 0.05)', borderRadius: [0, 10, 10, 0] },
+                    label: { show: true, position: 'right', color: '#fff', formatter: '{c}%' }
+                }]
+            };
+            langChart.setOption(langOption);
+
+            window.addEventListener('resize', () => {
+                graphChart.resize();
+                langChart.resize();
+            });
+        }
+
+        // --- 5. GSAP ANIMATIONS ---
+        function initGSAPAnimations() {
+            // Navbar Scroll Progress Logic moved to initScrollProgress
+        }
+
+        // --- 6. SCROLL PROGRESS LOGIC ---
+        function initScrollProgress() {
+            var progressWrap = document.querySelector('.progress-wrap');
+            var progressPath = document.querySelector('.progress-wrap path');
+            var pathLength = progressPath.getTotalLength();
+            
+            progressPath.style.transition = progressPath.style.WebkitTransition = 'none';
+            progressPath.style.strokeDasharray = pathLength + ' ' + pathLength;
+            progressPath.style.strokeDashoffset = pathLength;
+            progressPath.getBoundingClientRect();
+            progressPath.style.transition = progressPath.style.WebkitTransition = 'stroke-dashoffset 10ms linear';
+            
+            var updateProgress = function () {
+                var scroll = window.scrollY || window.pageYOffset;
+                var height = document.documentElement.scrollHeight - window.innerHeight;
+                var progress = pathLength - (scroll * pathLength / height);
+                progressPath.style.strokeDashoffset = progress;
+            }
+            
+            updateProgress();
+            window.addEventListener('scroll', updateProgress);
+            
+            var offset = 50;
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > offset) {
+                    progressWrap.classList.add('active-progress');
+                } else {
+                    progressWrap.classList.remove('active-progress');
+                }
+            });
+            
+            progressWrap.addEventListener('click', function(event) {
+                event.preventDefault();
+                window.scrollTo({top: 0, behavior: 'smooth'});
+                return false;
+            });
+
+            // Top Progress Bar
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById("scroll-progress").style.width = scrolled + "%";
+            });
+        }
+
+
+        // --- 7. MODAL LOGIC ---
+        function openProject(id) {
+            const p = DB.projects.find(x => x.id === id);
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-content');
+            const body = document.getElementById('modal-body');
+            const title = document.getElementById('modal-title');
+
+            title.innerText = p.title;
+            body.innerHTML = `
+                <div class="grid lg:grid-cols-2 h-full">
+                    <div class="h-64 lg:h-full bg-black relative">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+                    </div>
+                    <div class="p-8 lg:p-12 overflow-y-auto bg-surface">
+                        <span class="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full uppercase mb-4 inline-block">${p.cat}</span>
+                        <h2 class="text-3xl font-black text-white mb-6">${p.title}</h2>
+                        <p class="text-slate-400 leading-loose mb-8 text-lg">${p.desc}</p>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-white font-bold mb-4 border-b border-white/10 pb-2">المميزات الرئيسية</h4>
+                            <ul class="space-y-3">
+                                ${p.features.map(f => `<li class="flex items-center gap-3 text-slate-300"><i class="fas fa-check-circle text-green-500"></i> ${f}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button class="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-blue-600 transition shadow-lg shadow-primary/20">معاينة حية <i class="fas fa-external-link-alt ml-2"></i></button>
+                            <button class="flex-1 py-3 rounded-xl border border-white/20 text-white font-bold hover:bg-white/5 transition">GitHub Code <i class="fab fa-github ml-2"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // Open Service Modal Logic
+        function openService(id) {
+            const s = DB.services.find(item => item.id === id);
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-content');
+            const body = document.getElementById('modal-body');
+            const title = document.getElementById('modal-title');
+
+            title.innerText = s.title;
+            body.innerHTML = `
+                <div class="p-8 lg:p-12 h-full flex flex-col justify-center items-center text-center relative overflow-hidden bg-surface">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none"></div>
+                    <i class="${s.icon} text-[15rem] absolute opacity-5 text-white pointer-events-none animate-pulse"></i>
+                    
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-5xl text-white mb-8 shadow-[0_0_40px_rgba(59,130,246,0.4)] relative z-10">
+                        <i class="${s.icon}"></i>
+                    </div>
+                    
+                    <h2 class="text-4xl font-black text-white mb-6 relative z-10">${s.title}</h2>
+                    <p class="text-slate-300 text-lg leading-loose max-w-3xl relative z-10">${s.details}</p>
+                    
+                    <div class="mt-10 flex gap-4 relative z-10">
+                        <a href="#contact" onclick="closeModal()" class="px-8 py-3 rounded-full bg-primary hover:bg-blue-600 text-white font-bold transition shadow-lg shadow-primary/20">طلب الخدمة الآن</a>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // --- 8. FORM HANDLER ---
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate API Call
+            const btn = e.target.querySelector('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'تم الإرسال بنجاح!',
+                    text: 'شكراً لتواصلك، سأقوم بالرد عليك عبر تليجرام أو البريد الإلكتروني.',
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                e.target.reset();
+            }, 2000);
+        });
+
+    </script>
+</body>
+</html>
