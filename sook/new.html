@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sook | منصة السائقين الذكية</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Animation Libraries (AOS & GSAP) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, push, update, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBaEfEewAxIFqhfW2oQH7qGqGBeqVISnmc",
+          authDomain: "smarttrans-34bec.firebaseapp.com",
+          databaseURL: "https://smarttrans-34bec-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "smarttrans-34bec",
+          storageBucket: "smarttrans-34bec.firebasestorage.app",
+          messagingSenderId: "611309810028",
+          appId: "1:611309810028:web:e817a023fc50b42959c349",
+          measurementId: "G-60987892BP"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app); 
+
+        window.db = db;
+        window.auth = auth;
+        
+        window.rtdbRef = ref;
+        window.rtdbSet = set;
+        window.rtdbGet = get;
+        window.rtdbChild = child;
+        window.rtdbPush = push;
+        window.rtdbUpdate = update;
+        window.rtdbOnValue = onValue;
+        window.rtdbQuery = query;
+        window.rtdbOrderByChild = orderByChild;
+        window.rtdbEqualTo = equalTo;
+        
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+
+        console.log("Firebase Initialized");
+    </script>
+
+    <style>
+        :root {
+            --glass-bg: rgba(15, 23, 42, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .view-section {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background: #0f172a;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            z-index: 10;
+        }
+        
+        .view-hidden {
+            transform: translateX(100%); /* Changed for slide effect */
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .view-active {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 20;
+        }
+
+        /* --- Glassmorphism & UI Components --- */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7); /* Slate 800/70 */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .glass-card:active {
+            transform: scale(0.99);
+        }
+
+        .glass-sheet {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+            touch-action: none;
+        }
+
+        .glass-pill {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-modal {
+            background: rgba(20, 25, 40, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Toast Container & Animation --- */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .toast-item {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .toast-item.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        @keyframes toastSlideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Analytics Charts --- */
+        .pie-chart {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: conic-gradient(var(--chart-color) var(--chart-deg), rgba(255,255,255,0.05) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.4);
+            transition: --chart-deg 1s ease-out;
+        }
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            width: 74px;
+            height: 74px;
+            background: #0f172a;
+            border-radius: 50%;
+        }
+        .pie-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        /* --- Map & TomTom Tools UI --- */
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            z-index: 0;
+        }
+
+        #toolsMenu {
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: top left;
+        }
+        .tool-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .tool-item:last-child { border-bottom: none; }
+        .tool-item:hover { background: rgba(255,255,255,0.05); }
+        .tool-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .tool-item.active .toggle-switch { background: #10b981; }
+        .tool-item.active .toggle-switch::after { left: 22px; }
+
+        .pulse-ring {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.4);
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+        
+        /* Student Boarding Pin Style */
+        .student-pin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .student-pin-frame {
+            width: 44px;
+            height: 44px;
+            border-radius: 50% 50% 50% 0;
+            background: white;
+            border: 3px solid #10b981; /* Emerald */
+            transform: rotate(-45deg);
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .student-pin-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: rotate(45deg); /* Counter rotate image */
+            border-radius: 50%;
+        }
+
+        /* Improved Student Card */
+        .student-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        .student-card:active { transform: scale(0.98); }
+        .student-card.status-boarded {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .student-card.status-absent {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Boarding Button */
+        .board-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s;
+        }
+        .board-btn:active { transform: scale(0.95); }
+        .board-btn:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Timeline Marker Styles */
+        .timeline-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 25;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        .timeline-marker:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: #34d399;
+        }
+        .timeline-tooltip {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .timeline-marker:hover .timeline-tooltip {
+            opacity: 1;
+        }
+
+        .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Security Alert Specifics */
+        .security-lock-overlay {
+            background: rgba(127, 29, 29, 0.95); /* Deep Red */
+            backdrop-filter: blur(40px);
+        }
+        
+        .leaflet-control-container .leaflet-routing-container { display: none; }
+        .leaflet-control-attribution { display: none; }
+    </style>
+</head>
+<body class="w-screen h-screen overflow-hidden bg-slate-900 text-white">
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Security Alert Overlay -->
+    <div id="securityOverlay" class="fixed inset-0 z-[9999] security-lock-overlay hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(220,38,38,0.6)] animate-bounce">
+            <i class="fas fa-user-lock text-5xl text-white"></i>
+        </div>
+        <h2 class="text-3xl font-bold mb-4">تم قفل الحساب أمنياً</h2>
+        <p class="text-gray-200 mb-8 leading-relaxed max-w-sm">
+            تم اكتشاف محاولة دخول من جهاز غير مصرح به. هذا الحساب مرتبط بجهاز آخر.
+            <br><br>
+            <span class="text-sm bg-black/30 px-3 py-1 rounded">رمز الحماية: SEC-DEVICE-MISMATCH</span>
+        </p>
+        <button onclick="window.location.reload()" class="bg-white text-red-700 font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition shadow-xl">
+            العودة لتسجيل الدخول
+        </button>
+    </div>
+
+    <!-- ================= VIEW 1: LOGIN ================= -->
+    <div id="loginView" class="view-section view-active flex flex-col justify-center items-center p-6 bg-[url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+        
+        <div class="relative z-10 w-full max-w-md" data-aos="fade-up" data-aos-duration="1000">
+            <div class="text-center mb-10">
+                <div class="w-24 h-24 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.3)]">
+                    <i class="fas fa-bus-alt text-5xl text-white"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-2">منصة Sook</h1>
+                <p class="text-emerald-400 font-medium">نظام محمي برقم التعريف الموحد</p>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl space-y-6">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">البريد الإلكتروني</label>
+                    <div class="relative group">
+                        <i class="fas fa-envelope absolute right-4 top-4 text-gray-500 group-focus-within:text-emerald-400 transition"></i>
+                        <input type="email" id="loginEmail" class="w-full bg-black/20 border border-white/10 rounded-xl py-3.5 pr-10 pl-4 focus:outline-none focus:border-emerald-500 transition text-right text-white" placeholder="driver@sook.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">كلمة المرور</label>
+                    <div class="relative group">
+                        <i class="fas fa-lock absolute right-4 top-4 text-gray-500 group-focus-within:text-emerald-400 transition"></i>
+                        <input type="password" id="loginPass" class="w-full bg-black/20 border border-white/10 rounded-xl py-3.5 pr-10 pl-4 focus:outline-none focus:border-emerald-500 transition text-right text-white" placeholder="••••••">
+                    </div>
+                </div>
+                
+                <button onclick="handleLogin()" id="loginBtn" class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 font-bold text-lg shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition hover:shadow-emerald-500/40">
+                    تسجيل الدخول الآمن
+                </button>
+
+                <div class="text-center mt-4">
+                    <button onclick="seedDriver()" class="text-xs text-emerald-500 hover:text-emerald-400 underline">إنشاء حساب جديد (تجربة الحماية)</button>
+                </div>
+            </div>
+            
+            <p class="text-center text-xs text-gray-500 mt-8">جميع الحقوق محفوظة © 2024 Sook Platform</p>
+        </div>
+    </div>
+
+    <!-- ================= VIEW 2: HOME ================= -->
+    <div id="homeView" class="view-section view-hidden pt-safe pb-safe px-4">
+         <!-- Header -->
+        <header class="flex justify-between items-center py-6" data-aos="fade-down">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 rounded-full p-[2px] bg-gradient-to-br from-emerald-400 to-blue-500 shadow-lg">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Driver" class="w-full h-full rounded-full object-cover border-2 border-slate-900">
+                </div>
+                <div>
+                    <h2 class="font-bold text-xl" id="driverNameDisplay">جاري التحميل...</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">متاح للعمل</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-red-400 hover:bg-red-500/10 transition border border-white/5 shadow-md">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </header>
+
+        <!-- Stats Overview Row -->
+        <div class="grid grid-cols-2 gap-4 mb-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden border-r-4 border-r-blue-500">
+                <div class="absolute -left-4 -top-4 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <p class="text-gray-400 text-xs mb-1">المدرسة التابعة</p>
+                    <h3 class="font-bold text-sm truncate" id="schoolNameDisplay">--</h3>
+                    <div class="mt-3 flex items-center justify-between">
+                        <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded font-mono" id="shiftDisplay">--</span>
+                        <i class="fas fa-school text-blue-500/50 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card p-4 rounded-2xl relative overflow-hidden border-r-4 border-r-purple-500">
+                <div class="absolute -left-4 -top-4 w-20 h-20 bg-purple-500/20 rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <p class="text-gray-400 text-xs mb-1">إجمالي الطلاب</p>
+                    <h3 class="font-bold text-2xl" id="studentsCountDisplay">0</h3>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-xs text-gray-500">طالب مسجل</span>
+                        <i class="fas fa-users text-purple-500/50 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Trip Action -->
+        <div class="mb-8" data-aos="zoom-in" data-aos-delay="200">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                <i class="fas fa-play-circle text-emerald-500"></i>
+                مهام اليوم
+            </h3>
+            <button onclick="startDailyTrip()" class="w-full h-28 rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 relative overflow-hidden group shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] active:scale-[0.98] transition-all duration-300">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                
+                <div class="relative z-10 flex items-center justify-between px-6 h-full">
+                    <div class="text-right">
+                        <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] px-3 py-1 rounded-full mb-2 inline-block border border-white/10 shadow-sm">الآن</span>
+                        <h4 class="text-2xl font-bold text-white">بدء الرحلة اليومية</h4>
+                        <p class="text-emerald-100 text-sm opacity-90">توصيل الطلاب للمدرسة</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-3xl text-white border border-white/20 group-hover:scale-110 transition shadow-xl">
+                        <i class="fas fa-location-arrow transform -rotate-45 ml-1"></i>
+                    </div>
+                </div>
+            </button>
+        </div>
+
+        <!-- History & Analytics -->
+        <div data-aos="fade-up" data-aos-delay="300">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">سجل الأداء والرحلات</h3>
+                <div class="text-[10px] text-gray-400 bg-white/5 px-3 py-1 rounded-full border border-white/5">آخر 7 أيام</div>
+            </div>
+            
+            <div class="grid gap-3 pb-20" id="calendarGrid">
+                <div class="text-center text-gray-500 py-10 flex flex-col items-center">
+                    <i class="fas fa-history text-3xl mb-3 opacity-30"></i>
+                    جاري تحميل السجل...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW 3: MAP VIEW ================= -->
+    <div id="mapView" class="view-section view-hidden">
+        <div id="map"></div>
+        
+        <!-- Top Floating Controls -->
+        <div class="absolute top-0 left-0 right-0 z-30 pointer-events-none p-4 pt-safe flex flex-col gap-3">
+            <div class="flex justify-between items-start pointer-events-auto">
+                <button onclick="returnToHome()" class="glass-pill w-11 h-11 rounded-full flex items-center justify-center text-white active:scale-95 transition shadow-lg bg-slate-800 border-white/20">
+                    <i class="fas fa-arrow-right text-lg"></i>
+                </button>
+                <div class="flex gap-2">
+                    <!-- History Badge -->
+                    <div id="historyModeBadge" class="hidden glass-pill px-4 py-2 rounded-full flex items-center gap-2 bg-purple-500/20 border-purple-500/30 backdrop-blur-md shadow-xl" onclick="toggleAnalyticsDetails()">
+                        <div class="text-left">
+                            <span class="text-[10px] text-gray-300 block">نسبة الحضور</span>
+                            <span id="analyticsPercent" class="text-sm font-bold text-white">--%</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-purple-500/30 flex items-center justify-center">
+                            <i class="fas fa-chart-pie text-purple-300"></i>
+                        </div>
+                    </div>
+                    <!-- Tools Toggle -->
+                    <div onclick="toggleToolsMenu()" id="toolsBtn" class="hidden glass-pill w-11 h-11 rounded-full flex items-center justify-center text-gray-300 active:scale-95 transition border border-white/10 bg-slate-800/80 shadow-lg">
+                        <i class="fas fa-layer-group text-blue-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Route Info Pill -->
+            <div id="routeInfo" class="hidden glass-pill px-4 py-3 rounded-2xl flex items-center gap-3 w-fit border-l-4 border-l-emerald-500 bg-slate-800/90 pointer-events-auto shadow-2xl backdrop-blur-xl mx-auto">
+                <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400"><i class="fas fa-route"></i></div>
+                <div><p class="text-[10px] text-gray-400 uppercase tracking-wide">الوقت</p><p class="font-bold text-lg leading-none font-mono" id="routeTime">--</p></div>
+                <div class="h-8 w-px bg-white/10 mx-1"></div>
+                <div><p class="text-[10px] text-gray-400 uppercase tracking-wide">المسافة</p><p class="font-bold text-lg leading-none font-mono" id="routeSummary">--</p></div>
+            </div>
+        </div>
+
+        <!-- TomTom Tools Menu -->
+        <div id="toolsMenu" class="glass-card w-64 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 opacity-0 scale-95 origin-top-left pointer-events-none absolute top-[80px] left-4 z-40">
+            <div class="p-3 bg-white/5 border-b border-white/10">
+                <h4 class="text-sm font-bold text-gray-300">أدوات الخرائط الذكية</h4>
+            </div>
+            
+            <div class="tool-item" onclick="toggleTomTomLayer('trafficFlow')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-road text-orange-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">حركة المرور</span>
+                        <span class="text-[10px] text-gray-400 block">Traffic Flow</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-trafficFlow"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('trafficIncidents')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-car-crash text-red-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">الحوادث</span>
+                        <span class="text-[10px] text-gray-400 block">Incidents</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-trafficIncidents"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('evStations')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-charging-station text-green-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">محطات شحن</span>
+                        <span class="text-[10px] text-gray-400 block">EV Stations</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-evStations"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('pois')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-gas-pump text-blue-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">محطات وقود</span>
+                        <span class="text-[10px] text-gray-400 block">Gas Stations</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-pois"></div>
+            </div>
+            
+             <div class="tool-item" onclick="toggleTomTomLayer('snapRoads')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-magnet text-purple-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">تصحيح المسار</span>
+                        <span class="text-[10px] text-gray-400 block">Snap to Roads</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-snapRoads"></div>
+            </div>
+        </div>
+
+        <!-- Analytics Details Overlay (Review Mode) -->
+        <div id="analyticsOverlay" class="absolute top-24 left-4 right-4 z-50 hidden" data-aos="zoom-in">
+            <div class="glass-card p-5 rounded-2xl border border-purple-500/30 bg-slate-900/95 shadow-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-bold text-lg text-white">تحليل أداء الرحلة</h3>
+                    <button onclick="toggleAnalyticsDetails()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="flex items-center justify-around mb-6">
+                    <!-- CSS Pie Chart -->
+                    <div class="pie-chart" id="analyticsChart" style="--chart-color: #10b981; --chart-deg: 0deg;">
+                        <div class="pie-content">
+                            <span class="text-lg font-bold text-white" id="chartPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm flex-1 mr-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></span>
+                                <span class="text-gray-300">حضور</span>
+                            </div>
+                            <b id="statPresent" class="text-white font-mono text-lg">0</b>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span>
+                                <span class="text-gray-300">غياب</span>
+                            </div>
+                            <b id="statAbsent" class="text-white font-mono text-lg">0</b>
+                        </div>
+                        <div class="h-px bg-white/10 my-1"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400 text-xs">الإجمالي</span>
+                            <b id="statTotal" class="text-white font-mono">0</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl">
+                    <p class="text-[10px] text-blue-200 text-center">
+                        <i class="fas fa-info-circle ml-1"></i>
+                        تم احتساب الغياب تلقائياً للطلاب الذين لم يتم تسجيل ركوبهم.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="absolute right-4 bottom-[calc(85vh-160px+20px)] z-30 flex flex-col gap-4 pointer-events-auto">
+            <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
+                <i class="fas fa-crosshairs"></i>
+            </button>
+        </div>
+        
+        <div id="loadingRoute" class="hidden absolute inset-0 bg-black/60 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
+            <div class="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+            <span class="font-bold text-lg animate-pulse">جاري تحميل المسار الذكي...</span>
+        </div>
+
+        <!-- Bottom Panel -->
+        <div id="tripPanel" class="absolute bottom-0 left-0 right-0 z-40 glass-sheet rounded-t-[35px] transition-transform duration-300 ease-out transform translate-y-[calc(85vh-180px)] h-[85vh]">
+            <div id="dragHandle" class="w-full h-8 flex items-center justify-center cursor-grab active:cursor-grabbing pt-3 pb-1">
+                <div class="w-14 h-1.5 bg-white/20 rounded-full"></div>
+            </div>
+            <div class="h-full overflow-y-auto hide-scrollbar px-6 pb-24">
+                <div class="mb-8">
+                    <!-- Speed & Distance -->
+                    <div class="flex items-end justify-between mb-6">
+                        <div>
+                            <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mb-1">السرعة</p>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 font-mono tracking-tighter" id="speedDisplay">0</span>
+                                <span class="text-sm font-semibold text-emerald-500">كم/س</span>
+                            </div>
+                        </div>
+                        <div class="glass-pill px-4 py-2 rounded-xl border border-white/5 bg-white/5 text-left">
+                            <p class="text-gray-400 text-[10px] mb-0.5">المسافة</p>
+                            <p class="text-xl font-bold text-white font-mono" id="distanceDisplay">0.0 <span class="text-xs text-gray-500">كم</span></p>
+                        </div>
+                    </div>
+
+                    <div id="liveControls" class="grid grid-cols-1">
+                        <button id="actionBtn" onclick="toggleTracking()" class="h-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 text-white font-bold text-lg shadow-[0_8px_30px_rgba(16,185,129,0.3)] active:scale-[0.98] transition flex items-center justify-center gap-3 border border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fas fa-play"></i></div>
+                            <span>بدء التحرك الفعلي</span>
+                        </button>
+                    </div>
+
+                    <!-- Review Timeline Controls -->
+                    <div id="reviewControls" class="hidden mb-6 animate-fade-in">
+                        <div class="glass-card p-5 rounded-2xl border border-purple-500/20 bg-slate-900/50 relative overflow-hidden group">
+                            <!-- Glow Effect -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                            
+                            <div class="flex justify-between items-end mb-4 relative z-10">
+                                <div>
+                                    <p class="text-purple-300 text-xs font-mono mb-1">وقت الرحلة</p>
+                                    <h3 class="text-3xl font-black font-mono tracking-wider" id="timelineCurrent">00:00</h3>
+                                </div>
+                                <div class="text-left">
+                                     <div class="flex items-center gap-2 text-xs text-gray-400 mb-1 font-mono">
+                                        <span id="timelineStart">00:00</span>
+                                        <span class="w-8 h-[1px] bg-gray-600"></span>
+                                        <span id="timelineEnd">00:00</span>
+                                     </div>
+                                     <div class="flex items-center gap-1 justify-end">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="text-[10px] text-emerald-400 font-bold">تسجيل</span>
+                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Slider Container -->
+                            <div class="relative w-full h-8 flex items-center">
+                                <div class="absolute inset-x-0 h-2 bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                                    <div id="timelineProgress" class="h-full bg-gradient-to-r from-purple-600 to-pink-500 w-0 transition-all duration-75"></div>
+                                </div>
+                                <div id="timelineMarkers" class="absolute inset-x-0 h-2 pointer-events-none z-10 top-1/2 transform -translate-y-1/2"></div>
+                                <input type="range" id="timelineSlider" min="0" max="100" value="0" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                                <div id="customThumb" class="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-4 border-purple-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.6)] pointer-events-none z-10 transition-transform duration-75 ease-out flex items-center justify-center">
+                                     <div class="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                </div>
+                            </div>
+                            
+                            <p class="text-[10px] text-center text-gray-500 mt-3 font-mono">اسحب الشريط لمراجعة مسار الرحلة</p>
+                        </div>
+                    </div>
+
+                    <button id="closeReviewBtn" onclick="returnToHome()" class="hidden w-full h-14 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-lg active:scale-[0.98] transition flex items-center justify-center gap-2 mt-3 hover:bg-white/15">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>العودة للرئيسية</span>
+                    </button>
+                </div>
+                
+                <div id="expandedContent" class="transition-opacity duration-300 opacity-50 space-y-6">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <h3 class="font-bold text-lg mb-4 flex justify-between items-center">
+                            <span>قائمة الطلاب</span>
+                            <span class="text-xs bg-white/10 px-2 py-1 rounded text-emerald-400 font-mono border border-white/5" id="studentCountBadge">0</span>
+                        </h3>
+                        <div class="space-y-3" id="studentsListContainer">
+                            <div class="text-center text-gray-500 py-4">جاري تحميل الطلاب...</div>
+                        </div>
+                    </div>
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div id="studentModal" class="fixed inset-0 z-[250] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-modal w-full max-w-sm rounded-[2.5rem] overflow-hidden transform scale-95 transition-all duration-300 relative bg-slate-900 border border-white/10" id="studentModalContent">
+            <button onclick="closeStudentModal()" class="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/20 text-white flex items-center justify-center z-10 hover:bg-black/40 transition"><i class="fas fa-times"></i></button>
+            <div class="h-32 bg-gradient-to-br from-emerald-500 to-teal-700 relative">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+            </div>
+            <div class="px-6 pb-8 -mt-16 flex flex-col items-center">
+                <div class="w-28 h-28 rounded-full border-4 border-slate-900 shadow-2xl overflow-hidden mb-4 bg-slate-800 relative z-20">
+                    <img id="studentPhoto" src="" alt="Student" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-1" id="studentName">--</h3>
+                <span class="px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold mb-6 border border-white/5" id="studentGrade">--</span>
+                <div class="w-full space-y-4">
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">رقم البطاقة</p>
+                            <p class="font-mono font-bold text-sm text-emerald-400" id="studentBadge">----</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[10px] text-gray-400">هاتف ولي الأمر</p>
+                            <p class="font-mono font-bold text-sm dir-ltr text-right" id="studentParentPhone">----</p>
+                        </div>
+                        <a href="#" id="callParentBtn" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg active:scale-90 transition">
+                            <i class="fas fa-phone-alt text-xs"></i>
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">العنوان</p>
+                            <p class="text-sm" id="studentAddress">----</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Modal -->
+    <div id="customModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-modal w-full max-w-xs rounded-[2rem] p-6 transform scale-95 transition-all duration-300 text-center" id="modalContent">
+            <div id="modalIcon" class="mb-5 text-5xl drop-shadow-xl filter"></div>
+            <h3 id="modalTitle" class="text-xl font-bold text-white mb-2"></h3>
+            <p id="modalMessage" class="text-gray-300 text-sm leading-relaxed mb-8 px-2"></p>
+            <div id="modalInputContainer" class="w-full mb-4 hidden">
+                <input type="text" id="modalInput" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-center text-white focus:outline-none focus:border-emerald-500 font-mono text-lg" placeholder="">
+            </div>
+            <div id="modalActions" class="flex w-full gap-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- AOS INIT ---
+        AOS.init({ once: true, offset: 50, duration: 800 });
+
+        // --- DEVICE FINGERPRINTING LOGIC ---
+        function getDeviceFingerprint() {
+            let deviceId = localStorage.getItem('sook_trusted_device_id');
+            if (!deviceId) {
+                deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('sook_trusted_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        // --- GLOBAL VARIABLES ---
+        const API_KEYS = { google: "", tomtom: "lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu" }; 
+        let map, userMarker, pathLine, reviewPathLine;
+        let trafficLayerGroup = null;
+        let routingControl = null;
+        let watchId = null;
+        let isTracking = false;
+        let isSimulating = false;
+        let currentReviewTrip = null;
+        let wakeLock = null;
+        let currentDriverId = null;
+        let currentTripKey = null; 
+        let boardingMarkers = []; 
+        let currentPos = { lat: 0, lng: 0 };
+        
+        let driverData = {}; 
+        let myStudents = []; 
+        let currentTripStudents = [];
+        let currentTripEvents = []; // Tracking local events for analytics
+
+        // TomTom Layer State
+        let activeLayers = {
+            trafficFlow: false,
+            trafficIncidents: false,
+            evStations: false,
+            pois: false,
+            snapRoads: false
+        };
+        let tomTomLayers = {
+            trafficFlow: null,
+            trafficIncidents: null,
+            evStations: L.layerGroup(),
+            pois: L.layerGroup()
+        };
+
+        // Navigation State
+        let currentView = 'loginView';
+
+        // --- DOM ELEMENTS ---
+        const views = {
+            login: document.getElementById('loginView'),
+            home: document.getElementById('homeView'),
+            map: document.getElementById('mapView')
+        };
+        const loadingRoute = document.getElementById('loadingRoute');
+        const historyModeBadge = document.getElementById('historyModeBadge');
+        // Removed analyticsBadge as it's duplicate/null
+        const reviewControls = document.getElementById('reviewControls');
+        const routeInfo = document.getElementById('routeInfo');
+        const routeSummary = document.getElementById('routeSummary');
+        const routeTime = document.getElementById('routeTime');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const distanceDisplay = document.getElementById('distanceDisplay');
+        const actionBtn = document.getElementById('actionBtn');
+        const timelineStart = document.getElementById('timelineStart');
+        const timelineEnd = document.getElementById('timelineEnd');
+        const timelineCurrent = document.getElementById('timelineCurrent');
+        const timelineSlider = document.getElementById('timelineSlider');
+        const timelineMarkers = document.getElementById('timelineMarkers');
+        const timelineProgress = document.getElementById('timelineProgress');
+        const customThumb = document.getElementById('customThumb');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const studentsListContainer = document.getElementById('studentsListContainer');
+        const studentCountBadge = document.getElementById('studentCountBadge');
+        const closeReviewBtn = document.getElementById('closeReviewBtn');
+        const liveControls = document.getElementById('liveControls');
+        const securityOverlay = document.getElementById('securityOverlay');
+        const toolsMenu = document.getElementById('toolsMenu');
+        const toolsBtn = document.getElementById('toolsBtn');
+
+        // Student Modal Elements
+        const studentModal = document.getElementById('studentModal');
+        const studentModalContent = document.getElementById('studentModalContent');
+        const studentPhoto = document.getElementById('studentPhoto');
+        const studentName = document.getElementById('studentName');
+        const studentGrade = document.getElementById('studentGrade');
+        const studentBadge = document.getElementById('studentBadge');
+        const studentParentPhone = document.getElementById('studentParentPhone');
+        const studentAddress = document.getElementById('studentAddress');
+        const callParentBtn = document.getElementById('callParentBtn');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Bottom Sheet Drag Logic variables
+        const panel = document.getElementById('tripPanel');
+        const dragHandle = document.getElementById('dragHandle');
+        const expandedContent = document.getElementById('expandedContent');
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if(window.auth) {
+                    window.onAuthStateChanged(window.auth, (user) => {
+                        if (user) {
+                            handleAutoLogin(user.uid);
+                        } else {
+                            showView('login');
+                        }
+                    });
+                }
+            }, 500);
+
+            // Setup Timeline Listener
+            timelineSlider.addEventListener('input', handleTimelineInput);
+        });
+
+        // --- TIMELINE LOGIC ---
+        function handleTimelineInput() {
+            if(!currentReviewTrip || !currentReviewTrip.optimizedPath) return;
+            
+            const index = parseInt(timelineSlider.value);
+            const max = parseInt(timelineSlider.max);
+            const point = currentReviewTrip.optimizedPath[index];
+            
+            // Update Visual Progress & Thumb
+            const percent = (index / max) * 100;
+            timelineProgress.style.width = `${percent}%`;
+            customThumb.style.right = `${100 - percent}%`; // RTL adjustment
+            
+            if(point) {
+                // Update Marker Position
+                const latLng = [point.lat, point.lng];
+                if(userMarker) userMarker.setLatLng(latLng);
+                map.panTo(latLng, {animate: false}); 
+                
+                // Update Time Display
+                if(point.ts) {
+                    const timeStr = new Date(point.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                    timelineCurrent.innerText = timeStr;
+                }
+            }
+        }
+
+        // --- TOAST SYSTEM ---
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-item';
+            
+            let icon = '';
+            let colorClass = 'text-blue-400';
+            
+            if (type === 'success') {
+                icon = '<i class="fas fa-check-circle"></i>';
+                colorClass = 'text-emerald-400';
+            } else if (type === 'error') {
+                icon = '<i class="fas fa-exclamation-circle"></i>';
+                colorClass = 'text-red-400';
+            } else {
+                icon = '<i class="fas fa-info-circle"></i>';
+            }
+
+            toast.innerHTML = `
+                <div class="${colorClass} text-lg">${icon}</div>
+                <div class="text-sm font-semibold">${message}</div>
+            `;
+
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- SHIFT LOGIC ---
+        function checkShiftTime() {
+            if (!driverData || !driverData.shift) return true; 
+
+            const now = new Date();
+            const currentTimeStr = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'});
+            
+            const parts = driverData.shift.split('-');
+            if (parts.length !== 2) return true;
+
+            const startStr = parts[0].trim();
+            const endStr = parts[1].trim();
+
+            const parseTime = (str) => {
+                const [h, m] = str.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            const currentMinutes = parseTime(currentTimeStr);
+            const startMinutes = parseTime(startStr);
+            const endMinutes = parseTime(endStr);
+
+            // Simple check (ignores midnight crossover for now)
+            if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+                return true;
+            }
+            return false;
+        }
+
+        // --- VIEW MANAGEMENT ---
+        function showView(viewName) {
+            Object.values(views).forEach(el => {
+                if(el) {
+                    el.classList.add('view-hidden');
+                    el.classList.remove('view-active');
+                }
+            });
+            if(views[viewName]) {
+                views[viewName].classList.remove('view-hidden');
+                views[viewName].classList.add('view-active');
+                currentView = viewName;
+
+                if(viewName === 'map' && !map) {
+                    setTimeout(initMap, 300);
+                } else if (viewName === 'map') {
+                    setTimeout(() => {
+                        if (map) map.invalidateSize();
+                    }, 300);
+                }
+            }
+        }
+
+        // --- FIREBASE AUTH & SECURITY ---
+        async function handleLogin() {
+            const emailInput = document.getElementById('loginEmail');
+            const passInput = document.getElementById('loginPass');
+            const email = emailInput.value.trim();
+            const password = passInput.value.trim();
+
+            if(!email || !password) {
+                showToast('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error');
+                return;
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+            loginBtn.disabled = true;
+
+            try {
+                const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
+                const user = userCredential.user;
+                checkDriverProfile(user.uid, true);
+            } catch (error) {
+                console.error("Login Error:", error);
+                let msg = 'تعذر تسجيل الدخول. تأكد من البيانات.';
+                showToast(msg, 'error');
+                loginBtn.innerHTML = 'تسجيل الدخول الآمن';
+                loginBtn.disabled = false;
+            }
+        }
+
+        async function seedDriver() {
+            const email = prompt("أدخل بريد إلكتروني جديد:");
+            const password = prompt("أدخل كلمة مرور (6 أحرف على الأقل):");
+            if(!email || !password) return;
+            
+            try {
+                const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                const user = userCredential.user;
+                const currentDeviceId = getDeviceFingerprint();
+                const driverRef = window.rtdbRef(window.db, 'drivers/' + user.uid + '/profile');
+                await window.rtdbSet(driverRef, {
+                    id: user.uid,
+                    name: 'سائق جديد',
+                    email: email,
+                    school: 'مدرسة Sook للتجربة',
+                    shift: '07:00 - 15:00',
+                    createdAt: new Date().toISOString(),
+                    registeredDeviceId: currentDeviceId 
+                });
+                alert("تم إنشاء الحساب بنجاح! سيتم الدخول تلقائياً.");
+            } catch(e) {
+                alert("حدث خطأ أثناء الإنشاء: " + e.message);
+            }
+        }
+
+        async function checkDriverProfile(uid, isManualLogin = false) {
+            try {
+                const dbRef = window.rtdbRef(window.db);
+                const snapshot = await window.rtdbGet(window.rtdbChild(dbRef, `drivers/${uid}/profile`));
+
+                if (snapshot.exists()) {
+                    driverData = snapshot.val();
+                    const currentDeviceId = getDeviceFingerprint();
+                    const registeredId = driverData.registeredDeviceId;
+
+                    // Device Fingerprint Security Check
+                    if (!registeredId) {
+                        const profileRef = window.rtdbRef(window.db, `drivers/${uid}/profile`);
+                        await window.rtdbUpdate(profileRef, { registeredDeviceId: currentDeviceId });
+                        loginSuccess(uid);
+                    } else if (registeredId === currentDeviceId) {
+                        loginSuccess(uid);
+                    } else {
+                        window.signOut(window.auth);
+                        securityOverlay.classList.remove('hidden'); 
+                        document.getElementById('loginBtn').innerHTML = 'تسجيل الدخول الآمن';
+                        document.getElementById('loginBtn').disabled = false;
+                    }
+                } else {
+                    showToast('لم يتم العثور على ملف السائق.', 'error');
+                    window.signOut(window.auth);
+                    document.getElementById('loginBtn').innerHTML = 'تسجيل الدخول الآمن';
+                    document.getElementById('loginBtn').disabled = false;
+                }
+            } catch (e) {
+                console.error("Profile Fetch Error", e);
+                showToast('فشل في جلب البيانات', 'error');
+            }
+        }
+
+        function loginSuccess(id) {
+            currentDriverId = id;
+            document.getElementById('driverNameDisplay').innerText = driverData.name || 'سائق';
+            document.getElementById('schoolNameDisplay').innerText = driverData.school || 'غير محدد';
+            document.getElementById('shiftDisplay').innerText = driverData.shift || '--';
+            fetchStudents(id);
+            listenToHistory(id);
+            showToast('تم تسجيل الدخول بنجاح', 'success');
+            setTimeout(() => showView('home'), 500);
+        }
+
+        function handleAutoLogin(id) {
+            checkDriverProfile(id); 
+        }
+
+        function logout() {
+            window.signOut(window.auth).then(() => {
+                currentDriverId = null;
+                driverData = {};
+                showView('login');
+                const btn = document.getElementById('loginBtn');
+                if(btn) {
+                    btn.innerHTML = 'تسجيل الدخول الآمن';
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // --- FETCH & HISTORY & STUDENTS ---
+        function fetchStudents(driverId) {
+            if(!driverId) driverId = currentDriverId;
+            const studentsRef = window.rtdbRef(window.db, 'students');
+            const q = window.rtdbQuery(studentsRef, window.rtdbOrderByChild('driverId'), window.rtdbEqualTo(driverId));
+            
+            window.rtdbOnValue(q, (snapshot) => {
+                myStudents = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        data.id = childSnapshot.key;
+                        data.status = 'pending';
+                        myStudents.push(data);
+                    });
+                }
+                // Animate Counter
+                gsap.to('#studentsCountDisplay', { 
+                    innerText: myStudents.length, 
+                    duration: 1.5, 
+                    snap: { innerText: 1 }, 
+                    ease: "power2.out" 
+                });
+            });
+        }
+
+        function listenToHistory(driverId) {
+            const tripsRef = window.rtdbRef(window.db, 'drivers/' + driverId + '/trips');
+            const recentTripsQuery = window.rtdbQuery(tripsRef, window.rtdbOrderByChild('startTime'));
+
+            window.rtdbOnValue(recentTripsQuery, (snapshot) => {
+                calendarGrid.innerHTML = '';
+                if(!snapshot.exists()) {
+                    calendarGrid.innerHTML = '<div class="text-center text-gray-500 py-4">لا توجد رحلات سابقة</div>';
+                    return;
+                }
+                const trips = [];
+                snapshot.forEach((childSnapshot) => {
+                    trips.push({ key: childSnapshot.key, ...childSnapshot.val() });
+                });
+                trips.reverse(); 
+                trips.forEach((trip, index) => {
+                    if(trip.status === 'completed') { 
+                        renderTripCard(trip, index);
+                    }
+                });
+            });
+        }
+
+        // --- ANALYTICS CALCULATION ---
+        function calculateTripAnalytics(tripEvents, totalStudentsList) {
+            const total = totalStudentsList.length;
+            const boardedIds = new Set(tripEvents.filter(e => e.type === 'boarding').map(e => e.studentId));
+            const present = boardedIds.size;
+            const absent = total - present;
+            const percent = total > 0 ? Math.round((present / total) * 100) : 0;
+            return { total, present, absent, percent };
+        }
+        
+        function updateAnalyticsChart(stats) {
+            const chart = document.getElementById('analyticsChart');
+            const degree = (stats.percent / 100) * 360;
+            
+            // GSAP Animation for numbers
+            gsap.to('#chartPercent', { innerText: stats.percent + '%', duration: 1.5, snap: { innerText: 1 } });
+            gsap.to('#statPresent', { innerText: stats.present, duration: 1, snap: { innerText: 1 } });
+            gsap.to('#statAbsent', { innerText: stats.absent, duration: 1, snap: { innerText: 1 } });
+            gsap.to('#statTotal', { innerText: stats.total, duration: 1, snap: { innerText: 1 } });
+
+            // CSS Variable update for Conic Gradient
+            chart.style.setProperty('--chart-deg', degree + 'deg');
+            chart.style.setProperty('--chart-color', stats.percent >= 90 ? '#10b981' : stats.percent >= 50 ? '#f59e0b' : '#ef4444');
+            
+            const badge = document.getElementById('analyticsPercent');
+            if(badge) badge.innerText = stats.percent + '%';
+        }
+
+        function renderTripCard(trip, index) {
+            const dateObj = new Date(trip.startTime);
+            const dayName = dateObj.toLocaleDateString('ar-SA', {weekday: 'long'});
+            const distance = trip.totalDistance ? trip.totalDistance.toFixed(2) : "0.0";
+            
+            // Fallback for analytics if not saved in old trips
+            let percent = 0;
+            let presentCount = 0;
+            if (trip.stats) {
+                percent = trip.stats.percent;
+                presentCount = trip.stats.present;
+            } else if (trip.events) {
+                // On-the-fly calc for legacy data
+                const evs = Object.values(trip.events);
+                const stats = calculateTripAnalytics(evs, myStudents);
+                percent = stats.percent;
+                presentCount = stats.present;
+            }
+            
+            const colorClass = percent >= 90 ? 'text-emerald-400' : percent >= 70 ? 'text-yellow-400' : 'text-red-400';
+            const bgClass = percent >= 90 ? 'bg-emerald-500/10 border-emerald-500/20' : percent >= 70 ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-red-500/10 border-red-500/20';
+
+            const card = document.createElement('div');
+            card.className = 'glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition relative overflow-hidden group';
+            // Add AOS
+            card.setAttribute('data-aos', 'fade-up');
+            card.setAttribute('data-aos-delay', index * 50);
+            
+            card.onclick = () => reviewTrip(trip);
+            card.innerHTML = `
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-14 h-14 rounded-xl bg-white/5 flex flex-col items-center justify-center border border-white/10">
+                        <span class="text-xs text-gray-400 font-bold">${dateObj.toLocaleDateString('ar-SA', {weekday:'short'})}</span>
+                        <span class="text-lg font-bold text-white">${dateObj.getDate()}</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-white mb-1">رحلة توصيل ${dayName}</h4>
+                        <div class="flex items-center gap-2">
+                             <div class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${bgClass} ${colorClass}">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>حضور ${percent}%</span>
+                             </div>
+                             <span class="text-[10px] text-gray-500">(${presentCount} طالب)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-left relative z-10">
+                    <p class="text-sm font-bold font-mono text-white">${distance} km</p>
+                    <i class="fas fa-chevron-left text-xs text-gray-600 mt-1"></i>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-l from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+            `;
+            calendarGrid.appendChild(card);
+        }
+
+        // --- STUDENTS & BOARDING RENDER LOGIC ---
+        function renderStudentsList(isReviewMode = false, events = []) {
+            studentsListContainer.innerHTML = '';
+            let listToRender = isReviewMode ? JSON.parse(JSON.stringify(myStudents)) : currentTripStudents;
+            
+            if(listToRender.length === 0) studentsListContainer.innerHTML = '<div class="text-center text-gray-500 py-2">لا يوجد طلاب</div>';
+            
+            if (isReviewMode) {
+                listToRender = listToRender.map(student => {
+                    const event = events.find(e => e.studentId === student.id);
+                    return { ...student, status: event ? 'boarded' : 'absent', boardTime: event ? event.ts : null };
+                });
+            }
+            document.getElementById('studentCountBadge').innerText = listToRender.length;
+            
+            listToRender.forEach((student, idx) => {
+                const item = document.createElement('div');
+                const statusClass = student.status === 'boarded' ? 'status-boarded' : (student.status === 'absent' ? 'status-absent' : '');
+                item.className = `student-card cursor-pointer ${statusClass}`;
+                
+                // Staggered Animation
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(10px)';
+                setTimeout(() => { item.style.opacity = '1'; item.style.transform = 'translateY(0)'; }, idx * 50);
+                
+                item.onclick = (e) => { 
+                    if(e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+                         showStudentDetails(student); 
+                    }
+                };
+                
+                let actionArea = '';
+                if (student.status === 'boarded') {
+                    const timeStr = student.boardTime ? new Date(student.boardTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
+                    actionArea = `<div class="text-right"><span class="text-emerald-400 text-xs font-bold block"><i class="fas fa-check-circle"></i> تم الركوب</span><span class="text-gray-400 text-[10px] font-mono">${timeStr}</span></div>`;
+                } else if (student.status === 'absent') {
+                     actionArea = `<div class="text-right"><span class="text-red-400 text-xs font-bold block"><i class="fas fa-times-circle"></i> غائب</span></div>`;
+                } else if (!isReviewMode) {
+                    if(isTracking) {
+                         actionArea = `<button onclick="promptBoarding('${student.id}')" class="board-btn">تسجيل ركوب</button>`;
+                    } else {
+                         actionArea = `<button disabled class="board-btn opacity-50 cursor-not-allowed" title="يجب بدء الرحلة أولاً">انتظار البدء</button>`;
+                    }
+                }
+                
+                item.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden border border-white/10"><img src="${student.photo || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover"></div><div><span class="font-semibold text-sm block">${student.name}</span><span class="text-[10px] text-gray-400">${student.grade}</span></div></div>${actionArea}`;
+                studentsListContainer.appendChild(item);
+            });
+        }
+        
+        window.promptBoarding = function(studentId) {
+            const student = currentTripStudents.find(s => s.id === studentId);
+            if(!student) return;
+            
+            showInputModal('تأكيد الركوب', `أدخل رقم البطاقة للطالب: ${student.name}`, '1234...', (value) => {
+                if(value === student.badgeId) {
+                    markStudentBoarded(studentId);
+                } else {
+                    showToast('رقم البطاقة غير صحيح!', 'error');
+                }
+            });
+            setTimeout(() => {
+                const input = document.getElementById('modalInput');
+                if(input) input.focus();
+            }, 100);
+        };
+        
+        function markStudentBoarded(studentId) {
+            const studentIndex = currentTripStudents.findIndex(s => s.id === studentId);
+            if(studentIndex > -1) {
+                // UI Update
+                currentTripStudents[studentIndex].status = 'boarded';
+                currentTripStudents[studentIndex].boardTime = Date.now();
+                
+                // Analytics Event Tracking
+                const eventData = { 
+                    type: 'boarding', 
+                    studentId: studentId, 
+                    ts: Date.now() 
+                };
+                currentTripEvents.push(eventData);
+
+                renderStudentsList(false);
+            
+                // Sync to Firebase
+                if(currentTripKey && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        eventData.lat = pos.coords.latitude;
+                        eventData.lng = pos.coords.longitude;
+                        const eventsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/events');
+                        window.rtdbPush(eventsRef, eventData);
+                    });
+                }
+            }
+        }
+        
+        function showStudentDetails(student) {
+            studentName.innerText = student.name; studentGrade.innerText = student.grade; studentBadge.innerText = student.badgeId; studentParentPhone.innerText = student.parentPhone; studentAddress.innerText = student.address; studentPhoto.src = student.photo || 'https://via.placeholder.com/150'; callParentBtn.href = `tel:${student.parentPhone}`;
+            studentModal.classList.remove('hidden');
+            setTimeout(() => { studentModal.classList.remove('opacity-0'); studentModalContent.classList.remove('scale-95'); studentModalContent.classList.add('scale-100'); }, 10);
+        }
+        window.closeStudentModal = function() {
+            studentModal.classList.add('opacity-0'); studentModalContent.classList.remove('scale-100'); studentModalContent.classList.add('scale-95'); setTimeout(() => { studentModal.classList.add('hidden'); }, 300);
+        };
+
+        // --- MAP & ROUTING ---
+        function initMap() {
+            if(map) return;
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([24.7136, 46.6753], 13);
+            
+            // Base Layer check
+            if (API_KEYS.tomtom) {
+                 L.tileLayer(`https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {maxZoom: 22, subdomains: 'abcd'}).addTo(map);
+            } else {
+                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd' }).addTo(map);
+            }
+            
+            // Add layers to the group map for toggling
+            tomTomLayers.evStations.addTo(map);
+            tomTomLayers.pois.addTo(map);
+
+            const carIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="relative w-full h-full"><div class="pulse-ring"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-emerald-500 rounded-full border-2 border-white p-1 shadow-lg"><i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i></div></div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+            userMarker = L.marker([0, 0], {icon: carIcon});
+            pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+            
+            map.on('click', function(e) {
+                if(!historyView.classList.contains('hidden') || currentReviewTrip) return;
+                calculateRoute(e.latlng.lat, e.latlng.lng);
+            });
+        }
+        
+        async function calculateRoute(destLat, destLng) {
+            if (currentPos.lat === 0) { showToast('جاري تحديد موقعك...', 'info'); locateUser(); return; }
+            loadingRoute.classList.remove('hidden');
+            
+            if (API_KEYS.tomtom) {
+                try {
+                    const url = `https://api.tomtom.com/routing/1/calculateRoute/${currentPos.lat},${currentPos.lng}:${destLat},${destLng}/json?key=${API_KEYS.tomtom}&traffic=true&travelMode=car`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if(data.routes && data.routes.length > 0) {
+                        const route = data.routes[0];
+                        const points = route.legs[0].points.map(p => [p.latitude, p.longitude]);
+                        
+                        if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+                        if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
+                        
+                        window.currentRouteLayer = L.polyline(points, {
+                            color: '#3b82f6', 
+                            weight: 6, 
+                            opacity: 0.8
+                        }).addTo(map);
+                        
+                        map.fitBounds(window.currentRouteLayer.getBounds(), {padding: [50, 50]});
+
+                        const summary = route.summary;
+                        const distKm = (summary.lengthInMeters / 1000).toFixed(1);
+                        const timeMin = Math.round(summary.travelTimeInSeconds / 60);
+                        
+                        routeInfo.classList.remove('hidden');
+                        routeInfo.classList.add('flex');
+                        routeSummary.innerText = `${distKm} كم`;
+                        routeTime.innerText = `${timeMin} د`;
+                        loadingRoute.classList.add('hidden');
+                    } else {
+                        throw new Error("No route found");
+                    }
+                } catch(e) {
+                    console.error("TomTom Routing Error", e);
+                    useOSRM(destLat, destLng);
+                }
+            } else {
+                useOSRM(destLat, destLng);
+            }
+        }
+        
+        function useOSRM(destLat, destLng) {
+            if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+            if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
+            
+            routingControl = L.Routing.control({
+                waypoints: [L.latLng(currentPos.lat, currentPos.lng), L.latLng(destLat, destLng)],
+                router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+                lineOptions: { styles: [{color: '#3b82f6', opacity: 0.6, weight: 6}], extendToWaypoints: false, missingRouteTolerance: 10 },
+                showAlternatives: false,
+                createMarker: function(i, wp, nWps) {
+                    if (i === nWps - 1) return L.marker(wp.latLng, { icon: L.divIcon({ className: 'dest-icon', html: '<div class="text-emerald-500 text-4xl drop-shadow-2xl filter"><i class="fas fa-school"></i></div>', iconSize: [40, 40], iconAnchor: [20, 40] }) });
+                    return null;
+                },
+                addWaypoints: false, fitSelectedRoutes: true, show: false
+            }).addTo(map);
+            
+            routingControl.on('routesfound', function(e) {
+                loadingRoute.classList.add('hidden');
+                const bestRoute = e.routes[0];
+                routeInfo.classList.remove('hidden');
+                routeInfo.classList.add('flex');
+                routeSummary.innerText = `${(bestRoute.summary.totalDistance / 1000).toFixed(1)} كم`;
+                routeTime.innerText = `${Math.round(bestRoute.summary.totalTime / 60)} د`;
+            });
+            
+            routingControl.on('routingerror', function() {
+                loadingRoute.classList.add('hidden');
+                showToast("تعذر الوصول لهذا الموقع.", 'error');
+            });
+        }
+
+        // --- TOMTOM TOOLS LOGIC ---
+        function toggleToolsMenu() {
+            if (toolsMenu.classList.contains('pointer-events-none')) {
+                toolsMenu.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
+                toolsMenu.classList.add('opacity-100', 'scale-100');
+            } else {
+                toolsMenu.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+                toolsMenu.classList.remove('opacity-100', 'scale-100');
+            }
+        }
+
+        function toggleTomTomLayer(type) {
+            activeLayers[type] = !activeLayers[type];
+            const toggleEl = document.getElementById(`toggle-${type}`);
+            const itemEl = toggleEl.parentElement;
+            
+            if (activeLayers[type]) {
+                itemEl.classList.add('active');
+            } else {
+                itemEl.classList.remove('active');
+            }
+
+            if (!API_KEYS.tomtom) {
+                showToast('عذراً، يجب إضافة مفتاح TomTom API لتفعيل هذه الميزة', 'error');
+                activeLayers[type] = false;
+                itemEl.classList.remove('active');
+                return;
+            }
+
+            if (type === 'trafficFlow') {
+                if (activeLayers[type]) {
+                    if (!tomTomLayers.trafficFlow) {
+                         tomTomLayers.trafficFlow = L.tileLayer(`https://{s}.api.tomtom.com/traffic/map/4/tile/flow/relative/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {
+                            subdomains: 'abcd', opacity: 0.8, zIndex: 10
+                        });
+                    }
+                    tomTomLayers.trafficFlow.addTo(map);
+                } else {
+                    if (tomTomLayers.trafficFlow) map.removeLayer(tomTomLayers.trafficFlow);
+                }
+            }
+            
+            else if (type === 'trafficIncidents') {
+                if (activeLayers[type]) {
+                    if (!tomTomLayers.trafficIncidents) {
+                        tomTomLayers.trafficIncidents = L.tileLayer(`https://{s}.api.tomtom.com/traffic/map/4/tile/incidents/s3/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {
+                            subdomains: 'abcd', opacity: 1, zIndex: 11
+                        });
+                    }
+                    tomTomLayers.trafficIncidents.addTo(map);
+                } else {
+                    if (tomTomLayers.trafficIncidents) map.removeLayer(tomTomLayers.trafficIncidents);
+                }
+            }
+
+            else if (type === 'evStations' || type === 'pois') {
+                const query = type === 'evStations' ? 'electric vehicle station' : 'gas station';
+                const layer = type === 'evStations' ? tomTomLayers.evStations : tomTomLayers.pois;
+                
+                if (activeLayers[type]) {
+                    if (currentPos.lat !== 0) {
+                        fetchTomTomPOIs(query, layer, type === 'evStations' ? 'green' : 'blue');
+                    } else {
+                         showToast('يجب تحديد الموقع أولاً', 'error');
+                    }
+                } else {
+                    layer.clearLayers();
+                }
+            }
+        }
+
+        async function fetchTomTomPOIs(queryStr, layerGroup, color) {
+            const lat = currentPos.lat;
+            const lon = currentPos.lng;
+            const url = `https://api.tomtom.com/search/2/search/${queryStr}.json?key=${API_KEYS.tomtom}&lat=${lat}&lon=${lon}&radius=5000&limit=20`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                layerGroup.clearLayers();
+                
+                if (data.results) {
+                    data.results.forEach(result => {
+                        const marker = L.circleMarker([result.position.lat, result.position.lon], {
+                            radius: 8,
+                            fillColor: color === 'green' ? '#10b981' : '#3b82f6',
+                            color: '#fff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+                        
+                        marker.bindPopup(`<b>${result.poi.name}</b><br>${result.address.freeformAddress}`);
+                        layerGroup.addLayer(marker);
+                    });
+                    showToast(`تم العثور على ${data.results.length} موقع`, 'success');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('فشل في جلب البيانات', 'error');
+            }
+        }
+
+        // --- START DAILY TRIP ---
+        function startDailyTrip() {
+            if (!navigator.geolocation) { showToast('GPS غير مدعوم', 'error'); return; }
+            const isShiftValid = checkShiftTime();
+            if (!isShiftValid) { showToast('انتهت فترة العمل لهذا اليوم.', 'error'); return; }
+            if(!myStudents.length) { showToast('لا يوجد طلاب مسجلين', 'error'); return; }
+
+            showView('map');
+            loadingRoute.classList.remove('hidden');
+            historyModeBadge.classList.add('hidden');
+            // analyticsBadge removed to fix error
+            
+            // Show Live Controls
+            document.getElementById('liveControls').classList.remove('hidden');
+            reviewControls.classList.add('hidden'); 
+            document.getElementById('closeReviewBtn').classList.add('hidden');
+            document.getElementById('toolsBtn').classList.remove('hidden');
+
+            currentTripStudents = JSON.parse(JSON.stringify(myStudents));
+            currentTripEvents = []; // Reset events for new trip
+            renderStudentsList(false);
+
+            navigator.geolocation.getCurrentPosition(pos => {
+                if (!map) initMap();
+                if (!map) { console.error("Map not initialized"); return; }
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const currentLatLng = L.latLng(lat, lng);
+                
+                currentPos = {lat, lng};
+                
+                if(!map.hasLayer(userMarker)) userMarker.addTo(map);
+                userMarker.setLatLng(currentLatLng);
+                map.setView(currentLatLng, 15);
+                const destLatLng = L.latLng(29.939433605939247, 30.941213714457312); // School location placeholder
+                
+                calculateRoute(destLatLng.lat, destLatLng.lng);
+
+            }, err => { showToast('تعذر تحديد موقعك الحالي', 'error'); returnToHome(); });
+        }
+
+        // --- REVIEW HISTORY ---
+        function reviewTrip(trip) {
+            currentReviewTrip = trip;
+            showView('map');
+            if (!map) { initMap(); if (!map) return; }
+            setTimeout(() => { if(map) map.invalidateSize(); }, 100);
+
+            // Clean previous layers
+            if(pathLine && map.hasLayer(pathLine)) map.removeLayer(pathLine);
+            if(routingControl) map.removeControl(routingControl);
+            if(window.currentRouteLayer) map.removeLayer(window.currentRouteLayer); 
+            if(reviewPathLine && map.hasLayer(reviewPathLine)) map.removeLayer(reviewPathLine);
+            
+            boardingMarkers.forEach(m => map.removeLayer(m));
+            boardingMarkers = [];
+            timelineMarkers.innerHTML = '';
+            
+            // UI Toggles
+            document.getElementById('liveControls').classList.add('hidden');
+            reviewControls.classList.remove('hidden');
+            document.getElementById('closeReviewBtn').classList.remove('hidden');
+            routeInfo.classList.add('hidden');
+            historyModeBadge.classList.remove('hidden');
+            historyModeBadge.classList.add('flex');
+            
+            // Re-construct Events and Path
+            let events = [];
+            if(trip.events) {
+                events = Object.values(trip.events);
+                events.forEach(ev => {
+                    if(ev.type === 'boarding') {
+                        const student = myStudents.find(s => s.id === ev.studentId);
+                        const imgSrc = student ? (student.photo || 'https://via.placeholder.com/50') : 'https://via.placeholder.com/50';
+                        const marker = L.marker([ev.lat, ev.lng], {
+                            icon: L.divIcon({ className: 'student-pin', html: `<div class="student-pin-frame"><img src="${imgSrc}" class="student-pin-img"></div>`, iconSize: [40, 40], iconAnchor: [20, 40] })
+                        }).addTo(map);
+                        boardingMarkers.push(marker);
+                    }
+                });
+            }
+            
+            // Setup Analytics Overlay Data
+            let stats = trip.stats;
+            if(!stats) stats = calculateTripAnalytics(events, myStudents);
+            updateAnalyticsChart(stats);
+            // analyticsBadge removed to fix error
+            
+            renderStudentsList(true, events);
+            
+            // Draw Historical Path
+            let pathPoints = [];
+            if(trip.actualPath) pathPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
+            
+            if(pathPoints.length > 0) {
+                const latLngs = pathPoints.map(p => [p.lat, p.lng]);
+                reviewPathLine = L.polyline(latLngs, { color: '#a855f7', weight: 5, opacity: 1 }).addTo(map);
+                map.fitBounds(reviewPathLine.getBounds(), {padding: [50, 50]});
+                
+                currentReviewTrip.optimizedPath = pathPoints;
+                currentReviewTrip.events = events; 
+                
+                // Reset Slider
+                timelineSlider.max = pathPoints.length - 1;
+                timelineSlider.value = 0;
+                timelineProgress.style.width = '0%';
+                customThumb.style.right = '100%';
+                
+                if(!map.hasLayer(userMarker)) userMarker.addTo(map);
+                userMarker.setLatLng(latLngs[0]);
+                
+                const startD = new Date(trip.startTime);
+                const endD = new Date(trip.endTime);
+                timelineStart.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                timelineEnd.innerText = endD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                timelineCurrent.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+
+                // Generate Markers on Timeline
+                events.forEach(ev => {
+                    if(ev.type === 'boarding' && ev.ts) {
+                        let closestIndex = 0;
+                        let minDiff = Infinity;
+                        pathPoints.forEach((p, idx) => {
+                            const diff = Math.abs(p.ts - ev.ts);
+                            if(diff < minDiff) { minDiff = diff; closestIndex = idx; }
+                        });
+
+                        const percent = (closestIndex / (pathPoints.length - 1)) * 100;
+                        const studentName = myStudents.find(s => s.id === ev.studentId)?.name || 'طالب';
+                        const timeStr = new Date(ev.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+
+                        const dot = document.createElement('div');
+                        dot.className = 'timeline-marker';
+                        dot.style.left = `${percent}%`; // LTR timeline visual
+                        dot.innerHTML = `<div class="timeline-tooltip">${studentName} (${timeStr})</div>`;
+                        dot.onclick = (e) => {
+                            e.stopPropagation();
+                            timelineSlider.value = closestIndex;
+                            handleTimelineInput();
+                        };
+                        timelineMarkers.appendChild(dot);
+                    }
+                });
+            }
+            toggleAnalyticsDetails(); // Auto show analytics
+        }
+
+        function returnToHome() {
+            if(isTracking) stopTracking(false);
+            boardingMarkers.forEach(m => map.removeLayer(m));
+            boardingMarkers = [];
+            if(reviewPathLine && map.hasLayer(reviewPathLine)) map.removeLayer(reviewPathLine);
+            if(window.currentRouteLayer && map.hasLayer(window.currentRouteLayer)) map.removeLayer(window.currentRouteLayer);
+            if(pathLine && !map.hasLayer(pathLine)) pathLine.addTo(map);
+            
+            document.getElementById('liveControls').classList.remove('hidden');
+            reviewControls.classList.add('hidden');
+            document.getElementById('closeReviewBtn').classList.add('hidden');
+            historyModeBadge.classList.add('hidden');
+            // analyticsBadge removed to fix error
+            document.getElementById('analyticsOverlay').classList.add('hidden');
+            
+            currentReviewTrip = null;
+            showView('home');
+        }
+
+        // --- TRACKING LOGIC ---
+        async function toggleTracking() {
+            const btnSpan = actionBtn ? actionBtn.querySelector('span') : null;
+            const btnIcon = actionBtn ? actionBtn.querySelector('i') : null;
+            if (!isTracking) {
+                if (!navigator.geolocation) return;
+                isTracking = true;
+                
+                renderStudentsList(false);
+
+                try {
+                    const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
+                    const newTripRef = window.rtdbPush(tripsRef);
+                    currentTripKey = newTripRef.key;
+                    await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
+                } catch(e) { console.error("Error creating trip", e); }
+                
+                if(btnSpan) btnSpan.innerText = "إنهاء الرحلة وحفظ التحليل";
+                if(btnIcon) btnIcon.className = "fas fa-stop-circle animate-pulse text-red-500";
+                if(actionBtn) { actionBtn.classList.replace('from-emerald-500', 'from-red-600'); actionBtn.classList.replace('to-emerald-600', 'to-red-600'); }
+                
+                pathLine.setLatLngs([]);
+                let lastPos = null;
+                let totalDist = 0;
+                
+                watchId = navigator.geolocation.watchPosition(
+                    pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const latLng = [lat, lng];
+                        currentPos = {lat, lng};
+                        userMarker.setLatLng(latLng);
+                        map.panTo(latLng, {animate: true});
+                        pathLine.addLatLng(latLng);
+                        
+                        if(lastPos) {
+                            totalDist += L.latLng(lastPos).distanceTo(latLng);
+                            distanceDisplay.innerText = (totalDist/1000).toFixed(2) + " كم";
+                        }
+                        lastPos = latLng;
+                        speedDisplay.innerText = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(0) : 0;
+                        
+                        if(currentTripKey) {
+                            const pathRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/actualPath');
+                            const pointRef = window.rtdbPush(pathRef);
+                            window.rtdbSet(pointRef, { lat: lat, lng: lng, ts: Date.now() });
+                            const tripMetaRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
+                            window.rtdbUpdate(tripMetaRef, { totalDistance: totalDist / 1000 });
+                        }
+                    },
+                    err => console.error(err),
+                    { enableHighAccuracy: true, maximumAge: 0 }
+                );
+            } else {
+                stopTracking(true);
+            }
+        }
+
+        async function stopTracking(resetUI) {
+            isTracking = false;
+            if(watchId) navigator.geolocation.clearWatch(watchId);
+            
+            // Analytics Calculation
+            const stats = calculateTripAnalytics(currentTripEvents, myStudents);
+
+            if(currentTripKey) {
+                const tripRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
+                await window.rtdbUpdate(tripRef, { 
+                    status: 'completed', 
+                    endTime: Date.now(),
+                    stats: stats // Save stats to DB
+                });
+                currentTripKey = null;
+            }
+            if(resetUI && actionBtn) {
+                const btnSpan = actionBtn.querySelector('span');
+                const btnIcon = actionBtn.querySelector('i');
+                if(btnSpan) btnSpan.innerText = "بدء التحرك الفعلي";
+                if(btnIcon) btnIcon.className = "fas fa-play";
+                actionBtn.classList.replace('from-red-600', 'from-emerald-500');
+                actionBtn.classList.replace('to-red-600', 'to-emerald-600');
+                showToast(`أحسنت! نسبة الحضور: ${stats.percent}%`, 'success');
+                setTimeout(returnToHome, 1500);
+            }
+        }
+
+        // --- UTILS ---
+        function showInputModal(title, msg, placeholder, callback) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = msg;
+            document.getElementById('modalIcon').innerHTML = '<i class="fas fa-keyboard text-emerald-400"></i>';
+            const inputContainer = document.getElementById('modalInputContainer');
+            const input = document.getElementById('modalInput');
+            inputContainer.classList.remove('hidden');
+            input.value = '';
+            input.placeholder = placeholder;
+            const actions = document.getElementById('modalActions');
+            actions.innerHTML = '';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'flex-1 py-3 rounded-xl bg-white/10 text-gray-400 hover:bg-white/20 transition';
+            cancelBtn.innerText = 'إلغاء';
+            cancelBtn.onclick = () => { modal.classList.add('hidden'); modal.classList.remove('opacity-100'); };
+            
+            const okBtn = document.createElement('button');
+            okBtn.className = 'flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-lg transition';
+            okBtn.innerText = 'تأكيد';
+            okBtn.onclick = () => { modal.classList.add('hidden'); modal.classList.remove('opacity-100'); if(callback) callback(input.value); };
+            
+            actions.appendChild(cancelBtn); actions.appendChild(okBtn);
+            modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10);
+            setTimeout(() => input.focus(), 300);
+        }
+        
+        function toggleAnalyticsDetails() {
+            const overlay = document.getElementById('analyticsOverlay');
+            if(overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function locateUser(recenter) {
+            if(!map) return;
+            navigator.geolocation.getCurrentPosition(pos => {
+                const ll = [pos.coords.latitude, pos.coords.longitude];
+                if(recenter) map.setView(ll, 16);
+            });
+        }
+        
+        // Drag Logic & Bottom Sheet
+        let startY = 0; let isDragging = false; let isExpanded = false;
+        dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
+        dragHandle.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); });
+        dragHandle.addEventListener('touchend', (e) => { isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.changedTouches[0].clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
+        dragHandle.addEventListener('mousedown', (e) => { startY = e.clientY; isDragging = true; panel.style.transition = 'none'; });
+        window.addEventListener('mouseup', (e) => { if(!isDragging) return; isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
+        function expandPanel() { panel.style.transform = 'translateY(0)'; isExpanded = true; expandedContent.style.opacity = '1'; }
+        function collapsePanel() { panel.style.transform = 'translateY(calc(85vh - 180px))'; isExpanded = false; expandedContent.style.opacity = '0.5'; panel.querySelector('.overflow-y-auto').scrollTop = 0; }
+    </script>
+</body>
+</html>
