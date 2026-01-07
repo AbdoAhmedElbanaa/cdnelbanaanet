@@ -1316,7 +1316,9 @@
 
             const card = document.createElement('div');
             card.className = 'glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition relative overflow-hidden group';
-
+            // Add AOS
+            card.setAttribute('data-aos', 'fade-up');
+            card.setAttribute('data-aos-delay', index * 50);
             
             card.onclick = () => reviewTrip(trip);
             card.innerHTML = `
@@ -1476,7 +1478,7 @@
             pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
             
             map.on('click', function(e) {
-                if(!historyView.classList.contains('hidden') || currentReviewTrip) return;
+                if(currentReviewTrip) return;
                 calculateRoute(e.latlng.lat, e.latlng.lng);
             });
         }
@@ -1716,7 +1718,7 @@
                 if(!map.hasLayer(userMarker)) userMarker.addTo(map);
                 userMarker.setLatLng(currentLatLng);
                 map.setView(currentLatLng, 15);
-                const destLatLng = L.latLng(24.807606, 46.619076); // School location placeholder
+                const destLatLng = L.latLng(29.939433605939247, 30.941213714457312); // School location placeholder
                 
                 calculateRoute(destLatLng.lat, destLatLng.lng);
 
