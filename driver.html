@@ -116,7 +116,7 @@
         <div class="flex justify-between items-center mb-8 mt-4">
             <div>
                 <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-emerald-400 to-blue-500">Sook Driver</h2>
-                <p class="text-xs text-gray-400">الإصدار 2.0</p>
+                <p class="text-xs text-gray-400">الإصدار 2.1 (خلفية نشطة)</p>
             </div>
             <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-300 active:bg-white/10"><i class="fas fa-times text-lg"></i></button>
         </div>
@@ -260,6 +260,7 @@
         let isTracking = false;
         let isSimulating = false;
         let wasTrackingBeforeSimulation = false;
+        let wakeLock = null; // Wake Lock Variable for background activity
         
         let currentPos = { lat: 0, lng: 0 };
         let pathCoordinates = [];
@@ -282,6 +283,29 @@
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             locateUser(true);
+        });
+
+        // --- Wake Lock Implementation ---
+        // This keeps the screen on, which allows the browser to keep GPS active in "background" (foreground service equivalent for web)
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock is active (Background tracking enabled)');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock was released');
+                    });
+                }
+            } catch (err) {
+                console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+            }
+        }
+
+        // Re-acquire Wake Lock if visibility changes (e.g. user minimized then returned)
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
         });
 
         function initMap() {
@@ -515,9 +539,12 @@
             }
         }
 
-        function startTracking(updateUI = true) {
+        async function startTracking(updateUI = true) {
             if (!navigator.geolocation) return;
             isTracking = true;
+
+            // Request Wake Lock to allow "background" tracking (by keeping screen/cpu awake)
+            await requestWakeLock();
             
             if(updateUI) {
                 actionBtn.innerHTML = `<i class="fas fa-stop-circle animate-pulse"></i><span>إنهاء الرحلة</span>`;
@@ -536,7 +563,7 @@
                 { 
                     enableHighAccuracy: true, 
                     maximumAge: 0, 
-                    timeout: 5000 
+                    timeout: 10000 // Increased slightly to avoid timeout errors in background
                 }
             );
         }
@@ -546,6 +573,13 @@
             if (watchId !== null) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
+            }
+
+            // Release Wake Lock to save battery
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
             }
             
             if(clearUI) {
