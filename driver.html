@@ -22,21 +22,21 @@
 
     <style>
         :root {
-            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-bg: rgba(15, 23, 42, 0.85);
             --glass-border: rgba(255, 255, 255, 0.08);
             --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #0f172a;
             color: white;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Full Screen Map */
         #map {
             position: absolute;
             top: 0;
@@ -47,13 +47,21 @@
             background: #1a1a1a;
         }
 
-        /* Ultra Glassy Effect */
         .glass-sheet {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border-top: 1px solid var(--glass-border);
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+            touch-action: none;
+        }
+
+        .glass-modal {
+            background: rgba(20, 25, 40, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         .glass-pill {
@@ -69,9 +77,11 @@
             backdrop-filter: blur(20px);
         }
 
-        /* Animations */
-        .slide-up-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* History View Styling */
+        .history-view {
+            background: #0f172a;
+            z-index: 50;
+        }
 
         .pulse-ring {
             position: absolute;
@@ -88,25 +98,52 @@
             100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
         
-        /* REAL-TIME SMOOTHING: Add transition to marker movement */
         .leaflet-marker-icon.custom-div-icon {
             transition: transform 0.3s linear;
         }
 
-        /* Hide specific Leaflet controls */
         .leaflet-control-container .leaflet-routing-container { display: none; }
         .leaflet-control-attribution { display: none; }
 
-        /* Safe Area Spacing for Notch/Home Bar */
         .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
 
-        /* Custom Scrollbar for horizontal lists */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .content-fade { transition: opacity 0.3s ease; }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #a855f7; /* Purple to match history theme */
+            border: 3px solid white;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+        }
     </style>
 </head>
-<body class="h-screen w-screen relative">
+<body class="w-screen relative">
 
     <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 z-[60] hidden transition-opacity duration-300 backdrop-blur-sm opacity-0"></div>
@@ -116,7 +153,7 @@
         <div class="flex justify-between items-center mb-8 mt-4">
             <div>
                 <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-emerald-400 to-blue-500">Sook Driver</h2>
-                <p class="text-xs text-gray-400">الإصدار 2.1 (خلفية نشطة)</p>
+                <p class="text-xs text-gray-400">الإصدار 3.3</p>
             </div>
             <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-300 active:bg-white/10"><i class="fas fa-times text-lg"></i></button>
         </div>
@@ -131,120 +168,174 @@
                 </div>
             </div>
         </div>
-
+        <!-- Sidebar Links -->
         <nav class="space-y-3">
-            <a href="#" class="flex items-center gap-4 p-4 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
-                <i class="fas fa-map-marked-alt w-6"></i> <span>الخريطة المباشرة</span>
-            </a>
-            <a href="#" class="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-gray-300 transition">
-                <i class="fas fa-history w-6"></i> <span>سجل الرحلات</span>
-            </a>
-            <a href="#" class="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-gray-300 transition">
-                <i class="fas fa-wallet w-6"></i> <span>المحفظة (250 ر.س)</span>
-            </a>
-            <a href="#" class="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-gray-300 transition">
-                <i class="fas fa-cog w-6"></i> <span>الإعدادات</span>
-            </a>
+             <a href="#" onclick="showMapSection(); toggleSidebar()" class="flex items-center gap-4 p-4 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold"><i class="fas fa-map-marked-alt w-6"></i> <span>الخريطة المباشرة</span></a>
+             <a href="#" onclick="showHistorySection(); toggleSidebar()" class="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-gray-300 transition"><i class="fas fa-history w-6"></i> <span>سجل الرحلات</span></a>
         </nav>
     </aside>
+
+    <!-- Custom Modal System -->
+    <div id="customModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-modal w-full max-w-xs rounded-[2rem] p-6 transform scale-95 transition-all duration-300" id="modalContent">
+            <div class="flex flex-col items-center text-center">
+                <div id="modalIcon" class="mb-5 text-5xl drop-shadow-xl filter transition-transform duration-500 hover:scale-110"></div>
+                <h3 id="modalTitle" class="text-xl font-bold text-white mb-2">Title</h3>
+                <p id="modalMessage" class="text-gray-300 text-sm leading-relaxed mb-8 px-2">Message</p>
+                <div id="modalActions" class="flex w-full gap-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History View (Full Screen Overlay) -->
+    <div id="historyView" class="fixed inset-0 history-view hidden overflow-y-auto z-[40]">
+        <div class="pt-safe px-4 pb-4 sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 border-b border-white/5">
+            <div class="flex items-center justify-between py-4">
+                <h2 class="text-2xl font-bold text-white">سجل الرحلات</h2>
+                <button onclick="showMapSection()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div id="historyList" class="p-4 space-y-4 pb-safe">
+            <!-- Dynamic History Items -->
+        </div>
+    </div>
 
     <!-- Map Background -->
     <div id="map"></div>
 
-    <!-- UI Layer -->
-    <div class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between">
+    <!-- Map UI Layer -->
+    <div id="mapUI" class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between pb-[160px]"> 
         
-        <!-- Top Floating Header -->
+        <!-- Top Header -->
         <div class="pointer-events-auto p-4 pt-safe flex flex-col gap-3">
-            <!-- Top Bar -->
             <div class="flex justify-between items-start">
                 <button onclick="toggleSidebar()" class="glass-pill w-11 h-11 rounded-full flex items-center justify-center text-white active:scale-95 transition shadow-lg">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
-                
-                <div onclick="locateUser(true)" id="gpsStatus" class="glass-pill px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer active:scale-95 transition shadow-lg">
-                    <span class="w-2 h-2 bg-gray-400 rounded-full" id="gpsIndicator"></span>
-                    <span class="text-xs font-bold" id="gpsText">تفعيل GPS</span>
-                </div>
-            </div>
-
-            <!-- Stats/Info Chips (Horizontal Scroll) -->
-            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2 mask-linear">
-                <!-- Route Info Chip (Hidden by default) -->
-                <div id="routeInfo" class="hidden glass-pill px-4 py-3 rounded-2xl flex items-center gap-3 min-w-max border-l-4 border-l-emerald-500 animate-fade-in-down">
-                    <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400">
-                        <i class="fas fa-route"></i>
+                <div class="flex gap-2">
+                    <div id="historyModeBadge" class="hidden glass-pill px-4 py-2 rounded-full flex items-center gap-2 bg-purple-500/20 border-purple-500/30">
+                        <i class="fas fa-history text-purple-400"></i>
+                        <span class="text-xs font-bold text-purple-200">وضع المراجعة</span>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-400">الوقت المقدر</p>
-                        <p class="font-bold text-lg leading-none" id="routeTime">-- د</p>
-                    </div>
-                    <div class="h-8 w-px bg-white/10 mx-1"></div>
-                    <div>
-                        <p class="text-xs text-gray-400">المسافة</p>
-                        <p class="font-bold text-lg leading-none" id="routeSummary">-- كم</p>
+                    <div onclick="locateUser(true)" id="gpsStatus" class="glass-pill px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer active:scale-95 transition shadow-lg">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full" id="gpsIndicator"></span>
+                        <span class="text-xs font-bold" id="gpsText">تفعيل GPS</span>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Hint Overlay -->
-        <div id="mapHint" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center opacity-80">
-            <div class="glass-pill px-6 py-3 rounded-full text-sm font-semibold text-blue-100 shadow-xl inline-flex items-center gap-2">
-                <i class="fas fa-fingerprint text-blue-400 animate-pulse"></i>
-                اضغط مطولاً أو انقر لتحديد وجهة
-            </div>
-        </div>
-
-        <!-- Bottom Controls Area -->
-        <div class="pointer-events-auto flex flex-col items-end px-4 pb-4 gap-4">
             
-            <!-- Recenter FAB -->
-            <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition mb-2 bg-slate-800/90 border border-slate-600">
+            <!-- Route Info -->
+            <div id="routeInfo" class="hidden glass-pill px-4 py-3 rounded-2xl flex items-center gap-3 w-fit border-l-4 border-l-emerald-500">
+                <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400"><i class="fas fa-route"></i></div>
+                <div><p class="text-xs text-gray-400">الوقت</p><p class="font-bold text-lg leading-none" id="routeTime">--</p></div>
+                <div class="h-8 w-px bg-white/10 mx-1"></div>
+                <div><p class="text-xs text-gray-400">المسافة</p><p class="font-bold text-lg leading-none" id="routeSummary">--</p></div>
+            </div>
+        </div>
+
+        <!-- Recenter Button -->
+        <div class="pointer-events-auto flex flex-col items-end px-4 gap-4">
+            <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition mb-10 bg-slate-800/90 border border-slate-600">
                 <i class="fas fa-crosshairs"></i>
             </button>
-
-            <!-- Loading Indicator (Centered) -->
             <div id="loadingRoute" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm z-[50] flex flex-col items-center justify-center pointer-events-auto">
                 <div class="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
                 <span class="font-bold text-lg">جاري التوجيه...</span>
             </div>
-
         </div>
     </div>
 
-    <!-- Bottom Sheet (Draggable Look) -->
-    <div id="tripPanel" class="absolute bottom-0 left-0 right-0 z-20 glass-sheet rounded-t-[30px] p-6 pb-safe transition-transform duration-300 transform translate-y-0">
-        <!-- Drag Handle -->
-        <div class="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-6"></div>
+    <!-- Floating Timeline (Above Trip Panel) -->
+    <div id="tripTimeline" class="hidden absolute bottom-[calc(85vh-160px)] left-4 right-4 z-30 glass-pill p-4 flex-col gap-3 transition-all duration-300 transform translate-y-0">
+        <div class="flex justify-between items-center text-xs font-mono">
+            <span id="timelineStart" class="text-gray-400">00:00</span>
+            <div class="flex flex-col items-center">
+                <span id="timelineCurrent" class="text-purple-300 font-bold text-sm bg-purple-500/10 px-2 rounded">00:00</span>
+                <span class="text-[10px] text-gray-500">وقت التشغيل</span>
+            </div>
+            <span id="timelineEnd" class="text-gray-400">--:--</span>
+        </div>
+        <input type="range" id="timelineSlider" min="0" max="100" value="0" class="w-full">
+    </div>
 
-        <div class="flex items-end justify-between mb-6">
-            <div>
-                <p class="text-gray-400 text-xs font-medium mb-1 tracking-wider uppercase">السرعة الحالية</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-5xl font-black text-white tracking-tighter" id="speedDisplay">0</span>
-                    <span class="text-sm font-semibold text-gray-400">كم/س</span>
-                </div>
-            </div>
-            
-            <div class="text-left bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                <p class="text-gray-400 text-[10px] mb-0.5">المسافة المقطوعة</p>
-                <p class="text-xl font-bold text-emerald-400 font-mono" id="distanceDisplay">0.0 <span class="text-xs text-gray-500">كم</span></p>
-            </div>
+    <!-- Draggable Bottom Sheet -->
+    <div id="tripPanel" class="absolute bottom-0 left-0 right-0 z-20 glass-sheet rounded-t-[30px] transition-transform duration-300 ease-out transform translate-y-0 h-[85vh] translate-y-[calc(85vh-180px)]">
+        
+        <div id="dragHandle" class="w-full h-8 flex items-center justify-center cursor-grab active:cursor-grabbing pt-2">
+            <div class="w-12 h-1.5 bg-white/20 rounded-full"></div>
         </div>
 
-        <div class="grid grid-cols-5 gap-3">
-            <!-- Main Action Button (Span 4) -->
-            <button id="actionBtn" onclick="toggleTracking()" class="col-span-4 h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 text-white font-bold text-lg shadow-[0_4px_20px_rgba(16,185,129,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-                <i class="fas fa-location-arrow"></i>
-                <span>بدء الرحلة</span>
-            </button>
+        <div class="h-full overflow-y-auto hide-scrollbar px-6 pb-24">
             
-            <!-- Simulation Toggle Button (Span 1) -->
-            <button onclick="simulateRoute()" id="simBtn" class="col-span-1 h-14 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 flex items-center justify-center text-yellow-400 text-xl active:scale-90 transition relative overflow-hidden group">
-                <i class="fas fa-gamepad relative z-10"></i>
-                <div class="absolute inset-0 bg-yellow-400/10 opacity-0 group-hover:opacity-100 transition"></div>
-            </button>
+            <div class="mb-8">
+                <div class="flex items-end justify-between mb-6">
+                    <div>
+                        <p class="text-gray-400 text-xs font-medium mb-1 tracking-wider uppercase">السرعة الحالية</p>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-black text-white tracking-tighter" id="speedDisplay">0</span>
+                            <span class="text-sm font-semibold text-gray-400">كم/س</span>
+                        </div>
+                    </div>
+                    <div class="text-left bg-white/5 px-4 py-2 rounded-xl border border-white/5">
+                        <p class="text-gray-400 text-[10px] mb-0.5">المسافة المقطوعة</p>
+                        <p class="text-xl font-bold text-emerald-400 font-mono" id="distanceDisplay">0.0 <span class="text-xs text-gray-500">كم</span></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-3" id="liveControls">
+                    <button id="actionBtn" onclick="toggleTracking()" class="col-span-4 h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 text-white font-bold text-lg shadow-[0_4px_20px_rgba(16,185,129,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                        <i class="fas fa-location-arrow"></i><span>بدء الرحلة</span>
+                    </button>
+                    <button onclick="simulateRoute()" id="simBtn" class="col-span-1 h-14 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 flex items-center justify-center text-yellow-400 text-xl active:scale-90 transition relative overflow-hidden group">
+                        <i class="fas fa-gamepad relative z-10"></i>
+                    </button>
+                </div>
+                
+                <!-- Close Review Mode Button -->
+                <button id="closeReviewBtn" onclick="showMapSection()" class="hidden w-full h-14 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-lg active:scale-[0.98] transition">
+                    <i class="fas fa-arrow-right ml-2"></i> العودة للوضع المباشر
+                </button>
+            </div>
+
+            <div id="expandedContent" class="content-fade opacity-50 space-y-6">
+                <!-- Trip Review Details (Visible in Review Mode) -->
+                <div id="reviewDetails" class="hidden p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20">
+                    <h3 class="font-bold text-purple-300 mb-3"><i class="fas fa-info-circle ml-2"></i>تفاصيل الرحلة المسجلة</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><span class="text-gray-400 block text-xs">الوقت المستغرق</span><span id="reviewDuration" class="font-bold text-white">--</span></div>
+                        <div><span class="text-gray-400 block text-xs">المسافة</span><span id="reviewDistance" class="font-bold text-white">--</span></div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <div class="flex items-center gap-2 text-xs mb-2">
+                            <span class="w-3 h-1 bg-emerald-500 rounded"></span> <span class="text-gray-300">المسار الفعلي</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-3 h-1 bg-gray-500 border border-gray-400 border-dashed rounded"></span> <span class="text-gray-300">المسار المخطط (الأصلي)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Section (Default) -->
+                <div id="earningsSection" class="p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">أرباح اليوم</h3>
+                        <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg">+12%</span>
+                    </div>
+                    <div class="flex items-end gap-2 h-24 w-full justify-between px-2">
+                        <div class="w-full bg-blue-500/20 rounded-t-sm h-[40%] relative group"><div class="absolute bottom-0 w-full bg-blue-500 h-full rounded-t-sm opacity-60 group-hover:opacity-100 transition"></div></div>
+                        <div class="w-full bg-blue-500/20 rounded-t-sm h-[60%] relative group"><div class="absolute bottom-0 w-full bg-blue-500 h-full rounded-t-sm opacity-60 group-hover:opacity-100 transition"></div></div>
+                        <div class="w-full bg-blue-500/20 rounded-t-sm h-[30%] relative group"><div class="absolute bottom-0 w-full bg-blue-500 h-full rounded-t-sm opacity-60 group-hover:opacity-100 transition"></div></div>
+                        <div class="w-full bg-blue-500/20 rounded-t-sm h-[80%] relative group"><div class="absolute bottom-0 w-full bg-blue-500 h-full rounded-t-sm opacity-60 group-hover:opacity-100 transition"></div></div>
+                        <div class="w-full bg-blue-500/20 rounded-t-sm h-[50%] relative group"><div class="absolute bottom-0 w-full bg-blue-500 h-full rounded-t-sm opacity-60 group-hover:opacity-100 transition"></div></div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                        <span class="text-sm text-gray-400">الإجمالي</span>
+                        <span class="text-xl font-bold text-white">450.50 ر.س</span>
+                    </div>
+                </div>
+
+                <div class="h-20"></div>
+            </div>
         </div>
     </div>
 
@@ -254,18 +345,27 @@
 
     <script>
         // --- Variables ---
-        let map, userMarker, pathLine;
+        let map, userMarker, pathLine, originalPathLine, reviewPathLine;
         let routingControl = null;
         let watchId = null;
         let isTracking = false;
         let isSimulating = false;
         let wasTrackingBeforeSimulation = false;
-        let wakeLock = null; // Wake Lock Variable for background activity
-        
+        let wakeLock = null;
+        let saveInterval = null; // Interval ID for saving
+
+        // Data Models
         let currentPos = { lat: 0, lng: 0 };
-        let pathCoordinates = [];
-        let totalDistance = 0;
-        let selectedRouteCoordinates = [];
+        let currentTripData = {
+            id: null,
+            startTime: null,
+            endTime: null,
+            actualPath: [], // The driver's path
+            plannedPath: [], // The OSRM path (if available)
+            totalDistance: 0
+        };
+        let tripsHistory = []; // Loaded from localStorage
+        let currentReviewTrip = null; // For timeline
 
         // DOM Elements
         const speedDisplay = document.getElementById('speedDisplay');
@@ -277,317 +377,364 @@
         const routeInfo = document.getElementById('routeInfo');
         const routeSummary = document.getElementById('routeSummary');
         const routeTime = document.getElementById('routeTime');
-        const mapHint = document.getElementById('mapHint');
         const loadingRoute = document.getElementById('loadingRoute');
+        const historyView = document.getElementById('historyView');
+        const historyList = document.getElementById('historyList');
+        const tripPanel = document.getElementById('tripPanel');
+        const liveControls = document.getElementById('liveControls');
+        const closeReviewBtn = document.getElementById('closeReviewBtn');
+        const reviewDetails = document.getElementById('reviewDetails');
+        const earningsSection = document.getElementById('earningsSection');
+        const historyModeBadge = document.getElementById('historyModeBadge');
+        
+        // Timeline Elements
+        const tripTimeline = document.getElementById('tripTimeline');
+        const timelineSlider = document.getElementById('timelineSlider');
+        const timelineStart = document.getElementById('timelineStart');
+        const timelineEnd = document.getElementById('timelineEnd');
+        const timelineCurrent = document.getElementById('timelineCurrent');
 
+        // --- Init ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             locateUser(true);
+            loadHistory();
+            
+            // Timeline Event Listener
+            timelineSlider.addEventListener('input', (e) => {
+                if(!currentReviewTrip || !currentReviewTrip.actualPath) return;
+                const index = parseInt(e.target.value);
+                const pt = currentReviewTrip.actualPath[index];
+                
+                // Move marker
+                if(userMarker && pt) {
+                    userMarker.setLatLng(pt);
+                    map.setView(pt, 16); // Follow marker
+                }
+                
+                // Update Time Display
+                const progress = index / (currentReviewTrip.actualPath.length - 1);
+                const duration = currentReviewTrip.endTime - currentReviewTrip.startTime;
+                const currentTime = new Date(currentReviewTrip.startTime + (duration * progress));
+                timelineCurrent.innerText = currentTime.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            });
         });
 
-        // --- Wake Lock Implementation ---
-        // This keeps the screen on, which allows the browser to keep GPS active in "background" (foreground service equivalent for web)
+        // --- Wake Lock ---
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Wake Lock is active (Background tracking enabled)');
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Wake Lock was released');
-                    });
                 }
-            } catch (err) {
-                console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // Re-acquire Wake Lock if visibility changes (e.g. user minimized then returned)
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                requestWakeLock();
-            }
-        });
-
+        // --- Map Init ---
         function initMap() {
-            // Dark map tiles for professional look
-            map = L.map('map', { 
-                zoomControl: false,
-                attributionControl: false 
-            }).setView([30.0444, 31.2357], 15);
-
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 20,
-                subdomains: 'abcd',
-            }).addTo(map);
-
-            // Car Marker with Pulse Effect
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([30.0444, 31.2357], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd' }).addTo(map);
+            
             const carIcon = L.divIcon({
                 className: 'custom-div-icon',
-                html: `<div class="relative w-full h-full">
-                        <div class="pulse-ring"></div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-blue-500 rounded-full border-2 border-white p-1 shadow-lg">
-                            <i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i>
-                        </div>
-                       </div>`,
+                html: `<div class="relative w-full h-full"><div class="pulse-ring"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-blue-500 rounded-full border-2 border-white p-1 shadow-lg"><i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i></div></div>`,
                 iconSize: [40, 40],
                 iconAnchor: [20, 20]
             });
             userMarker = L.marker([0, 0], {icon: carIcon});
-
-            pathLine = L.polyline([], {
-                color: '#10b981',
-                weight: 6,
-                opacity: 0.8,
-                lineCap: 'round',
-                lineJoin: 'round'
-            }).addTo(map);
-
+            
+            // Live Path Line (Green)
+            pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+            
             map.on('click', function(e) {
-                if(isSimulating) { alert("يرجى إيقاف المحاكاة لتغيير الوجهة"); return; }
+                if(isSimulating) { showModal('تنبيه', "يرجى إيقاف المحاكاة لتغيير الوجهة", 'alert'); return; }
+                if(!historyView.classList.contains('hidden')) return; // Don't click map under history
                 calculateRoute(e.latlng.lat, e.latlng.lng);
             });
         }
 
-        function calculateRoute(destLat, destLng) {
-            if (currentPos.lat === 0) {
-                alert("جاري تحديد موقعك...");
-                locateUser();
+        // --- History Logic ---
+
+        function loadHistory() {
+            const stored = localStorage.getItem('sook_driver_history');
+            if(stored) {
+                tripsHistory = JSON.parse(stored);
+            }
+        }
+
+        function saveHistory() {
+            localStorage.setItem('sook_driver_history', JSON.stringify(tripsHistory));
+        }
+
+        function showHistorySection() {
+            historyView.classList.remove('hidden');
+            renderHistoryList();
+        }
+
+        function showMapSection() {
+            historyView.classList.add('hidden');
+            exitReviewMode();
+        }
+
+        function renderHistoryList() {
+            historyList.innerHTML = '';
+            if(tripsHistory.length === 0) {
+                historyList.innerHTML = `<div class="text-center text-gray-500 mt-10"><i class="fas fa-route text-4xl mb-3 opacity-30"></i><p>لا توجد رحلات سابقة</p></div>`;
                 return;
             }
 
-            loadingRoute.classList.remove('hidden');
-            mapHint.classList.add('hidden');
+            // Sort by date desc
+            const sorted = [...tripsHistory].sort((a, b) => b.startTime - a.startTime);
 
-            if (routingControl) {
-                map.removeControl(routingControl);
-                routingControl = null;
+            sorted.forEach(trip => {
+                const date = new Date(trip.startTime);
+                const timeStr = date.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                const dateStr = date.toLocaleDateString('ar-EG');
+                const duration = trip.endTime ? Math.round((trip.endTime - trip.startTime) / 60000) : 0;
+                
+                const div = document.createElement('div');
+                div.className = 'glass-pill p-4 rounded-2xl border-l-4 border-l-purple-500 active:scale-[0.98] transition cursor-pointer';
+                div.onclick = () => viewTripOnMap(trip);
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-bold text-white">رحلة مسجلة</h4>
+                            <p class="text-xs text-gray-400">${dateStr} • ${timeStr}</p>
+                        </div>
+                        <span class="bg-purple-500/10 text-purple-400 text-xs px-2 py-1 rounded-lg font-bold">${trip.totalDistance.toFixed(2)} كم</span>
+                    </div>
+                    
+                    <!-- Timeline Visual -->
+                    <div class="flex items-center gap-2 mt-3 text-xs text-gray-400">
+                        <div class="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500 w-full opacity-70"></div>
+                        </div>
+                        <span>${duration} دقيقة</span>
+                    </div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function viewTripOnMap(trip) {
+            historyView.classList.add('hidden'); // Hide list
+            currentReviewTrip = trip;
+            
+            // Enter Review Mode
+            historyModeBadge.classList.remove('hidden');
+            historyModeBadge.classList.add('flex');
+            
+            liveControls.classList.add('hidden');
+            closeReviewBtn.classList.remove('hidden');
+            
+            earningsSection.classList.add('hidden');
+            reviewDetails.classList.remove('hidden');
+            
+            // Show Timeline
+            tripTimeline.classList.remove('hidden');
+            tripTimeline.classList.add('flex');
+            
+            // Setup Timeline Data
+            if(trip.actualPath && trip.actualPath.length > 0) {
+                timelineSlider.max = trip.actualPath.length - 1;
+                timelineSlider.value = 0;
+                
+                const startDate = new Date(trip.startTime);
+                const endDate = new Date(trip.endTime);
+                
+                timelineStart.innerText = startDate.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                timelineEnd.innerText = endDate.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                timelineCurrent.innerText = startDate.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            }
+            
+            // Populate Details
+            const duration = trip.endTime ? Math.round((trip.endTime - trip.startTime) / 60000) : 0;
+            document.getElementById('reviewDuration').innerText = duration + " دقيقة";
+            document.getElementById('reviewDistance').innerText = trip.totalDistance.toFixed(2) + " كم";
+
+            // Clear current map
+            if(pathLine) map.removeLayer(pathLine);
+            if(routingControl) map.removeControl(routingControl);
+            if(originalPathLine) map.removeLayer(originalPathLine);
+            if(reviewPathLine) map.removeLayer(reviewPathLine);
+
+            // 1. Draw Original Planned Path (if exists) - Grey/Dashed
+            if(trip.plannedPath && trip.plannedPath.length > 0) {
+                originalPathLine = L.polyline(trip.plannedPath, {
+                    color: '#64748b', // Slate 500
+                    weight: 5,
+                    opacity: 0.6,
+                    dashArray: '10, 10',
+                    lineCap: 'round'
+                }).addTo(map);
             }
 
+            // 2. Draw Actual Path - Solid Purple/Green
+            if(trip.actualPath && trip.actualPath.length > 0) {
+                reviewPathLine = L.polyline(trip.actualPath, {
+                    color: '#a855f7', // Purple 500
+                    weight: 6,
+                    opacity: 1,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                }).addTo(map);
+                
+                // Fit bounds to show entire trip
+                map.fitBounds(reviewPathLine.getBounds(), {padding: [50, 50]});
+                
+                // Move marker to start
+                userMarker.setLatLng(trip.actualPath[0]);
+            } else {
+                showModal('تنبيه', "لا توجد بيانات مسار لهذه الرحلة", 'alert');
+            }
+
+            // Expand Panel slightly but not full to see map
+            // For review, we want user to use the slider, so maybe collapse?
+            collapsePanel();
+        }
+
+        function exitReviewMode() {
+            historyModeBadge.classList.add('hidden');
+            historyModeBadge.classList.remove('flex');
+            
+            liveControls.classList.remove('hidden');
+            closeReviewBtn.classList.add('hidden');
+            
+            earningsSection.classList.remove('hidden');
+            reviewDetails.classList.add('hidden');
+            
+            tripTimeline.classList.add('hidden');
+            tripTimeline.classList.remove('flex');
+            currentReviewTrip = null;
+
+            // Cleanup Review Layers
+            if(originalPathLine) map.removeLayer(originalPathLine);
+            if(reviewPathLine) map.removeLayer(reviewPathLine);
+
+            // Restore Live Layers
+            pathLine.addTo(map);
+            
+            // Center user
+            locateUser(true);
+            collapsePanel();
+        }
+
+
+        // --- Routing & Live Tracking Logic ---
+
+        function calculateRoute(destLat, destLng) {
+            if (currentPos.lat === 0) { showModal('جاري العمل', "جاري تحديد موقعك...", 'info'); locateUser(); return; }
+            loadingRoute.classList.remove('hidden');
+            if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+            
+            // Store planned path in currentTripData when tracking starts
+            
             routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(currentPos.lat, currentPos.lng),
-                    L.latLng(destLat, destLng)
-                ],
+                waypoints: [L.latLng(currentPos.lat, currentPos.lng), L.latLng(destLat, destLng)],
                 router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-                lineOptions: {
-                    styles: [
-                        {color: '#000', opacity: 0.3, weight: 12}, // Shadow
-                        {color: '#3b82f6', opacity: 0.9, weight: 6} // Main Line
-                    ],
-                    extendToWaypoints: true,
-                    missingRouteTolerance: 10
-                },
+                lineOptions: { styles: [{color: '#000', opacity: 0.3, weight: 12}, {color: '#3b82f6', opacity: 0.9, weight: 6}], extendToWaypoints: true, missingRouteTolerance: 10 },
                 showAlternatives: false,
                 createMarker: function(i, wp, nWps) {
-                    if (i === nWps - 1) {
-                        return L.marker(wp.latLng, {
-                            icon: L.divIcon({
-                                className: 'dest-icon',
-                                html: '<div class="text-red-500 text-4xl drop-shadow-2xl filter"><i class="fas fa-map-marker-alt"></i></div>',
-                                iconSize: [40, 40],
-                                iconAnchor: [20, 40]
-                            })
-                        });
-                    }
+                    if (i === nWps - 1) { return L.marker(wp.latLng, { icon: L.divIcon({ className: 'dest-icon', html: '<div class="text-red-500 text-4xl drop-shadow-2xl filter"><i class="fas fa-map-marker-alt"></i></div>', iconSize: [40, 40], iconAnchor: [20, 40] }) }); }
                     return null;
                 },
-                addWaypoints: false,
-                fitSelectedRoutes: true,
-                show: false
+                addWaypoints: false, fitSelectedRoutes: true, show: false
             }).addTo(map);
 
             routingControl.on('routesfound', function(e) {
                 loadingRoute.classList.add('hidden');
                 const bestRoute = e.routes[0];
                 selectedRouteCoordinates = bestRoute.coordinates;
-
-                const distKm = (bestRoute.summary.totalDistance / 1000).toFixed(1);
-                const timeMin = Math.round(bestRoute.summary.totalTime / 60);
+                
+                // Save planned path for the record
+                currentTripData.plannedPath = bestRoute.coordinates;
 
                 routeInfo.classList.remove('hidden');
                 routeInfo.classList.add('flex');
-                routeSummary.innerText = `${distKm} كم`;
-                routeTime.innerText = `${timeMin} د`;
+                routeSummary.innerText = `${(bestRoute.summary.totalDistance / 1000).toFixed(1)} كم`;
+                routeTime.innerText = `${Math.round(bestRoute.summary.totalTime / 60)} د`;
             });
-
-            routingControl.on('routingerror', function() {
-                loadingRoute.classList.add('hidden');
-                alert("تعذر الوصول لهذا الموقع.");
-            });
+            routingControl.on('routingerror', function() { loadingRoute.classList.add('hidden'); showModal('خطأ', "تعذر الوصول لهذا الموقع.", 'error'); });
         }
 
-        function locateUser(centerMap = false) {
-            if (!navigator.geolocation) {
-                gpsText.innerText = "غير مدعوم";
-                return;
-            }
-
-            gpsText.innerText = "جاري البحث...";
-            gpsIndicator.className = "w-2 h-2 bg-yellow-400 rounded-full animate-pulse";
-
-            const options = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    updateUserPosition(latitude, longitude, 0, centerMap);
-                    
-                    if (!map.hasLayer(userMarker)) userMarker.addTo(map);
-                    
-                    gpsText.innerText = "GPS نشط";
-                    gpsIndicator.className = "w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_#34d399]";
-                    gpsText.classList.add('text-emerald-400');
-                },
-                (error) => {
-                    console.error("GPS Error", error);
-                    gpsText.innerText = "فشل الاتصال";
-                    gpsIndicator.className = "w-2 h-2 bg-red-500 rounded-full";
-                    gpsText.classList.remove('text-emerald-400');
-                    fallbackLocation(centerMap);
-                },
-                options
-            );
-        }
-
-        function fallbackLocation(centerMap) {
-            if(currentPos.lat === 0) {
-                 updateUserPosition(30.0444, 31.2357, 0, centerMap); // Cairo
-                 if (!map.hasLayer(userMarker)) userMarker.addTo(map);
-            }
-        }
-
-        let simTimer;
-        function simulateRoute() {
-            if (isSimulating) {
-                stopSimulation();
-                return;
-            }
-
-            if (selectedRouteCoordinates.length === 0) {
-                alert("حدد وجهة على الخريطة أولاً!");
-                return;
-            }
-            
-            if (isTracking) {
-                wasTrackingBeforeSimulation = true;
-                stopTracking(false); // Don't clear data, just pause
-            } else {
-                wasTrackingBeforeSimulation = false;
-            }
-
-            isSimulating = true;
-            actionBtn.disabled = true;
-            actionBtn.classList.add('opacity-50', 'grayscale');
-            
-            simBtn.innerHTML = '<i class="fas fa-stop text-red-500 animate-pulse"></i>';
-            simBtn.classList.add('bg-red-500/10', 'border-red-500/20');
-
-            let index = 0;
-            const intervalTime = 80; // Smooth 60fps feel
-
-            simTimer = setInterval(() => {
-                if (index >= selectedRouteCoordinates.length) {
-                    stopSimulation();
-                    alert("الرحلة انتهت!");
-                    return;
-                }
-
-                const coord = selectedRouteCoordinates[index];
-                const fakeSpeed = 50 + Math.random() * 10;
-                
-                updateUserPosition(coord.lat, coord.lng, fakeSpeed / 3.6);
-                index++;
-
-            }, intervalTime);
-        }
-
-        function stopSimulation() {
-            isSimulating = false;
-            clearInterval(simTimer);
-            
-            actionBtn.disabled = false;
-            actionBtn.classList.remove('opacity-50', 'grayscale');
-            
-            simBtn.innerHTML = '<i class="fas fa-gamepad"></i>';
-            simBtn.classList.remove('bg-red-500/10', 'border-red-500/20');
-            
-            speedDisplay.innerText = "0";
-
-            // Restore position to start of route
-            if (selectedRouteCoordinates.length > 0) {
-                 const startPoint = selectedRouteCoordinates[0];
-                 updateUserPosition(startPoint.lat, startPoint.lng, 0, true);
-            }
-
-            if (wasTrackingBeforeSimulation) {
-                startTracking(false);
-                wasTrackingBeforeSimulation = false;
-            }
-        }
-
-        function toggleTracking() {
-            if(isSimulating) return;
-            if (isTracking) {
-                stopTracking(true);
-            } else {
-                // Clear old session
-                pathCoordinates = [];
-                totalDistance = 0;
-                pathLine.setLatLngs([]);
-                distanceDisplay.innerHTML = `0.0 <span class="text-xs text-gray-500">كم</span>`;
-                startTracking(true);
-            }
-        }
+        // --- Tracking Core ---
 
         async function startTracking(updateUI = true) {
             if (!navigator.geolocation) return;
             isTracking = true;
-
-            // Request Wake Lock to allow "background" tracking (by keeping screen/cpu awake)
             await requestWakeLock();
             
+            // Initialize New Trip
+            currentTripData = {
+                id: Date.now(),
+                startTime: Date.now(),
+                endTime: null,
+                actualPath: [],
+                plannedPath: currentTripData.plannedPath || [], // Keep planned if set
+                totalDistance: 0
+            };
+
+            // Start 10s Recording Interval
+            if(saveInterval) clearInterval(saveInterval);
+            saveInterval = setInterval(() => {
+                // Save temp state to LocalStorage (Crash protection)
+                localStorage.setItem('sook_current_trip_temp', JSON.stringify(currentTripData));
+            }, 10000);
+
             if(updateUI) {
                 actionBtn.innerHTML = `<i class="fas fa-stop-circle animate-pulse"></i><span>إنهاء الرحلة</span>`;
                 actionBtn.classList.replace('from-emerald-500', 'from-red-500');
                 actionBtn.classList.replace('to-emerald-600', 'to-red-600');
                 actionBtn.classList.replace('shadow-[0_4px_20px_rgba(16,185,129,0.3)]', 'shadow-[0_4px_20px_rgba(239,68,68,0.3)]');
             }
-            
-            // Watch with NO CACHE and HIGH FREQUENCY
+
             watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const { latitude, longitude, speed } = position.coords;
-                    updateUserPosition(latitude, longitude, speed);
-                },
+                (position) => { updateUserPosition(position.coords.latitude, position.coords.longitude, position.coords.speed); },
                 (error) => console.error(error),
-                { 
-                    enableHighAccuracy: true, 
-                    maximumAge: 0, 
-                    timeout: 10000 // Increased slightly to avoid timeout errors in background
-                }
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
             );
         }
 
         function stopTracking(clearUI = true) {
             isTracking = false;
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
+            if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+            if (wakeLock !== null) { wakeLock.release().then(() => { wakeLock = null; }); }
+            if (saveInterval) { clearInterval(saveInterval); saveInterval = null; }
+
+            // Finalize Trip Data
+            currentTripData.endTime = Date.now();
+            
+            // Only save if there is data
+            if(currentTripData.actualPath.length > 0) {
+                tripsHistory.unshift(currentTripData); // Add to beginning
+                saveHistory();
+                localStorage.removeItem('sook_current_trip_temp'); // Clear temp
             }
 
-            // Release Wake Lock to save battery
-            if (wakeLock !== null) {
-                wakeLock.release().then(() => {
-                    wakeLock = null;
-                });
-            }
-            
             if(clearUI) {
                 actionBtn.innerHTML = `<i class="fas fa-location-arrow"></i><span>بدء الرحلة</span>`;
                 actionBtn.classList.replace('from-red-500', 'from-emerald-500');
                 actionBtn.classList.replace('to-red-600', 'to-emerald-600');
                 actionBtn.classList.replace('shadow-[0_4px_20px_rgba(239,68,68,0.3)]', 'shadow-[0_4px_20px_rgba(16,185,129,0.3)]');
                 speedDisplay.innerText = "0";
+                
+                showModal('نجاح', `تم حفظ الرحلة بنجاح! المسافة: ${currentTripData.totalDistance.toFixed(2)} كم`, 'success');
+            }
+            
+            // Reset current data
+            currentTripData = { actualPath: [], plannedPath: [], totalDistance: 0 };
+        }
+
+        function toggleTracking() {
+            if(isSimulating) return;
+            if (isTracking) stopTracking(true);
+            else { 
+                // Reset map lines for new trip
+                pathCoordinates = []; 
+                totalDistance = 0; 
+                pathLine.setLatLngs([]); 
+                distanceDisplay.innerHTML = `0.0 <span class="text-xs text-gray-500">كم</span>`; 
+                startTracking(true); 
             }
         }
 
@@ -595,51 +742,138 @@
             const prevLatLng = L.latLng(currentPos.lat, currentPos.lng);
             currentPos = { lat, lng };
             const newLatLng = L.latLng(lat, lng);
-
             userMarker.setLatLng(newLatLng);
             
-            // Auto Rotate Marker (Rough estimation)
             if(prevLatLng.lat !== 0) {
                  const angle = Math.atan2(newLatLng.lng - prevLatLng.lng, newLatLng.lat - prevLatLng.lat) * 180 / Math.PI;
                  const markerIcon = userMarker.getElement().querySelector('.fa-location-arrow');
                  if(markerIcon) markerIcon.style.transform = `rotate(${angle}deg)`;
             }
-
-            if (centerMap || isTracking || isSimulating) {
-                // VERY FAST PAN for real-time feel
-                map.panTo(newLatLng, {animate: true, duration: 0.1, easeLinearity: 0.5});
-            }
-
+            
+            if (centerMap || isTracking || isSimulating) map.panTo(newLatLng, {animate: true, duration: 0.1, easeLinearity: 0.5});
+            
             if (isTracking || isSimulating) {
-                // Low threshold (1m) to capture every moment
                 if (pathCoordinates.length === 0 || prevLatLng.distanceTo(newLatLng) > 1) {
-                    pathCoordinates.push([lat, lng]);
+                    const pt = [lat, lng];
+                    pathCoordinates.push(pt);
                     pathLine.setLatLngs(pathCoordinates);
                     
+                    // Add to Trip Data for Recording
+                    if(isTracking) {
+                         currentTripData.actualPath.push(pt);
+                    }
+
                     if (pathCoordinates.length > 1) {
-                        totalDistance += prevLatLng.distanceTo(newLatLng);
+                        const dist = prevLatLng.distanceTo(newLatLng);
+                        totalDistance += dist;
+                        if(isTracking) currentTripData.totalDistance += dist / 1000; // Store in km
                         distanceDisplay.innerHTML = `${(totalDistance / 1000).toFixed(1)} <span class="text-xs text-gray-500">كم</span>`;
                     }
                 }
-                const kmh = speed ? (speed * 3.6).toFixed(0) : 0;
-                speedDisplay.innerText = kmh;
+                speedDisplay.innerText = speed ? (speed * 3.6).toFixed(0) : 0;
             }
         }
 
+        // --- Standard Location Logic ---
+        function locateUser(centerMap = false) {
+            if (!navigator.geolocation) { gpsText.innerText = "غير مدعوم"; return; }
+            gpsText.innerText = "جاري البحث...";
+            gpsIndicator.className = "w-2 h-2 bg-yellow-400 rounded-full animate-pulse";
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, speed } = position.coords;
+                    updateUserPosition(latitude, longitude, speed, centerMap);
+                    if (!map.hasLayer(userMarker)) userMarker.addTo(map);
+                    gpsText.innerText = "GPS نشط";
+                    gpsIndicator.className = "w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_#34d399]";
+                    gpsText.classList.add('text-emerald-400');
+                },
+                (error) => { console.error(error); gpsText.innerText = "فشل الاتصال"; gpsIndicator.className = "w-2 h-2 bg-red-500 rounded-full"; fallbackLocation(centerMap); },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
+        }
+
+        function fallbackLocation(centerMap) {
+            if(currentPos.lat === 0) { updateUserPosition(30.0444, 31.2357, 0, centerMap); if (!map.hasLayer(userMarker)) userMarker.addTo(map); }
+        }
+
+        // --- UI & Simulation ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-            
-            if (sidebar.classList.contains('translate-x-full')) {
-                sidebar.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            } else {
-                sidebar.classList.add('translate-x-full');
-                overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
+            if (sidebar.classList.contains('translate-x-full')) { sidebar.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 10); } 
+            else { sidebar.classList.add('translate-x-full'); overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300); }
         }
+
+        function simulateRoute() {
+            if (isSimulating) { stopSimulation(); return; }
+            if (selectedRouteCoordinates.length === 0) { showModal('تنبيه', "حدد وجهة على الخريطة أولاً!", 'alert'); return; }
+            if (isTracking) { wasTrackingBeforeSimulation = true; stopTracking(false); } else { wasTrackingBeforeSimulation = false; }
+            isSimulating = true;
+            actionBtn.disabled = true; actionBtn.classList.add('opacity-50', 'grayscale');
+            simBtn.innerHTML = '<i class="fas fa-stop text-red-500 animate-pulse"></i>'; simBtn.classList.add('bg-red-500/10', 'border-red-500/20');
+            let index = 0;
+            simTimer = setInterval(() => {
+                if (index >= selectedRouteCoordinates.length) { stopSimulation(); showModal('وصلت!', "الرحلة انتهت بنجاح.", 'success'); return; }
+                const coord = selectedRouteCoordinates[index];
+                updateUserPosition(coord.lat, coord.lng, (50 + Math.random() * 10) / 3.6);
+                index++;
+            }, 80);
+        }
+        function stopSimulation() {
+            isSimulating = false; clearInterval(simTimer);
+            actionBtn.disabled = false; actionBtn.classList.remove('opacity-50', 'grayscale');
+            simBtn.innerHTML = '<i class="fas fa-gamepad"></i>'; simBtn.classList.remove('bg-red-500/10', 'border-red-500/20');
+            speedDisplay.innerText = "0";
+            if (selectedRouteCoordinates.length > 0) { const startPoint = selectedRouteCoordinates[0]; updateUserPosition(startPoint.lat, startPoint.lng, 0, true); }
+            if (wasTrackingBeforeSimulation) { startTracking(false); wasTrackingBeforeSimulation = false; }
+        }
+
+        // --- Modal ---
+        function showModal(title, message, type = 'info', callback = null) {
+            const modal = document.getElementById('customModal');
+            const content = document.getElementById('modalContent');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalActions = document.getElementById('modalActions');
+            const modalIcon = document.getElementById('modalIcon');
+            modalTitle.innerText = title;
+            modalMessage.innerText = message;
+            modalActions.innerHTML = '';
+            let iconHtml = '';
+            if (type === 'error' || type === 'alert') iconHtml = '<i class="fas fa-exclamation-triangle text-red-500"></i>';
+            else if (type === 'success') iconHtml = '<i class="fas fa-check-circle text-emerald-500"></i>';
+            else iconHtml = '<i class="fas fa-info-circle text-blue-400"></i>';
+            modalIcon.innerHTML = iconHtml;
+            const okBtn = document.createElement('button');
+            okBtn.className = 'w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/30 active:scale-95 transition';
+            okBtn.innerText = 'حسناً';
+            okBtn.onclick = closeModal;
+            modalActions.appendChild(okBtn);
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+        }
+        function closeModal() {
+            const modal = document.getElementById('customModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        // --- Bottom Sheet ---
+        const panel = document.getElementById('tripPanel');
+        const dragHandle = document.getElementById('dragHandle');
+        const expandedContent = document.getElementById('expandedContent');
+        let startY = 0; let isDragging = false; let isExpanded = false;
+        dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
+        dragHandle.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); });
+        dragHandle.addEventListener('touchend', (e) => { isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.changedTouches[0].clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
+        dragHandle.addEventListener('mousedown', (e) => { startY = e.clientY; isDragging = true; panel.style.transition = 'none'; });
+        window.addEventListener('mouseup', (e) => { if(!isDragging) return; isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
+        function expandPanel() { panel.style.transform = 'translateY(0)'; isExpanded = true; expandedContent.style.opacity = '1'; }
+        function collapsePanel() { panel.style.transform = 'translateY(calc(85vh - 180px))'; isExpanded = false; expandedContent.style.opacity = '0.5'; panel.querySelector('.overflow-y-auto').scrollTop = 0; }
     </script>
 </body>
 </html>
