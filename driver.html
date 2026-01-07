@@ -153,7 +153,7 @@
         <div class="flex justify-between items-center mb-8 mt-4">
             <div>
                 <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-emerald-400 to-blue-500">Sook Driver</h2>
-                <p class="text-xs text-gray-400">الإصدار 3.3</p>
+                <p class="text-xs text-gray-400">الإصدار 3.4</p>
             </div>
             <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-300 active:bg-white/10"><i class="fas fa-times text-lg"></i></button>
         </div>
@@ -245,9 +245,14 @@
         </div>
     </div>
 
-    <!-- Floating Timeline (Above Trip Panel) -->
-    <div id="tripTimeline" class="hidden absolute bottom-[calc(85vh-160px)] left-4 right-4 z-30 glass-pill p-4 flex-col gap-3 transition-all duration-300 transform translate-y-0">
-        <div class="flex justify-between items-center text-xs font-mono">
+    <!-- Draggable Floating Timeline (Initially centered) -->
+    <div id="tripTimeline" class="hidden absolute top-32 left-1/2 transform -translate-x-1/2 z-[60] glass-pill p-4 flex-col gap-3 w-[90%] max-w-md shadow-2xl cursor-grab active:cursor-grabbing border border-white/10" style="touch-action: none;">
+        <!-- Drag Handle Visual -->
+        <div class="w-full flex justify-center -mt-2 pb-2 opacity-50">
+            <div class="w-12 h-1 bg-white/50 rounded-full"></div>
+        </div>
+
+        <div class="flex justify-between items-center text-xs font-mono pointer-events-none select-none">
             <span id="timelineStart" class="text-gray-400">00:00</span>
             <div class="flex flex-col items-center">
                 <span id="timelineCurrent" class="text-purple-300 font-bold text-sm bg-purple-500/10 px-2 rounded">00:00</span>
@@ -255,7 +260,8 @@
             </div>
             <span id="timelineEnd" class="text-gray-400">--:--</span>
         </div>
-        <input type="range" id="timelineSlider" min="0" max="100" value="0" class="w-full">
+        <!-- Slider needs pointer-events-auto to work inside a draggable container -->
+        <input type="range" id="timelineSlider" min="0" max="100" value="0" class="w-full pointer-events-auto">
     </div>
 
     <!-- Draggable Bottom Sheet -->
@@ -420,6 +426,66 @@
             });
         });
 
+        // --- Draggable Timeline Logic ---
+        let isDraggingTimeline = false;
+        let timelineOffset = { x: 0, y: 0 };
+
+        const startDragTimeline = (e) => {
+            // Prevent dragging if target is the slider input itself
+            if(e.target.id === 'timelineSlider') return;
+            
+            isDraggingTimeline = true;
+            tripTimeline.style.cursor = 'grabbing';
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const rect = tripTimeline.getBoundingClientRect();
+            timelineOffset.x = clientX - rect.left;
+            timelineOffset.y = clientY - rect.top;
+            
+            // Unset centering transform to allow free movement via top/left
+            tripTimeline.classList.remove('transform', '-translate-x-1/2', 'left-1/2');
+            tripTimeline.style.left = rect.left + 'px';
+            tripTimeline.style.top = rect.top + 'px';
+        };
+
+        const dragTimeline = (e) => {
+            if (!isDraggingTimeline) return;
+            e.preventDefault(); // Prevent scrolling while dragging timeline
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let newX = clientX - timelineOffset.x;
+            let newY = clientY - timelineOffset.y;
+            
+            // Keep within screen bounds
+            const maxX = window.innerWidth - tripTimeline.offsetWidth;
+            const maxY = window.innerHeight - tripTimeline.offsetHeight;
+            
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+
+            tripTimeline.style.left = newX + 'px';
+            tripTimeline.style.top = newY + 'px';
+        };
+
+        const endDragTimeline = () => {
+            isDraggingTimeline = false;
+            tripTimeline.style.cursor = 'grab';
+        };
+
+        tripTimeline.addEventListener('mousedown', startDragTimeline);
+        tripTimeline.addEventListener('touchstart', startDragTimeline);
+
+        window.addEventListener('mousemove', dragTimeline);
+        window.addEventListener('touchmove', dragTimeline, { passive: false });
+
+        window.addEventListener('mouseup', endDragTimeline);
+        window.addEventListener('touchend', endDragTimeline);
+
+
         // --- Wake Lock ---
         async function requestWakeLock() {
             try {
@@ -533,6 +599,11 @@
             // Show Timeline
             tripTimeline.classList.remove('hidden');
             tripTimeline.classList.add('flex');
+            
+            // Reset position of timeline to center top if not dragged yet
+            if(tripTimeline.style.left === "") {
+                 // it defaults to css class
+            }
             
             // Setup Timeline Data
             if(trip.actualPath && trip.actualPath.length > 0) {
