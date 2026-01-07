@@ -109,7 +109,7 @@
         }
         
         .view-hidden {
-            transform: translateX(100%); /* Changed for slide effect */
+            transform: translateX(100%); 
             opacity: 0;
             pointer-events: none;
             z-index: 0;
@@ -322,7 +322,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: rotate(45deg); /* Counter rotate image */
+            transform: rotate(45deg); 
             border-radius: 50%;
         }
 
@@ -724,7 +724,7 @@
 
         <!-- Controls -->
         <div class="absolute right-4 bottom-[calc(85vh-160px+20px)] z-30 flex flex-col gap-4 pointer-events-auto">
-            <!-- Compass Button (New) -->
+            <!-- Compass Button -->
             <button onclick="resetBearing()" id="compassBtn" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
                 <i class="fas fa-compass" id="compassIcon"></i>
             </button>
@@ -760,7 +760,30 @@
                             <p class="text-xl font-bold text-white font-mono" id="distanceDisplay">0.0 <span class="text-xs text-gray-500">كم</span></p>
                         </div>
                     </div>
+                    <!-- AI Trip Analytics -->
+                    <div id="aiTripAnalytics" class="mt-6 mb-5 glass-card p-4 rounded-2xl border border-white/10">
+                        <h4 class="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                            <i class="fas fa-brain"></i>
+                            التحليل الذكي للرحلة
+                        </h4>
 
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="glass-pill p-3 rounded-xl">
+                                <p class="text-[10px] text-gray-400 mb-1">الوقت المتوقع</p>
+                                <p id="aiEta" class="font-mono font-bold text-lg text-white">--</p>
+                            </div>
+
+                            <div class="glass-pill p-3 rounded-xl">
+                                <p class="text-[10px] text-gray-400 mb-1">المسافة</p>
+                                <p id="aiDistance" class="font-mono font-bold text-lg text-white">--</p>
+                            </div>
+
+                            <div class="glass-pill p-3 rounded-xl">
+                                <p class="text-[10px] text-gray-400 mb-1">السرعة المتوقعة</p>
+                                <p id="aiSpeed" class="font-mono font-bold text-lg text-emerald-400">--</p>
+                            </div>
+                        </div>
+                    </div>
                     <div id="liveControls" class="grid grid-cols-1">
                         <button id="actionBtn" onclick="toggleTracking()" class="h-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 text-white font-bold text-lg shadow-[0_8px_30px_rgba(16,185,129,0.3)] active:scale-[0.98] transition flex items-center justify-center gap-3 border border-white/10">
                             <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fas fa-play"></i></div>
@@ -907,7 +930,7 @@
         }
 
         // --- GLOBAL VARIABLES ---
-        const API_KEYS = { google: "", tomtom: "lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu" }; 
+        const API_KEYS = { google: "", tomtom: "lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu", gemini: "AIzaSyCsJXwmZjVrqHtdLv0yWwtiMJgp5voJF0k" }; 
         let map, userMarker, pathLine, reviewPathLine;
         let trafficLayerGroup = null;
         let routingControl = null;
@@ -918,6 +941,7 @@
         let wakeLock = null;
         let currentDriverId = null;
         let currentTripKey = null; 
+        let aiAnalyticsInterval = null;
         let boardingMarkers = []; 
         let currentPos = { lat: 0, lng: 0 };
         
@@ -925,6 +949,9 @@
         let myStudents = []; 
         let currentTripStudents = [];
         let currentTripEvents = []; // Tracking local events for analytics
+
+        // Fixed Destination Coordinate (School)
+        const FIXED_SCHOOL_LOCATION = { lat: 29.939433605939247, lng: 30.941213714457312 };
 
         // TomTom Layer State
         let activeLayers = {
@@ -950,8 +977,6 @@
             home: document.getElementById('homeView'),
             map: document.getElementById('mapView')
         };
-        // Removed global consts that might be null at startup to prevent errors
-        // Accessing elements dynamically inside functions instead
         
         const actionBtn = document.getElementById('actionBtn');
         const timelineStart = document.getElementById('timelineStart');
@@ -985,6 +1010,10 @@
         const panel = document.getElementById('tripPanel');
         const dragHandle = document.getElementById('dragHandle');
         const expandedContent = document.getElementById('expandedContent');
+        // Speed Ai Analytics Interval
+        const aiEtaEl = document.getElementById('aiEta');
+        const aiDistanceEl = document.getElementById('aiDistance');
+        const aiSpeedEl = document.getElementById('aiSpeed');
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1015,7 +1044,7 @@
             // Update Visual Progress & Thumb
             const percent = (index / max) * 100;
             timelineProgress.style.width = `${percent}%`;
-            customThumb.style.right = `${100 - percent}%`; // RTL adjustment
+            customThumb.style.right = `${100 - percent}%`; 
             
             if(point) {
                 // Update Marker Position
@@ -1083,7 +1112,6 @@
             const startMinutes = parseTime(startStr);
             const endMinutes = parseTime(endStr);
 
-            // Simple check (ignores midnight crossover for now)
             if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
                 return true;
             }
@@ -1177,7 +1205,6 @@
                     const currentDeviceId = getDeviceFingerprint();
                     const registeredId = driverData.registeredDeviceId;
 
-                    // Device Fingerprint Security Check
                     if (!registeredId) {
                         const profileRef = window.rtdbRef(window.db, `drivers/${uid}/profile`);
                         await window.rtdbUpdate(profileRef, { registeredDeviceId: currentDeviceId });
@@ -1246,7 +1273,6 @@
                         myStudents.push(data);
                     });
                 }
-                // Animate Counter
                 gsap.to('#studentsCountDisplay', { 
                     innerText: myStudents.length, 
                     duration: 1.5, 
@@ -1295,13 +1321,11 @@
             
             const degree = (stats.percent / 100) * 360;
             
-            // GSAP Animation for numbers
             gsap.to('#chartPercent', { innerText: stats.percent + '%', duration: 1.5, snap: { innerText: 1 } });
             gsap.to('#statPresent', { innerText: stats.present, duration: 1, snap: { innerText: 1 } });
             gsap.to('#statAbsent', { innerText: stats.absent, duration: 1, snap: { innerText: 1 } });
             gsap.to('#statTotal', { innerText: stats.total, duration: 1, snap: { innerText: 1 } });
 
-            // CSS Variable update for Conic Gradient
             chart.style.setProperty('--chart-deg', degree + 'deg');
             chart.style.setProperty('--chart-color', stats.percent >= 90 ? '#10b981' : stats.percent >= 50 ? '#f59e0b' : '#ef4444');
             
@@ -1314,14 +1338,12 @@
             const dayName = dateObj.toLocaleDateString('ar-SA', {weekday: 'long'});
             const distance = trip.totalDistance ? trip.totalDistance.toFixed(2) : "0.0";
             
-            // Fallback for analytics if not saved in old trips
             let percent = 0;
             let presentCount = 0;
             if (trip.stats) {
                 percent = trip.stats.percent;
                 presentCount = trip.stats.present;
             } else if (trip.events) {
-                // On-the-fly calc for legacy data
                 const evs = Object.values(trip.events);
                 const stats = calculateTripAnalytics(evs, myStudents);
                 percent = stats.percent;
@@ -1333,7 +1355,6 @@
 
             const card = document.createElement('div');
             card.className = 'glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition relative overflow-hidden group';
-            // Add AOS
             card.setAttribute('data-aos', 'fade-up');
             card.setAttribute('data-aos-delay', index * 50);
             
@@ -1384,7 +1405,6 @@
                 const statusClass = student.status === 'boarded' ? 'status-boarded' : (student.status === 'absent' ? 'status-absent' : '');
                 item.className = `student-card cursor-pointer ${statusClass}`;
                 
-                // Staggered Animation
                 item.style.opacity = '0';
                 item.style.transform = 'translateY(10px)';
                 setTimeout(() => { item.style.opacity = '1'; item.style.transform = 'translateY(0)'; }, idx * 50);
@@ -1434,11 +1454,9 @@
         function markStudentBoarded(studentId) {
             const studentIndex = currentTripStudents.findIndex(s => s.id === studentId);
             if(studentIndex > -1) {
-                // UI Update
                 currentTripStudents[studentIndex].status = 'boarded';
                 currentTripStudents[studentIndex].boardTime = Date.now();
                 
-                // Analytics Event Tracking
                 const eventData = { 
                     type: 'boarding', 
                     studentId: studentId, 
@@ -1448,7 +1466,6 @@
 
                 renderStudentsList(false);
             
-                // Sync to Firebase
                 if(currentTripKey && navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(pos => {
                         eventData.lat = pos.coords.latitude;
@@ -1475,28 +1492,24 @@
             map = L.map('map', { 
                 zoomControl: false, 
                 attributionControl: false,
-                rotate: true,         // Enable Rotation
-                touchRotate: true     // Enable Touch Rotation
+                rotate: true,         
+                touchRotate: true     
             }).setView([24.7136, 46.6753], 13);
             
-            // Add rotate event to update compass icon
             map.on('rotate', function(e) {
                 const angle = map.getBearing();
                 const icon = document.getElementById('compassIcon');
                 if(icon) {
-                    // Counter rotate icon so it always points North relative to the map
                     icon.style.transform = `rotate(${angle}deg)`;
                 }
             });
 
-            // Base Layer check
             if (API_KEYS.tomtom) {
                  L.tileLayer(`https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {maxZoom: 22, subdomains: 'abcd'}).addTo(map);
             } else {
                  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd' }).addTo(map);
             }
             
-            // Add layers to the group map for toggling
             tomTomLayers.evStations.addTo(map);
             tomTomLayers.pois.addTo(map);
 
@@ -1509,15 +1522,13 @@
             userMarker = L.marker([0, 0], {icon: carIcon});
             pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
             
-            map.on('click', function(e) {
-                if(currentReviewTrip) return;
-                calculateRoute(e.latlng.lat, e.latlng.lng);
-            });
+            // تم إزالة مستمع الضغط (click) لمنع السائق من تغيير الوجهة يدوياً
+            // الخريطة الآن تعتمد على المسارات الثابتة المبرمجة
         }
         
         function resetBearing() {
             if(map) {
-                map.setBearing(0); // Reset to North
+                map.setBearing(0); 
             }
         }
         
@@ -1721,7 +1732,6 @@
 
             showView('map');
             
-            // Safe DOM access to prevent null errors
             const ldRoute = document.getElementById('loadingRoute');
             if(ldRoute) ldRoute.classList.remove('hidden');
             
@@ -1741,7 +1751,7 @@
             if(tools) tools.classList.remove('hidden');
 
             currentTripStudents = JSON.parse(JSON.stringify(myStudents));
-            currentTripEvents = []; // Reset events for new trip
+            currentTripEvents = []; 
             renderStudentsList(false);
 
             navigator.geolocation.getCurrentPosition(pos => {
@@ -1756,7 +1766,9 @@
                 if(!map.hasLayer(userMarker)) userMarker.addTo(map);
                 userMarker.setLatLng(currentLatLng);
                 map.setView(currentLatLng, 15);
-                const destLatLng = L.latLng(29.939433605939247, 30.941213714457312); // School location placeholder
+                
+                // وجهة ثابتة للمدرسة (تم تثبيتها من الكود كما طلبت)
+                const destLatLng = L.latLng(FIXED_SCHOOL_LOCATION.lat, FIXED_SCHOOL_LOCATION.lng);
                 
                 calculateRoute(destLatLng.lat, destLatLng.lng);
 
@@ -1770,7 +1782,6 @@
             if (!map) { initMap(); if (!map) return; }
             setTimeout(() => { if(map) map.invalidateSize(); }, 100);
 
-            // Clean previous layers
             if(pathLine && map.hasLayer(pathLine)) map.removeLayer(pathLine);
             if(routingControl) map.removeControl(routingControl);
             if(window.currentRouteLayer) map.removeLayer(window.currentRouteLayer); 
@@ -1780,7 +1791,6 @@
             boardingMarkers = [];
             if(timelineMarkers) timelineMarkers.innerHTML = '';
             
-            // UI Toggles
             const liveCtrl = document.getElementById('liveControls');
             if(liveCtrl) liveCtrl.classList.add('hidden');
             
@@ -1788,7 +1798,7 @@
             if(revCtrl) revCtrl.classList.remove('hidden');
             
             const closeRev = document.getElementById('closeReviewBtn');
-            if(closeRev) closeRev.classList.remove('hidden');
+            if(closeRev) closeRev.classList.add('hidden');
             
             const rInfo = document.getElementById('routeInfo');
             if(rInfo) rInfo.classList.add('hidden');
@@ -1799,7 +1809,6 @@
                 histBadge.classList.add('flex');
             }
             
-            // Re-construct Events and Path
             let events = [];
             if(trip.events) {
                 events = Object.values(trip.events);
@@ -1815,15 +1824,12 @@
                 });
             }
             
-            // Setup Analytics Overlay Data
             let stats = trip.stats;
             if(!stats) stats = calculateTripAnalytics(events, myStudents);
             updateAnalyticsChart(stats);
-            // analyticsBadge removed to fix error
             
             renderStudentsList(true, events);
             
-            // Draw Historical Path
             let pathPoints = [];
             if(trip.actualPath) pathPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
             
@@ -1835,7 +1841,6 @@
                 currentReviewTrip.optimizedPath = pathPoints;
                 currentReviewTrip.events = events; 
                 
-                // Reset Slider
                 if(timelineSlider) {
                     timelineSlider.max = pathPoints.length - 1;
                     timelineSlider.value = 0;
@@ -1852,7 +1857,6 @@
                 if(timelineEnd) timelineEnd.innerText = endD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
                 if(timelineCurrent) timelineCurrent.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
 
-                // Generate Markers on Timeline
                 if(timelineMarkers) {
                     events.forEach(ev => {
                         if(ev.type === 'boarding' && ev.ts) {
@@ -1869,7 +1873,7 @@
 
                             const dot = document.createElement('div');
                             dot.className = 'timeline-marker';
-                            dot.style.left = `${percent}%`; // LTR timeline visual
+                            dot.style.left = `${percent}%`; 
                             dot.innerHTML = `<div class="timeline-tooltip">${studentName} (${timeStr})</div>`;
                             dot.onclick = (e) => {
                                 e.stopPropagation();
@@ -1881,7 +1885,7 @@
                     });
                 }
             }
-            toggleAnalyticsDetails(); // Auto show analytics
+            toggleAnalyticsDetails(); 
         }
 
         function returnToHome() {
@@ -1892,7 +1896,6 @@
             if(window.currentRouteLayer && map.hasLayer(window.currentRouteLayer)) map.removeLayer(window.currentRouteLayer);
             if(pathLine && !map.hasLayer(pathLine)) pathLine.addTo(map);
             
-            // Safe DOM controls
             const liveCtrl = document.getElementById('liveControls');
             if(liveCtrl) liveCtrl.classList.remove('hidden');
             
@@ -1977,7 +1980,6 @@
             isTracking = false;
             if(watchId) navigator.geolocation.clearWatch(watchId);
             
-            // Analytics Calculation
             const stats = calculateTripAnalytics(currentTripEvents, myStudents);
 
             if(currentTripKey) {
@@ -1985,7 +1987,7 @@
                 await window.rtdbUpdate(tripRef, { 
                     status: 'completed', 
                     endTime: Date.now(),
-                    stats: stats // Save stats to DB
+                    stats: stats 
                 });
                 currentTripKey = null;
             }
@@ -2046,7 +2048,102 @@
                 if(recenter) map.setView(ll, 16);
             });
         }
-        
+        function startAITripAnalytics() {
+    if (aiAnalyticsInterval) clearInterval(aiAnalyticsInterval);
+    fetchAndAnalyzeTrip();
+    aiAnalyticsInterval = setInterval(fetchAndAnalyzeTrip, 5000);
+}
+
+        /* إيقاف التحليل */
+        function stopAITripAnalytics() {
+            if (aiAnalyticsInterval) clearInterval(aiAnalyticsInterval);
+        }
+
+        /* جلب المسار من TomTom */
+        async function fetchTomTomRoute() {
+            const { lat, lng } = currentPos;
+            const dest = FIXED_SCHOOL_LOCATION;
+
+            const url = `https://api.tomtom.com/routing/1/calculateRoute/${lat},${lng}:${dest.lat},${dest.lng}/json?traffic=true&key=${API_KEYS.tomtom}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (!data.routes || !data.routes[0]) throw new Error("No route");
+
+            const summary = data.routes[0].summary;
+
+            return {
+                distanceKm: (summary.lengthInMeters / 1000).toFixed(1),
+                travelTimeMin: Math.round(summary.travelTimeInSeconds / 60),
+                trafficDelayMin: Math.round(summary.trafficDelayInSeconds / 60)
+            };
+        }
+
+        /* إرسال البيانات إلى Gemini للتحليل */
+        async function analyzeWithGemini(routeData) {
+            const prompt = `
+        أنت نظام ملاحة ذكي.
+        حلل البيانات التالية وأعد النتيجة بشكل مختصر:
+
+        المسافة: ${routeData.distanceKm} كم
+        وقت الرحلة: ${routeData.travelTimeMin} دقيقة
+        تأخير المرور: ${routeData.trafficDelayMin} دقيقة
+
+        أعد:
+        - الوقت المتوقع للوصول (ETA)
+        - السرعة المتوقعة كم/س
+        - ملخص قصير
+        `;
+
+            const res = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS.gemini}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                }
+            );
+
+            const data = await res.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+            return text;
+        }
+
+        /* التنفيذ الكامل */
+        async function fetchAndAnalyzeTrip() {
+            try {
+                const route = await fetchTomTomRoute();
+                const aiText = await analyzeWithGemini(route);
+
+                /* حساب السرعة المتوقعة */
+                const speed =
+                    route.travelTimeMin > 0
+                        ? (route.distanceKm / (route.travelTimeMin / 60)).toFixed(1)
+                        : 0;
+
+                aiEtaEl.innerText = `${route.travelTimeMin} د`;
+                aiDistanceEl.innerText = `${route.distanceKm} كم`;
+                aiSpeedEl.innerText = `${speed} كم/س`;
+
+            } catch (e) {
+                console.warn("AI Trip Analytics Error", e);
+            }
+        }
+
+        /* ربطها بزر بدء التحرك */
+        const originalToggleTracking = toggleTracking;
+        toggleTracking = function () {
+            originalToggleTracking();
+            if (isTracking) {
+                startAITripAnalytics();
+            } else {
+                stopAITripAnalytics();
+            }
+        };
         // Drag Logic & Bottom Sheet
         let startY = 0; let isDragging = false; let isExpanded = false;
         dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
