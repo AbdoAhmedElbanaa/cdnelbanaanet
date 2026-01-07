@@ -941,7 +941,14 @@
         let wakeLock = null;
         let currentDriverId = null;
         let currentTripKey = null; 
-        let aiAnalyticsInterval = null;
+        let aiInterval = null;
+        let lastGeminiCall = 0;
+        let lastGeminiResult = null;
+        // Timer For Alerting Prolonged Stops
+        let lastMovePosition = null;
+        let lastMoveTime = null;
+        let stopInfoShown = false;
+        let stopWarningShown = false;
         let boardingMarkers = []; 
         let currentPos = { lat: 0, lng: 0 };
         
@@ -952,6 +959,13 @@
 
         // Fixed Destination Coordinate (School)
         const FIXED_SCHOOL_LOCATION = { lat: 29.939433605939247, lng: 30.941213714457312 };
+        const GEMINI_MIN_INTERVAL = 60 * 1000; // Gemini مرة كل دقيقة
+        const TOMTOM_INTERVAL = 5000;   // TomTom Layer Update Interval
+
+        //Speed AI Analytics Data
+        const STOP_DISTANCE_THRESHOLD = 3;       // متر (أقل من كده = ثابت)
+        const STOP_INFO_TIME = 60 * 1000;        // 1 دقيقة
+        const STOP_WARNING_TIME = 120 * 1000;    // 2 دقيقة
 
         // TomTom Layer State
         let activeLayers = {
@@ -1044,7 +1058,7 @@
             // Update Visual Progress & Thumb
             const percent = (index / max) * 100;
             timelineProgress.style.width = `${percent}%`;
-            customThumb.style.right = `${100 - percent}%`; 
+            customThumb.style.right = `${percent}%`; 
             
             if(point) {
                 // Update Marker Position
@@ -1846,7 +1860,7 @@
                     timelineSlider.value = 0;
                 }
                 if(timelineProgress) timelineProgress.style.width = '0%';
-                if(customThumb) customThumb.style.right = '100%';
+                if(customThumb) customThumb.style.right = '0%';
                 
                 if(!map.hasLayer(userMarker)) userMarker.addTo(map);
                 userMarker.setLatLng(latLngs[0]);
@@ -2048,102 +2062,238 @@
                 if(recenter) map.setView(ll, 16);
             });
         }
-        function startAITripAnalytics() {
-    if (aiAnalyticsInterval) clearInterval(aiAnalyticsInterval);
-    fetchAndAnalyzeTrip();
-    aiAnalyticsInterval = setInterval(fetchAndAnalyzeTrip, 5000);
+
+
+/* =========================================================
+   TOMTOM ROUTE
+   ========================================================= */
+async function fetchTomTomRoute() {
+    if (!currentPos?.lat) throw new Error("GPS not ready");
+
+    const { lat, lng } = currentPos;
+    const d = FIXED_SCHOOL_LOCATION;
+
+    const url = `https://api.tomtom.com/routing/1/calculateRoute/${lat},${lng}:${d.lat},${d.lng}/json?traffic=true&key=${API_KEYS.tomtom}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const s = data?.routes?.[0]?.summary;
+    if (!s) throw new Error("No route");
+
+    return {
+        distanceKm: s.lengthInMeters / 1000,
+        travelTimeMin: s.travelTimeInSeconds / 60,
+        delayMin: s.trafficDelayInSeconds / 60
+    };
 }
 
-        /* إيقاف التحليل */
-        function stopAITripAnalytics() {
-            if (aiAnalyticsInterval) clearInterval(aiAnalyticsInterval);
-        }
+/* =========================================================
+   GEMINI – SAFE CALL
+   ========================================================= */
+async function analyzeWithGeminiSafe(route) {
+    const now = Date.now();
 
-        /* جلب المسار من TomTom */
-        async function fetchTomTomRoute() {
-            const { lat, lng } = currentPos;
-            const dest = FIXED_SCHOOL_LOCATION;
+    /* Rate limit protection */
+    if (now - lastGeminiCall < GEMINI_MIN_INTERVAL) {
+        return lastGeminiResult;
+    }
 
-            const url = `https://api.tomtom.com/routing/1/calculateRoute/${lat},${lng}:${dest.lat},${dest.lng}/json?traffic=true&key=${API_KEYS.tomtom}`;
+    lastGeminiCall = now;
 
-            const res = await fetch(url);
-            const data = await res.json();
+    try {
+        const prompt = `
+حلل الرحلة باختصار:
+المسافة: ${route.distanceKm.toFixed(1)} كم
+الوقت: ${Math.round(route.travelTimeMin)} دقيقة
+تأخير المرور: ${Math.round(route.delayMin)} دقيقة
+`;
 
-            if (!data.routes || !data.routes[0]) throw new Error("No route");
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEYS.gemini}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            }
+        );
 
-            const summary = data.routes[0].summary;
+        if (!res.ok) throw new Error("Gemini rate limit");
 
-            return {
-                distanceKm: (summary.lengthInMeters / 1000).toFixed(1),
-                travelTimeMin: Math.round(summary.travelTimeInSeconds / 60),
-                trafficDelayMin: Math.round(summary.trafficDelayInSeconds / 60)
-            };
-        }
+        const data = await res.json();
+        lastGeminiResult =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 
-        /* إرسال البيانات إلى Gemini للتحليل */
-        async function analyzeWithGemini(routeData) {
-            const prompt = `
-        أنت نظام ملاحة ذكي.
-        حلل البيانات التالية وأعد النتيجة بشكل مختصر:
+        return lastGeminiResult;
 
-        المسافة: ${routeData.distanceKm} كم
-        وقت الرحلة: ${routeData.travelTimeMin} دقيقة
-        تأخير المرور: ${routeData.trafficDelayMin} دقيقة
+    } catch (e) {
+        console.warn("Gemini throttled – using cached data");
+        return lastGeminiResult;
+    }
+}
 
-        أعد:
-        - الوقت المتوقع للوصول (ETA)
-        - السرعة المتوقعة كم/س
-        - ملخص قصير
-        `;
+/* =========================================================
+   MAIN LOOP
+   ========================================================= */
+async function updateTripAnalytics() {
+    try {
+        const route = await fetchTomTomRoute();
 
-            const res = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS.gemini}`,
+        /* حساب السرعة */
+        const speed =
+            route.travelTimeMin > 0
+                ? route.distanceKm / (route.travelTimeMin / 60)
+                : 0;
+
+        /* تحديث الواجهة */
+        aiEtaEl.innerText = `${Math.round(route.travelTimeMin)} د`;
+        aiDistanceEl.innerText = `${route.distanceKm.toFixed(1)} كم`;
+        aiSpeedEl.innerText = `${speed.toFixed(1)} كم/س`;
+
+        /* Gemini تحليل ذكي (غير إلزامي) */
+        analyzeWithGeminiSafe(route);
+
+    } catch (e) {
+        console.warn("Trip Analytics skipped:", e.message);
+    }
+}
+
+/* =========================================================
+   CONTROLLER
+   ========================================================= */
+function startAIAnalytics() {
+    if (aiInterval) return;
+    updateTripAnalytics();
+    aiInterval = setInterval(updateTripAnalytics, TOMTOM_INTERVAL);
+}
+
+function stopAIAnalytics() {
+    if (aiInterval) {
+        clearInterval(aiInterval);
+        aiInterval = null;
+    }
+}
+
+/* =========================================================
+   AUTO START (BEFORE & DURING TRIP)
+   ========================================================= */
+const _showView = showView;
+showView = function(view) {
+    _showView(view);
+    if (view === 'map') startAIAnalytics();
+    else stopAIAnalytics();
+};
+
+const _toggleTracking = toggleTracking;
+toggleTracking = function() {
+    _toggleTracking();
+    startAIAnalytics();
+};
+
+
+
+/* =========================================================
+   DISTANCE CALCULATION (Haversine)
+   ========================================================= */
+function getDistanceInMeters(p1, p2) {
+    const R = 6371000;
+    const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+    const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(p1.lat * Math.PI / 180) *
+        Math.cos(p2.lat * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/* =========================================================
+   STOP CHECK CORE
+   ========================================================= */
+function monitorStopByLocation() {
+    if (!isTracking || !currentPos?.lat) {
+        resetStopMonitor();
+        return;
+    }
+
+    const now = Date.now();
+    const currentPosition = { lat: currentPos.lat, lng: currentPos.lng };
+
+    /* أول قراءة */
+    if (!lastMovePosition) {
+        lastMovePosition = currentPosition;
+        lastMoveTime = now;
+        return;
+    }
+
+    const distance = getDistanceInMeters(lastMovePosition, currentPosition);
+
+    /* تحرك */
+    if (distance > STOP_DISTANCE_THRESHOLD) {
+        lastMovePosition = currentPosition;
+        lastMoveTime = now;
+        resetStopAlerts();
+        return;
+    }
+
+    /* ثابت */
+    const stoppedDuration = now - lastMoveTime;
+
+    /* تنبيه بعد دقيقة */
+    if (stoppedDuration >= STOP_INFO_TIME && !stopInfoShown) {
+        stopInfoShown = true;
+        showToast(
+            'تم التوقف لمدة دقيقة ⏸️، هل هناك عائق أو ازدحام؟',
+            'info'
+        );
+    }
+
+    /* تحذير بعد دقيقتين */
+    if (stoppedDuration >= STOP_WARNING_TIME && !stopWarningShown) {
+        stopWarningShown = true;
+        showCustomModal({
+            icon: '⚠️',
+            title: 'تحذير توقف طويل',
+            message:
+                'تم رصد توقف المركبة لفترة طويلة.\n' +
+                'يرجى التأكد من عدم وجود عطل أو مشكلة.',
+            actions: [
                 {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
+                    label: 'متابعة الرحلة',
+                    class: 'bg-emerald-500 text-white',
+                    onClick: closeCustomModal
                 }
-            );
+            ]
+        });
+    }
+}
 
-            const data = await res.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+/* =========================================================
+   RESET HELPERS
+   ========================================================= */
+function resetStopAlerts() {
+    stopInfoShown = false;
+    stopWarningShown = false;
+}
 
-            return text;
-        }
+function resetStopMonitor() {
+    lastMovePosition = null;
+    lastMoveTime = null;
+    resetStopAlerts();
+}
 
-        /* التنفيذ الكامل */
-        async function fetchAndAnalyzeTrip() {
-            try {
-                const route = await fetchTomTomRoute();
-                const aiText = await analyzeWithGemini(route);
+/* =========================================================
+   INTEGRATION (WITHOUT TOUCHING OLD CODE)
+   ========================================================= */
+const ___updateTripAnalytics = updateTripAnalytics;
+updateTripAnalytics = async function () {
+    await ___updateTripAnalytics();
+    monitorStopByLocation();
+};
 
-                /* حساب السرعة المتوقعة */
-                const speed =
-                    route.travelTimeMin > 0
-                        ? (route.distanceKm / (route.travelTimeMin / 60)).toFixed(1)
-                        : 0;
-
-                aiEtaEl.innerText = `${route.travelTimeMin} د`;
-                aiDistanceEl.innerText = `${route.distanceKm} كم`;
-                aiSpeedEl.innerText = `${speed} كم/س`;
-
-            } catch (e) {
-                console.warn("AI Trip Analytics Error", e);
-            }
-        }
-
-        /* ربطها بزر بدء التحرك */
-        const originalToggleTracking = toggleTracking;
-        toggleTracking = function () {
-            originalToggleTracking();
-            if (isTracking) {
-                startAITripAnalytics();
-            } else {
-                stopAITripAnalytics();
-            }
-        };
         // Drag Logic & Bottom Sheet
         let startY = 0; let isDragging = false; let isExpanded = false;
         dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
