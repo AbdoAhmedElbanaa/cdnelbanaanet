@@ -606,7 +606,7 @@
 
 <div class="entry-fade-up-2 mb-10"> <div class="flex items-center justify-between px-2 mb-3"> <h3 class="font-bold text-base text-white flex items-center gap-2"> <span class="w-1 h-5 bg-emerald-500 rounded-full"></span> بدء المهمة </h3> <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20"> <i class="fas fa-check-circle mr-1"></i> النظام جاهز </span> </div>
 
-<button onclick="startDailyTrip()" class="w-full group relative h-28 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.3)] active:scale-[0.99]">
+<button onclick="startDailyTrip()" id="startMissionBtn" class="w-full group relative h-28 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.3)] active:scale-[0.99]">
     <div class="absolute inset-0 bg-[#132d25]"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/80 via-emerald-800/20 to-transparent opacity-100"></div>
     
@@ -1364,8 +1364,57 @@ function getDeviceFingerprint() {
             document.getElementById('shiftDisplay').innerText = driverData.shift || '--';
             fetchStudents(id);
             listenToHistory(id);
+            
+            // --- جديد: التحقق من الرحلات النشطة واستعادتها ---
+            checkForActiveTrip(id);
+            
             showToast('تم تسجيل الدخول بنجاح', 'success');
             setTimeout(() => showView('home'), 500);
+        }
+
+        // --- اكتشاف واستعادة الرحلات النشطة ---
+        function checkForActiveTrip(driverId) {
+            const tripsRef = window.rtdbRef(window.db, `drivers/${driverId}/trips`);
+            const activeTripQuery = window.rtdbQuery(tripsRef, window.rtdbOrderByChild('status'), window.rtdbEqualTo('active'));
+
+            window.rtdbGet(activeTripQuery).then((snapshot) => {
+                if (snapshot.exists()) {
+                    // العثور على رحلة نشطة
+                    const trips = snapshot.val();
+                    const keys = Object.keys(trips);
+                    const activeKey = keys[keys.length - 1]; // أحدث رحلة نشطة
+                    const tripData = trips[activeKey];
+
+                    showToast('هناك رحلة نشطة الان', 'info');
+                    
+                    // تحديث زر البدء ليظهر حالة التحميل
+                    const startBtn = document.getElementById('startMissionBtn');
+                    if(startBtn) {
+                         startBtn.innerHTML = '<div class="h-full flex flex-col items-center justify-center"><i class="fas fa-sync fa-spin text-3xl text-emerald-300 mb-2"></i><span class="text-white font-bold">جاري استعادة الرحلة...</span></div>';
+                    }
+
+                    // الانتظار 3 ثواني ثم الاستعادة
+                    setTimeout(() => {
+                        resumeActiveTrip(activeKey, tripData);
+                    }, 3000);
+                }
+            }).catch(err => console.error("Error checking active trips:", err));
+        }
+
+        function resumeActiveTrip(key, tripData) {
+            currentTripKey = key;
+            // استرجاع أحداث الرحلة السابقة لتحديد حالة الطلاب
+            const eventsRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${key}/events`);
+            window.rtdbGet(eventsRef).then((snapshot) => {
+                currentTripEvents = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        currentTripEvents.push(child.val());
+                    });
+                }
+                // بدء واجهة التتبع في وضع "استئناف"
+                startDailyTrip(true);
+            });
         }
 
         function handleAutoLogin(id) {
@@ -1851,16 +1900,25 @@ function getDeviceFingerprint() {
         }
 
 // --- START DAILY TRIP (UPDATED) ---
-        function startDailyTrip() {
-            // 1. التحقق من توفر الـ GPS
-            if (!navigator.geolocation) { showToast('GPS غير مدعوم', 'error'); return; }
-            
-            // 2. التحقق من وقت الوردية
-            const isShiftValid = checkShiftTime();
-            if (!isShiftValid) { showToast('انتهت فترة العمل لهذا اليوم.', 'error'); return; }
-            
-            // 3. التحقق من وجود طلاب مسندين للسائق
-            if(!myStudents.length) { showToast('لا يوجد طلاب مسجلين لهذه الرحلة', 'error'); return; }
+        function startDailyTrip(isResuming = false) {
+            // التحقق مما إذا كانت هناك رحلة نشطة بالفعل ولم نكن في وضع الاستئناف
+            if (!isResuming && currentTripKey) {
+                showToast('سيتم استكمال الرحلة النشطة الحالية...', 'info');
+                startDailyTrip(true);
+                return;
+            }
+
+            if (!isResuming) {
+                // 1. التحقق من توفر الـ GPS
+                if (!navigator.geolocation) { showToast('GPS غير مدعوم', 'error'); return; }
+                
+                // 2. التحقق من وقت الوردية
+                const isShiftValid = checkShiftTime();
+                if (!isShiftValid) { showToast('انتهت فترة العمل لهذا اليوم.', 'error'); return; }
+                
+                // 3. التحقق من وجود طلاب مسندين للسائق
+                if(!myStudents.length) { showToast('لا يوجد طلاب مسجلين لهذه الرحلة', 'error'); return; }
+            }
 
             // 4. الانتقال لواجهة الخريطة وتجهيز العناصر
             showView('map');
@@ -1883,10 +1941,29 @@ function getDeviceFingerprint() {
             const tools = document.getElementById('toolsBtn');
             if(tools) tools.classList.remove('hidden');
 
-            // 5. تهيئة قائمة الطلاب للرحلة الحالية
-            currentTripStudents = JSON.parse(JSON.stringify(myStudents));
-            currentTripEvents = []; 
-            renderStudentsList(false);
+            if (isResuming) {
+                // استعادة حالة الطلاب من الأحداث المسجلة
+                currentTripStudents = JSON.parse(JSON.stringify(myStudents));
+                currentTripEvents.forEach(ev => {
+                    if (ev.type === 'boarding') {
+                        const sIndex = currentTripStudents.findIndex(s => s.id === ev.studentId);
+                        if (sIndex > -1) {
+                            currentTripStudents[sIndex].status = 'boarded';
+                            currentTripStudents[sIndex].boardTime = ev.ts;
+                        }
+                    }
+                });
+                renderStudentsList(false);
+                
+                // تفعيل التتبع دون إنشاء رحلة جديدة في قاعدة البيانات
+                if(!isTracking) toggleTracking(true);
+
+            } else {
+                // وضع بدء رحلة جديدة كلياً
+                currentTripStudents = JSON.parse(JSON.stringify(myStudents));
+                currentTripEvents = []; 
+                renderStudentsList(false);
+            }
 
             // 6. تحديد موقع السائق الحالي وحساب المسار للوجهة المسجلة
             navigator.geolocation.getCurrentPosition(pos => {
@@ -2075,7 +2152,7 @@ function getDeviceFingerprint() {
         }
 
         // --- TRACKING LOGIC ---
-        async function toggleTracking() {
+        async function toggleTracking(isResuming = false) {
             const btnSpan = actionBtn ? actionBtn.querySelector('span') : null;
             const btnIcon = actionBtn ? actionBtn.querySelector('i') : null;
             if (!isTracking) {
@@ -2084,12 +2161,16 @@ function getDeviceFingerprint() {
                 
                 renderStudentsList(false);
 
-                try {
-                    const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
-                    const newTripRef = window.rtdbPush(tripsRef);
-                    currentTripKey = newTripRef.key;
-                    await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
-                } catch(e) { console.error("Error creating trip", e); }
+                if (!isResuming) {
+                    try {
+                        const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
+                        const newTripRef = window.rtdbPush(tripsRef);
+                        currentTripKey = newTripRef.key;
+                        await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
+                    } catch(e) { console.error("Error creating trip", e); }
+                } else {
+                    showToast('تم استكمال الرحلة النشطة', 'success');
+                }
                 
                 if(btnSpan) btnSpan.innerText = "إنهاء الرحلة وحفظ التحليل";
                 if(btnIcon) btnIcon.className = "fas fa-stop-circle animate-pulse text-red-500";
@@ -2331,8 +2412,8 @@ showView = function(view) {
 };
 
 const _toggleTracking = toggleTracking;
-toggleTracking = function() {
-    _toggleTracking();
+toggleTracking = function(isResuming = false) {
+    _toggleTracking(isResuming);
     startAIAnalytics();
 };
 
