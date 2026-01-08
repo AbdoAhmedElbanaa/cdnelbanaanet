@@ -696,7 +696,7 @@
                             <div class="relative">
                                 <h2 class="text-3xl font-bold text-white flex items-center gap-3">
                                     <span class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/20 border border-blue-500/30">
-                                        <i class="ph ph-radar text-2xl text-blue-400 animate-spin-slow" style="animation-duration: 4s;"></i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24"><path fill="currentColor" d="M6.72 16.64a1 1 0 1 1 .56 1.92c-.5.146-.86.3-1.091.44c.238.143.614.303 1.136.452C8.48 19.782 10.133 20 12 20s3.52-.218 4.675-.548c.523-.149.898-.309 1.136-.452c-.23-.14-.59-.294-1.09-.44a1 1 0 0 1 .559-1.92c.668.195 1.28.445 1.75.766c.435.299.97.82.97 1.594c0 .783-.548 1.308-.99 1.607c-.478.322-1.103.573-1.786.768C15.846 21.77 14 22 12 22s-3.846-.23-5.224-.625c-.683-.195-1.308-.446-1.786-.768c-.442-.3-.99-.824-.99-1.607c0-.774.535-1.295.97-1.594c.47-.321 1.082-.571 1.75-.766M12 7.5c-1.54 0-2.502 1.667-1.732 3c.357.619 1.017 1 1.732 1c1.54 0 2.502-1.667 1.732-3A2 2 0 0 0 12 7.5" class="duoicon-primary-layer"/><path fill="currentColor" d="M12 2a7.5 7.5 0 0 1 7.5 7.5c0 2.568-1.4 4.656-2.85 6.14a16.4 16.4 0 0 1-1.853 1.615c-.594.446-1.952 1.282-1.952 1.282a1.71 1.71 0 0 1-1.69 0a21 21 0 0 1-1.952-1.282A16.4 16.4 0 0 1 7.35 15.64C5.9 14.156 4.5 12.068 4.5 9.5A7.5 7.5 0 0 1 12 2" class="duoicon-secondary-layer" opacity="0.3"/></svg>
                                         <span class="absolute inset-0 rounded-2xl border border-blue-400/30 animate-ping" style="animation-duration: 2s;"></span>
                                     </span>
                                     <div>
@@ -747,9 +747,19 @@
                                     <i class="ph ph-steering-wheel absolute -right-6 -bottom-6 text-[120px] text-white/5 group-hover:text-white/10 transition-transform duration-700 rotate-12"></i>
 
                                     <div class="relative p-6 flex flex-col items-center">
-                                        <button onclick="App.navigate('tracking')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition border border-white/5 hover:border-white/30 z-20">
-                                            <i class="ph ph-x font-bold"></i>
-                                        </button>
+                                        <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                                            <button onclick="App.navigate('tracking')" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition border border-white/5 hover:border-white/30" title="إغلاق">
+                                                <i class="ph ph-x font-bold"></i>
+                                            </button>
+                                            
+                                            <button onclick="App.confirmEndTrip()" id="btn-end-trip" class="w-8 h-8 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white flex items-center justify-center transition border border-emerald-500/30 shadow-lg shadow-emerald-900/20" title="إنهاء الرحلة">
+                                                <i class="ph ph-check font-bold"></i>
+                                            </button>
+
+                                            <button onclick="App.confirmDeleteTrip()" id="btn-delete-trip" class="w-8 h-8 rounded-full bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white flex items-center justify-center transition border border-red-500/30 shadow-lg shadow-red-900/20" title="حذف الرحلة نهائياً">
+                                                <i class="ph ph-trash font-bold"></i>
+                                            </button>
+                                        </div>
 
                                         <div class="mb-4">
                                             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
@@ -784,6 +794,49 @@
                                     </div>
                                 </div>
 
+                        <div id="attendance-card" class="bg-[#0f172a]/70 backdrop-blur-xl rounded-3xl border border-white/10 p-5 shadow-lg shrink-0 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[50px] rounded-full group-hover:bg-emerald-500/20 transition-all"></div>
+                            
+                            <div class="flex justify-between items-center mb-4 relative z-10">
+                                <h4 class="font-bold text-xs text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="ph ph-chart-pie-slice text-lg"></i> إحصائيات الحضور
+                                </h4>
+                                <div class="px-2 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] text-slate-400">
+                                    <span id="att-percent-text">0%</span> مكتمل
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-6 relative z-10">
+                                <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+                                    <svg class="w-full h-full transform -rotate-90">
+                                        <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-700/50" />
+                                        <circle id="att-circle-progress" cx="40" cy="40" r="36" stroke="currentColor" stroke-width="8" fill="transparent" 
+                                            class="text-emerald-500 transition-all duration-1000 ease-out" 
+                                            stroke-dasharray="226" 
+                                            stroke-dashoffset="226" 
+                                            stroke-linecap="round" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
+                                        <i class="ph ph-student text-xl mb-1 text-slate-400"></i>
+                                    </div>
+                                </div>
+
+                                <div class="flex-1 grid grid-cols-2 gap-3">
+                                    <div class="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-xl text-center">
+                                        <div class="text-[10px] text-emerald-400 mb-1">حضور</div>
+                                        <div id="att-present-count" class="text-xl font-bold text-white">0</div>
+                                    </div>
+                                    <div class="bg-red-500/10 border border-red-500/20 p-2 rounded-xl text-center">
+                                        <div class="text-[10px] text-red-400 mb-1">غياب/انتظار</div>
+                                        <div id="att-absent-count" class="text-xl font-bold text-white">0</div>
+                                    </div>
+                                    <div class="col-span-2 bg-white/5 border border-white/5 p-2 rounded-xl flex justify-between items-center px-4">
+                                        <span class="text-[10px] text-slate-400">إجمالي الطلاب</span>
+                                        <span id="att-total-count" class="text-sm font-bold text-white">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                                 <div class="bg-[#0f172a]/70 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col shadow-lg shrink-0 min-h-[300px]">
                                     <h4 class="font-bold text-xs text-pink-300 uppercase tracking-wider mb-5 flex items-center gap-2 border-b border-white/5 pb-3">
                                         <i class="ph ph-list-dashes text-lg"></i> سجل الأحداث الحية
@@ -1305,8 +1358,46 @@
                 </div>
             </div>
         </div>
-    </div>
 
+
+    </div>
+        <!-- Confirm Modal -->
+        <div id="modal-confirm" class="fixed inset-0 z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            
+            <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-md transition-opacity opacity-0 confirm-backdrop"></div>
+
+            <div class="fixed inset-0 z-[10000] w-screen overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center">
+                    
+                    <div class="relative transform overflow-hidden rounded-2xl bg-[#0f172a] border border-white/10 text-right shadow-2xl transition-all sm:w-full sm:max-w-md scale-95 opacity-0 confirm-panel">
+                        
+                        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none" id="confirm-glow-color"></div>
+                        
+                        <div class="relative px-6 pb-6 pt-8">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/5 border border-white/10 mb-5 shadow-[0_0_30px_rgba(0,0,0,0.5)]" id="confirm-icon-container">
+                                    <i id="confirm-icon" class="ph ph-warning text-3xl"></i>
+                                </div>
+                                
+                                <h3 class="text-xl font-bold leading-6 text-white mb-2" id="confirm-title">عنوان التأكيد</h3>
+                                <p class="text-sm text-slate-400 leading-relaxed" id="confirm-message">
+                                    هل أنت متأكد من القيام بهذا الإجراء؟
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/20 px-6 py-4 flex flex-row-reverse gap-3">
+                            <button type="button" id="btn-confirm-action" class="inline-flex w-full justify-center rounded-xl px-3 py-3 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] sm:w-auto sm:min-w-[120px]">
+                                نعم، نفذ
+                            </button>
+                            <button type="button" onclick="App.Modals.closeConfirm()" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white/5 px-3 py-3 text-sm font-bold text-slate-300 shadow-sm ring-1 ring-inset ring-white/10 hover:bg-white/10 hover:text-white sm:mt-0 sm:w-auto sm:min-w-[100px] transition-colors">
+                                إلغاء
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     <script>
         // --- 1. CONFIGURATION ---
         const firebaseConfig = {
@@ -1642,15 +1733,54 @@
             },
 
             checkAdminRole: function(user) {
-                const adminRef = db.ref(`school_admins/${user.uid}`);
-                adminRef.once('value').then(snapshot => {
-                    this.state.user = user;
-                    const popupEmail = document.getElementById('popup-admin-email');
-                    if(popupEmail) popupEmail.textContent = user.email;
-                    
-                    this.showDashboard();
+                // 1. أولاً: التحقق مما إذا كان مدير مدرسة
+                const schoolAdminRef = db.ref(`school_admins/${user.uid}`);
+                
+                schoolAdminRef.once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        // -- المستخدم مدير مدرسة --
+                        this.state.user = user;
+                        this.state.role = 'school_admin';
+                        
+                        const adminData = snapshot.val();
+                        const popupEmail = document.getElementById('popup-admin-email');
+                        const adminName = document.getElementById('sidebar-admin-name');
+                        
+                        if(popupEmail) popupEmail.textContent = adminData.email || user.email;
+                        if(adminName) adminName.textContent = adminData.name || 'مدير المدرسة';
+                        
+                        this.showDashboard();
+                    } else {
+                        // 2. ثانياً: إذا لم يكن مدير مدرسة، تحقق مما إذا كان سوبر أدمن
+                        const superAdminRef = db.ref(`super_admins/${user.uid}`);
+                        
+                        superAdminRef.once('value').then(superSnap => {
+                            if (superSnap.exists()) {
+                                // -- المستخدم سوبر أدمن --
+                                this.state.user = user;
+                                this.state.role = 'super_admin';
+                                
+                                const adminData = superSnap.val();
+                                const popupEmail = document.getElementById('popup-admin-email');
+                                const adminName = document.getElementById('sidebar-admin-name');
+                                
+                                if(popupEmail) popupEmail.textContent = adminData.email || user.email;
+                                if(adminName) adminName.textContent = adminData.name || 'Super Admin';
+                                // تمييز السوبر أدمن بلون مختلف (اختياري)
+                                if(adminName) adminName.classList.add('text-yellow-400'); 
+
+                                this.showDashboard();
+                            } else {
+                                // 3. المستخدم ليس مديراً ولا سوبر أدمن
+                                console.error("Access Denied: User ID not found in admin lists.");
+                                alert("عذراً، هذا الحساب لا يملك صلاحيات الدخول.");
+                                auth.signOut();
+                                this.showAuth();
+                            }
+                        });
+                    }
                 }).catch(err => {
-                    console.error(err);
+                    console.error("Database Error:", err);
                     alert("خطأ في الاتصال بقاعدة البيانات");
                 });
             },
@@ -2033,13 +2163,17 @@
                 // Get active trip or last trip
                 const tripKeys = Object.keys(driver.trips);
                 const currentTrip = driver.trips[tripKeys[tripKeys.length - 1]];
-                
+                const endBtn = document.getElementById('btn-end-trip');
+                const deleteBtn = document.getElementById('btn-delete-trip'); // الزر الجديد
                 if(!currentTrip || !currentTrip.actualPath) return;
 
                 // --- Real-time Status Update Logic ---
                 const statusEl = document.getElementById('track-status');
                 if (statusEl) {
                     if (currentTrip.status === 'completed') {
+                        // إذا كانت مكتملة: أخفِ زر الإنهاء، وأبقِ زر الحذف
+                        if(endBtn) endBtn.classList.add('hidden');
+                        if(deleteBtn) deleteBtn.classList.remove('hidden');
                         statusEl.textContent = 'مكتملة';
                         statusEl.className = 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs transition-colors duration-300';
                         
@@ -2047,6 +2181,9 @@
                         if(!App.Replay.tripData) App.Replay.init(currentTrip);
 
                     } else if (currentTrip.status === 'active') {
+                                        // إذا كانت نشطة: أظهر زر الإنهاء وزر الحذف
+                        if(endBtn) endBtn.classList.remove('hidden');
+                        if(deleteBtn) deleteBtn.classList.remove('hidden');
                         statusEl.textContent = 'نشطة الآن';
                         statusEl.className = 'bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs transition-colors duration-300 animate-pulse';
                         
@@ -2145,7 +2282,7 @@
                 } catch(e) {
                     console.warn("Map update skipped:", e);
                 }
-
+                this.updateAttendanceUI(currentTrip, driverId);
                 this.renderStudentTimeline(currentTrip);
             },
 
@@ -2385,7 +2522,9 @@
                 // Update markers for this specific history trip
                 const events = trip.events ? Object.values(trip.events) : [];
                 this.updateStudentMarkers(events);
-                
+                const driverId = this.state.currentTrackingDriverId; 
+                if(driverId) this.updateAttendanceUI(trip, driverId);
+
                 // Update Timeline for this history trip
                 this.renderStudentTimeline(trip);
 
@@ -2405,8 +2544,189 @@
 
                 App.Toast.show('تم عرض بيانات الرحلة السابقة', 'success');
             },
+            
+            // --- Trip Management Actions ---
 
+            // 1. طلب تأكيد إنهاء الرحلة
+            confirmEndTrip: function() {
+    // 1. التحقق من وجود معرف السائق
+    const driverId = this.state.currentTrackingDriverId;
+    if (!driverId) {
+        App.Toast.show('لم يتم تحديد سائق!', 'error');
+        return;
+    }
+
+    // 2. التحقق من بيانات السائق
+    const driver = this.state.drivers[driverId];
+    if (!driver || !driver.trips) {
+        App.Toast.show('لا توجد رحلات لهذا السائق', 'error');
+        return;
+    }
+
+    // 3. جلب آخر رحلة بطريقة آمنة
+    const tripKeys = Object.keys(driver.trips);
+    if (tripKeys.length === 0) {
+        App.Toast.show('قائمة الرحلات فارغة', 'error');
+        return;
+    }
+
+    // الحصول على معرف آخر رحلة (tripId)
+    const tripId = tripKeys[tripKeys.length - 1];
+    const tripData = driver.trips[tripId];
+
+    // طباعة للتأكد في الكونسول
+    console.log("Ending Trip:", { driverId, tripId, tripData });
+
+    // 4. التحقق من أن tripId ليس undefined
+    if (!tripId || tripId === 'undefined') {
+        App.Toast.show('خطأ: لا يمكن العثور على معرف الرحلة', 'error');
+        return;
+    }
+
+    if (tripData.status === 'completed') {
+        App.Toast.show('هذه الرحلة منتهية بالفعل', 'error');
+        return;
+    }
+
+    // استدعاء المودال للتأكيد
+    App.Modals.showConfirm({
+        title: 'إنهاء الرحلة الحالية',
+        message: 'سيتم تسجيل وقت الوصول وإغلاق المسار، هل أنت متأكد؟',
+        icon: 'ph-check-circle',
+        color: 'emerald',
+        confirmText: 'نعم، إنهاء',
+        onConfirm: () => {
+            // استدعاء دالة التنفيذ مع المعرفات الصحيحة
+            this.endTripAction(driverId, tripId);
+        }
+    });
+},
+           
+            endTripAction: async function(driverId, tripId) {
+                try {
+                    await db.ref(`drivers/${driverId}/trips/${tripId}`).update({
+                        status: 'completed',
+                        endTime: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    App.Toast.show('تم إنهاء الرحلة بنجاح', 'success');
+                    
+                    // تحديث الواجهة فورياً
+                    document.getElementById('track-status').textContent = 'مكتملة';
+                    document.getElementById('track-status').className = 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs transition-colors duration-300';
+                    
+                    // إيقاف المؤقت
+                    if(this.tripTimerInterval) clearInterval(this.tripTimerInterval);
+
+                } catch (error) {
+                    console.error(error);
+                    App.Toast.show('حدث خطأ أثناء إنهاء الرحلة', 'error');
+                }
+            },
+
+            // 2. طلب تأكيد حذف الرحلة
+            confirmDeleteTrip: function() {
+                const driverId = this.state.currentTrackingDriverId;
+                if (!driverId) return;
+
+                const driver = this.state.drivers[driverId];
+                if (!driver || !driver.trips) {
+                    App.Toast.show('لا توجد رحلة لحذفها', 'error');
+                    return;
+                }
+
+                const tripEntries = Object.entries(driver.trips);
+                const [tripId, tripData] = tripEntries[tripEntries.length - 1];
+
+                // استدعاء المودال الجديد الجذاب
+                App.Modals.showConfirm({
+                    title: 'حذف بيانات الرحلة',
+                    message: 'تحذير: سيتم حذف جميع سجلات المسار والأحداث والتقارير المرتبطة بهذه الرحلة نهائياً ولا يمكن التراجع. هل أنت متأكد؟',
+                    icon: 'ph-trash',
+                    color: 'red', // لون أحمر
+                    confirmText: 'نعم، حذف نهائياً',
+                    onConfirm: () => {
+                        this.deleteTripAction(driverId, tripId);
+                    }
+                });
+            },
+            // تنفيذ حذف الرحلة من قاعدة البيانات
+            deleteTripAction: async function(driverId, tripId) {
+    try {
+        await db.ref(`drivers/${driverId}/trips/${tripId}`).remove();
+        
+        App.Toast.show('تم حذف الرحلة نهائياً', 'success');
+        
+        // العودة للقائمة الرئيسية لأن الرحلة لم تعد موجودة
+        this.navigate('tracking');
+        
+        // تحديث القوائم
+        this.updateTrackingListUI();
+
+    } catch (error) {
+        console.error(error);
+        App.Toast.show('فشل حذف الرحلة', 'error');
+    }
+},
             // --- STANDARD STATS & UI UPDATES ---
+            // أضف هذه الدالة داخل كائن App (مثلاً بعد دالة renderStudentTimeline)
+            updateAttendanceUI: function(trip, driverId) {
+                // 1. جلب إجمالي الطلاب المرتبطين بهذا السائق
+                const allStudents = Object.values(this.state.students);
+                const driverStudents = allStudents.filter(s => s.driverId === driverId);
+                const totalStudents = driverStudents.length;
+
+                let present = 0;
+                let absent = totalStudents;
+
+                // 2. التحقق مما إذا كانت الإحصائيات محفوظة في قاعدة البيانات (كما في قواعد الأمان لديك)
+                if (trip.stats) {
+                    present = trip.stats.present || 0;
+                    absent = trip.stats.absent || (totalStudents - present);
+                } else {
+                    // 3. حساب يدوي إذا لم تكن الإحصائيات موجودة (بناءً على أحداث الركوب الحالية)
+                    if (trip.events) {
+                        const boardingEvents = Object.values(trip.events).filter(e => e.type === 'boarding');
+                        // استخدام Set لمنع تكرار نفس الطالب
+                        const boardedStudentIds = new Set(boardingEvents.map(e => e.studentId));
+                        present = boardedStudentIds.size;
+                        absent = Math.max(0, totalStudents - present);
+                    }
+                }
+
+                // 4. حساب النسبة المئوية
+                const percent = totalStudents > 0 ? Math.round((present / totalStudents) * 100) : 0;
+
+                // 5. تحديث واجهة المستخدم (DOM)
+                const presentEl = document.getElementById('att-present-count');
+                const absentEl = document.getElementById('att-absent-count');
+                const totalEl = document.getElementById('att-total-count');
+                const percentTextEl = document.getElementById('att-percent-text');
+                const circleEl = document.getElementById('att-circle-progress');
+
+                if(presentEl) this.animateValue(presentEl, present); // استخدام دالة الأنيميشن الموجودة لديك
+                if(absentEl) absentEl.innerText = absent;
+                if(totalEl) totalEl.innerText = totalStudents;
+                if(percentTextEl) percentTextEl.innerText = `${percent}%`;
+
+                // 6. تحريك الدائرة البيانية
+                if (circleEl) {
+                    const radius = 36;
+                    const circumference = 2 * Math.PI * radius; // حوالي 226
+                    const offset = circumference - (percent / 100) * circumference;
+                    circleEl.style.strokeDashoffset = offset;
+                    
+                    // تغيير لون الدائرة بناءً على الاكتمال
+                    if(percent === 100) {
+                        circleEl.classList.remove('text-emerald-500');
+                        circleEl.classList.add('text-blue-500');
+                    } else {
+                        circleEl.classList.add('text-emerald-500');
+                        circleEl.classList.remove('text-blue-500');
+                    }
+                }
+            },
+
             updateStats: function() {
                 const drivers = Object.values(this.state.drivers);
                 const students = Object.values(this.state.students);
@@ -3146,10 +3466,16 @@
             },
 
             // --- UTILS ---
-            animateValue: function(id, end) {
-                const obj = document.getElementById(id);
+            animateValue: function(elementOrId, end) {
+                const obj = typeof elementOrId === 'string' ? document.getElementById(elementOrId) : elementOrId;
                 if (!obj) return;
                 
+                // التأكد من أن القيمة الحالية رقم، وإلا ابدأ من 0
+                const start = parseInt(obj.innerText) || 0;
+                
+                // إذا كانت القيمة لم تتغير، لا تقم بالتحريك
+                if (start === end) return;
+
                 gsap.to(obj, {
                     innerHTML: end,
                     duration: 1,
@@ -3159,18 +3485,16 @@
 
             Modals: {
                 openDriverModal: function() {
-                    // Reset Form for Add Mode
                     document.getElementById('driver-form').reset();
                     document.getElementById('driver-edit-id').value = '';
                     document.getElementById('driver-modal-title').textContent = 'إنشاء حساب سائق جديد';
                     document.getElementById('driver-submit-btn').textContent = 'إنشاء الحساب وحفظ البيانات';
                     
-                    // Show Auth Section & Require Fields
                     const authSection = document.getElementById('driver-auth-section');
-                    authSection.classList.remove('hidden');
+                    if(authSection) authSection.classList.remove('hidden');
+                    
                     document.getElementById('driver-email').setAttribute('required', 'true');
                     document.getElementById('driver-password').setAttribute('required', 'true');
-
                     document.getElementById('selected-destination-text').textContent = '';
                     
                     this.open('modal-driver');
@@ -3187,20 +3511,98 @@
                     this.open('modal-alert');
                 },
                 open: function(id) {
-                    document.getElementById('modal-overlay').classList.remove('hidden');
+                    const overlay = document.getElementById('modal-overlay');
+                    if(overlay) overlay.classList.remove('hidden');
+                    
                     const modal = document.getElementById(id);
-                    modal.classList.remove('hidden');
-                    gsap.to(modal, {scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)"});
+                    if(modal) {
+                        modal.classList.remove('hidden');
+                        gsap.to(modal, {scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)"});
+                    }
                 },
                 closeAll: function() {
                     const modals = document.querySelectorAll('.modal-content');
                     gsap.to(modals, {scale: 0.9, opacity: 0, duration: 0.2, onComplete: () => {
                         modals.forEach(m => m.classList.add('hidden'));
-                        document.getElementById('modal-overlay').classList.add('hidden');
+                        const overlay = document.getElementById('modal-overlay');
+                        if(overlay) overlay.classList.add('hidden');
                     }});
+                },
+                showConfirm: function(options) {
+                    const { title, message, icon, color, confirmText, onConfirm } = options;
+                    
+                    const modal = document.getElementById('modal-confirm');
+                    if(!modal) {
+                        console.error('Modal element not found!');
+                        return;
+                    }
+
+                    const backdrop = modal.querySelector('.confirm-backdrop');
+                    const panel = modal.querySelector('.confirm-panel');
+                    
+                    // تعيين النصوص
+                    document.getElementById('confirm-title').innerText = title;
+                    document.getElementById('confirm-message').innerText = message;
+                    document.getElementById('btn-confirm-action').innerText = confirmText;
+                    
+                    // تعيين الأيقونة واللون
+                    const iconEl = document.getElementById('confirm-icon');
+                    const iconContainer = document.getElementById('confirm-icon-container');
+                    const glow = document.getElementById('confirm-glow-color');
+                    const btn = document.getElementById('btn-confirm-action');
+
+                    // إزالة الكلاسات القديمة بحذر لتجنب التراكم
+                    iconEl.className = `ph ${icon} text-3xl text-${color}-400`;
+                    
+                    // تحديث الحاوية
+                    iconContainer.className = `mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-${color}-500/10 border border-${color}-500/20 mb-5 shadow-[0_0_30px_rgba(var(--color-${color}),0.2)]`;
+                    
+                    // تحديث الخلفية المتوهجة
+                    glow.className = `absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none bg-${color}-500`;
+                    
+                    // تحديث الزر
+                    btn.className = `inline-flex w-full justify-center rounded-xl px-3 py-3 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] sm:w-auto sm:min-w-[120px]`;
+                    
+                    if (color === 'red') {
+                        btn.classList.add('bg-red-600', 'hover:bg-red-500', 'shadow-red-900/20');
+                    } else if (color === 'emerald') {
+                        btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500', 'shadow-emerald-900/20');
+                    } else {
+                        btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+                    }
+
+                    // إعادة تعيين الحدث onclick (إزالة القديم وإضافة الجديد)
+                    btn.onclick = () => {
+                        if (onConfirm) onConfirm();
+                        this.closeConfirm();
+                    };
+
+                    // إظهار المودال
+                    modal.classList.remove('hidden');
+                    
+                    // استخدام Timeout صغير لضمان تفعيل الـ CSS Transition
+                    setTimeout(() => {
+                        backdrop.classList.remove('opacity-0');
+                        panel.classList.remove('opacity-0', 'scale-95');
+                        panel.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                },
+                closeConfirm: function() {
+                    const modal = document.getElementById('modal-confirm');
+                    if(!modal) return;
+                    
+                    const backdrop = modal.querySelector('.confirm-backdrop');
+                    const panel = modal.querySelector('.confirm-panel');
+
+                    backdrop.classList.add('opacity-0');
+                    panel.classList.remove('opacity-100', 'scale-100');
+                    panel.classList.add('opacity-0', 'scale-95');
+
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300); // نفس مدة الـ transition في CSS
                 }
             },
-
             Toast: {
                 show: function(msg, type = 'success') {
                     const container = document.getElementById('toast-container');
