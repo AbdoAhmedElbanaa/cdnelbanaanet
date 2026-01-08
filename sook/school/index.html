@@ -1,0 +1,3276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم المدرسية الذكية</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- TomTom Maps & Services -->
+    <link rel='stylesheet' type='text/css' href='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css'>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps-web.min.js"></script>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/services/services-web.min.js"></script>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Time Picker Customization */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .glass-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glass-btn:hover {
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Map Styling - Dark Mode Hack */
+        #map, #home-map, #tracking-map, #driver-location-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            overflow: hidden;
+            z-index: 1;
+        }
+        /* CSS Filter for Dark Mode Map */
+        .map-container canvas, #driver-location-map canvas {
+            filter: invert(100%) hue-rotate(180deg) brightness(0.95) contrast(90%);
+        }
+
+        .marker-icon {
+            background-size: cover;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+            z-index: 10;
+        }
+
+        .student-marker {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #10b981; /* Green for boarded */
+            background-size: cover;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            transition: transform 0.2s;
+        }
+        .student-marker:hover {
+            transform: scale(1.2);
+            z-index: 20;
+        }
+        .student-marker.active-focus {
+            transform: scale(1.5);
+            border-color: #f43f5e; /* Rose color for focus */
+            box-shadow: 0 0 25px rgba(244, 63, 94, 0.8);
+            z-index: 30;
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        /* Detailed Timeline Styles */
+        .dt-container {
+            position: relative;
+            padding-right: 20px;
+        }
+        .dt-item {
+            position: relative;
+            padding-bottom: 2rem;
+            border-right: 2px dashed rgba(255, 255, 255, 0.1);
+            padding-right: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .dt-item:last-child {
+            border-right: none;
+            padding-bottom: 0;
+        }
+        .dt-dot {
+            position: absolute;
+            right: -9px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2px solid #64748b; /* Default Gray */
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        /* Active State (Boarded) */
+        .dt-item.active .dt-dot {
+            background: #10b981;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+            animation: pulse-green 2s infinite;
+        }
+        
+        /* Inactive State (Not Boarded Yet) */
+        .dt-item.inactive .dt-dot {
+            background: #1e293b;
+            border-color: #475569;
+            box-shadow: none;
+        }
+        .dt-item.inactive .dt-card {
+            opacity: 0.6;
+            filter: grayscale(0.8);
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .dt-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .dt-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+            opacity: 1 !important;
+            filter: none !important;
+        }
+
+        /* Replay Control Styles */
+        .speed-btn {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+        }
+        .speed-btn.active {
+            color: white;
+            background: #6366f1;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Timeline Scrubber */
+        #timeline-track {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+        #timeline-progress {
+            height: 100%;
+            background: #6366f1;
+            border-radius: 4px;
+            width: 0%;
+            pointer-events: none;
+        }
+        #timeline-thumb {
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(50%, -50%); /* Center thumb */
+            right: auto;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            cursor: grab;
+            transition: transform 0.1s;
+        }
+        #timeline-thumb:active {
+            cursor: grabbing;
+            transform: translate(50%, -50%) scale(1.2);
+        }
+
+        /* Loader */
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .sidebar-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-right: 3px solid #6366f1;
+            color: white;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            transform: translateX(-100%);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        /* Suggestions list for search */
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1e1b4b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+        }
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .suggestion-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes float-reverse {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(15px) rotate(-5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-float-delayed { animation: float 6s ease-in-out 3s infinite; }
+    .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+    
+    .glass-morphism {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .card-shine {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(125deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 60%);
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+    }
+    .group:hover .card-shine { transform: translateX(100%); }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <!-- App Container -->
+    <div id="app" class="relative min-h-screen flex overflow-hidden">
+        
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a] transition-opacity duration-500">
+            <div class="flex flex-col items-center">
+                <div class="loader mb-4"></div>
+                <h2 class="text-xl font-bold animate-pulse">جاري تحميل النظام...</h2>
+            </div>
+        </div>
+
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="glass-panel p-8 rounded-2xl w-full max-w-md relative z-10 auth-box">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
+                        <i class="ph ph-bus text-3xl text-indigo-400"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white mb-2">منصة إدارة النقل المدرسي</h1>
+                    <p class="text-slate-400 text-sm">تسجيل دخول المشرفين</p>
+                </div>
+                
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="email" class="glass-input w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500" placeholder="admin@school.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">كلمة المرور</label>
+                        <input type="password" id="password" class="glass-input w-full px-4 py-3 rounded-xl" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="glass-btn w-full py-3 rounded-xl font-bold text-white shadow-lg hover:shadow-indigo-500/30">
+                        دخول للنظام
+                    </button>
+                    <p id="login-error" class="text-red-400 text-sm text-center hidden"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Layout -->
+        <div id="dashboard-layout" class="flex w-full hidden opacity-0">
+            
+            <!-- Sidebar -->
+            <aside class="w-20 lg:w-64 glass-panel border-l border-white/10 flex flex-col transition-all duration-300 z-30">
+                <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-white/10">
+                    <i class="ph ph-steering-wheel text-3xl text-indigo-400 lg:ml-3"></i>
+                    <span class="font-bold text-lg hidden lg:block">النقل الذكي</span>
+                </div>
+
+                <nav class="flex-1 py-6 space-y-2 px-2">
+                    <button onclick="App.navigate('home')" id="nav-home" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-squares-four text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">الرئيسية</span>
+                    </button>
+                    <button onclick="App.navigate('tracking')" id="nav-tracking" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-crosshair text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">تتبع الرحلات</span>
+                    </button>
+                    <button onclick="App.navigate('map')" id="nav-map" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-map-trifold text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">الخريطة الكاملة</span>
+                    </button>
+                    <button onclick="App.navigate('drivers')" id="nav-drivers" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-users-three text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">السائقين</span>
+                    </button>
+                    <button onclick="App.navigate('students')" id="nav-students" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-student text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">الطلاب</span>
+                    </button>
+                </nav>
+
+                <div class="p-4 border-t border-white/10 relative">
+                    <button onclick="App.toggleAdminMenu()" class="w-full flex items-center justify-center lg:justify-start p-2 rounded-xl hover:bg-white/5 transition-all group">
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" class="w-10 h-10 rounded-full border-2 border-indigo-500/50">
+                            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0f172a] rounded-full flex items-center justify-center">
+                                <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+                            </span>
+                        </div>
+                        
+                        <div class="hidden lg:block mr-3 text-right flex-1 min-w-0">
+                            <div class="text-sm font-bold text-white truncate" id="sidebar-admin-name">المدير العام</div>
+                            <div class="text-[10px] text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-full w-fit mt-0.5 border border-indigo-500/20">
+                                مسئول المتابعة
+                            </div>
+                        </div>
+                        
+                        <i class="ph ph-caret-up text-slate-500 hidden lg:block transition-transform duration-300" id="admin-menu-arrow"></i>
+                    </button>
+
+                    <!-- Popup Menu -->
+                    <div id="admin-menu" class="absolute bottom-full left-0 w-[calc(100%-2rem)] mx-4 mb-2 hidden opacity-0 transform translate-y-2 transition-all duration-200 z-50">
+                        <div class="glass-panel p-4 rounded-xl bg-[#1e1b4b]/95 backdrop-blur-xl border border-white/10 shadow-2xl">
+                            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-white/10">
+                                <div class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-xl font-bold text-white">
+                                    <i class="ph ph-user-gear"></i>
+                                </div>
+                                <div>
+                                    <div class="text-white font-bold text-sm">بيانات المسؤول</div>
+                                    <div class="text-xs text-slate-400" id="popup-admin-email">admin@school.com</div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <button class="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs">
+                                    <i class="ph ph-gear"></i> الإعدادات
+                                </button>
+                                <button onclick="App.logout()" class="w-full flex items-center gap-2 p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-xs font-bold">
+                                    <i class="ph ph-sign-out"></i> تسجيل الخروج
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+                <!-- Header -->
+                <header class="h-20 glass-panel border-b border-white/10 flex items-center justify-between px-8 z-20">
+                    <div class="flex items-center">
+                        <h2 id="page-title" class="text-xl font-bold">لوحة المعلومات</h2>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3 px-4 py-2 glass-card rounded-full">
+                            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <span class="text-xs font-medium text-slate-300">النظام متصل</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-indigo-600/50 flex items-center justify-center border border-indigo-400/30">
+                            <i class="ph ph-user text-xl"></i>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Scrollable Content Area -->
+                <div id="content-area" class="flex-1 overflow-y-auto p-4 lg:p-8 relative scroll-smooth">
+                       <!-- Home View  --> 
+                    <div id="view-home" class="view-section space-y-8 p-2">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            
+                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2">
+                                <div class="card-shine z-20 pointer-events-none"></div>
+                                <i class="ph ph-steering-wheel absolute -right-6 -bottom-6 text-9xl text-blue-600/10 group-hover:text-blue-500/20 transition-all duration-500 animate-float"></i>
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full group-hover:bg-blue-500/30 transition-all"></div>
+                                
+                                <div class="relative z-10 flex flex-col h-full justify-between">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                                            <i class="ph ph-users-three text-2xl"></i>
+                                        </div>
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-900/50 text-blue-300 border border-blue-500/20">نشط</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-400 text-sm font-medium mb-1">إجمالي السائقين</p>
+                                        <h3 id="stat-drivers" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-blue-200 drop-shadow-sm">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-500 hover:-translate-y-2">
+                                <div class="card-shine z-20 pointer-events-none"></div>
+                                <i class="ph ph-map-pin-line absolute -right-6 -bottom-6 text-9xl text-emerald-600/10 group-hover:text-emerald-500/20 transition-all duration-500 animate-float-reverse"></i>
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-600/20 blur-[60px] rounded-full group-hover:bg-emerald-500/30 transition-all"></div>
+                                
+                                <div class="relative z-10 flex flex-col h-full justify-between">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                                            <i class="ph ph-broadcast text-2xl animate-pulse"></i>
+                                        </div>
+                                        <span class="flex h-3 w-3 relative">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-400 text-sm font-medium mb-1">رحلات نشطة الآن</p>
+                                        <h3 id="stat-active" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-emerald-200 drop-shadow-sm">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition-all duration-500 hover:-translate-y-2">
+                                <div class="card-shine z-20 pointer-events-none"></div>
+                                <i class="ph ph-graduation-cap absolute -right-6 -bottom-6 text-9xl text-purple-600/10 group-hover:text-purple-500/20 transition-all duration-500 animate-float-delayed"></i>
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-600/20 blur-[60px] rounded-full group-hover:bg-purple-500/30 transition-all"></div>
+                                
+                                <div class="relative z-10 flex flex-col h-full justify-between">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                                            <i class="ph ph-student text-2xl"></i>
+                                        </div>
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-500/20">مسجل</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-400 text-sm font-medium mb-1">إجمالي الطلاب</p>
+                                        <h3 id="stat-students" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-purple-200 drop-shadow-sm">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-pink-500/50 transition-all duration-500 hover:-translate-y-2">
+                                <div class="card-shine z-20 pointer-events-none"></div>
+                                <div class="absolute -right-10 -bottom-10 flex gap-4 opacity-10 group-hover:opacity-20 transition-all animate-float">
+                                    <i class="ph ph-gender-male text-8xl text-cyan-400"></i>
+                                    <i class="ph ph-gender-female text-8xl text-pink-400"></i>
+                                </div>
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-500/20 to-pink-500/20 blur-[60px] rounded-full"></div>
+                                
+                                <div class="relative z-10 flex flex-col h-full justify-between">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-pink-400 group-hover:bg-gradient-to-r group-hover:from-cyan-500 group-hover:to-pink-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                                            <i class="ph ph-users text-2xl"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-400 text-sm font-medium mb-2">توزيع الطلاب</p>
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex items-center gap-2 bg-cyan-950/40 px-3 py-1.5 rounded-lg border border-cyan-500/20">
+                                                <i class="ph ph-gender-male text-cyan-400 text-lg"></i>
+                                                <span id="stat-boys" class="text-xl font-bold text-white">0</span>
+                                            </div>
+                                            <div class="h-8 w-[1px] bg-white/10"></div>
+                                            <div class="flex items-center gap-2 bg-pink-950/40 px-3 py-1.5 rounded-lg border border-pink-500/20">
+                                                <i class="ph ph-gender-female text-pink-400 text-lg"></i>
+                                                <span id="stat-girls" class="text-xl font-bold text-white">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-morphism rounded-3xl p-1.5 relative h-[500px] overflow-hidden group shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+                            <div id="home-map" class="w-full h-full rounded-2xl opacity-80 hover:opacity-100 transition-opacity duration-700 bg-[#0f172a]"></div>
+                            
+                            <div class="absolute inset-0 pointer-events-none rounded-3xl border border-white/5 bg-gradient-to-b from-transparent via-transparent to-[#0f172a]/80"></div>
+
+                            <div class="absolute top-6 left-6 z-10">
+                                <div class="glass-morphism px-4 py-2 rounded-xl flex items-center gap-3 border-l-4 border-l-red-500 animate-float">
+                                    <span class="relative flex h-3 w-3">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                    <div>
+                                        <p class="text-xs text-slate-400 font-medium">حالة النظام</p>
+                                        <p class="text-sm font-bold text-white tracking-wide">تتبع مباشر</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="glass-morphism rounded-3xl p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[100px] rounded-full -mr-20 -mt-20"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                                    <span class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                                        <i class="ph ph-pulse text-xl"></i>
+                                        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                                        </span>
+                                    </span>
+                                    مراقبة الأسطول
+                                    <span class="text-xs font-normal text-slate-400 mr-2 bg-slate-800/50 px-2 py-1 rounded-lg border border-slate-700">تحديث لحظي</span>
+                                </h3>
+                                
+                                <div class="flex gap-2">
+                                    <button class="p-2 rounded-lg bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors border border-slate-700/50">
+                                        <i class="ph ph-squares-four"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="recent-activity-body" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                
+                                <div class="group relative bg-slate-800/40 hover:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 overflow-hidden">
+                                    
+                                    <i class="ph ph-car-profile absolute -left-4 -bottom-4 text-[80px] text-white/5 group-hover:text-white/10 group-hover:-rotate-12 transition-all duration-500"></i>
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+                                    <div class="flex items-start justify-between mb-4 relative z-10">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-indigo-500/20">
+                                                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-indigo-300 font-bold text-lg">
+                                                    A </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-white font-bold text-base leading-tight">أحمد محمد</h4> <span class="text-xs text-slate-400 mt-1 block">رقم المركبة: 4580</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end gap-1">
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                متصل
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <hr class="border-white/5 mb-4" />
+
+                                    <div class="grid grid-cols-2 gap-4 relative z-10">
+                                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-blue-500/20 transition-colors">
+                                            <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                                                <i class="ph ph-speedometer text-blue-400"></i> السرعة
+                                            </p>
+                                            <p class="text-xl font-mono font-bold text-white tracking-wider">65 <span class="text-xs font-sans text-slate-500">كم/س</span></p>
+                                        </div>
+                                        
+                                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
+                                            <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                                                <i class="ph ph-clock text-purple-400"></i> آخر تحديث
+                                            </p>
+                                            <p class="text-sm font-bold text-slate-200 mt-1">منذ دقيقتين</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                        </div>
+                    </div>  
+
+                    </div>
+
+                    <!-- View: Tracking (Drivers List) -->
+                    <div id="view-tracking" class="view-section hidden space-y-8 relative min-h-screen">
+                        
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+                            
+                            <div class="relative">
+                                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                                    <span class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/20 border border-blue-500/30">
+                                        <i class="ph ph-radar text-2xl text-blue-400 animate-spin-slow" style="animation-duration: 4s;"></i>
+                                        <span class="absolute inset-0 rounded-2xl border border-blue-400/30 animate-ping" style="animation-duration: 2s;"></span>
+                                    </span>
+                                    <div>
+                                        <span class="block text-transparent bg-clip-text bg-gradient-to-l from-blue-200 to-white">تتبع المركبات</span>
+                                        <span class="text-xs text-slate-400 font-normal">نظام المراقبة الحية للأسطول</span>
+                                    </div>
+                                </h2>
+                                
+                                <i class="ph ph-map-trifold absolute -top-8 -left-12 text-6xl text-slate-700/20 animate-float"></i>
+                            </div>
+
+                            <div class="relative w-full max-w-lg group">
+                                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                                
+                                <div class="relative flex items-center glass-morphism rounded-xl p-1">
+                                    <div class="pl-4 pr-3 text-slate-400">
+                                        <i class="ph ph-magnifying-glass text-xl group-focus-within:text-blue-400 transition-colors"></i>
+                                    </div>
+                                    <input type="text" 
+                                        id="tracking-search" 
+                                        placeholder="ابحث باسم السائق، رقم المركبة، أو المنطقة..." 
+                                        class="w-full bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 text-sm py-3 px-2">
+                                    
+                                    <div class="hidden md:flex items-center gap-2 px-3 border-r border-white/10">
+                                        <span class="text-[10px] bg-slate-800/50 text-slate-400 border border-white/10 px-2 py-1 rounded-md">CMD + K</span>
+                                    </div>
+                                </div>
+                                
+                                <i class="ph ph-compass absolute -bottom-8 -right-8 text-5xl text-cyan-500/10 animate-float-reverse pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <div id="tracking-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-20">
+                            </div>
+                    </div>
+
+                    <!-- View: Tracking Detail (Map + Stats + Timeline) -->
+                    <div id="view-tracking-detail" class="view-section hidden h-full flex flex-col lg:flex-row gap-6 overflow-hidden relative">
+                        
+                        <div class="absolute top-0 right-0 w-[600px] h-full bg-blue-900/10 blur-[120px] pointer-events-none -z-10"></div>
+
+                        <div class="w-full lg:w-[400px] flex flex-col gap-5 h-full overflow-hidden shrink-0">
+                            
+                            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-5 pr-1 pb-2">
+                                
+                                <div class="group relative bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl shrink-0">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-transparent opacity-50"></div>
+                                    <i class="ph ph-steering-wheel absolute -right-6 -bottom-6 text-[120px] text-white/5 group-hover:text-white/10 transition-transform duration-700 rotate-12"></i>
+
+                                    <div class="relative p-6 flex flex-col items-center">
+                                        <button onclick="App.navigate('tracking')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition border border-white/5 hover:border-white/30 z-20">
+                                            <i class="ph ph-x font-bold"></i>
+                                        </button>
+
+                                        <div class="mb-4">
+                                            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                                                <span id="track-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                <span class="text-[11px] font-bold text-emerald-400 tracking-wider">LIVE STATUS</span>
+                                            </div>
+                                        </div>
+
+                                        <h3 id="track-driver-name" class="text-2xl font-bold text-white mb-6 text-center leading-tight drop-shadow-md">...</h3>
+
+                                        <div class="relative w-48 h-48 flex items-center justify-center mb-6">
+                                            <div class="absolute inset-0 rounded-full border-[8px] border-slate-800"></div>
+                                            <div class="absolute inset-0 rounded-full border-[8px] border-t-blue-500 border-r-blue-500/30 border-b-transparent border-l-transparent rotate-[-45deg] transition-all duration-1000"></div>
+                                            <div class="absolute inset-4 rounded-full border border-dashed border-slate-600 opacity-50 animate-spin-slow" style="animation-duration: 20s"></div>
+                                            
+                                            <div class="flex flex-col items-center z-10">
+                                                <span id="track-speed" class="text-6xl font-black text-white tracking-tighter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">0</span>
+                                                <span class="text-xs font-bold text-blue-400 uppercase tracking-widest mt-1">KM/H</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-full grid grid-cols-2 gap-3">
+                                            <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/5 hover:bg-white/10 transition">
+                                                <span class="text-[10px] text-slate-400 block mb-1 flex items-center justify-center gap-1"><i class="ph ph-timer"></i> المدة</span>
+                                                <span id="track-duration" class="font-mono text-sm font-bold text-white">00:00:00</span>
+                                            </div>
+                                            <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/5 hover:bg-white/10 transition">
+                                                <span class="text-[10px] text-slate-400 block mb-1 flex items-center justify-center gap-1"><i class="ph ph-car"></i> المركبة</span>
+                                                <span class="font-mono text-sm font-bold text-slate-200">VAN-01</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#0f172a]/70 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col shadow-lg shrink-0 min-h-[300px]">
+                                    <h4 class="font-bold text-xs text-pink-300 uppercase tracking-wider mb-5 flex items-center gap-2 border-b border-white/5 pb-3">
+                                        <i class="ph ph-list-dashes text-lg"></i> سجل الأحداث الحية
+                                    </h4>
+                                    <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar relative dt-container">
+                                        <div id="track-timeline" class="space-y-4 pl-3 border-r border-dashed border-slate-700/50">
+                                            <div class="text-center text-xs text-slate-500 py-10 flex flex-col items-center gap-2">
+                                                <i class="ph ph-spinner animate-spin text-lg"></i>
+                                                جاري الاتصال بالسائق...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#0f172a]/70 backdrop-blur-xl rounded-3xl border border-white/10 p-6 shadow-lg shrink-0">
+                                    <h4 class="font-bold text-xs text-indigo-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="ph ph-clock-counter-clockwise text-lg"></i> الرحلات السابقة
+                                    </h4>
+                                    <div class="max-h-48 overflow-y-auto custom-scrollbar">
+                                        <div id="track-history" class="space-y-2">
+                                            </div>
+                                    </div>
+                                </div>
+
+                            </div> </div>
+
+                        <div class="flex-1 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl group map-container bg-slate-900 h-full">
+                            
+                            <div id="tracking-map" class="w-full h-full opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            
+                            <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(transparent_60%,rgba(15,23,42,0.7)_100%)]"></div>
+
+                            <div class="absolute top-5 right-5 bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-lg z-10 flex flex-col gap-3 transition hover:scale-105">
+                                <div class="flex items-center gap-3 text-[11px] font-bold text-slate-300">
+                                    <span class="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_8px_#6366f1]"></span> 
+                                    مسار فعلي (GPS)
+                                </div>
+                                <div class="flex items-center gap-3 text-[11px] font-bold text-slate-300">
+                                    <span class="w-3 h-3 rounded-full border-2 border-dashed border-slate-400"></span> 
+                                    مسار متوقع
+                                </div>
+                            </div>
+
+                            <div id="replay-controls" class="absolute bottom-6 left-6 right-6 lg:left-20 lg:right-20 hidden z-20 animate-slide-up">
+                                <div class="bg-[#0f172a]/95 backdrop-blur-2xl p-5 rounded-3xl border border-white/10 shadow-[0_10px_50px_rgba(0,0,0,0.8)] flex flex-col gap-4 relative">
+                                    
+                                    <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60"></div>
+
+                                    <div class="flex justify-between items-center px-2 text-[10px] font-mono font-bold text-slate-400">
+
+                                        <div class="text-left">
+                                            <span class="block text-slate-600 text-[9px] mb-0.5">البداية</span>
+                                            <span id="replay-start-time" class="text-slate-200">00:00:00</span>
+                                        </div>
+                                        <span id="replay-current-status" class="text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
+                                            REPLAY MODE ACTIVE
+                                        </span>
+                                        <div class="text-right">
+                                            <span class="block text-slate-600 text-[9px] mb-0.5">النهاية</span>
+                                            <span id="replay-end-time" class="text-slate-200">00:00:00</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative h-4 flex items-center cursor-pointer group px-1" id="timeline-track">
+                                        <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                                            <div class="w-full h-full opacity-10" style="background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
+                                        </div>
+                                        <div id="timeline-progress" class="absolute h-1.5 bg-gradient-to-r from-indigo-600 to-blue-400 rounded-full w-0 shadow-[0_0_15px_#6366f1] transition-all duration-75"></div>
+                                        <div id="timeline-thumb" class="absolute right-10 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-200"></div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between">
+                                        <button onclick="App.Replay.stop()" class="text-red-400 hover:text-white text-xs font-bold flex items-center gap-2 px-3 py-2 hover:bg-red-500/20 rounded-xl transition border border-transparent hover:border-red-500/20">
+                                            <i class="ph ph-stop-circle text-lg"></i> 
+                                            <span class="hidden md:inline">إنهاء</span>
+                                        </button>
+
+                                        <div class="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-2xl border border-white/5">
+                                            <button onclick="App.Replay.jump(-10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="-10s">
+                                                <i class="ph ph-rewind text-xl"></i>
+                                            </button>
+                                            
+                                            <button onclick="App.Replay.toggle()" class="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-900/40 transition active:scale-95 group/play">
+                                                <span id="replay-play-icon" class="group-hover/play:scale-110 transition-transform">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/></svg>
+                                                </span>
+                                            </button>
+                                            
+                                            <button onclick="App.Replay.jump(10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="+10s">
+                                                <i class="ph ph-fast-forward text-xl"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="flex gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                                            <button onclick="App.Replay.setSpeed(0.5)" class="speed-btn px-2.5 py-1 text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition" data-speed="0.5">.5x</button>
+                                            <button onclick="App.Replay.setSpeed(1)" class="speed-btn px-2.5 py-1 text-[10px] font-bold text-white bg-indigo-500/20 border border-indigo-500/30 rounded-lg transition" data-speed="1">1x</button>
+                                            <button onclick="App.Replay.setSpeed(2)" class="speed-btn px-2.5 py-1 text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition" data-speed="2">2x</button>
+                                            <button onclick="App.Replay.setSpeed(5)" class="speed-btn px-2.5 py-1 text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition" data-speed="5">5x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View: Map (Full - Night Mode) -->
+                    <div id="view-map" class="view-section hidden h-full flex flex-col">
+                        <div class="glass-panel p-1 rounded-2xl flex-1 relative map-container">
+                             <div id="map"></div>
+                        </div>
+                    </div>
+
+                    <!-- View: Drivers -->
+                    <div id="view-drivers" class="view-section hidden space-y-8 relative min-h-screen">
+    
+                        <div class="absolute top-0 right-1/4 w-96 h-96 bg-indigo-900/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+                        <i class="ph ph-steering-wheel absolute -top-4 right-10 text-8xl text-white/5 animate-float pointer-events-none"></i>
+
+                        <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+                            
+                            <div>
+                                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                                    <div class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600/20 border border-indigo-500/30">
+                                        <i class="ph ph-identification-card text-2xl text-indigo-400"></i>
+                                        <span class="absolute inset-0 rounded-2xl border border-indigo-400/20 animate-pulse"></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-transparent bg-clip-text bg-gradient-to-l from-indigo-200 to-white">كباتن الأسطول</span>
+                                        <span class="text-xs text-slate-400 font-normal">إدارة وتعديل بيانات السائقين</span>
+                                    </div>
+                                </h2>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                
+                                <div class="relative group w-full sm:w-72">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                                    <div class="relative flex items-center bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-xl">
+                                        <i class="ph ph-magnifying-glass absolute right-4 text-slate-400 group-focus-within:text-indigo-400 transition-colors"></i>
+                                        <input type="text" 
+                                            id="driver-search" 
+                                            placeholder="بحث بالاسم، رقم الهاتف..." 
+                                            class="w-full bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 text-sm py-3 pr-10 pl-4">
+                                    </div>
+                                </div>
+
+                                <button onclick="App.Modals.openDriverModal()" class="relative overflow-hidden group bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-900/20 transition-all transform hover:-translate-y-0.5">
+                                    <div class="absolute inset-0 w-full h-full bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+                                    <div class="relative flex items-center justify-center gap-2">
+                                        <i class="ph ph-plus-circle text-lg"></i>
+                                        <span>إضافة سائق</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="drivers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-20">
+                            </div>
+                    </div>
+
+                    <!-- View: Students -->
+                    <div id="view-students" class="view-section hidden space-y-8 relative min-h-screen">
+                        
+                        <div class="absolute top-20 left-10 w-64 h-64 bg-purple-900/10 blur-[80px] rounded-full pointer-events-none -z-10"></div>
+                        <i class="ph ph-backpack absolute -top-4 right-10 text-8xl text-white/5 animate-float-delayed pointer-events-none"></i>
+
+                        <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+                            
+                            <div>
+                                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                                    <div class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600/20 border border-purple-500/30">
+                                        <i class="ph ph-student text-2xl text-purple-400"></i>
+                                        <span class="absolute inset-0 rounded-2xl border border-purple-400/20 animate-pulse"></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-transparent bg-clip-text bg-gradient-to-l from-purple-200 to-white">سجل الطلاب</span>
+                                        <span class="text-xs text-slate-400 font-normal">إدارة بيانات الطلاب المسجلين</span>
+                                    </div>
+                                </h2>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                
+                                <div class="relative group w-full sm:w-72">
+                                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                                    <div class="relative flex items-center bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-xl">
+                                        <i class="ph ph-magnifying-glass absolute right-4 text-slate-400 group-focus-within:text-purple-400 transition-colors"></i>
+                                        <input type="text" 
+                                            id="student-search" 
+                                            placeholder="بحث باسم الطالب، الصف..." 
+                                            class="w-full bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 text-sm py-3 pr-10 pl-4">
+                                    </div>
+                                </div>
+
+                                <button onclick="App.Modals.openStudentModal()" class="relative overflow-hidden group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-purple-900/20 transition-all transform hover:-translate-y-0.5">
+                                    <div class="absolute inset-0 w-full h-full bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+                                    <div class="relative flex items-center justify-center gap-2">
+                                        <i class="ph ph-plus-circle text-lg"></i>
+                                        <span>إضافة طالب</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="students-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
+                            </div>
+                        
+                        <div id="students-empty-state" class="hidden py-12 text-center relative z-10">
+                            <div class="inline-block p-4 rounded-full bg-white/5 mb-3 border border-white/5"><i class="ph ph-student text-3xl text-slate-600"></i></div>
+                            <p class="text-slate-500">لا يوجد طلاب مطابقين للبحث</p>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 z-[60] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        
+        <!-- Add/Edit Driver Modal -->
+        <div id="modal-driver" class="modal-content hidden glass-panel p-6 rounded-2xl w-full max-w-2xl relative transform scale-95 opacity-0 transition-all duration-300 h-[90vh] flex flex-col">
+            <button onclick="App.Modals.closeAll()" class="absolute top-4 left-4 text-slate-400 hover:text-white z-20"><i class="ph ph-x text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-steering-wheel text-indigo-400"></i> <span id="driver-modal-title">إنشاء حساب سائق جديد</span></h3>
+            
+            <div class="flex-1 overflow-y-auto pr-2">
+                <form id="driver-form" class="space-y-4">
+                    <input type="hidden" name="id" id="driver-edit-id">
+                    
+                    <!-- Auth Section: Shown ONLY in Create Mode -->
+                    <div id="driver-auth-section" class="bg-indigo-900/30 p-4 rounded-xl border border-indigo-500/30 mb-4 transition-all duration-300">
+                        <h4 class="text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2"><i class="ph ph-shield-check"></i> بيانات الحساب (Auth)</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">البريد الإلكتروني (للدخول)</label>
+                                <input type="email" name="email" id="driver-email" class="glass-input w-full px-3 py-2 rounded-lg" placeholder="driver@school.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">كلمة المرور</label>
+                                <input type="text" name="password" id="driver-password" class="glass-input w-full px-3 py-2 rounded-lg text-emerald-400 font-mono" placeholder="********">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">الاسم الكامل</label>
+                            <input type="text" name="name" id="driver-name" required class="glass-input w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">المدرسة</label>
+                            <input type="text" name="school" id="driver-school" required class="glass-input w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-2">توقيت الوردية (Time Picker)</label>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <span class="text-[10px] text-slate-500 block mb-1">من</span>
+                                <input type="time" id="shift-start" class="glass-input w-full px-3 py-2 rounded-lg text-center" required>
+                            </div>
+                            <div class="flex-1">
+                                <span class="text-[10px] text-slate-500 block mb-1">إلى</span>
+                                <input type="time" id="shift-end" class="glass-input w-full px-3 py-2 rounded-lg text-center" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destination Picker -->
+                    <div class="border-t border-white/10 pt-4 mt-2">
+                        <label class="block text-sm font-bold text-slate-300 mb-2">تحديد وجهة السائق (المدرسة/المنطقة)</label>
+                        <div class="relative mb-2">
+                            <i class="ph ph-magnifying-glass absolute top-1/2 right-3 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="destination-search" placeholder="ابحث عن المدرسة..." class="glass-input w-full pl-4 pr-10 py-2 rounded-lg text-sm">
+                            <div id="search-suggestions" class="suggestions-list hidden"></div>
+                        </div>
+                        <div class="h-64 rounded-xl overflow-hidden relative border border-white/10">
+                            <div id="driver-location-map"></div>
+                            <div class="absolute bottom-2 right-2 bg-black/50 px-2 py-1 rounded text-xs text-white z-10 pointer-events-none">اضغط لتحديد الوجهة</div>
+                        </div>
+                        <input type="hidden" name="destinationLat" id="dest-lat">
+                        <input type="hidden" name="destinationLng" id="dest-lng">
+                        <input type="hidden" name="destinationLabel" id="dest-label">
+                        <div id="selected-destination-text" class="text-xs text-green-400 mt-1 h-4"></div>
+                    </div>
+
+                    <div class="text-xs text-slate-500 flex items-center gap-1 mt-2">
+                        <i class="ph ph-info"></i> سيتم ربط الجهاز تلقائياً عند تسجيل السائق للدخول أول مرة.
+                    </div>
+
+                    <button type="submit" id="driver-submit-btn" class="glass-btn w-full py-2 rounded-xl mt-4 font-bold text-white">حفظ البيانات</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Driver Details Modal -->
+        <div id="modal-driver-details" class="modal-content hidden glass-panel p-0 rounded-2xl w-full max-w-2xl relative transform scale-95 opacity-0 transition-all duration-300 overflow-hidden">
+             <!-- ... existing content ... -->
+             <div class="h-32 bg-indigo-600/30 relative">
+                 <button onclick="App.Modals.closeAll()" class="absolute top-4 left-4 text-white z-10 bg-black/20 p-1 rounded-full hover:bg-black/40"><i class="ph ph-x text-xl"></i></button>
+                 <div class="absolute -bottom-10 right-8 flex items-end gap-4">
+                     <div class="w-24 h-24 rounded-2xl bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-3xl font-bold shadow-xl overflow-hidden" id="detail-driver-avatar">
+                         <!-- Avatar -->
+                     </div>
+                     <div class="mb-2">
+                         <h2 class="text-2xl font-bold text-white" id="detail-driver-name">اسم السائق</h2>
+                         <p class="text-indigo-300 text-sm" id="detail-driver-school">المدرسة</p>
+                     </div>
+                 </div>
+             </div>
+             <div class="pt-14 px-8 pb-8">
+                 <div class="grid grid-cols-3 gap-4 mb-6">
+                     <div class="bg-white/5 p-4 rounded-xl text-center">
+                         <p class="text-xs text-slate-400 mb-1">الوردية</p>
+                         <p class="font-bold" id="detail-driver-shift">-</p>
+                     </div>
+                     <div class="bg-white/5 p-4 rounded-xl text-center">
+                         <p class="text-xs text-slate-400 mb-1">السرعة الحالية</p>
+                         <p class="font-bold text-indigo-400" id="detail-driver-speed">0 كم/س</p>
+                     </div>
+                     <div class="bg-white/5 p-4 rounded-xl text-center">
+                         <p class="text-xs text-slate-400 mb-1">الطلاب</p>
+                         <p class="font-bold text-green-400" id="detail-driver-students">0</p>
+                     </div>
+                 </div>
+                 <div class="space-y-4">
+                     <div>
+                         <h4 class="text-sm font-bold text-slate-300 mb-2">بيانات الاتصال</h4>
+                         <div class="bg-white/5 p-4 rounded-xl space-y-2 text-sm">
+                             <div class="flex justify-between">
+                                 <span class="text-slate-400">البريد الإلكتروني:</span>
+                                 <span id="detail-driver-email" class="select-all">-</span>
+                             </div>
+                             <div class="flex justify-between">
+                                 <span class="text-slate-400">كلمة المرور:</span>
+                                 <span id="detail-driver-password" class="select-all font-mono text-emerald-400">-</span>
+                             </div>
+                             <div class="flex justify-between">
+                                 <span class="text-slate-400">رقم الحماية (ID):</span>
+                                 <span id="detail-driver-id" class="font-mono text-xs select-all">-</span>
+                             </div>
+                             <div class="flex justify-between border-t border-white/10 pt-2 mt-2 items-center">
+                                 <div>
+                                     <span class="text-slate-400 block mb-1">حالة الجهاز:</span>
+                                     <span id="detail-driver-device-status" class="text-xs">-</span>
+                                 </div>
+                                 <button onclick="App.resetDriverDevice()" class="btn-danger px-3 py-1 rounded text-xs text-white font-bold hover:scale-105 transition-transform flex items-center gap-1">
+                                     <i class="ph ph-warning"></i> فك الارتباط
+                                 </button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Add Student Modal -->
+        <div id="modal-student" class="modal-content hidden glass-panel p-6 rounded-2xl w-full max-w-lg relative transform scale-95 opacity-0 transition-all duration-300">
+            <!-- ... existing content ... -->
+            <button onclick="App.Modals.closeAll()" class="absolute top-4 left-4 text-slate-400 hover:text-white"><i class="ph ph-x text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-student text-pink-400"></i> بيانات الطالب</h3>
+            <form id="student-form" class="space-y-4">
+                <input type="hidden" name="id" id="student-edit-id"> 
+                <div class="flex items-center gap-4 mb-4">
+                     <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border border-white/20">
+                         <img id="student-preview" src="https://i.pravatar.cc/150" class="w-full h-full object-cover">
+                     </div>
+                     <div class="flex-1">
+                        <label class="block text-xs text-slate-400 mb-1">رابط الصورة</label>
+                        <input type="text" name="photo" id="student-photo-input" value="https://i.pravatar.cc/150" class="glass-input w-full px-3 py-2 rounded-lg text-xs">
+                     </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">اسم الطالب</label>
+                        <input type="text" name="name" id="student-name-input" required class="glass-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">النوع</label>
+                        <select name="gender" id="student-gender-input" class="glass-input w-full px-3 py-2 rounded-lg bg-[#1e1b4b]">
+                            <option value="male">ذكر</option>
+                            <option value="female">أنثى</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">الصف الدراسي</label>
+                        <select name="grade" id="student-grade-input" class="glass-input w-full px-3 py-2 rounded-lg bg-[#1e1b4b]">
+                            <option value="الروضة">الروضة</option>
+                            <option value="الصف الأول">الصف الأول</option>
+                            <option value="الصف الثاني">الصف الثاني</option>
+                            <option value="الصف الثالث">الصف الثالث</option>
+                            <option value="الصف الرابع">الصف الرابع</option>
+                            <option value="الصف الخامس">الصف الخامس</option>
+                            <option value="الصف السادس">الصف السادس</option>
+                        </select>
+                    </div>
+                     <div>
+                         <label class="block text-xs text-slate-400 mb-1">تعيين لسائق</label>
+                         <select name="driverId" id="student-driver-select" class="glass-input w-full px-3 py-2 rounded-lg bg-[#1e1b4b]">
+                             <option value="">اختر السائق...</option>
+                         </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">هاتف ولي الأمر</label>
+                        <input type="text" name="parentPhone" id="student-phone-input" required class="glass-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">رقم الشارة (Badge ID)</label>
+                        <input type="text" name="badgeId" id="student-badge-input" required class="glass-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">العنوان</label>
+                    <input type="text" name="address" id="student-address-input" required class="glass-input w-full px-3 py-2 rounded-lg">
+                </div>
+                <button type="submit" class="glass-btn w-full py-2 rounded-xl mt-4 font-bold text-white">حفظ البيانات</button>
+            </form>
+        </div>
+
+        <!-- Student Details Modal -->
+        <div id="modal-student-details" class="modal-content hidden glass-panel p-0 rounded-2xl w-full max-w-md relative transform scale-95 opacity-0 transition-all duration-300 overflow-hidden">
+             <!-- ... existing content ... -->
+             <div class="h-28 bg-pink-600/30 relative flex items-center justify-center">
+                 <button onclick="App.Modals.closeAll()" class="absolute top-4 left-4 text-white z-10 bg-black/20 p-1 rounded-full hover:bg-black/40"><i class="ph ph-x text-xl"></i></button>
+                 <div class="absolute -bottom-12 w-24 h-24 rounded-full border-4 border-[#0f172a] overflow-hidden">
+                     <img id="detail-student-photo" src="" class="w-full h-full object-cover">
+                 </div>
+             </div>
+             <div class="pt-16 pb-8 px-6 text-center">
+                 <h2 id="detail-student-name" class="text-2xl font-bold mb-1">اسم الطالب</h2>
+                 <p id="detail-student-grade" class="text-slate-400 text-sm mb-4">الصف</p>
+                 <div class="grid grid-cols-2 gap-3 mb-6">
+                     <div class="bg-white/5 p-3 rounded-xl">
+                         <div class="text-xs text-slate-500">ولي الأمر</div>
+                         <div id="detail-student-phone" class="font-bold text-sm"></div>
+                     </div>
+                     <div class="bg-white/5 p-3 rounded-xl">
+                         <div class="text-xs text-slate-500">السائق</div>
+                         <div id="detail-student-driver" class="font-bold text-sm text-indigo-400"></div>
+                     </div>
+                 </div>
+                 <div class="text-right space-y-3 bg-white/5 p-4 rounded-xl text-sm">
+                     <div class="flex justify-between border-b border-white/5 pb-2">
+                         <span class="text-slate-500">العنوان</span>
+                         <span id="detail-student-address"></span>
+                     </div>
+                     <div class="flex justify-between border-b border-white/5 pb-2">
+                         <span class="text-slate-500">Badge ID</span>
+                         <span id="detail-student-badge" class="font-mono"></span>
+                     </div>
+                     <div class="flex justify-between">
+                         <span class="text-slate-500">النوع</span>
+                         <span id="detail-student-gender"></span>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Custom Alert/Confirm -->
+        <div id="modal-alert" class="modal-content hidden glass-panel p-6 rounded-2xl w-full max-w-sm text-center relative transform scale-95 opacity-0 transition-all duration-300">
+            <div id="alert-icon" class="w-16 h-16 rounded-full bg-indigo-500/20 mx-auto flex items-center justify-center mb-4 text-3xl text-indigo-400">
+                <i class="ph ph-info"></i>
+            </div>
+            <h3 id="alert-title" class="text-xl font-bold mb-2">تنبيه</h3>
+            <p id="alert-message" class="text-slate-300 text-sm mb-6">الرسالة هنا</p>
+            <div class="flex justify-center gap-3" id="alert-actions">
+                <button onclick="App.Modals.closeAll()" class="glass-btn px-6 py-2 rounded-lg text-white text-sm">حسناً</button>
+            </div>
+        </div>
+
+        <!--  Reset Device Modal -->
+        <div id="modal-device-reset" class="fixed inset-0 z-[60] hidden" aria-hidden="true">
+            
+            <div id="modal-backdrop" 
+                class="absolute inset-0 bg-[#000]/90 backdrop-blur-md transition-opacity duration-300 ease-out opacity-0">
+            </div>
+
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div id="modal-panel" 
+                    class="relative w-full max-w-sm bg-[#0f172a] rounded-3xl border border-red-500/20 shadow-[0_0_50px_rgba(220,38,38,0.2)] overflow-hidden transform transition-all duration-300 ease-out scale-95 opacity-0">
+                    
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-orange-500 to-red-600"></div>
+                    
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+
+                    <div class="p-8 text-center relative z-10">
+                        
+                        <div class="mx-auto w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 relative group">
+                            <div class="absolute inset-0 rounded-full border border-red-500/30 animate-ping opacity-20"></div>
+                            <div class="absolute inset-0 rounded-full border border-red-500/50 scale-110"></div>
+                            <i class="ph ph-warning-octagon text-4xl text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]"></i>
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-white mb-2 tracking-wide">فك ارتباط الجهاز</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                            هل أنت متأكد تماماً؟
+                            <br>
+                            سيتم تسجيل خروج السائق فوراً وسيتمكن من الدخول من هاتف جديد. <span class="text-red-400">لا يمكن التراجع عن هذا الإجراء.</span>
+                        </p>
+
+                        <div class="flex flex-col gap-3">
+                            <button id="btn-confirm-reset" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-red-900/30 transition-all active:scale-95 flex items-center justify-center gap-2 group">
+                                <span>نعم، فك الارتباط</span>
+                                <i class="ph ph-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                            </button>
+                            
+                            <button id="btn-cancel-reset" class="w-full py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium">
+                                إلغاء الأمر
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaEfEewAxIFqhfW2oQH7qGqGBeqVISnmc",
+            authDomain: "smarttrans-34bec.firebaseapp.com",
+            databaseURL: "https://smarttrans-34bec-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "smarttrans-34bec",
+            storageBucket: "smarttrans-34bec.firebasestorage.app",
+            messagingSenderId: "611309810028",
+            appId: "1:611309810028:web:e817a023fc50b42959c349",
+            measurementId: "G-60987892BP"
+        };
+        const TOMTOM_KEY = 'lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu'; 
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const appId = firebaseConfig.appId || 'default';
+
+        // --- 2. STATE MANAGEMENT & UTILS ---
+        const App = {
+            state: {
+                user: null,
+                drivers: {},
+                students: {},
+                activeTrips: 0,
+                map: null,
+                homeMap: null,
+                trackingMap: null, 
+                driverLocationMap: null, 
+                destinationMarker: null,
+                markers: {},
+                homeMarkers: {},
+                trackingMarkers: {},
+                currentTrackingDriverId: null,
+                currentViewDriverId: null // Used for Reset Device logic
+            },
+
+            // --- REPLAY MODULE ---
+            Replay: {
+                tripData: null,
+                isPlaying: false,
+                playbackSpeed: 1, // 1x, 5x, 10x
+                currentIndex: 0,
+                totalPoints: 0,
+                animationFrame: null,
+                isDragging: false,
+                
+                init: function(trip) {
+                    this.stop(); // Clear any existing replay
+                    if (!trip || !trip.actualPath) return;
+                    
+                    // Sort points by time
+                    const points = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
+                    if (points.length < 2) return;
+
+                    this.tripData = {
+                        points: points,
+                        events: trip.events ? Object.values(trip.events) : [],
+                        startTime: points[0].ts,
+                        endTime: points[points.length-1].ts
+                    };
+                    this.totalPoints = points.length;
+                    this.currentIndex = 0;
+                    
+                    // Show Controls
+                    const controls = document.getElementById('replay-controls');
+                    if (controls) {
+                        controls.classList.remove('hidden');
+                        controls.classList.add('flex');
+                    }
+                    
+                    // Update Time Labels
+                    document.getElementById('replay-start-time').textContent = new Date(this.tripData.startTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+                    document.getElementById('replay-end-time').textContent = new Date(this.tripData.endTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+                    
+                    // Init Trail Layer - safely
+                    if (App.state.trackingMap) {
+                        if (App.state.trackingMap.getLayer('trail')) {
+                            try {
+                                 App.state.trackingMap.getSource('trail').setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: [] } });
+                                 App.state.trackingMap.setPaintProperty('trail', 'line-color', '#6366f1'); // Indigo for replay
+                            } catch(e) { console.warn(e); }
+                        }
+                    }
+
+                    // Init Drag Events if not already attached
+                    this.setupDragEvents();
+                    
+                    // Render Timeline initial state
+                    App.renderStudentTimeline(trip);
+                },
+                
+                setupDragEvents: function() {
+                    const track = document.getElementById('timeline-track');
+                    if (!track || track.dataset.hasListeners) return;
+                    
+                    const handleMove = (clientX) => {
+                        if (!this.tripData) return;
+                        const rect = track.getBoundingClientRect();
+                        let percent = (clientX - rect.left) / rect.width;
+                        percent = Math.max(0, Math.min(1, percent));
+                        
+                        this.currentIndex = Math.floor(percent * (this.totalPoints - 1));
+                        this.updateFrame();
+                    };
+
+                    track.addEventListener('mousedown', (e) => {
+                        this.isDragging = true;
+                        this.wasPlaying = this.isPlaying;
+                        this.pause();
+                        handleMove(e.clientX);
+                    });
+                    
+                    window.addEventListener('mousemove', (e) => {
+                        if (this.isDragging) handleMove(e.clientX);
+                    });
+                    
+                    window.addEventListener('mouseup', () => {
+                        if (this.isDragging) {
+                            this.isDragging = false;
+                            if (this.wasPlaying) this.play();
+                        }
+                    });
+
+                    // Touch support
+                    track.addEventListener('touchstart', (e) => {
+                        this.isDragging = true;
+                        this.wasPlaying = this.isPlaying;
+                        this.pause();
+                        handleMove(e.touches[0].clientX);
+                    }, {passive: false});
+
+                    window.addEventListener('touchmove', (e) => {
+                         if (this.isDragging) {
+                             e.preventDefault(); 
+                             handleMove(e.touches[0].clientX);
+                         }
+                    }, {passive: false});
+
+                    window.addEventListener('touchend', () => {
+                        if (this.isDragging) {
+                            this.isDragging = false;
+                            if (this.wasPlaying) this.play();
+                        }
+                    });
+
+                    track.dataset.hasListeners = 'true';
+                },
+                
+                toggle: function() {
+                    this.isPlaying ? this.pause() : this.play();
+                },
+                
+                play: function() {
+                    if (!this.tripData) return;
+                    this.isPlaying = true;
+                    const icon = document.getElementById('replay-play-icon');
+                    if(icon) icon.className = 'ph ph-pause-fill text-xl';
+                    this.loop();
+                },
+                
+                pause: function() {
+                    this.isPlaying = false;
+                    const icon = document.getElementById('replay-play-icon');
+                    if(icon) icon.className = 'ph ph-play-fill text-xl';
+                    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+                },
+                
+                stop: function() {
+                    this.pause();
+                    this.currentIndex = 0;
+                    const controls = document.getElementById('replay-controls');
+                    if(controls) {
+                        controls.classList.add('hidden');
+                        controls.classList.remove('flex');
+                    }
+                    // Reset UI
+                    const progress = document.getElementById('timeline-progress');
+                    if(progress) progress.style.width = '0%';
+                },
+                
+                setSpeed: function(speed) {
+                    this.playbackSpeed = parseFloat(speed);
+                    document.querySelectorAll('.speed-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if(parseFloat(btn.dataset.speed) === this.playbackSpeed) btn.classList.add('active');
+                    });
+                },
+
+                jump: function(amount) {
+                    if (!this.tripData) return;
+                    let newIndex = this.currentIndex + (amount * 5); 
+                    newIndex = Math.max(0, Math.min(newIndex, this.totalPoints - 1));
+                    this.currentIndex = newIndex;
+                    this.updateFrame();
+                },
+                
+                loop: function() {
+                    if (!this.isPlaying || this.isDragging) return;
+                    
+                    this.currentIndex += this.playbackSpeed; 
+                    
+                    if (this.currentIndex >= this.totalPoints) {
+                        this.currentIndex = this.totalPoints - 1;
+                        this.updateFrame();
+                        this.pause();
+                        return; 
+                    }
+                    
+                    this.updateFrame();
+                    
+                    setTimeout(() => {
+                        this.animationFrame = requestAnimationFrame(() => this.loop());
+                    }, 1000 / 30);
+                },
+                
+                updateFrame: function() {
+                    if (!this.tripData || !this.tripData.points) return;
+                    
+                    const idx = Math.floor(this.currentIndex);
+                    const currentPoint = this.tripData.points[idx];
+                    if (!currentPoint) return;
+                    
+                    // Update Map Position
+                    const lngLat = [currentPoint.lng, currentPoint.lat];
+                    if (App.state.trackingMarkers['car']) {
+                        App.state.trackingMarkers['car'].setLngLat(lngLat);
+                        App.state.trackingMap.panTo(lngLat);
+                    }
+                    
+                    // Draw Trail up to current point
+                    const pathSoFar = this.tripData.points.slice(0, idx + 1).map(p => [p.lng, p.lat]);
+                    const trailData = {
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: pathSoFar }
+                    };
+                    const source = App.state.trackingMap.getSource('trail');
+                    if (source) source.setData(trailData);
+                    
+                    // Update Timeline UI
+                    const percent = (idx / (this.totalPoints - 1)) * 100;
+                    document.getElementById('timeline-progress').style.width = `${percent}%`;
+                    document.getElementById('timeline-thumb').style.left = `${100 - percent}%`; 
+                    
+                    // Update Status text
+                    const time = new Date(currentPoint.ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+                    document.getElementById('replay-current-status').textContent = time;
+
+                    // *** Update Student Timeline Status ***
+                    const timelineItems = document.querySelectorAll('#track-timeline .dt-item');
+                    timelineItems.forEach(item => {
+                        const eventTs = parseInt(item.dataset.ts);
+                        const statusLabel = item.querySelector('.status-label');
+                        
+                        // Fix: Skip if no status label (e.g., Start Node)
+                        if (!statusLabel) return;
+
+                        if (currentPoint.ts >= eventTs) {
+                            item.classList.remove('inactive');
+                            item.classList.add('active');
+                            statusLabel.innerHTML = '<i class="ph ph-check-circle text-emerald-400"></i> تم الركوب';
+                            statusLabel.classList.remove('text-slate-500');
+                            statusLabel.classList.add('text-emerald-400');
+                        } else {
+                            item.classList.remove('active');
+                            item.classList.add('inactive');
+                            statusLabel.innerHTML = '<i class="ph ph-clock text-slate-500"></i> لم يركب بعد';
+                            statusLabel.classList.remove('text-emerald-400');
+                            statusLabel.classList.add('text-slate-500');
+                        }
+                    });
+                }
+            },
+
+            // --- INIT ---
+            init: function() {
+                // GSAP Animations Setup
+                gsap.to("#loading-screen", { opacity: 0, delay: 1, duration: 0.5, onComplete: () => {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                }});
+
+                // Auth Listener
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        this.state.user = user; 
+                        this.checkAdminRole(user);
+                    } else {
+                        this.showAuth();
+                    }
+                });
+
+                // Event Listeners
+                document.getElementById('login-form').addEventListener('submit', this.handleLogin.bind(this));
+                document.getElementById('driver-form').addEventListener('submit', this.handleSaveDriver.bind(this));
+                document.getElementById('student-form').addEventListener('submit', this.handleSaveStudent.bind(this));
+                
+                const destSearch = document.getElementById('destination-search');
+                if (destSearch) destSearch.addEventListener('input', this.handleLocationSearch.bind(this));
+
+                const studentSearch = document.getElementById('student-search');
+                if (studentSearch) studentSearch.addEventListener('input', () => this.updateStudentsUI());
+
+                const driverSearch = document.getElementById('driver-search');
+                if (driverSearch) driverSearch.addEventListener('input', () => this.updateDriversUI());
+
+                const trackingSearch = document.getElementById('tracking-search');
+                if (trackingSearch) trackingSearch.addEventListener('input', () => this.updateTrackingListUI());
+
+                const photoInput = document.getElementById('student-photo-input');
+                if (photoInput) {
+                    photoInput.addEventListener('input', (e) => {
+                        const preview = document.getElementById('student-preview');
+                        if (preview) preview.src = e.target.value;
+                    });
+                }
+            },
+
+            // --- AUTH LOGIC ---
+            handleLogin: async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorEl = document.getElementById('login-error');
+                
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    errorEl.textContent = "خطأ في البريد أو كلمة المرور";
+                    errorEl.classList.remove('hidden');
+                }
+            },
+
+            checkAdminRole: function(user) {
+                const adminRef = db.ref(`school_admins/${user.uid}`);
+                adminRef.once('value').then(snapshot => {
+                    this.state.user = user;
+                    const popupEmail = document.getElementById('popup-admin-email');
+                    if(popupEmail) popupEmail.textContent = user.email;
+                    
+                    this.showDashboard();
+                }).catch(err => {
+                    console.error(err);
+                    alert("خطأ في الاتصال بقاعدة البيانات");
+                });
+            },
+
+            logout: function() {
+                auth.signOut().then(() => location.reload());
+            },
+
+            // --- UI NAVIGATION ---
+            showAuth: function() {
+                const authScreen = document.getElementById('auth-screen');
+                const dashboardLayout = document.getElementById('dashboard-layout');
+
+                if (authScreen) authScreen.classList.remove('hidden');
+                if (dashboardLayout) dashboardLayout.classList.add('hidden');
+                gsap.from(".auth-box", {y: 50, opacity: 0, duration: 0.8, ease: "back.out(1.7)"});
+            },
+
+            showDashboard: function() {
+                const authScreen = document.getElementById('auth-screen');
+                const dashboardLayout = document.getElementById('dashboard-layout');
+
+                if (authScreen) authScreen.classList.add('hidden');
+                if (dashboardLayout) dashboardLayout.classList.remove('hidden');
+                gsap.to(dashboardLayout, {opacity: 1, duration: 0.5});
+
+                this.setupRealtimeListeners();
+                this.navigate('home');
+                
+                setTimeout(() => this.initHomeMap(), 1000);
+            },
+
+            toggleAdminMenu: function() {
+                const menu = document.getElementById('admin-menu');
+                const arrow = document.getElementById('admin-menu-arrow');
+                
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        menu.classList.remove('opacity-0', 'translate-y-2');
+                        arrow.style.transform = 'rotate(180deg)';
+                    });
+                } else {
+                    menu.classList.add('opacity-0', 'translate-y-2');
+                    arrow.style.transform = 'rotate(0deg)';
+                    setTimeout(() => menu.classList.add('hidden'), 200);
+                }
+            },
+
+            navigate: function(viewId) {
+                document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+                const navItem = document.getElementById(`nav-${viewId}`);
+                if(navItem) navItem.classList.add('active');
+
+                // Hide all views
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                
+                const targetId = viewId === 'tracking-detail' ? 'view-tracking-detail' : `view-${viewId}`;
+                const target = document.getElementById(targetId);
+                
+                target.classList.remove('hidden');
+                gsap.fromTo(target, {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: 0.4});
+
+                const titles = { 
+                    'home': 'لوحة المعلومات', 
+                    'map': 'الخريطة الكاملة', 
+                    'drivers': 'إدارة السائقين', 
+                    'students': 'إدارة الطلاب', 
+                    'tracking': 'تتبع الرحلات', 
+                    'tracking-detail': 'مراقبة الرحلة' 
+                };
+                document.getElementById('page-title').textContent = titles[viewId] || 'النظام';
+
+                // Stop replay if navigating away from detail
+                if (viewId !== 'tracking-detail') {
+                    App.Replay.stop();
+                }
+
+                if (viewId === 'map') {
+                    setTimeout(() => {
+                        if (!this.state.map) this.initMap();
+                        else this.state.map.resize();
+                    }, 100);
+                }
+                if (viewId === 'home' && this.state.homeMap) {
+                    setTimeout(() => this.state.homeMap.resize(), 100);
+                }
+                if (viewId === 'tracking-detail' && this.state.trackingMap) {
+                     setTimeout(() => this.state.trackingMap.resize(), 100);
+                } else if (viewId === 'tracking') {
+                     this.updateTrackingListUI();
+                } else if (viewId === 'drivers') {
+                     this.updateDriversUI();
+                }
+            },
+
+            // --- DATA & REALTIME ---
+            setupRealtimeListeners: function() {
+                db.ref('drivers').on('value', (snapshot) => {
+                    this.state.drivers = snapshot.val() || {};
+                    this.updateStats();
+                    this.updateDriversUI();
+                    this.updateMapMarkers();
+                    this.updateHomeMapMarkers();
+                    
+                    if (!document.getElementById('view-tracking').classList.contains('hidden')) {
+                        this.updateTrackingListUI();
+                    }
+                    if(this.state.currentTrackingDriverId) {
+                        this.updateTrackingDetailMap(this.state.currentTrackingDriverId);
+                    }
+                });
+
+                db.ref('students').on('value', (snapshot) => {
+                    this.state.students = snapshot.val() || {};
+                    this.updateStats();
+                    this.updateStudentsUI();
+                });
+            },
+
+            // --- DRIVER LOCATION SELECTION ---
+            initDriverLocationMap: function() {
+                if(this.state.driverLocationMap) return;
+
+                const center = [29.9560651, 30.9122484]; 
+                this.state.driverLocationMap = tt.map({
+                    key: TOMTOM_KEY,
+                    container: 'driver-location-map',
+                    center: center,
+                    zoom: 10,
+                    language: 'ar', 
+                    theme: { style: 'main', layer: 'basic', source: 'vector' }
+                });
+                
+                this.state.driverLocationMap.addControl(new tt.NavigationControl());
+                
+                this.state.driverLocationMap.on('click', (e) => {
+                    this.setDestination(e.lngLat);
+                });
+            },
+
+            setDestination: function(lngLat, label = 'موقع محدد') {
+                const { lng, lat } = lngLat;
+                
+                document.getElementById('dest-lat').value = lat;
+                document.getElementById('dest-lng').value = lng;
+                document.getElementById('dest-label').value = label;
+                document.getElementById('selected-destination-text').textContent = `تم تحديد: ${label} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+
+                if(this.state.destinationMarker) this.state.destinationMarker.remove();
+                
+                this.state.destinationMarker = new tt.Marker({ color: '#10b981' })
+                    .setLngLat(lngLat)
+                    .addTo(this.state.driverLocationMap);
+            },
+
+            handleLocationSearch: function(e) {
+                const query = e.target.value;
+                const suggestionsBox = document.getElementById('search-suggestions');
+                
+                if(query.length < 3) {
+                    suggestionsBox.classList.add('hidden');
+                    return;
+                }
+
+                tt.services.fuzzySearch({
+                    key: TOMTOM_KEY,
+                    query: query,
+                    language: 'ar-EG'
+                }).then(response => {
+                    suggestionsBox.innerHTML = '';
+                    if(response.results.length > 0) {
+                        suggestionsBox.classList.remove('hidden');
+                        response.results.forEach(result => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item text-xs text-slate-300';
+                            div.textContent = result.address.freeformAddress;
+                            div.onclick = () => {
+                                this.setDestination(result.position, result.address.freeformAddress);
+                                document.getElementById('destination-search').value = result.address.freeformAddress;
+                                this.state.driverLocationMap.flyTo({ center: result.position, zoom: 14 });
+                                suggestionsBox.classList.add('hidden');
+                            };
+                            suggestionsBox.appendChild(div);
+                        });
+                    } else {
+                        suggestionsBox.classList.add('hidden');
+                    }
+                });
+            },
+
+            // --- TRACKING LOGIC ---
+            updateTrackingListUI: function() {
+                const list = document.getElementById('tracking-list');
+                if (!list) return; // حماية إضافية في حال لم يتم تحميل الصفحة
+                
+                list.innerHTML = '';
+                const searchInput = document.getElementById('tracking-search');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                
+                // التغيير هنا: نستخدم entries لجلب الـ ID من المفتاح (Key) لضمان وجوده
+                Object.entries(this.state.drivers || {}).forEach(([driverId, driverData]) => {
+                    
+                    // دمج الـ ID مع بيانات السائق لضمان وجوده
+                    const driver = { ...driverData, id: driverId };
+                    const profile = driver.profile || { name: 'غير معروف' };
+                    
+                    // حماية: إذا كان الاسم غير موجود
+                    const driverName = profile.name || 'بدون اسم';
+                    
+                    // 1. منطق التصفية (Filter Logic)
+                    // التأكد من أن القيم موجودة قبل البحث فيها
+                    const searchMatch = driverName.toLowerCase().includes(searchTerm) || 
+                                        String(driver.id).includes(searchTerm);
+                                        
+                    if (searchTerm && !searchMatch) return;
+
+                    // 2. منطق الحسابات (Calculation Logic)
+                    let currentSpeed = 0;
+                    let lastUpdate = 'غير متوفر';
+                    let isActive = false;
+
+                    if(driver.trips) {
+                        const tripKeys = Object.keys(driver.trips);
+                        if (tripKeys.length > 0) {
+                            const lastTrip = driver.trips[tripKeys[tripKeys.length - 1]];
+                            if(lastTrip && lastTrip.actualPath) {
+                                currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
+                                const pathKeys = Object.keys(lastTrip.actualPath);
+                                if (pathKeys.length > 0) {
+                                    const lastPoint = lastTrip.actualPath[pathKeys[pathKeys.length - 1]];
+                                    if (lastPoint && lastPoint.ts) {
+                                        lastUpdate = new Date(lastPoint.ts).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                                        isActive = (Date.now() - lastPoint.ts) < 5 * 60 * 1000;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 3. إعداد متغيرات التصميم
+                    const glowClass = isActive 
+                        ? 'shadow-[0_0_20px_rgba(16,185,129,0.15)] border-emerald-500/30' 
+                        : 'border-white/5';
+                    
+                    const statusColor = isActive ? 'emerald' : 'slate';
+                    const statusText = isActive ? 'متصل الآن' : 'غير نشط';
+                    
+                    // إصلاح الخطأ: التأكد من وجود ID وقصه بأمان
+                    // إذا كان الـ ID غير موجود نضع نص افتراضي
+                    const displayId = driver.id ? String(driver.id).substring(0, 8) : '---';
+                    const driverInitial = driverName.charAt(0);
+
+                    // 4. إنشاء البطاقة
+                    const card = document.createElement('div');
+                    card.className = `group relative bg-[#0f172a]/60 backdrop-blur-xl rounded-3xl border ${glowClass} p-1 overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-[#0f172a]/80`;
+                    
+                    card.innerHTML = `
+                        <div class="h-28 w-full bg-slate-800/50 rounded-2xl relative overflow-hidden group-hover:opacity-90 transition">
+                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#4b5563 1px, transparent 1px); background-size: 10px 10px;"></div>
+                            
+                            ${isActive ? 
+                                `<div class="absolute inset-0 bg-emerald-900/10 flex items-center justify-center">
+                                    <div class="flex items-center gap-2 text-emerald-400 text-[10px] font-mono bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        GPS SIGNAL LIVE
+                                    </div>
+                                </div>` 
+                                : 
+                                `<div class="absolute inset-0 flex items-center justify-center text-slate-600/50">
+                                    <i class="ph ph-map-pin-slash text-4xl"></i>
+                                </div>`
+                            }
+                        </div>
+
+                        <div class="p-5 relative">
+                            <div class="absolute -top-10 right-5">
+                                <div class="w-14 h-14 rounded-2xl bg-[#0f172a] p-1 border border-white/10 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                    <div class="w-full h-full rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-lg font-bold text-white shadow-inner">
+                                        ${driverInitial}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h4 class="text-lg font-bold text-white leading-tight mb-1">${driverName}</h4>
+                                <p class="text-[10px] text-slate-400 font-mono tracking-wider opacity-70">ID: ${displayId}</p>
+                            </div>
+
+                            <div class="mt-6 grid grid-cols-2 gap-2">
+                                <button id="btn-${driver.id}" class="col-span-2 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold transition-all shadow-lg shadow-blue-900/20 group-hover:shadow-blue-500/30 flex items-center justify-center gap-2 border border-white/10">
+                                    <i class="ph ph-crosshair-simple text-base"></i>
+                                    مركز القيادة والتتبع
+                                </button>
+                                
+                                <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col justify-center items-center gap-1 group-hover:bg-white/10 transition">
+                                    <span class="text-[10px] text-slate-400">الحالة</span>
+                                    <span class="text-xs font-bold text-${statusColor}-400 flex items-center gap-1">
+                                        ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>' : ''}
+                                        ${statusText}
+                                    </span>
+                                </div>
+                                
+                                <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col justify-center items-center gap-1 group-hover:bg-white/10 transition">
+                                    <span class="text-[10px] text-slate-400">السرعة الحالية</span>
+                                    <span class="text-xs font-mono font-bold text-indigo-300">${currentSpeed} <span class="text-[9px] text-slate-500">km/h</span></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 text-center border-t border-white/5 pt-2">
+                                <p class="text-[10px] text-slate-500">آخر إشارة: <span class="text-slate-300 font-mono">${lastUpdate}</span></p>
+                            </div>
+                        </div>
+                    `;
+
+                    const btn = card.querySelector(`#btn-${driver.id}`);
+                    if(btn) {
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            // التأكد من أن الدالة موجودة قبل استدعائها
+                            if (typeof this.openTrackingDetail === 'function') {
+                                this.openTrackingDetail(driver.id);
+                            } else {
+                                console.error('openTrackingDetail function is missing');
+                            }
+                        };
+                    }
+                    
+                    list.appendChild(card);
+                });
+            },
+
+            openTrackingDetail: function(driverId) {
+                this.state.currentTrackingDriverId = driverId;
+                this.navigate('tracking-detail');
+                
+                setTimeout(() => {
+                    this.initTrackingMap(() => {
+                        this.updateTrackingDetailMap(driverId);
+                    });
+                    this.renderTripHistory(driverId);
+                }, 200);
+            },
+
+            initTrackingMap: function(onLoaded) {
+                if(this.state.trackingMap) {
+                    if (onLoaded) onLoaded();
+                    return;
+                }
+
+                const center = [29.9560651, 30.9122484]; 
+                const map = tt.map({
+                    key: TOMTOM_KEY,
+                    container: 'tracking-map',
+                    center: center,
+                    zoom: 14,
+                    language: 'ar', 
+                    theme: { style: 'main', layer: 'basic', source: 'vector' }
+                });
+                
+                this.state.trackingMap = map;
+                this.state.trackingMap.addControl(new tt.NavigationControl());
+                
+                map.on('load', () => {
+                    if (onLoaded) onLoaded();
+                });
+            },
+
+            updateTrackingDetailMap: function(driverId) {
+                // If Replay is playing, do not update map with live data
+                if(App.Replay.isPlaying) return;
+
+                const driver = this.state.drivers[driverId];
+                if(!driver || !driver.trips || !this.state.trackingMap) return;
+                
+                if (!this.state.trackingMap.getStyle) return;
+
+                document.getElementById('track-driver-name').textContent = driver.profile.name;
+                
+                // Get active trip or last trip
+                const tripKeys = Object.keys(driver.trips);
+                const currentTrip = driver.trips[tripKeys[tripKeys.length - 1]];
+                
+                if(!currentTrip || !currentTrip.actualPath) return;
+
+                // --- Real-time Status Update Logic ---
+                const statusEl = document.getElementById('track-status');
+                if (statusEl) {
+                    if (currentTrip.status === 'completed') {
+                        statusEl.textContent = 'مكتملة';
+                        statusEl.className = 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs transition-colors duration-300';
+                        
+                        // *** Init Replay if completed ***
+                        if(!App.Replay.tripData) App.Replay.init(currentTrip);
+
+                    } else if (currentTrip.status === 'active') {
+                        statusEl.textContent = 'نشطة الآن';
+                        statusEl.className = 'bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs transition-colors duration-300 animate-pulse';
+                        
+                        // Hide Replay if active
+                        App.Replay.stop();
+                    } else {
+                        statusEl.textContent = 'غير معروف';
+                    }
+                }
+
+                const speed = App.Utils.calculateSpeed(currentTrip.actualPath);
+                document.getElementById('track-speed').textContent = speed;
+
+                // Start Timer
+                App.startTripTimer(currentTrip.startTime, currentTrip.status);
+
+                // Path Data
+                const points = Object.values(currentTrip.actualPath).sort((a,b) => a.ts - b.ts);
+                const coordinates = points.map(p => [p.lng, p.lat]);
+                const lastPos = coordinates[coordinates.length-1];
+                
+                // 1. Draw Actual Trail (Raw GPS)
+                const trailData = {
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: coordinates }
+                };
+
+                try {
+                    if (this.state.trackingMap.getLayer('trail')) {
+                        this.state.trackingMap.getSource('trail').setData(trailData);
+                    } else {
+                        this.state.trackingMap.addSource('trail', { type: 'geojson', data: trailData });
+                        this.state.trackingMap.addLayer({
+                            'id': 'trail',
+                            'type': 'line',
+                            'source': 'trail',
+                            'layout': { 'line-cap': 'round', 'line-join': 'round' },
+                            'paint': { 'line-color': '#4f46e5', 'line-width': 6 }
+                        });
+                    }
+
+                    // 2. Draw Projected Route
+                    const destination = driver.profile.destination;
+                    if (destination && destination.lat && destination.lng) {
+                        tt.services.calculateRoute({
+                            key: TOMTOM_KEY,
+                            locations: `${lastPos[0]},${lastPos[1]}:${destination.lng},${destination.lat}`
+                        }).then(response => {
+                            const geojson = response.toGeoJson();
+                            if (this.state.trackingMap.getLayer('projected')) {
+                                this.state.trackingMap.getSource('projected').setData(geojson);
+                            } else {
+                                this.state.trackingMap.addSource('projected', { type: 'geojson', data: geojson });
+                                this.state.trackingMap.addLayer({
+                                    'id': 'projected',
+                                    'type': 'line',
+                                    'source': 'projected',
+                                    'layout': { 'line-cap': 'round' },
+                                    'paint': { 
+                                        'line-color': '#94a3b8', 
+                                        'line-width': 4,
+                                        'line-dasharray': [2, 2] 
+                                    }
+                                });
+                            }
+                            
+                            if(!this.state.trackingMarkers['dest']) {
+                                const el = document.createElement('div');
+                                el.innerHTML = '<i class="ph ph-flag-checkered text-2xl text-red-500"></i>';
+                                this.state.trackingMarkers['dest'] = new tt.Marker({ element: el })
+                                    .setLngLat([destination.lng, destination.lat])
+                                    .addTo(this.state.trackingMap);
+                            }
+                        }).catch(err => console.warn("Routing ignored"));
+                    }
+
+                    // 3. Update Car Marker
+                    if(this.state.trackingMarkers['car']) {
+                        this.state.trackingMarkers['car'].setLngLat(lastPos);
+                    } else {
+                        const el = document.createElement('div');
+                        el.className = 'marker-icon';
+                        el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${driver.profile.name}&background=4f46e5&color=fff')`;
+                        el.style.border = '3px solid #fff';
+                        
+                        this.state.trackingMarkers['car'] = new tt.Marker({ element: el })
+                            .setLngLat(lastPos)
+                            .addTo(this.state.trackingMap);
+                    }
+
+                    // 4. Update Student Boarding Markers (Pass current trip events)
+                    const currentTripEvents = currentTrip.events ? Object.values(currentTrip.events) : [];
+                    this.updateStudentMarkers(currentTripEvents);
+
+                    this.state.trackingMap.panTo(lastPos);
+                } catch(e) {
+                    console.warn("Map update skipped:", e);
+                }
+
+                this.renderStudentTimeline(currentTrip);
+            },
+
+            updateStudentMarkers: function(events) {
+                // Clear old student markers except car/dest
+                Object.keys(this.state.trackingMarkers).forEach(key => {
+                    if(key.startsWith('student_')) {
+                        this.state.trackingMarkers[key].remove();
+                        delete this.state.trackingMarkers[key];
+                    }
+                });
+
+                events.forEach(event => {
+                    if(event.type === 'boarding' && event.lat && event.lng) {
+                        const student = this.state.students[event.studentId];
+                        const photoUrl = student ? student.photo : 'https://i.pravatar.cc/150';
+                        
+                        const el = document.createElement('div');
+                        el.className = 'student-marker';
+                        el.style.backgroundImage = `url('${photoUrl}')`;
+                        el.title = student ? student.name : 'طالب';
+
+                        const marker = new tt.Marker({ element: el })
+                            .setLngLat([event.lng, event.lat])
+                            .addTo(this.state.trackingMap);
+                        
+                        this.state.trackingMarkers[`student_${event.studentId}`] = marker;
+                    }
+                });
+            },
+
+            renderStudentTimeline: function(trip) {
+                const timeline = document.getElementById('track-timeline');
+                timeline.innerHTML = '';
+
+                // Filter only actual events for THIS specific trip
+                const events = trip.events ? Object.values(trip.events) : [];
+                
+                // Sort by time (newest first)
+                const sortedEvents = events.sort((a,b) => b.ts - a.ts); 
+                
+                // Start Node (if trip has start time)
+                if (trip.startTime) {
+                    // Logic to display start at the end since we are sorting newest first
+                }
+
+                if (sortedEvents.length === 0 && !trip.startTime) {
+                    timeline.innerHTML = '<div class="text-center text-xs text-slate-500 py-4">لم تبدأ الرحلة بعد أو لا توجد أحداث</div>';
+                    return;
+                }
+
+                // Helper for time format with seconds
+                const fmtTime = (ts) => new Date(ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+                let html = '';
+                
+                sortedEvents.forEach(e => {
+                    const time = fmtTime(e.ts);
+                    const student = this.state.students[e.studentId];
+                    const studentName = student?.name || 'طالب غير معروف';
+                    const photo = student?.photo || 'https://i.pravatar.cc/150';
+                    
+                    // Determine Type
+                    let typeLabel = 'حدث';
+                    let typeColor = 'gray';
+                    let icon = 'ph-info';
+                    
+                    if (e.type === 'boarding') {
+                        typeLabel = 'ركوب طالب';
+                        typeColor = 'emerald'; // green-500
+                        icon = 'ph-user-plus';
+                    } else if (e.type === 'dropoff' || e.type === 'stop') {
+                        typeLabel = 'نزول/توقف';
+                        typeColor = 'orange'; // orange-500
+                        icon = 'ph-user-minus';
+                    } else if (e.type === 'alert') {
+                        typeLabel = 'تنبيه';
+                        typeColor = 'red'; 
+                        icon = 'ph-warning';
+                    }
+
+                    // For Replay logic: Initially mark as inactive if in replay mode.
+                    const initialState = 'active'; 
+                    const statusText = 'تم الركوب';
+                    const statusClass = 'text-emerald-400';
+
+                    // Create HTML string for item
+                    // Added data-ts attribute for Replay logic
+                    const itemHtml = `
+                        <div class="dt-item group ${initialState}" data-ts="${e.ts}" onclick="App.focusOnStudentEvent({lat:${e.lat}, lng:${e.lng}, id:'${e.studentId}'})">
+                            <div class="dt-dot"></div>
+                            
+                            <div class="dt-card flex items-start gap-3">
+                                <img src="${photo}" class="w-10 h-10 rounded-full object-cover border border-slate-600">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="text-xs font-bold text-${typeColor}-400 flex items-center gap-1 status-label ${statusClass}">
+                                            <i class="ph ${icon}"></i> ${statusText}
+                                        </span>
+                                        <span class="text-[10px] font-mono text-slate-400 bg-black/30 px-1.5 py-0.5 rounded tracking-wider status-time">${time}</span>
+                                    </div>
+                                    <div class="text-sm font-bold text-slate-200 truncate">${studentName}</div>
+                                    <div class="text-[10px] text-slate-500 mt-1 flex items-center gap-1 truncate">
+                                        <i class="ph ph-map-pin"></i>
+                                        ${e.lat.toFixed(5)}, ${e.lng.toFixed(5)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    html += itemHtml;
+                });
+
+                // Add "Start" node at the bottom
+                if(trip.startTime) {
+                     html += `
+                        <div class="dt-item active" data-ts="${trip.startTime}">
+                            <div class="dt-dot" style="background: #3b82f6; border-color: #3b82f6;"></div>
+                            <div class="flex items-center gap-3 opacity-75 pl-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                    <i class="ph ph-play-circle text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-blue-400">بداية الرحلة</div>
+                                    <div class="text-[10px] font-mono text-slate-400">${fmtTime(trip.startTime)}</div>
+                                </div>
+                            </div>
+                        </div>
+                     `;
+                }
+
+                timeline.innerHTML = html;
+            },
+
+            focusOnStudentEvent: function(event) {
+                if(!this.state.trackingMap || !event.lat || !event.lng) return;
+
+                // 1. Fly to location
+                this.state.trackingMap.flyTo({
+                    center: [event.lng, event.lat],
+                    zoom: 18,
+                    speed: 1.5
+                });
+
+                // 2. Highlight Marker
+                const markerKey = `student_${event.id || event.studentId}`;
+                const marker = this.state.trackingMarkers[markerKey];
+                
+                if(marker) {
+                    // Remove highlight from others
+                    document.querySelectorAll('.student-marker').forEach(el => el.classList.remove('active-focus'));
+                    
+                    // Add highlight class
+                    const el = marker.getElement();
+                    if(el) {
+                        el.classList.add('active-focus');
+                        // Remove highlight after 3 seconds
+                        setTimeout(() => el.classList.remove('active-focus'), 3000);
+                    }
+                }
+            },
+
+            startTripTimer: function(startTime, status) {
+                if (this.tripTimerInterval) clearInterval(this.tripTimerInterval);
+                const durationEl = document.getElementById('track-duration');
+                
+                if (status === 'completed' || !startTime) {
+                    durationEl.textContent = '00:00:00';
+                    return;
+                }
+
+                this.tripTimerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const diff = now - startTime;
+                    
+                    const hours = Math.floor(diff / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    durationEl.textContent = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            },
+
+            renderTripHistory: function(driverId) {
+                const historyEl = document.getElementById('track-history');
+                historyEl.innerHTML = '';
+                
+                const driver = this.state.drivers[driverId];
+                if(!driver || !driver.trips) return;
+
+                const trips = Object.values(driver.trips).sort((a,b) => b.startTime - a.startTime);
+
+                trips.forEach(trip => {
+                    const date = new Date(trip.startTime).toLocaleDateString('ar');
+                    const time = new Date(trip.startTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+                    
+                    const item = document.createElement('div');
+                    item.className = 'bg-white/5 p-3 rounded-xl hover:bg-white/10 cursor-pointer transition text-xs flex justify-between items-center';
+                    item.onclick = () => this.loadHistoryTripOnMap(trip); 
+                    item.innerHTML = `
+                        <div>
+                            <div class="font-bold text-indigo-300">رحلة ${date}</div>
+                            <div class="text-slate-400">${time}</div>
+                        </div>
+                        <div class="text-right">
+                             <div class="${trip.status === 'completed' ? 'text-green-400':'text-yellow-400'}">${trip.status==='completed'?'مكتملة':'جارية'}</div>
+                        </div>
+                    `;
+                    historyEl.appendChild(item);
+                });
+            },
+
+            loadHistoryTripOnMap: function(trip) {
+                if(!trip.actualPath || !this.state.trackingMap) {
+                    App.Toast.show('لا توجد بيانات مسار لهذه الرحلة', 'error');
+                    return;
+                }
+
+                const points = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
+                const coordinates = points.map(p => [p.lng, p.lat]);
+
+                const trailData = {
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: coordinates }
+                };
+                
+                // Override main trail color to yellow to indicate "History View"
+                this.state.trackingMap.getSource('trail').setData(trailData);
+                this.state.trackingMap.setPaintProperty('trail', 'line-color', '#f59e0b');
+                
+                // Fit bounds
+                const bounds = new tt.LngLatBounds();
+                coordinates.forEach(c => bounds.extend(c));
+                this.state.trackingMap.fitBounds(bounds, { padding: 50 });
+
+                // Update markers for this specific history trip
+                const events = trip.events ? Object.values(trip.events) : [];
+                this.updateStudentMarkers(events);
+                
+                // Update Timeline for this history trip
+                this.renderStudentTimeline(trip);
+
+                // Update Status UI for History
+                const statusEl = document.getElementById('track-status');
+                if(statusEl) {
+                    statusEl.textContent = 'عرض تاريخي';
+                    statusEl.className = 'bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs';
+                }
+                
+                // Stop live timer
+                if(this.tripTimerInterval) clearInterval(this.tripTimerInterval);
+                document.getElementById('track-duration').textContent = '--:--:--';
+                
+                // --- Init Replay Module for History Trip ---
+                App.Replay.init(trip);
+
+                App.Toast.show('تم عرض بيانات الرحلة السابقة', 'success');
+            },
+
+            // --- STANDARD STATS & UI UPDATES ---
+            updateStats: function() {
+                const drivers = Object.values(this.state.drivers);
+                const students = Object.values(this.state.students);
+                
+                // تحديث العدادات العلوية
+                this.animateValue('stat-drivers', drivers.length);
+
+                let activeCount = 0;
+                drivers.forEach(d => {
+                    if (d.trips) {
+                        const trips = Object.values(d.trips);
+                        const active = trips.find(t => t.status === 'started' || (t.startTime && !t.endTime));
+                        if (active) activeCount++;
+                    }
+                });
+                this.animateValue('stat-active', activeCount);
+
+                this.animateValue('stat-students', students.length);
+                const boys = students.filter(s => s.gender === 'male').length; 
+                const girls = students.filter(s => s.gender === 'female').length;
+                document.getElementById('stat-boys').innerText = boys;
+                document.getElementById('stat-girls').innerText = girls;
+
+                // --- بداية الجزء المعدل (نظام الكاردات) ---
+                const container = document.getElementById('recent-activity-body');
+                container.innerHTML = ''; // مسح المحتوى القديم
+                
+                let recentActivities = [];
+                drivers.forEach(d => {
+                    if(d.trips) {
+                        const trips = Object.entries(d.trips).map(([id, t]) => ({...t, id, driverName: d.profile?.name, actualPath: t.actualPath}));
+                        recentActivities = [...recentActivities, ...trips];
+                    }
+                });
+                
+                // ترتيب حسب الأحدث
+                recentActivities.sort((a, b) => b.startTime - a.startTime);
+                
+                // عرض أحدث 6 بطاقات بدلاً من 5 لتناسب الشبكة (Grid)
+                recentActivities.slice(0, 6).forEach(trip => {
+                    const date = new Date(trip.startTime).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                    const speed = App.Utils.calculateSpeed(trip.actualPath);
+                    const driverName = trip.driverName || 'غير معروف';
+                    const driverInitial = driverName.charAt(0);
+                    
+                    // تحديد الألوان والحالة بناءً على حالة الرحلة
+                    const isCompleted = trip.status === 'completed';
+                    
+                    // تصميم الحالة (نشط = أخضر، مكتمل = أزرق باهت)
+                    const statusConfig = isCompleted 
+                        ? { 
+                            text: 'مكتملة', 
+                            classes: 'bg-slate-700/50 text-slate-400 border-slate-600', 
+                            dot: 'bg-slate-500' 
+                        }
+                        : { 
+                            text: 'نشطة الآن', 
+                            classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]', 
+                            dot: 'bg-emerald-500 animate-pulse' 
+                        };
+
+                    // قالب الكارد الجديد
+                    const cardHtml = `
+                        <div class="group relative bg-slate-800/40 hover:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 overflow-hidden">
+                            
+                            <i class="ph ph-car-profile absolute -left-4 -bottom-4 text-[80px] text-white/5 group-hover:text-white/10 group-hover:-rotate-12 transition-all duration-500"></i>
+                            
+                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+                            <div class="flex items-start justify-between mb-4 relative z-10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-indigo-500/20">
+                                        <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-indigo-300 font-bold text-lg">
+                                            ${driverInitial}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-bold text-base leading-tight">${driverName}</h4>
+                                        <span class="text-[10px] text-slate-400 mt-1 block font-mono opacity-70">ID: ${trip.id.substring(0, 8)}...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-col items-end gap-1">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border flex items-center gap-1.5 ${statusConfig.classes}">
+                                        <span class="w-1.5 h-1.5 rounded-full ${statusConfig.dot}"></span>
+                                        ${statusConfig.text}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr class="border-white/5 mb-4" />
+
+                            <div class="grid grid-cols-2 gap-4 relative z-10">
+                                <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-blue-500/20 transition-colors">
+                                    <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                                        <i class="ph ph-speedometer text-blue-400"></i> السرعة
+                                    </p>
+                                    <p class="text-xl font-mono font-bold text-white tracking-wider">${speed} <span class="text-xs font-sans text-slate-500">كم/س</span></p>
+                                </div>
+                                
+                                <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
+                                    <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                                        <i class="ph ph-clock text-purple-400"></i> التوقيت
+                                    </p>
+                                    <p class="text-sm font-bold text-slate-200 mt-1 font-mono">${date}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += cardHtml;
+                });
+            },
+            
+            updateDriversUI: function() {
+                const grid = document.getElementById('drivers-grid');
+                // حماية للكود في حال لم يتم تحميل العنصر
+                if (!grid) return;
+                
+                grid.innerHTML = '';
+                
+                const select = document.getElementById('student-driver-select');
+                if(select) select.innerHTML = '<option value="">اختر السائق...</option>';
+
+                // استخدام Object.entries لضمان الحصول على الـ ID والبيانات بشكل سليم
+                Object.entries(this.state.drivers || {}).forEach(([key, driverData]) => {
+                    // دمج المعرف (ID) داخل بيانات السائق
+                    const driver = { ...driverData, id: driverData.profile?.id || key };
+                    const profile = driver.profile || {};
+                    
+                    // تحديث القائمة المنسدلة (Dropdown) - منطقك القديم
+                    if(select) {
+                        const opt = document.createElement('option');
+                        opt.value = driver.id;
+                        opt.textContent = profile.name || 'سائق بدون اسم';
+                        select.appendChild(opt);
+                    }
+
+                    // --- إعداد متغيرات التصميم ---
+                    // استخدام صورة السائق أو صورة افتراضية ملونة باستخدام اسمه
+                    const avatarUrl = profile.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'User')}&background=random&color=fff`;
+                    
+                    // افتراض الحالة (يمكنك ربطها بمنطق الاتصال الحقيقي لديك)
+                    const isActive = true; 
+                    const statusColor = isActive ? 'emerald' : 'slate';
+
+                    const card = document.createElement('div');
+                    // تطبيق كلاسات التصميم الجديد (Neo-Glassmorphism)
+                    card.className = 'group relative bg-[#0f172a]/60 backdrop-blur-xl rounded-3xl border border-white/5 hover:border-indigo-500/30 p-5 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10';
+                    
+                    // بناء الـ HTML الداخلي للبطاقة
+                    card.innerHTML = `
+                        <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-indigo-900/20 to-transparent opacity-50 pointer-events-none"></div>
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-[40px] rounded-full group-hover:bg-blue-500/20 transition-all pointer-events-none"></div>
+
+                        <div class="relative flex items-start gap-4 mb-4">
+                            <div class="relative shrink-0">
+                                <div class="w-16 h-16 rounded-2xl bg-slate-800 bg-cover bg-center border-2 border-transparent group-hover:border-indigo-500/50 transition-all shadow-lg" 
+                                    style="background-image: url('${avatarUrl}');">
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#0f172a] rounded-full flex items-center justify-center">
+                                    <div class="w-3 h-3 rounded-full bg-${statusColor}-500 animate-pulse shadow-[0_0_8px_#10b981]"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 min-w-0 pt-1">
+                                <h4 class="text-white font-bold text-lg truncate leading-tight">${profile.name || 'غير معروف'}</h4>
+                                <p class="text-xs text-slate-400 truncate mt-1 font-mono opacity-80">${profile.email || 'لا يوجد بريد'}</p>
+                                
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
+                                        <i class="ph ph-clock"></i> ${profile.shift || 'غير محدد'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-5">
+                            <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
+                                <span class="text-[10px] text-slate-500 block mb-1">المدرسة</span>
+                                <span class="text-xs font-bold text-slate-200 truncate block" title="${profile.school}">${profile.school || '---'}</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
+                                <span class="text-[10px] text-slate-500 block mb-1">ID</span>
+                                <span class="text-xs font-bold text-slate-200 font-mono">${String(driver.id).substring(0,8)}...</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 border-t border-white/5 pt-4">
+                            <button onclick="App.openDriverDetails('${driver.id}')" class="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 group/btn">
+                                <i class="ph ph-user-list text-lg group-hover/btn:scale-110 transition-transform"></i>
+                                التفاصيل الكاملة
+                            </button>
+                            
+                            <button onclick="App.openDriverEdit('${driver.id}')" class="px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white transition-all border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            },
+
+            openDriverDetails: function(driverId) {
+                const driver = this.state.drivers[driverId];
+                if(!driver) return;
+                
+                this.state.currentViewDriverId = driverId; // Important for reset device
+
+                const profile = driver.profile || {};
+                const studentsCount = Object.values(this.state.students).filter(s => s.driverId === driverId).length;
+
+                let currentSpeed = 0;
+                if(driver.trips) {
+                    const tripKeys = Object.keys(driver.trips);
+                    const lastTrip = driver.trips[tripKeys[tripKeys.length - 1]];
+                    currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
+                }
+
+                // Safe setter helper
+                const setText = (id, text) => {
+                    const el = document.getElementById(id);
+                    if(el) el.textContent = text;
+                }
+
+                setText('detail-driver-name', profile.name);
+                setText('detail-driver-school', profile.school);
+                setText('detail-driver-shift', profile.shift || 'غير محدد');
+                setText('detail-driver-email', profile.email);
+                setText('detail-driver-password', profile.password || '****');
+                setText('detail-driver-id', profile.id); // This caused the error because element was missing
+                setText('detail-driver-students', studentsCount);
+                setText('detail-driver-speed', currentSpeed + ' كم/س');
+                setText('detail-driver-device-status', profile.registeredDeviceId ? 'الجهاز مرتبط ✅' : 'في انتظار الارتباط ⏳');
+
+                const avatarEl = document.getElementById('detail-driver-avatar');
+                if (avatarEl) {
+                    avatarEl.innerHTML = `<span class="text-white">${profile.name.charAt(0)}</span>`;
+                    avatarEl.style.backgroundColor = '#4f46e5';
+                }
+
+                App.Modals.open('modal-driver-details');
+            },
+
+            openDriverEdit: function(driverId) {
+                const driver = this.state.drivers[driverId];
+                if(!driver) return;
+                const p = driver.profile || {};
+
+                // Populate Form
+                document.getElementById('driver-edit-id').value = p.id;
+                document.getElementById('driver-name').value = p.name;
+                document.getElementById('driver-school').value = p.school;
+                
+                // Do NOT set email/password values as they will be hidden
+                
+                // Parse Time
+                if(p.shift && p.shift.includes(' - ')) {
+                    const times = p.shift.split(' - ');
+                    document.getElementById('shift-start').value = times[0];
+                    document.getElementById('shift-end').value = times[1];
+                } else {
+                    document.getElementById('shift-start').value = '';
+                    document.getElementById('shift-end').value = '';
+                }
+
+                // Destination Map Setup
+                if(p.destination) {
+                    document.getElementById('destination-search').value = p.destination.label || '';
+                    document.getElementById('dest-lat').value = p.destination.lat;
+                    document.getElementById('dest-lng').value = p.destination.lng;
+                    document.getElementById('dest-label').value = p.destination.label;
+                    document.getElementById('selected-destination-text').textContent = `تم تحديد: ${p.destination.label}`;
+                }
+
+                // UI Changes for Edit Mode: HIDE AUTH SECTION completely
+                document.getElementById('driver-modal-title').textContent = 'تعديل بيانات السائق';
+                document.getElementById('driver-submit-btn').textContent = 'حفظ التعديلات';
+                
+                // Hide Auth Section
+                const authSection = document.getElementById('driver-auth-section');
+                authSection.classList.add('hidden');
+                
+                // Remove Required attribute to prevent validation errors on hidden fields
+                document.getElementById('driver-email').removeAttribute('required');
+                document.getElementById('driver-password').removeAttribute('required');
+
+                App.Modals.open('modal-driver');
+                setTimeout(() => {
+                    App.initDriverLocationMap();
+                    if(p.destination) App.setDestination({lng: p.destination.lng, lat: p.destination.lat}, p.destination.label);
+                }, 200);
+            },
+
+            resetDriverDevice: function() {
+                // 1. التحقق من وجود سائق
+                const driverId = this.state.currentViewDriverId;
+                if (!driverId) {
+                    App.Toast.show('لم يتم تحديد سائق!', 'error');
+                    return;
+                }
+
+                // تعريف العناصر
+                const modal = document.getElementById('modal-device-reset');
+                const backdrop = document.getElementById('modal-backdrop');
+                const panel = document.getElementById('modal-panel');
+                const confirmBtn = document.getElementById('btn-confirm-reset');
+                const cancelBtn = document.getElementById('btn-cancel-reset');
+
+                if (!modal || !backdrop || !panel) return;
+
+                // --- دالة الفتح السلس ---
+                const openModal = () => {
+                    modal.classList.remove('hidden');
+                    // تأخير بسيط جداً للسماح للمتصفح برسم العنصر قبل بدء الحركة
+                    setTimeout(() => {
+                        backdrop.classList.remove('opacity-0');
+                        panel.classList.remove('opacity-0', 'scale-95');
+                        panel.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                };
+
+                // --- دالة الإغلاق السلس ---
+                const closeModal = () => {
+                    backdrop.classList.add('opacity-0');
+                    panel.classList.remove('opacity-100', 'scale-100');
+                    panel.classList.add('opacity-0', 'scale-95');
+                    
+                    // الانتظار حتى انتهاء الحركة (300ms) ثم الإخفاء
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                };
+
+                // 2. تهيئة محتوى الزر (إعادته لحالته الأصلية)
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = `<span>نعم، فك الارتباط</span> <i class="ph ph-arrow-left group-hover:-translate-x-1 transition-transform"></i>`;
+                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                // 3. فتح النافذة
+                openModal();
+
+                // 4. إعداد زر الإلغاء والخلفية للإغلاق
+                const handleClose = () => closeModal();
+                cancelBtn.onclick = handleClose;
+                backdrop.onclick = handleClose;
+
+                // 5. إعداد زر التأكيد
+                confirmBtn.onclick = async () => {
+                    // حالة التحميل
+                    confirmBtn.disabled = true;
+                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    confirmBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-lg"></i> جاري التنفيذ...`;
+
+                    try {
+                        await db.ref(`drivers/${driverId}/profile`).update({
+                            registeredDeviceId: null,
+                            lastDeviceReset: firebase.database.ServerValue.TIMESTAMP
+                        });
+
+                        closeModal(); // إغلاق سلس
+                        
+                        // تأخير رسالة النجاح قليلاً لتبدو أجمل
+                        setTimeout(() => {
+                            App.Toast.show('تم فك ارتباط الجهاز بنجاح', 'success');
+                        }, 300);
+
+                        if (typeof this.openDriverDetails === 'function') {
+                            this.openDriverDetails(driverId);
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                        confirmBtn.disabled = false;
+                        confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        confirmBtn.innerHTML = `<span>نعم، فك الارتباط</span> <i class="ph ph-arrow-left"></i>`;
+                        App.Toast.show('حدث خطأ أثناء العملية', 'error');
+                    }
+                };
+            },            
+
+            updateStudentsUI: function() {
+                // 1. تحديد الحاوية الجديدة (الشبكة)
+                const grid = document.getElementById('students-grid');
+                const emptyState = document.getElementById('students-empty-state');
+                const searchTerm = document.getElementById('student-search').value.toLowerCase();
+
+                if (!grid) return;
+                grid.innerHTML = ''; // مسح المحتوى القديم
+
+                const students = Object.values(this.state.students);
+                let visibleCount = 0;
+
+                students.forEach(student => {
+                    // فلترة البحث
+                    if (searchTerm && !student.name.toLowerCase().includes(searchTerm) && !String(student.badgeId).includes(searchTerm)) return;
+                    
+                    visibleCount++;
+
+                    // جلب اسم السائق
+                    const driverName = this.state.drivers[student.driverId]?.profile?.name || null;
+                    
+                    // تحديد أيقونة ولون الجنس
+                    const isFemale = student.gender === 'female';
+                    const genderColor = isFemale ? 'pink' : 'cyan';
+                    const genderIcon = isFemale ? 'ph-gender-female' : 'ph-gender-male';
+
+                    // إنشاء عنصر البطاقة
+                    const card = document.createElement('div');
+                    card.className = 'group relative bg-[#0f172a]/60 backdrop-blur-xl rounded-3xl border border-white/5 hover:border-purple-500/30 p-5 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10 flex flex-col';
+                    
+                    card.innerHTML = `
+                        <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-purple-900/20 to-transparent opacity-50 pointer-events-none"></div>
+                        <i class="ph ph-backpack absolute -right-4 -bottom-4 text-8xl text-white/5 group-hover:text-purple-500/10 group-hover:rotate-12 transition-all duration-500 pointer-events-none"></i>
+
+                        <div class="relative flex items-start gap-4 mb-4 z-10">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-2xl bg-slate-800 bg-cover bg-center border-2 border-transparent group-hover:border-purple-500/50 transition-all shadow-lg" 
+                                    style="background-image: url('${student.photo || 'https://ui-avatars.com/api/?name=' + student.name}');">
+                                </div>
+                                <div class="absolute -bottom-2 -right-2 w-7 h-7 bg-[#0f172a] rounded-lg flex items-center justify-center border border-white/10">
+                                    <i class="ph ${genderIcon} text-${genderColor}-400 text-sm"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 min-w-0 pt-1">
+                                <h3 class="text-white font-bold text-lg truncate leading-tight">${student.name}</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/5 text-slate-400 border border-white/10">
+                                        ID: ${student.badgeId}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <button class="text-slate-500 hover:text-white transition">
+                                <i class="ph ph-dots-three-vertical text-xl"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-5 relative z-10">
+                            <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
+                                <span class="text-[10px] text-slate-500 block mb-1 flex items-center gap-1"><i class="ph ph-books"></i> الصف</span>
+                                <span class="text-xs font-bold text-slate-200 truncate block">${student.grade}</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
+                                <span class="text-[10px] text-slate-500 block mb-1 flex items-center gap-1"><i class="ph ph-phone"></i> ولي الأمر</span>
+                                <span class="text-xs font-bold text-slate-200 font-mono truncate block" dir="ltr">${student.parentPhone}</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-5 relative z-10">
+                            ${driverName ? 
+                                `<div class="flex items-center gap-3 p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                                        <i class="ph ph-steering-wheel text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] text-indigo-300/70">السائق المخصص</p>
+                                        <p class="text-xs font-bold text-indigo-300 truncate">${driverName}</p>
+                                    </div>
+                                </div>` 
+                                : 
+                                `<div class="flex items-center gap-2 p-2 rounded-xl bg-slate-800/50 border border-slate-700/50 border-dashed">
+                                    <i class="ph ph-warning-circle text-slate-500"></i>
+                                    <p class="text-xs text-slate-500">غير مخصص لسائق</p>
+                                </div>`
+                            }
+                        </div>
+
+                        <div class="flex gap-2 mt-auto relative z-10 border-t border-white/5 pt-4">
+                            <button onclick="App.openStudentDetails('${student.id}')" class="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 group/btn">
+                                <i class="ph ph-eye text-lg group-hover/btn:scale-110 transition-transform"></i>
+                                التفاصيل
+                            </button>
+                            
+                            <button onclick="App.openStudentEdit('${student.id}')" class="px-4 py-2.5 rounded-xl bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white transition-all border border-purple-500/20 shadow-lg shadow-purple-500/10">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                // إظهار حالة الفراغ إذا لم توجد نتائج
+                if (emptyState) {
+                    emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+                }
+            },
+
+            openStudentDetails: function(studentId) {
+                const student = Object.values(this.state.students).find(s => s.id === studentId);
+                if (!student) return;
+
+                const driverName = this.state.drivers[student.driverId]?.profile?.name || 'غير معين';
+
+                document.getElementById('detail-student-photo').src = student.photo;
+                document.getElementById('detail-student-name').textContent = student.name;
+                document.getElementById('detail-student-grade').textContent = student.grade;
+                document.getElementById('detail-student-phone').textContent = student.parentPhone;
+                document.getElementById('detail-student-driver').textContent = driverName;
+                document.getElementById('detail-student-address').textContent = student.address;
+                document.getElementById('detail-student-badge').textContent = student.badgeId;
+                document.getElementById('detail-student-gender').textContent = student.gender === 'female' ? 'أنثى' : 'ذكر';
+
+                App.Modals.open('modal-student-details');
+            },
+
+            openStudentEdit: function(studentId) {
+                const student = Object.values(this.state.students).find(s => s.id === studentId);
+                if (!student) return;
+
+                document.getElementById('student-edit-id').value = student.id;
+                document.getElementById('student-name-input').value = student.name;
+                document.getElementById('student-photo-input').value = student.photo;
+                document.getElementById('student-preview').src = student.photo;
+                document.getElementById('student-gender-input').value = student.gender;
+                document.getElementById('student-grade-input').value = student.grade;
+                document.getElementById('student-driver-select').value = student.driverId;
+                document.getElementById('student-phone-input').value = student.parentPhone;
+                document.getElementById('student-badge-input').value = student.badgeId;
+                document.getElementById('student-address-input').value = student.address;
+
+                App.Modals.open('modal-student');
+            },
+
+            // --- MAP INTEGRATION ---
+            initMap: function() {
+                if (this.state.map) return;
+                
+                const center = [29.9560651, 30.9122484]; 
+                
+                this.state.map = tt.map({
+                    key: TOMTOM_KEY,
+                    container: 'map',
+                    center: center,
+                    zoom: 12,
+                    language: 'ar', 
+                    theme: {
+                        style: 'main',
+                        layer: 'basic',
+                        source: 'vector'
+                    }
+                });
+                
+                this.state.map.addControl(new tt.FullscreenControl());
+                this.state.map.addControl(new tt.NavigationControl());
+                this.updateMapMarkers();
+            },
+
+            initHomeMap: function() {
+                if (this.state.homeMap) return;
+                
+                const center = [29.9560651, 30.9122484]; 
+                
+                this.state.homeMap = tt.map({
+                    key: TOMTOM_KEY,
+                    container: 'home-map',
+                    center: center,
+                    zoom: 11,
+                    language: 'ar', 
+                    theme: {
+                        style: 'main',
+                        layer: 'basic',
+                        source: 'vector'
+                    }
+                });
+                this.state.homeMap.addControl(new tt.NavigationControl());
+                this.updateHomeMapMarkers();
+            },
+
+            updateMapMarkers: function() {
+                this._updateMarkers(this.state.map, this.state.markers);
+            },
+
+            updateHomeMapMarkers: function() {
+                this._updateMarkers(this.state.homeMap, this.state.homeMarkers);
+            },
+
+            _updateMarkers: function(mapInstance, markersStorage) {
+                if (!mapInstance) return;
+
+                Object.values(this.state.drivers).forEach(driver => {
+                    if (!driver.trips) return;
+                    
+                    const tripKeys = Object.keys(driver.trips);
+                    const lastTripKey = tripKeys[tripKeys.length - 1];
+                    const trip = driver.trips[lastTripKey];
+                    
+                    if (trip && trip.actualPath) {
+                        const pathKeys = Object.keys(trip.actualPath);
+                        const lastPoint = trip.actualPath[pathKeys[pathKeys.length - 1]];
+                        const lngLat = [lastPoint.lng, lastPoint.lat];
+                        
+                        const speed = App.Utils.calculateSpeed(trip.actualPath);
+                        
+                        if (markersStorage[driver.profile.id]) {
+                            markersStorage[driver.profile.id].setLngLat(lngLat);
+                            const popup = markersStorage[driver.profile.id].getPopup();
+                            popup.setHTML(`
+                                <div class="p-2 text-slate-800 text-right font-sans">
+                                    <strong class="text-sm">${driver.profile.name}</strong><br>
+                                    <span class="text-xs text-indigo-600 font-bold">${speed} كم/س</span>
+                                </div>
+                            `);
+                        } else {
+                            const el = document.createElement('div');
+                            el.className = 'marker-icon';
+                            el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${driver.profile.name}&background=random')`;
+                            
+                            const popup = new tt.Popup({ offset: 35 }).setHTML(`
+                                <div class="p-2 text-slate-800 text-right font-sans">
+                                    <strong class="text-sm">${driver.profile.name}</strong><br>
+                                    <span class="text-xs text-indigo-600 font-bold">${speed} كم/س</span>
+                                </div>
+                            `);
+
+                            markersStorage[driver.profile.id] = new tt.Marker({ element: el })
+                                .setLngLat(lngLat)
+                                .setPopup(popup)
+                                .addTo(mapInstance);
+                        }
+                    }
+                });
+            },
+
+            // --- CRUD ACTIONS ---
+            handleSaveDriver: async function(e) {
+                e.preventDefault();
+                const form = new FormData(e.target);
+                const data = Object.fromEntries(form.entries());
+                const isEdit = data.id && data.id.trim().length > 0;
+                
+                // Show loading
+                const btn = e.target.querySelector('button[type="submit"]');
+                const oldText = btn.innerText;
+                btn.innerText = isEdit ? "جاري التحديث..." : "جاري إنشاء الحساب...";
+                btn.disabled = true;
+
+                // Build shift string
+                const shiftStart = document.getElementById('shift-start').value;
+                const shiftEnd = document.getElementById('shift-end').value;
+                const shift = (shiftStart && shiftEnd) ? `${shiftStart} - ${shiftEnd}` : data.shift;
+
+                const destination = data.destinationLat ? {
+                    lat: parseFloat(data.destinationLat),
+                    lng: parseFloat(data.destinationLng),
+                    label: data.destinationLabel
+                } : null;
+
+                try {
+                    let uid = data.id;
+
+                    if (!isEdit) {
+                        // --- CREATE NEW DRIVER ---
+                        // Create Auth User ONLY if adding new driver
+                        const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+                        const userCredential = await secondaryApp.auth().createUserWithEmailAndPassword(data.email, data.password);
+                        uid = userCredential.user.uid;
+                        await secondaryApp.auth().signOut();
+                        secondaryApp.delete();
+
+                        // Full Profile Object
+                        const payload = {
+                            profile: {
+                                name: data.name,
+                                email: data.email,
+                                password: data.password,
+                                school: data.school,
+                                shift: shift,
+                                id: uid, 
+                                createdAt: new Date().toISOString(), 
+                                registeredDeviceId: null,
+                                destination: destination
+                            }
+                        };
+                        
+                        await db.ref(`drivers/${uid}`).update(payload);
+
+                    } else {
+                        // --- UPDATE EXISTING DRIVER (Granular Updates) ---
+                        // Only update specific fields to avoid overwriting Auth data or sending undefined
+                        const updates = {};
+                        updates[`profile/name`] = data.name;
+                        updates[`profile/school`] = data.school;
+                        updates[`profile/shift`] = shift;
+                        if(destination) {
+                            updates[`profile/destination`] = destination;
+                        }
+                        
+                        await db.ref(`drivers/${uid}`).update(updates);
+                    }
+
+                    App.Modals.closeAll();
+                    App.Toast.show(isEdit ? 'تم تحديث بيانات السائق' : 'تم إنشاء حساب السائق بنجاح', 'success');
+                    e.target.reset();
+                    document.getElementById('driver-edit-id').value = '';
+                    
+                } catch (error) {
+                    console.error("Error saving driver:", error);
+                    let msg = "حدث خطأ";
+                    if(error.code === 'auth/email-already-in-use') msg = "البريد الإلكتروني مسجل بالفعل";
+                    if(error.code === 'auth/weak-password') msg = "كلمة المرور ضعيفة جداً";
+                    App.Toast.show(msg, 'error');
+                } finally {
+                    btn.innerText = oldText;
+                    btn.disabled = false;
+                }
+            },
+
+            handleSaveStudent: function(e) {
+                e.preventDefault();
+                const form = new FormData(e.target);
+                const data = Object.fromEntries(form.entries());
+                
+                let ref;
+                let isEdit = false;
+
+                if (data.id && data.id.trim() !== '') {
+                    // Edit Mode
+                    ref = db.ref(`students/${data.id}`);
+                    isEdit = true;
+                } else {
+                    // Add Mode
+                    ref = db.ref('students').push();
+                    data.id = ref.key;
+                }
+
+                ref.update(data)
+                  .then(() => {
+                      App.Modals.closeAll();
+                      App.Toast.show(isEdit ? 'تم تعديل بيانات الطالب بنجاح' : 'تم إضافة الطالب بنجاح', 'success');
+                      e.target.reset();
+                      document.getElementById('student-edit-id').value = '';
+                  });
+            },
+
+            // --- UTILS ---
+            animateValue: function(id, end) {
+                const obj = document.getElementById(id);
+                if (!obj) return;
+                
+                gsap.to(obj, {
+                    innerHTML: end,
+                    duration: 1,
+                    snap: { innerHTML: 1 }
+                });
+            },
+
+            Modals: {
+                openDriverModal: function() {
+                    // Reset Form for Add Mode
+                    document.getElementById('driver-form').reset();
+                    document.getElementById('driver-edit-id').value = '';
+                    document.getElementById('driver-modal-title').textContent = 'إنشاء حساب سائق جديد';
+                    document.getElementById('driver-submit-btn').textContent = 'إنشاء الحساب وحفظ البيانات';
+                    
+                    // Show Auth Section & Require Fields
+                    const authSection = document.getElementById('driver-auth-section');
+                    authSection.classList.remove('hidden');
+                    document.getElementById('driver-email').setAttribute('required', 'true');
+                    document.getElementById('driver-password').setAttribute('required', 'true');
+
+                    document.getElementById('selected-destination-text').textContent = '';
+                    
+                    this.open('modal-driver');
+                    setTimeout(() => App.initDriverLocationMap(), 200);
+                },
+                openStudentModal: function() {
+                    document.getElementById('student-form').reset();
+                    document.getElementById('student-edit-id').value = '';
+                    this.open('modal-student');
+                },
+                showCustomAlert: function(title, msg) {
+                    document.getElementById('alert-title').innerText = title;
+                    document.getElementById('alert-message').innerText = msg;
+                    this.open('modal-alert');
+                },
+                open: function(id) {
+                    document.getElementById('modal-overlay').classList.remove('hidden');
+                    const modal = document.getElementById(id);
+                    modal.classList.remove('hidden');
+                    gsap.to(modal, {scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)"});
+                },
+                closeAll: function() {
+                    const modals = document.querySelectorAll('.modal-content');
+                    gsap.to(modals, {scale: 0.9, opacity: 0, duration: 0.2, onComplete: () => {
+                        modals.forEach(m => m.classList.add('hidden'));
+                        document.getElementById('modal-overlay').classList.add('hidden');
+                    }});
+                }
+            },
+
+            Toast: {
+                show: function(msg, type = 'success') {
+                    const container = document.getElementById('toast-container');
+                    const toast = document.createElement('div');
+                    
+                    const bgClass = type === 'success' ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50';
+                    const iconClass = type === 'success' ? 'text-green-400' : 'text-red-400';
+                    const icon = type === 'success' ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-warning-circle"></i>';
+
+                    toast.className = `toast glass-panel p-4 rounded-xl border flex items-center gap-3 shadow-lg w-72 ${bgClass}`;
+                    toast.innerHTML = `
+                        <div class="text-2xl ${iconClass}">${icon}</div>
+                        <div class="text-sm font-bold text-white">${msg}</div>
+                    `;
+
+                    container.appendChild(toast);
+
+                    requestAnimationFrame(() => toast.classList.add('show'));
+
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+            },
+            
+            Utils: {
+                generateId: function() {
+                    // Legacy generator, kept if needed for visual placeholders
+                    const id = 'DRV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                    // document.getElementById('driver-security-id').value = id; 
+                },
+                
+                calculateSpeed: function(pathObj) {
+                    if (!pathObj) return 0;
+                    
+                    const points = Object.values(pathObj).sort((a, b) => a.ts - b.ts);
+                    
+                    if (points.length < 2) return 0;
+                    
+                    const p1 = points[points.length - 2];
+                    const p2 = points[points.length - 1];
+                    
+                    const timeDiffHours = (p2.ts - p1.ts) / (1000 * 60 * 60);
+                    
+                    if (timeDiffHours === 0) return 0;
+                    
+                    const R = 6371; 
+                    const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+                    const dLon = (p2.lng - p1.lng) * Math.PI / 180;
+                    const a = 
+                        Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    const distanceKm = R * c;
+                    
+                    const speed = distanceKm / timeDiffHours;
+                    
+                    if (speed > 200) return 0; 
+                    
+                    return Math.round(speed);
+                }
+            }
+        };
+
+        // Listeners
+        // Handled in init()
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => App.init());
+
+    </script>
+</body>
+</html>
