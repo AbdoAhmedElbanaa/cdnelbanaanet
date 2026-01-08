@@ -835,14 +835,14 @@
                                     <div class="flex justify-between items-center px-2 text-[10px] font-mono font-bold text-slate-400">
 
                                         <div class="text-left">
-                                            <span class="block text-slate-600 text-[9px] mb-0.5">البداية</span>
+                                            <span class="block text-slate-600 text-[9px] mb-0.5">توقيت الانطلاق</span>
                                             <span id="replay-start-time" class="text-slate-200">00:00:00</span>
                                         </div>
                                         <span id="replay-current-status" class="text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
-                                            REPLAY MODE ACTIVE
+                                            منطقة مراجعة الرحلة 
                                         </span>
                                         <div class="text-right">
-                                            <span class="block text-slate-600 text-[9px] mb-0.5">النهاية</span>
+                                            <span class="block text-slate-600 text-[9px] mb-0.5">توقيت الوصول</span>
                                             <span id="replay-end-time" class="text-slate-200">00:00:00</span>
                                         </div>
                                     </div>
@@ -858,12 +858,12 @@
                                     <div class="flex items-center justify-between">
                                         <button onclick="App.Replay.stop()" class="text-red-400 hover:text-white text-xs font-bold flex items-center gap-2 px-3 py-2 hover:bg-red-500/20 rounded-xl transition border border-transparent hover:border-red-500/20">
                                             <i class="ph ph-stop-circle text-lg"></i> 
-                                            <span class="hidden md:inline">إنهاء</span>
+                                            <span class="hidden md:inline">انهاء المراجعة</span>
                                         </button>
 
                                         <div class="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-2xl border border-white/5">
-                                            <button onclick="App.Replay.jump(-10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="-10s">
-                                                <i class="ph ph-rewind text-xl"></i>
+                                            <button onclick="App.Replay.jump(10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="+10s">
+                                                <i class="ph ph-fast-forward text-xl"></i>
                                             </button>
                                             
                                             <button onclick="App.Replay.toggle()" class="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-900/40 transition active:scale-95 group/play">
@@ -871,10 +871,11 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/></svg>
                                                 </span>
                                             </button>
-                                            
-                                            <button onclick="App.Replay.jump(10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="+10s">
-                                                <i class="ph ph-fast-forward text-xl"></i>
+
+                                            <button onclick="App.Replay.jump(-10)" class="text-slate-400 hover:text-white hover:scale-110 transition p-1" title="-10s">
+                                                <i class="ph ph-rewind text-xl"></i>
                                             </button>
+                                            
                                         </div>
 
                                         <div class="flex gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
