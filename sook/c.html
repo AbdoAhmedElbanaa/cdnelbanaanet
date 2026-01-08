@@ -1037,6 +1037,7 @@
         let aiInterval = null;
         let lastGeminiCall = 0;
         let lastGeminiResult = null;
+        let tripStatusUnsubscribe = null; // متغير جديد لحفظ دالة إيقاف المراقبة
         // Timer For Alerting Prolonged Stops
         let lastMovePosition = null;
         let lastMoveTime = null;
@@ -2264,7 +2265,7 @@
         function resumeTracking(tripKey) {
             isTracking = true;
             currentTripKey = tripKey;
-            
+            monitorTripStatus(tripKey);
             updateTrackingUI(true);
             startLocationWatcher();
             startAIAnalytics();
@@ -2282,6 +2283,7 @@
                     const newTripRef = window.rtdbPush(tripsRef);
                     currentTripKey = newTripRef.key;
                     await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
+                    monitorTripStatus(currentTripKey);
                 } catch(e) { console.error("Error creating trip", e); }
                 
                 updateTrackingUI(true);
@@ -2351,6 +2353,11 @@
         }
 
         async function stopTracking(resetUI) {
+            if (tripStatusUnsubscribe) {
+                tripStatusUnsubscribe();
+                tripStatusUnsubscribe = null;
+            }
+
             isTracking = false;
             if(watchId) navigator.geolocation.clearWatch(watchId);
             
@@ -2372,7 +2379,75 @@
             }
             stopAIAnalytics();
         }
+        // --- ADMIN ACTION MONITORING ---
 
+        // دالة لمراقبة حالة الرحلة في قاعدة البيانات
+        function monitorTripStatus(tripKey) {
+            // إزالة أي مراقب سابق لتجنب التداخل
+            if (tripStatusUnsubscribe) {
+                tripStatusUnsubscribe();
+                tripStatusUnsubscribe = null;
+            }
+
+            const tripRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${tripKey}`);
+
+            // بدء المراقبة
+            tripStatusUnsubscribe = window.rtdbOnValue(tripRef, (snapshot) => {
+                // إذا لم نكن في وضع التتبع (السائق أنهى الرحلة بنفسه)، نتجاهل التحديثات
+                if (!isTracking) return;
+
+                // الحالة 1: الرحلة حذفت (Snapshot لا توجد)
+                if (!snapshot.exists()) {
+                    handleAdminAction(
+                        'تم حذف الرحلة 🗑️',
+                        'قام المسؤول بحذف سجل الرحلة الحالي نهائياً.'
+                    );
+                    return;
+                }
+
+                const data = snapshot.val();
+
+                // الحالة 2: الرحلة تم إنهاؤها (completed) والسائق لا يزال يتتبعها
+                if (data.status === 'completed') {
+                    handleAdminAction(
+                        'تم إنهاء الرحلة 🛑',
+                        'قام المسؤول بإنهاء الرحلة الحالية. يرجى مراجعة الإدارة.'
+                    );
+                }
+            });
+        }
+
+        // دالة لتنفيذ الإجراء عند تدخل المسؤول
+        function handleAdminAction(title, message) {
+            // 1. إيقاف التتبع محلياً دون التحديث في قاعدة البيانات (لأنها حُذفت أو انتهت بالفعل)
+            isTracking = false;
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            stopAIAnalytics();
+            
+            // إيقاف المراقب
+            if (tripStatusUnsubscribe) {
+                tripStatusUnsubscribe();
+                tripStatusUnsubscribe = null;
+            }
+            
+            // 2. إظهار النافذة المنبثقة
+            showCustomModal({
+                icon: '⚠️',
+                title: title,
+                message: message,
+                actions: [
+                    {
+                        label: 'العودة للرئيسية',
+                        class: 'bg-red-600 text-white hover:bg-red-700',
+                        onClick: () => {
+                            closeCustomModal();
+                            returnToHome(); // دالة العودة للرئيسية الموجودة عندك
+                        }
+                    }
+                ]
+            });
+        }
+                
         // --- UTILS ---
         function showInputModal(title, msg, placeholder, callback) {
             const modal = document.getElementById('customModal');
