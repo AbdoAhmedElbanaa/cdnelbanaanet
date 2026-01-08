@@ -1208,7 +1208,7 @@
             if (!driverData || !driverData.shift) return true; 
 
             const now = new Date();
-            const currentTimeStr = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'});
+            const currentTimeStr = now.toLocaleTimeString('en-US', {hour12: true, hour: '2-digit', minute: '2-digit'});
             
             const parts = driverData.shift.split('-');
             if (parts.length !== 2) return true;
