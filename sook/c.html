@@ -2028,13 +2028,15 @@
             });
         }
 
-        // --- REVIEW HISTORY ---
-        function reviewTrip(trip) {
+        // --- REVIEW HISTORY & SMART PATH LOGIC ---
+        
+        async function reviewTrip(trip) {
             currentReviewTrip = trip;
             showView('map');
             if (!map) { initMap(); if (!map) return; }
             setTimeout(() => { if(map) map.invalidateSize(); }, 100);
 
+            // Reset Layers
             if(pathLine && map.hasLayer(pathLine)) map.removeLayer(pathLine);
             if(routingControl) map.removeControl(routingControl);
             if(window.currentRouteLayer) map.removeLayer(window.currentRouteLayer); 
@@ -2044,18 +2046,15 @@
             boardingMarkers = [];
             if(timelineMarkers) timelineMarkers.innerHTML = '';
             
+            // Adjust UI
             const liveCtrl = document.getElementById('liveControls');
             if(liveCtrl) liveCtrl.classList.add('hidden');
-            
             const revCtrl = document.getElementById('reviewControls');
             if(revCtrl) revCtrl.classList.remove('hidden');
-            
             const closeRev = document.getElementById('closeReviewBtn');
-            if(closeRev) closeRev.classList.add('hidden');
-            
+            if(closeRev) closeRev.classList.remove('hidden');
             const rInfo = document.getElementById('routeInfo');
             if(rInfo) rInfo.classList.add('hidden');
-            
             const histBadge = document.getElementById('historyModeBadge');
             if(histBadge) {
                 histBadge.classList.remove('hidden');
@@ -2080,47 +2079,69 @@
             let stats = trip.stats;
             if(!stats) stats = calculateTripAnalytics(events, myStudents);
             updateAnalyticsChart(stats);
-            
             renderStudentsList(true, events);
             
+            // Draw Initial Path
             let pathPoints = [];
             if(trip.actualPath) pathPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
             
             if(pathPoints.length > 0) {
                 const latLngs = pathPoints.map(p => [p.lat, p.lng]);
-                reviewPathLine = L.polyline(latLngs, { color: '#a855f7', weight: 5, opacity: 1 }).addTo(map);
+                
+                // Draw initial simple line first
+                reviewPathLine = L.polyline(latLngs, { color: '#a855f7', weight: 5, opacity: 0.7 }).addTo(map);
                 map.fitBounds(reviewPathLine.getBounds(), {padding: [50, 50]});
                 
+                // Set initial state for timeline
                 currentReviewTrip.optimizedPath = pathPoints;
-                currentReviewTrip.events = events; 
-                
-                if(timelineSlider) {
-                    timelineSlider.max = pathPoints.length - 1;
-                    timelineSlider.value = 0;
-                }
-                if(timelineProgress) timelineProgress.style.width = '0%';
-                if(customThumb) customThumb.style.right = '0%';
-                
+                updateTimelineUI(pathPoints);
+
+                // Initialize marker
                 if(!map.hasLayer(userMarker)) userMarker.addTo(map);
                 userMarker.setLatLng(latLngs[0]);
-                
-                const startD = new Date(trip.startTime);
-                const endD = new Date(trip.endTime);
-                if(timelineStart) timelineStart.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                if(timelineEnd) timelineEnd.innerText = endD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                if(timelineCurrent) timelineCurrent.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
 
+                // --- SMART PATH ENHANCEMENT ---
+                // Trigger the smart enhancement if gaps are detected
+                showToast('جاري تحسين جودة المسار ومعالجة الطرق...', 'info');
+                
+                try {
+                    const enhancedPath = await enhanceRoutePath(pathPoints);
+                    
+                    // Update visual path with enhanced one
+                    map.removeLayer(reviewPathLine);
+                    const enhancedLatLngs = enhancedPath.map(p => [p.lat, p.lng]);
+                    reviewPathLine = L.polyline(enhancedLatLngs, { 
+                        color: '#d946ef', // Brighter Purple/Pink
+                        weight: 6, 
+                        opacity: 1,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(map);
+                    
+                    // Update Timeline Data
+                    currentReviewTrip.optimizedPath = enhancedPath;
+                    updateTimelineUI(enhancedPath);
+                    
+                    showToast('تمت معالجة المسار بنجاح! يطابق الطرق الآن', 'success');
+                    
+                } catch(e) {
+                    console.error("Smart Path Enhancement Failed", e);
+                    // Fallback is already drawn
+                }
+
+                // Add event markers to timeline
                 if(timelineMarkers) {
                     events.forEach(ev => {
                         if(ev.type === 'boarding' && ev.ts) {
                             let closestIndex = 0;
                             let minDiff = Infinity;
-                            pathPoints.forEach((p, idx) => {
+                            // Use the optimized path (which might be enhanced now)
+                            currentReviewTrip.optimizedPath.forEach((p, idx) => {
                                 const diff = Math.abs(p.ts - ev.ts);
                                 if(diff < minDiff) { minDiff = diff; closestIndex = idx; }
                             });
 
-                            const percent = (closestIndex / (pathPoints.length - 1)) * 100;
+                            const percent = (closestIndex / (currentReviewTrip.optimizedPath.length - 1)) * 100;
                             const studentName = myStudents.find(s => s.id === ev.studentId)?.name || 'طالب';
                             const timeStr = new Date(ev.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
 
@@ -2139,6 +2160,75 @@
                 }
             }
             toggleAnalyticsDetails(); 
+        }
+
+        function updateTimelineUI(points) {
+            if(timelineSlider) {
+                timelineSlider.max = points.length - 1;
+                timelineSlider.value = 0;
+            }
+            if(timelineProgress) timelineProgress.style.width = '0%';
+            if(customThumb) customThumb.style.right = '0%';
+            
+            const startD = new Date(points[0].ts);
+            const endD = new Date(points[points.length-1].ts);
+            
+            if(timelineStart) timelineStart.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+            if(timelineEnd) timelineEnd.innerText = endD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+            if(timelineCurrent) timelineCurrent.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+        }
+
+        // --- SMART GAP FILLING ALGORITHM ---
+        async function enhanceRoutePath(originalPoints) {
+            if (!originalPoints || originalPoints.length < 2) return originalPoints;
+
+            let enhancedPath = [];
+            // Gap Threshold in meters. If gap > 200m, we treat it as a "closed app" situation.
+            const GAP_THRESHOLD = 200; 
+
+            for (let i = 0; i < originalPoints.length - 1; i++) {
+                const p1 = originalPoints[i];
+                const p2 = originalPoints[i+1];
+                
+                // Always add the start point of segment
+                enhancedPath.push(p1);
+
+                const dist = getDistanceInMeters(p1, p2);
+                
+                if (dist > GAP_THRESHOLD) {
+                    try {
+                        // Use OSRM to get the driving path between these two distant points
+                        const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${p1.lng},${p1.lat};${p2.lng},${p2.lat}?overview=full&geometries=geojson`);
+                        const data = await response.json();
+                        
+                        if (data.routes && data.routes.length > 0) {
+                            const routeCoords = data.routes[0].geometry.coordinates; // [lng, lat]
+                            
+                            // Interpolate timestamps for smoother timeline
+                            const totalPoints = routeCoords.length;
+                            const startTime = p1.ts;
+                            const endTime = p2.ts;
+                            const timeDiff = endTime - startTime;
+                            
+                            routeCoords.forEach((coord, index) => {
+                                // Skip first and last to avoid duplicate points (as p1 is added before loop, p2 will be added next iteration)
+                                if (index > 0 && index < totalPoints - 1) {
+                                    enhancedPath.push({
+                                        lat: coord[1],
+                                        lng: coord[0],
+                                        ts: startTime + (timeDiff * (index / totalPoints))
+                                    });
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.warn("Failed to fill gap, keeping straight line", e);
+                    }
+                }
+            }
+            // Add the very last point
+            enhancedPath.push(originalPoints[originalPoints.length - 1]);
+            return enhancedPath;
         }
 
         function returnToHome() {
@@ -2532,6 +2622,50 @@ function resetStopMonitor() {
     lastMovePosition = null;
     lastMoveTime = null;
     resetStopAlerts();
+}
+
+function showCustomModal(options) {
+    const modal = document.getElementById('customModal');
+    if(!modal) return;
+    
+    document.getElementById('modalTitle').innerText = options.title || 'تنبيه';
+    document.getElementById('modalMessage').innerText = options.message || '';
+    document.getElementById('modalIcon').innerText = options.icon || '🔔';
+    
+    // Hide input
+    document.getElementById('modalInputContainer').classList.add('hidden');
+    
+    const actionsDiv = document.getElementById('modalActions');
+    actionsDiv.innerHTML = '';
+    
+    if(options.actions && options.actions.length > 0) {
+        options.actions.forEach(action => {
+             const btn = document.createElement('button');
+             btn.className = `flex-1 py-3 rounded-xl font-bold shadow-lg transition ${action.class || 'bg-gray-500 text-white'}`;
+             btn.innerText = action.label;
+             btn.onclick = () => {
+                 if(action.onClick) action.onClick();
+                 else closeCustomModal();
+             };
+             actionsDiv.appendChild(btn);
+        });
+    } else {
+         const btn = document.createElement('button');
+         btn.className = 'flex-1 py-3 rounded-xl bg-emerald-500 text-white font-bold';
+         btn.innerText = 'حسناً';
+         btn.onclick = closeCustomModal;
+         actionsDiv.appendChild(btn);
+    }
+    
+    modal.classList.remove('hidden'); 
+    setTimeout(() => modal.classList.add('opacity-100'), 10);
+}
+
+function closeCustomModal() {
+    const modal = document.getElementById('customModal');
+    if(!modal) return;
+    modal.classList.add('opacity-0'); 
+    setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
 /* =========================================================
