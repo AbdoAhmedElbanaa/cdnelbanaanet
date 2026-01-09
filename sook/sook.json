@@ -47,12 +47,25 @@
       "imageUrl": "https://cdn-icons-png.flaticon.com/512/10695/10695914.png"
     }
   ],
-  "update": {
-    "latestVersionCode": 2,
-    "versionName": "2.0.0 (V3 Update)",
-    "title": "تحديث هام متوفر!",
-    "desc": "تم إضافة نظام الإشعارات الجديد وتحسينات في الأداء.",
-    "isMandatory": true,
-    "apkUrl": "https://example.com/SookDriver_v2.apk" 
+"update": {
+    "versions": [
+      {
+        "versionCode": 1,
+        "versionName": "v1.0.0",
+        "title": "الإصدار الأول",
+        "desc": "الإطلاق الأولي للمنصة.",
+        "isMandatory": false,
+        "apkUrl": "https://example.com/old_version.apk"
+      },
+      {
+        "versionCode": 2,
+        "versionName": "v2.0.0",
+        "title": "تحديث رئيسي لمنصة سوق",
+        "desc": "إضافة نظام الإشعارات الذكي، تحسين الأداء، وتعزيز استقرار التتبع والتواصل اللحظي.",
+        "isMandatory": true,
+        "apkUrl": "https://download.mediafire.com/your_direct_link/SookDriver_v2.apk"
+      }
+    ],
+    "latestVersionCode": 2
   }
 }
