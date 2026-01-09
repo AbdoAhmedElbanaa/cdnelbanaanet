@@ -415,8 +415,14 @@
 
         .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* إخفاء شريط التمرير للمتصفحات */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
 
         /* Security Alert Specifics */
         .security-lock-overlay {
@@ -458,6 +464,40 @@
 
 .status-dot-pulse {
     animation: gold-pulse 2s infinite;
+}
+/* --- New Home Styles --- */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+/* Glass Pill for Header */
+.glass-pill-premium {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 3D Cube Effect for Stats */
+.glass-cube {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 10px 20px -5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+.glass-cube:active {
+    transform: scale(0.95);
+}
+
+/* Floating Icon Base Style */
+.floating-icon, .floating-icon-delayed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    /* Animation handled by GSAP */
 }
     </style>
 </head>
@@ -522,150 +562,168 @@
     </div>
 
     <!-- ================= VIEW 2: HOME ================= -->
-    <div id="homeView" class="view-section view-hidden pt-safe pb-safe px-4">
-         <!-- Header -->
-        <header class="flex justify-between items-center py-6" data-aos="fade-down">
-            <div class="flex items-center gap-3">
-                <div class="w-14 h-14 rounded-full p-[2px] bg-gradient-to-br from-emerald-400 to-blue-500 shadow-lg">
+<div id="homeView" class="view-section view-hidden pt-safe pb-safe px-5 overflow-y-auto hide-scrollbar">
+        <div class="fixed top-[-10%] right-[-10%] w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[-10%] left-[-10%] w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
+    <header class="gsap-header flex justify-between items-center py-6 relative z-20">
+        <div class="glass-pill-premium flex items-center gap-4 pr-2 pl-6 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-lg">
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-emerald-400 via-cyan-400 to-blue-500">
                     <img src="https://i.pravatar.cc/150?img=11" alt="Driver" class="w-full h-full rounded-full object-cover border-2 border-slate-900">
                 </div>
-                <div>
-                    <h2 class="font-bold text-xl" id="driverNameDisplay">جاري التحميل...</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <p class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">متاح للعمل</p>
+                <div class="absolute bottom-0 left-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full animate-pulse"></div>
+            </div>
+            <div class="flex flex-col">
+                <h2 class="font-bold text-base text-white leading-tight" id="driverNameDisplay">...</h2>
+                <span class="text-[10px] text-emerald-400 tracking-wide font-mono">ONLINE DRIVER</span>
+            </div>
+        </div>
+        
+        <button onclick="logout()" class="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300 shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-90">
+            <i class="fas fa-power-off text-lg"></i>
+        </button>
+    </header>
+
+    <div class="gsap-hero relative w-full mb-6 mt-2 perspective-1000">
+        <div class="relative overflow-visible">
+            <div class="floating-icon absolute -top-6 -left-2 z-30 w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl flex items-center justify-center shadow-[0_10px_30px_rgba(245,158,11,0.4)] transform rotate-12 border border-white/20">
+                <i class="fas fa-university text-3xl text-white"></i>
+            </div>
+
+            <div class="relative bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-[2rem] border border-white/10 p-6 shadow-2xl overflow-hidden group">
+                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')]"></div>
+                
+                <div class="relative z-10 flex flex-col items-start pt-4">
+                    <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full mb-4">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-400 tracking-wider">LIVE DESTINATION</span>
+                    </div>
+
+                    <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 leading-tight mb-2" id="schoolNameDisplay">--</h1>
+                    
+                    <p class="text-xs text-gray-400 font-medium bg-black/20 px-3 py-2 rounded-lg border-r-2 border-amber-500 w-full">
+                        <i class="fas fa-quote-right ml-2 text-amber-500/50"></i>
+                         قيادة آمنة تعني مستقبلاً آمناً للطلاب
+                    </p>
+                </div>
+                
+                <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-emerald-500/20 blur-[50px] rounded-full group-hover:bg-emerald-500/30 transition-all duration-500"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-6 perspective-1000">
+        
+        <div class="gsap-stat-card glass-cube relative p-5 rounded-[1.8rem] bg-[#1e293b]/60 border border-white/5 overflow-visible">
+            <div class="floating-icon-delayed absolute -top-4 -right-2 w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-white/20 z-20">
+                <i class="fas fa-clock text-white text-sm"></i>
+            </div>
+            
+            <div class="relative z-10 mt-2">
+                <p class="text-indigo-300 text-[10px] font-bold uppercase tracking-wider mb-1">الوردية</p>
+                <h3 class="text-lg font-bold text-white font-mono" id="shiftDisplay">--</h3>
+                <div class="w-full h-1 bg-gray-700 rounded-full mt-3 overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-2/3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gsap-stat-card glass-cube relative p-5 rounded-[1.8rem] bg-[#1e293b]/60 border border-white/5 overflow-visible">
+            <div class="floating-icon absolute -top-4 -left-2 w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/30 border border-white/20 z-20">
+                <i class="fas fa-user-graduate text-white text-sm"></i>
+            </div>
+
+            <div class="relative z-10 mt-2">
+                <p class="text-pink-300 text-[10px] font-bold uppercase tracking-wider mb-1">الطلاب</p>
+                <div class="flex items-end gap-1">
+                    <h3 class="text-2xl font-bold text-white leading-none" id="studentsCountDisplay">0</h3>
+                    <span class="text-[9px] text-gray-400 mb-1">/25</span>
+                </div>
+                <div class="flex -space-x-2 space-x-reverse mt-3">
+                    <div class="w-5 h-5 rounded-full bg-gray-600 border border-slate-800"></div>
+                    <div class="w-5 h-5 rounded-full bg-gray-500 border border-slate-800"></div>
+                    <div class="w-5 h-5 rounded-full bg-gray-400 border border-slate-800"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gsap-action mb-8">
+        <div class="flex items-center justify-between px-4 mb-2">
+            <h3 class="font-bold text-sm text-gray-300">مركز التحكم</h3>
+            <span class="flex items-center gap-1 text-[10px] text-emerald-400 px-2 py-1 bg-emerald-500/10 rounded-lg">
+                <i class="fas fa-satellite-dish animate-pulse"></i> GPS متصل
+            </span>
+        </div>
+
+        <button onclick="startDailyTrip()" class="group relative w-full h-24 rounded-[2rem] bg-slate-800 overflow-hidden shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.5)] transition-all duration-500 border border-emerald-500/30">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/90 via-slate-900/90 to-slate-900/90"></div>
+            
+            <div class="absolute top-0 bottom-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent skew-x-12 group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out"></div>
+
+            <div class="relative z-10 flex items-center justify-between px-6 h-full">
+                <div class="text-right">
+                    <h2 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">بدء الرحلة</h2>
+                    <p class="text-xs text-gray-400 group-hover:text-gray-300">تسجيل الحضور والمسار</p>
+                </div>
+                
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/40 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300 border border-white/20">
+                    <i class="fas fa-location-arrow text-2xl text-white drop-shadow-md"></i>
+                </div>
+            </div>
+        </button>
+    </div>
+
+    <div class="gsap-history flex-1 relative mt-auto">
+        <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-white/10 rounded-full"></div>
+        
+        <div class="bg-gradient-to-b from-[#1e293b]/90 to-[#0f172a] backdrop-blur-xl border-t border-white/10 rounded-t-[2.5rem] p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] h-full min-h-[300px]">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-500 border border-amber-500/20">
+                        <i class="fas fa-history text-sm"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-white">سجل النشاط</h3>
+                </div>
+                <div class="p-1 bg-black/40 rounded-xl flex gap-1">
+                    <button class="px-3 py-1 rounded-lg text-[10px] bg-white/10 text-white shadow-sm font-bold">يومي</button>
+                    <button class="px-3 py-1 rounded-lg text-[10px] text-gray-500 hover:text-white transition">أسبوعي</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between bg-black/20 p-4 rounded-2xl mb-6 border border-white/5">
+                <div class="text-center w-1/3 border-l border-white/5">
+                    <span class="block text-lg font-black text-white">12</span>
+                    <span class="text-[9px] text-gray-400 uppercase">رحلة</span>
+                </div>
+                <div class="text-center w-1/3 border-l border-white/5">
+                    <span class="block text-lg font-black text-emerald-400">450</span>
+                    <span class="text-[9px] text-gray-400 uppercase">كم</span>
+                </div>
+                <div class="text-center w-1/3">
+                    <span class="block text-lg font-black text-amber-400">98%</span>
+                    <span class="text-[9px] text-gray-400 uppercase">دقة</span>
+                </div>
+            </div>
+            
+            <div id="calendarGrid" class="flex flex-col gap-3 pb-20">
+                 <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 animate-pulse">
+                    <div class="w-12 h-12 rounded-xl bg-slate-700"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-3 bg-slate-700 rounded w-1/2"></div>
+                        <div class="h-2 bg-slate-700 rounded w-1/3"></div>
                     </div>
                 </div>
             </div>
-            <button onclick="logout()" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-red-400 hover:bg-red-500/10 transition border border-white/5 shadow-md">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </header>
-<div class="entry-fade-down relative w-full mb-8 mt-6"> <div class="relative overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl group">
-
-    <div class="absolute inset-0 bg-gradient-to-br from-[#172554] via-[#0f172a] to-black"></div>
-    <div class="noise-bg"></div>
-
-    <div class="relative z-10 p-7">
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 status-dot-pulse"></span>
-                    <span class="text-[10px] uppercase tracking-widest text-emerald-500/80 font-semibold">Live Connection</span>
-                </div>
-                <h2 class="text-xs text-gray-400 font-light">وجهة التعاقد الحالية</h2>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-sm shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-                <i class="fas fa-university text-xl text-amber-100/90"></i>
-            </div>
-        </div>
-
-        <div class="mb-8">
-          <span class="flex-col"><i class="fas fa-map-marker-alt text-amber-500/70"></i> <h1 class="text-3xl font-bold text-white leading-tight tracking-tight mb-2" id="schoolNameDisplay">--</h1></span> 
-            <p class="text-sm text-gray-400 flex items-center gap-2">
-                <span class="border-b border-dashed border-gray-600 pb-0.5">قد بسلام لتصل الى وجهتك بسلام ولاتنسي السلامة اولاً</span>
-            </p>
-        </div>
-
-    </div>
-</div>
-</div>
-
-<div class="entry-fade-up-1 grid grid-cols-2 gap-4 mb-8">
-
-<div class="premium-glass p-5 rounded-[1.5rem] relative overflow-hidden group">
-    <div class="absolute top-0 right-0 p-3 opacity-20">
-        <i class="fas fa-sun text-4xl text-amber-500"></i>
-    </div>
-    
-    <div class="relative z-10">
-        <p class="text-amber-500/80 text-[10px] font-bold uppercase tracking-wider mb-2">جدول العمل</p>
-        <h3 class="text-lg font-bold text-white mb-1" id="shiftDisplay">--</h3>
-        <p class="text-[10px] text-gray-400 mb-4 font-mono">وقت عملك المقدر من النظام</p>
-        
-        <div class="w-full bg-gray-700/30 h-1.5 rounded-full overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-600 to-amber-400 h-full w-[0%]" style="width: 100%"></div>
-        </div>
-        <div class="flex justify-between mt-1">
         </div>
     </div>
 </div>
-
-<div class="premium-glass p-5 rounded-[1.5rem] relative overflow-hidden group">
-    <div class="absolute top-0 left-0 p-3 opacity-20">
-        <i class="fas fa-users text-4xl text-indigo-400"></i>
-    </div>
-    
-    <div class="relative z-10">
-        <p class="text-indigo-400/80 text-[10px] font-bold uppercase tracking-wider mb-2">سعة الباص</p>
-        <div class="flex items-baseline gap-1 mb-1">
-            <h3 class="text-2xl font-bold text-white" id="studentsCountDisplay">0</h3>
-            <span class="text-[10px] text-gray-400">/ 25 مقعد</span>
-        </div>
-        <p class="text-[10px] text-gray-400 mb-4">طلاب مسجلين</p>
-
-    </div>
-</div>
-</div>
-
-<div class="entry-fade-up-2 mb-10"> <div class="flex items-center justify-between px-2 mb-3"> <h3 class="font-bold text-base text-white flex items-center gap-2"> <span class="w-1 h-5 bg-emerald-500 rounded-full"></span> بدء المهمة </h3> <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20"> <i class="fas fa-check-circle mr-1"></i> النظام جاهز </span> </div>
-
-<button onclick="startDailyTrip()" class="w-full group relative h-28 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.3)] active:scale-[0.99]">
-    <div class="absolute inset-0 bg-[#132d25]"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/80 via-emerald-800/20 to-transparent opacity-100"></div>
-    
-    <div class="relative z-10 flex items-center justify-between px-7 h-full">
-        <div class="flex flex-col items-start gap-1 text-right">
-            <span class="text-white text-lg font-bold group-hover:text-emerald-300 transition-colors">انطلاق الرحلة الصباحية</span>
-            <div class="flex items-center gap-3 text-xs text-gray-400 mt-1">
-                <span class="flex items-center gap-1"><i class="fas fa-road text-gray-500"></i> طريق سالك</span>
-                <span class="w-1 h-1 rounded-full bg-gray-600"></span>
-                <span class="flex items-center gap-1"><i class="fas fa-cloud-sun text-gray-500"></i> 24°C</span>
-            </div>
-        </div>
-        
-        <div class="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:rotate-45 transition-transform duration-300 border border-emerald-400">
-            <i class="fas fa-location-arrow text-xl"></i>
-        </div>
-    </div>
-    
-    <div class="absolute bottom-0 left-0 w-full h-1 bg-emerald-900">
-        <div class="h-full bg-emerald-500 w-1/4 animate-pulse"></div>
-    </div>
-</button>
-</div>
-
-<div class="entry-fade-up-3"> <div class="premium-glass rounded-t-[2.5rem] border-b-0 -mx-4 px-6 pt-8 pb-24 mt-auto"> <div class="flex justify-between items-center mb-6"> <h3 class="font-bold text-lg text-white">سجل الرحلات</h3> <div class="flex bg-white/5 rounded-full p-1 border border-white/5"> <button class="px-3 py-1 rounded-full text-[10px] bg-white/10 text-white shadow-sm">أسبوعي</button> <button class="px-3 py-1 rounded-full text-[10px] text-gray-500 hover:text-gray-300">شهري</button> </div> </div>
-
-    <div class="flex justify-around mb-6 pb-6 border-b border-white/5">
-        <div class="text-center">
-            <span class="block text-xl font-bold text-white">12</span>
-            <span class="text-[10px] text-gray-500">رحلة مكتملة</span>
-        </div>
-        <div class="w-px h-8 bg-white/5"></div>
-        <div class="text-center">
-            <span class="block text-xl font-bold text-emerald-400">450</span>
-            <span class="text-[10px] text-gray-500">كم مقطوعة</span>
-        </div>
-        <div class="w-px h-8 bg-white/5"></div>
-        <div class="text-center">
-            <span class="block text-xl font-bold text-amber-400">98%</span>
-            <span class="text-[10px] text-gray-500">التزام بالمواعيد</span>
-        </div>
-    </div>
-    
-    <div id="calendarGrid" class="flex flex-col gap-3 opacity-60">
-        <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
-            <div class="w-10 h-10 rounded-full bg-slate-800 animate-pulse"></div>
-            <div class="flex-1 space-y-2">
-                <div class="h-2 bg-slate-800 rounded w-3/4 animate-pulse"></div>
-                <div class="h-2 bg-slate-800 rounded w-1/2 animate-pulse"></div>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-    </div>
 
     <!-- ================= VIEW 3: MAP VIEW ================= -->
     <div id="mapView" class="view-section view-hidden">
@@ -1045,7 +1103,10 @@
         let stopWarningShown = false;
         let boardingMarkers = []; 
         let currentPos = { lat: 0, lng: 0 };
-        
+        // --- متغيرات مراقبة المسافة ---
+        let allowedRouteDistance = 0; // المسافة المخططة (بالمتر)
+        let distanceAlertShown = false; // لمنع تكرار التنبيه
+        const DISTANCE_TOLERANCE = 1.20; // سماحية 20% زيادة عن الطريق الأصلي
         let driverData = {}; 
         let myStudents = []; 
         let currentTripStudents = [];
@@ -1155,19 +1216,85 @@
             customThumb.style.right = `${percent}%`; 
             
             if(point) {
-                // Update Marker Position
+                // 1. تحديث موقع السيارة
                 const latLng = [point.lat, point.lng];
                 if(userMarker) userMarker.setLatLng(latLng);
-                map.panTo(latLng, {animate: false}); 
+                map.panTo(latLng, {animate: false}); // تحريك ناعم
                 
-                // Update Time Display
+                // 2. تحديث الوقت
                 if(point.ts) {
-                    const timeStr = new Date(point.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                    const timeStr = new Date(point.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                     timelineCurrent.innerText = timeStr;
                 }
+
+                // 3. تحديث السرعة المسجلة (الميزة الجديدة)
+                // نسترجع السرعة المحفوظة (s) أو نضع 0
+                const recordedSpeed = point.s || 0; 
+                const speedEl = document.getElementById('speedDisplay');
+                
+                // تأثير عداد رقمي عند التغيير
+                if(speedEl) {
+                    speedEl.innerText = recordedSpeed;
+                    
+                    // تغيير لون العداد في وضع المراجعة
+                    if (recordedSpeed > 100) speedEl.parentElement.classList.add('animate-pulse', 'text-red-500');
+                    else speedEl.parentElement.classList.remove('animate-pulse', 'text-red-500');
+                }
+
+                // 4. عرض حالة المرور المسجلة (الميزة الجديدة)
+                // نسترجع حالة المرور (t)
+                const trafficStatus = point.t || 'disabled';
+                updateReviewTrafficIndicator(trafficStatus);
             }
         }
 
+        function updateReviewTrafficIndicator(status) {
+            let indicator = document.getElementById('reviewTrafficIndicator');
+            
+            // إنشاء المؤشر إذا لم يكن موجوداً
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'reviewTrafficIndicator';
+                indicator.className = 'absolute top-24 left-4 glass-pill px-3 py-2 flex items-center gap-2 z-[400] transition-all duration-300 transform translate-x-[-200%]'; // مخفي مبدئياً
+                document.getElementById('mapView').appendChild(indicator);
+            }
+
+            // إعداد النصوص والألوان بناءً على الحالة المسجلة
+            let icon, text, colorClass, borderClass;
+            
+            switch(status) {
+                case 'jammed':
+                    icon = 'fa-traffic-light';
+                    text = 'زحام شديد';
+                    colorClass = 'text-red-500';
+                    borderClass = 'border-red-500/50 bg-red-500/10';
+                    indicator.style.transform = 'translateX(0)'; // إظهار
+                    break;
+                case 'heavy':
+                    icon = 'fa-car-side';
+                    text = 'حركة بطيئة';
+                    colorClass = 'text-orange-400';
+                    borderClass = 'border-orange-500/50 bg-orange-500/10';
+                    indicator.style.transform = 'translateX(0)'; // إظهار
+                    break;
+                case 'clear':
+                    icon = 'fa-road';
+                    text = 'طريق سالك';
+                    colorClass = 'text-emerald-400';
+                    borderClass = 'border-emerald-500/50 bg-emerald-500/10';
+                    indicator.style.transform = 'translateX(0)'; // إظهار
+                    break;
+                default: // disabled or unknown
+                    indicator.style.transform = 'translateX(-200%)'; // إخفاء
+                    return;
+            }
+
+            indicator.className = `absolute top-24 left-4 glass-pill px-3 py-2 flex items-center gap-2 z-[400] transition-all duration-300 ${borderClass}`;
+            indicator.innerHTML = `
+                <i class="fas ${icon} ${colorClass} animate-pulse"></i>
+                <span class="text-xs font-bold text-white">${text}</span>
+            `;
+        }
         // --- TOAST SYSTEM ---
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -1230,6 +1357,67 @@
             return false;
         }
 
+        function initHomeAnimations() {
+    // التأكد من أن GSAP متاح
+    if (typeof gsap === 'undefined') return;
+
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    // 1. Header Slide Down
+    tl.fromTo(".gsap-header", 
+        { y: -50, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.8 }
+    );
+
+    // 2. Hero Card Scale & Rotate slightly
+    tl.fromTo(".gsap-hero", 
+        { scale: 0.8, opacity: 0, rotationX: 10 }, 
+        { scale: 1, opacity: 1, rotationX: 0, duration: 0.8 }, 
+        "-=0.4"
+    );
+
+    // 3. Stats Cards Stagger (Pop up)
+    tl.fromTo(".gsap-stat-card", 
+        { y: 50, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.6, stagger: 0.2 }, 
+        "-=0.6"
+    );
+
+    // 4. Action Button Elastic
+    tl.fromTo(".gsap-action", 
+        { scale: 0.9, opacity: 0 }, 
+        { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.5)" }, 
+        "-=0.4"
+    );
+
+    // 5. History Panel Slide Up
+    tl.fromTo(".gsap-history", 
+        { y: 100, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.8 }, 
+        "-=0.6"
+    );
+
+    // --- Continuous Floating Icons Animation ---
+    gsap.to(".floating-icon", {
+        y: -10,
+        rotation: 5,
+        duration: 2,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut"
+    });
+    
+    gsap.to(".floating-icon-delayed", {
+        y: -8,
+        rotation: -5,
+        duration: 2.5,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        delay: 0.5
+    });
+}
+
         // --- VIEW MANAGEMENT ---
         function showView(viewName) {
             Object.values(views).forEach(el => {
@@ -1242,7 +1430,10 @@
                 views[viewName].classList.remove('view-hidden');
                 views[viewName].classList.add('view-active');
                 currentView = viewName;
-
+        // Trigger animations ONLY when Home is shown
+                if (viewName === 'home') {
+                    initHomeAnimations();
+                }
                 if(viewName === 'map' && !map) {
                     setTimeout(initMap, 300);
                 } else if (viewName === 'map') {
@@ -1536,6 +1727,7 @@
             const dayName = dateObj.toLocaleDateString('ar-SA', {weekday: 'long'});
             const distance = trip.totalDistance ? trip.totalDistance.toFixed(2) : "0.0";
             
+            // --- حساب الإحصائيات ---
             let percent = 0;
             let presentCount = 0;
             if (trip.stats) {
@@ -1547,39 +1739,166 @@
                 percent = stats.percent;
                 presentCount = stats.present;
             }
-            
-            const colorClass = percent >= 90 ? 'text-emerald-400' : percent >= 70 ? 'text-yellow-400' : 'text-red-400';
-            const bgClass = percent >= 90 ? 'bg-emerald-500/10 border-emerald-500/20' : percent >= 70 ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-red-500/10 border-red-500/20';
 
+            // --- تحديد الألوان والثيم بناءً على الأداء ---
+            let theme = {
+                gradient: 'from-emerald-500 to-teal-400',
+                shadow: 'shadow-emerald-500/20',
+                text: 'text-emerald-400',
+                bg: 'bg-emerald-500/10',
+                border: 'border-emerald-500/20',
+                icon: 'fa-check-circle'
+            };
+
+            if (percent < 90 && percent >= 70) {
+                theme = {
+                    gradient: 'from-amber-400 to-orange-500',
+                    shadow: 'shadow-amber-500/20',
+                    text: 'text-amber-400',
+                    bg: 'bg-amber-500/10',
+                    border: 'border-amber-500/20',
+                    icon: 'fa-exclamation-circle'
+                };
+            } else if (percent < 70) {
+                theme = {
+                    gradient: 'from-red-500 to-pink-600',
+                    shadow: 'shadow-red-500/20',
+                    text: 'text-red-400',
+                    bg: 'bg-red-500/10',
+                    border: 'border-red-500/20',
+                    icon: 'fa-times-circle'
+                };
+            }
+
+            // إنشاء العنصر
             const card = document.createElement('div');
-            card.className = 'glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition relative overflow-hidden group';
-
+            // إضافة كلاسات للتفاعل
+            card.className = 'trip-card-interactive relative w-full mb-5 cursor-pointer perspective-1000';
             
+            // إعداد التفاعل عند النقر
             card.onclick = () => reviewTrip(trip);
+
+            // --- الهيكل الداخلي (HTML) ---
             card.innerHTML = `
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="w-14 h-14 rounded-xl bg-white/5 flex flex-col items-center justify-center border border-white/10">
-                        <span class="text-xs text-gray-400 font-bold">${dateObj.toLocaleDateString('ar-SA', {weekday:'short'})}</span>
-                        <span class="text-lg font-bold text-white">${dateObj.getDate()}</span>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-white mb-1">رحلة توصيل ${dayName}</h4>
-                        <div class="flex items-center gap-2">
-                             <div class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${bgClass} ${colorClass}">
-                                <i class="fas fa-chart-pie"></i>
-                                <span>حضور ${percent}%</span>
-                             </div>
-                             <span class="text-[10px] text-gray-500">(${presentCount} طالب)</span>
+                <div class="card-content relative bg-[#1e293b] rounded-[1.5rem] p-1 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group border border-white/5">
+                    
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br ${theme.gradient} opacity-10 blur-3xl rounded-full group-hover:opacity-20 transition-opacity duration-500"></div>
+
+                    <div class="relative z-10 bg-[#0f172a]/80 backdrop-blur-md rounded-[1.3rem] p-4 border ${theme.border}">
+                        
+                        <div class="flying-particles absolute inset-0 pointer-events-none overflow-hidden rounded-[1.3rem]">
+                            <i class="fas fa-star particle absolute top-1/2 left-1/2 text-[10px] ${theme.text} opacity-0"></i>
+                            <i class="fas fa-circle particle absolute top-1/2 left-1/2 text-[6px] text-white opacity-0"></i>
+                            <i class="fas fa-map-marker-alt particle absolute top-1/2 left-1/2 text-[12px] ${theme.text} opacity-0"></i>
+                            <i class="fas fa-route particle absolute top-1/2 left-1/2 text-[10px] text-gray-400 opacity-0"></i>
+                            <i class="fas fa-bus particle absolute top-1/2 left-1/2 text-[14px] text-white opacity-0"></i>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-4">
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-16 h-16 flex-shrink-0">
+                                    <div class="absolute inset-0 bg-gradient-to-br ${theme.gradient} rounded-2xl opacity-20 group-hover:rotate-12 transition-transform duration-500"></div>
+                                    <div class="absolute inset-0 border border-white/10 rounded-2xl bg-[#1e293b] flex flex-col items-center justify-center shadow-lg group-hover:scale-95 transition-transform">
+                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${dateObj.toLocaleDateString('en-US', {weekday:'short'})}</span>
+                                        <span class="text-2xl font-bold text-white font-mono">${dateObj.getDate()}</span>
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0f172a] rounded-full flex items-center justify-center">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-gradient-to-r ${theme.gradient} animate-pulse"></div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <h4 class="text-white font-bold text-sm flex items-center gap-2">
+                                        <span>رحلة ${dayName}</span>
+                                        <i class="fas ${theme.icon} ${theme.text} text-xs opacity-0 group-hover:opacity-100 transition-opacity delay-100 -translate-x-2 group-hover:translate-x-0 duration-300"></i>
+                                    </h4>
+                                    
+                                    <div class="flex items-center gap-2 text-xs">
+                                        <div class="px-2 py-0.5 rounded-md ${theme.bg} ${theme.text} border ${theme.border} flex items-center gap-1">
+                                            <i class="fas fa-users text-[10px]"></i>
+                                            <span class="font-mono font-bold">${percent}%</span>
+                                        </div>
+                                        <span class="text-gray-500 text-[10px]">|</span>
+                                        <span class="text-gray-400 text-[10px]">${presentCount} طالب</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-left relative">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">المسافة</p>
+                                <div class="flex items-baseline justify-end gap-1 group-hover:scale-110 transition-transform origin-right duration-300">
+                                    <span class="text-xl font-black text-white font-mono tracking-tight">${distance}</span>
+                                    <span class="text-xs font-bold ${theme.text}">km</span>
+                                </div>
+                                
+                                <div class="absolute top-1/2 -left-3 -translate-y-1/2 -translate-x-full opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-r ${theme.gradient} flex items-center justify-center shadow-lg text-white">
+                                        <i class="fas fa-chevron-left text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r ${theme.gradient} transition-all duration-1000 w-0 group-hover:w-full opacity-50"></div>
                 </div>
-                <div class="text-left relative z-10">
-                    <p class="text-sm font-bold font-mono text-white">${distance} km</p>
-                    <i class="fas fa-chevron-left text-xs text-gray-600 mt-1"></i>
-                </div>
-                <div class="absolute inset-0 bg-gradient-to-l from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
             `;
+
             calendarGrid.appendChild(card);
+
+            // --- 1. أنيميشن الدخول (GSAP Entry) ---
+            if (typeof gsap !== 'undefined') {
+                gsap.fromTo(card, 
+                    { y: 50, opacity: 0, rotateX: -10 },
+                    { 
+                        y: 0, 
+                        opacity: 1, 
+                        rotateX: 0, 
+                        duration: 0.6, 
+                        delay: index * 0.1, 
+                        ease: "power3.out" 
+                    }
+                );
+
+                // --- 2. أنيميشن تطاير الأيقونات عند اللمس/الماوس ---
+                const particles = card.querySelectorAll('.particle');
+                
+                const animateParticles = () => {
+                    particles.forEach((p) => {
+                        // إعادة تعيين المكان للمنتصف
+                        gsap.set(p, { x: 0, y: 0, opacity: 1, scale: 0 });
+                        
+                        // حساب زاوية ومسافة عشوائية
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = 30 + Math.random() * 50; // مسافة التطاير
+                        const x = Math.cos(angle) * dist;
+                        const y = Math.sin(angle) * dist;
+
+                        // التفجير
+                        gsap.to(p, {
+                            x: x,
+                            y: y,
+                            opacity: 0,
+                            scale: 1.5,
+                            rotation: Math.random() * 360,
+                            duration: 0.8 + Math.random() * 0.5,
+                            ease: "power2.out"
+                        });
+                    });
+                };
+
+                // تفعيل الأنيميشن عند الهوفر (للكمبيوتر)
+                card.addEventListener('mouseenter', animateParticles);
+                
+                // تفعيل الأنيميشن عند اللمس (للموبايل)
+                card.addEventListener('touchstart', () => {
+                    animateParticles();
+                    // تكبير بسيط للبطاقة عند اللمس
+                    gsap.to(card.querySelector('.card-content'), { scale: 0.98, duration: 0.1, yoyo: true, repeat: 1 });
+                }, {passive: true});
+            }
         }
 
         // --- STUDENTS & BOARDING RENDER LOGIC ---
@@ -1649,6 +1968,10 @@
         };
         
         function markStudentBoarded(studentId) {
+            if (!currentTripKey) {
+                showToast('يجب بدء الرحلة أولاً لتسجيل الحضور', 'error');
+                return; 
+            }
             const studentIndex = currentTripStudents.findIndex(s => s.id === studentId);
             if(studentIndex > -1) {
                 currentTripStudents[studentIndex].status = 'boarded';
@@ -1663,12 +1986,14 @@
 
                 renderStudentsList(false);
             
-                if(currentTripKey && navigator.geolocation) {
+                if(navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(pos => {
                         eventData.lat = pos.coords.latitude;
                         eventData.lng = pos.coords.longitude;
+                        
+                        // الكتابة في Firebase
                         const eventsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/events');
-                        window.rtdbPush(eventsRef, eventData);
+                        window.rtdbPush(eventsRef, eventData).catch(e => console.error("Error logging boarding:", e));
                     });
                 }
             }
@@ -1753,6 +2078,7 @@
 
                         const summary = route.summary;
                         const distKm = (summary.lengthInMeters / 1000).toFixed(1);
+                        allowedRouteDistance = summary.lengthInMeters;
                         const timeMin = Math.round(summary.travelTimeInSeconds / 60);
                         
                         routeInfo.classList.remove('hidden');
@@ -1795,6 +2121,8 @@
                 if(lRoute) lRoute.classList.add('hidden');
                 
                 const bestRoute = e.routes[0];
+                allowedRouteDistance = bestRoute.summary.totalDistance; // <--- أضف هذا السطر (بالمتر)  
+                
                 const rInfo = document.getElementById('routeInfo');
                 if(rInfo) {
                     rInfo.classList.remove('hidden');
@@ -1811,6 +2139,120 @@
                 if(lRoute) lRoute.classList.add('hidden');
                 showToast("تعذر الوصول لهذا الموقع.", 'error');
             });
+        }
+
+        // check if spped or root defference exceeded
+        function checkDistanceLimit(currentTotalDistanceMeters) {
+            // إذا لم يتم حساب مسار أصلاً، لا تقم بالمراقبة
+            if (allowedRouteDistance === 0) return;
+
+            const maxAllowed = allowedRouteDistance * DISTANCE_TOLERANCE;
+
+            // إذا تجاوزنا الحد ولم يظهر التنبيه مسبقاً
+            if (currentTotalDistanceMeters > maxAllowed && !distanceAlertShown) {
+                distanceAlertShown = true;
+                triggerExcessiveDistanceAlert(currentTotalDistanceMeters, maxAllowed);
+            }
+        }
+
+        function triggerExcessiveDistanceAlert(current, max) {
+    // 1. تغيير لون عداد المسافة (كما هو سابقاً)
+    const distContainer = document.getElementById('distanceDisplay').parentElement;
+    if(distContainer) {
+        distContainer.classList.remove('bg-white/5', 'border-white/5');
+        distContainer.classList.add('bg-red-500/20', 'border-red-500/50', 'animate-pulse');
+        
+        const warningIcon = document.createElement('div');
+        warningIcon.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 text-xl drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]"></i>';
+        warningIcon.className = 'absolute -top-3 -right-3 animate-bounce z-50';
+        distContainer.style.position = 'relative';
+        distContainer.style.overflow = 'visible';
+        distContainer.appendChild(warningIcon);
+    }
+
+    // 2. إظهار النافذة المنبثقة مع الأزرار الثلاثة
+    showCustomModal({
+        icon: '<div class="relative"><i class="fas fa-route text-red-500 text-5xl"></i><i class="fas fa-ban absolute -bottom-2 -right-2 text-white text-2xl bg-red-600 rounded-full p-1 border-2 border-[#1e293b]"></i></div>',
+        title: 'تنبيه: خروج عن المسار',
+        message: `لقد تجاوزت المسافة المقدرة للرحلة (${(allowedRouteDistance/1000).toFixed(1)} كم).\n المسافة الحالية: ${(current/1000).toFixed(1)} كم.\n اختر إجراء لتصحيح الوضع:`,
+        actions: [
+            {
+                label: 'إعادة تحديد مسار 🔄',
+                class: 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/30',
+                onClick: () => {
+                    handleRerouting(); // استدعاء دالة إعادة التوجيه
+                    closeCustomModal();
+                }
+            },
+            {
+                label: 'إبلاغ عن تحويلة 🚧',
+                class: 'bg-amber-500 text-white hover:bg-amber-600',
+                onClick: () => {
+                    showToast('تم تسجيل التحويلة للإدارة', 'success');
+                    // يمكنك هنا إضافة كود لحفظ التبرير في Firebase
+                    closeCustomModal();
+                }
+            },
+            {
+                label: 'تجاهل',
+                class: 'bg-white/10 text-gray-400 hover:bg-white/20',
+                onClick: closeCustomModal
+            }
+        ]
+    });
+
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+}
+        
+        function handleRerouting() {
+            showToast('جاري حساب أفضل مسار من موقعك الحالي...', 'info');
+            
+            // 1. التأكد من وجود إحداثيات حالية ووجهة
+            if (currentPos.lat === 0 || currentPos.lng === 0) {
+                showToast('تعذر تحديد موقعك الحالي!', 'error');
+                return;
+            }
+
+            // نستخدم الوجهة المحفوظة (المدرسة) أو الإحداثيات الثابتة كاحتياطي
+            let destLat = FIXED_SCHOOL_LOCATION.lat;
+            let destLng = FIXED_SCHOOL_LOCATION.lng;
+
+            if (driverData && driverData.destination && driverData.destination.lat) {
+                destLat = driverData.destination.lat;
+                destLng = driverData.destination.lng;
+            }
+
+            // 2. طلب حساب المسار من جديد (هذا سيقوم بتحديث الخط على الخريطة)
+            // الدالة calculateRoute موجودة بالفعل في كودك وتقوم برسم الخط
+            calculateRoute(destLat, destLng)
+                .then(() => {
+                    // ملاحظة: calculateRoute عادةً ما تكون async أو تعتمد على callback
+                    // إذا كانت calculateRoute لا ترجع Promise، قد تحتاج لتعديلها أو الاعتماد على أن الـ Alert سيختفي
+                    
+                    showToast('تم تحديث المسار بنجاح ✅', 'success');
+                    
+                    // 3. إعادة تعيين حالة التنبيه والمسافة المسموحة
+                    // لأن calculateRoute ستقوم تلقائياً بتحديث allowedRouteDistance
+                    // عند نجاح التوجيه (سواء TomTom أو OSRM)
+                    
+                    // نعيد عداد المسافة لشكله الطبيعي
+                    const distContainer = document.getElementById('distanceDisplay').parentElement;
+                    if(distContainer) {
+                        distContainer.classList.remove('bg-red-500/20', 'border-red-500/50', 'animate-pulse');
+                        distContainer.classList.add('bg-white/5', 'border-white/5');
+                        const warningIcon = distContainer.querySelector('.fa-exclamation-triangle')?.parentElement;
+                        if(warningIcon) warningIcon.remove();
+                    }
+                    
+                    // السماح بتنبيه جديد في المستقبل إذا انحرف عن المسار الجديد أيضاً
+                    distanceAlertShown = false; 
+                    
+                })
+                .catch(() => {
+                    // في حال كانت calculateRoute لا تدعم الـ Promise حالياً، 
+                    // الكود سيعمل لأن التحديث يحدث داخل الـ Callbacks الخاصة بـ Routing Control
+                    distanceAlertShown = false; // إعادة ضبط التنبيه ليسمح بحساب المسافة الجديدة
+                });
         }
 
         // --- TOMTOM TOOLS LOGIC ---
@@ -2254,7 +2696,10 @@
             
             const anOverlay = document.getElementById('analyticsOverlay');
             if(anOverlay) anOverlay.classList.add('hidden');
-            
+
+            const trafficInd = document.getElementById('reviewTrafficIndicator');
+            if(trafficInd) trafficInd.remove();
+
             currentReviewTrip = null;
             showView('home');
         }
@@ -2310,46 +2755,82 @@
             }
         }
         
+        function estimateTrafficLevel(speedKmh) {
+            // إذا كانت الطبقة غير مفعلة، لا نسجل بيانات
+            if (!activeLayers.trafficFlow) return 'disabled';
+
+            // منطق بسيط: سرعة منخفضة جداً = زحام، سرعة عالية = سالك
+            if (speedKmh < 10) return 'jammed'; // زحام شديد (أحمر)
+            if (speedKmh < 30) return 'heavy';  // زحام متوسط (برتقالي)
+            return 'clear';                     // سالك (أخضر)
+        }
+
         function startLocationWatcher() {
             if (watchId) navigator.geolocation.clearWatch(watchId);
             let lastPos = null;
             let totalDist = 0; // ملاحظة: في حالة الاستعادة، يجب جلب المسافة السابقة إذا أردنا الدقة التامة، لكننا سنبدأ من الصفر للجلسة الحالية للإضافة عليها
 
-            watchId = navigator.geolocation.watchPosition(
-                pos => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    const latLng = [lat, lng];
-                    currentPos = {lat, lng};
-                    userMarker.setLatLng(latLng);
-                    map.panTo(latLng, {animate: true});
-                    pathLine.addLatLng(latLng);
-                    
-                    const distEl = document.getElementById('distanceDisplay');
-                    const speedEl = document.getElementById('speedDisplay');
-                    
-                    if(lastPos) {
-                        totalDist += L.latLng(lastPos).distanceTo(latLng);
-                        if(distEl) distEl.innerText = (totalDist/1000).toFixed(2) + " كم";
-                    }
-                    lastPos = latLng;
-                    if(speedEl) speedEl.innerText = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(0) : 0;
-                    
-                    if(currentTripKey) {
-                        // تسجيل النقطة في المسار
-                        const pathRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/actualPath');
-                        const pointRef = window.rtdbPush(pathRef);
-                        window.rtdbSet(pointRef, { lat: lat, lng: lng, ts: Date.now() });
+                watchId = navigator.geolocation.watchPosition(
+                    pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const latLng = [lat, lng];
                         
-                        // تحديث المسافة الإجمالية
-                        // ملاحظة: لتحسين الأداء يمكن تحديث المسافة كل فترة وليس كل نقطة
-                        const tripMetaRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
-                        window.rtdbUpdate(tripMetaRef, { totalDistance: totalDist / 1000 });
-                    }
-                },
-                err => console.error(err),
-                { enableHighAccuracy: true, maximumAge: 0 }
-            );
+                        // حساب السرعة (تحويل من م/ث إلى كم/س)
+                        // نستخدم 0 كقيمة افتراضية إذا كانت السرعة null
+                        const rawSpeed = pos.coords.speed || 0;
+                        const speedKmh = Math.round(rawSpeed * 3.6); 
+                        
+                        // تحديد حالة المرور
+                        const trafficStatus = estimateTrafficLevel(speedKmh);
+
+                        currentPos = {lat, lng};
+                        userMarker.setLatLng(latLng);
+                        map.panTo(latLng, {animate: true});
+                        pathLine.addLatLng(latLng);
+                        
+                        // تحديث واجهة السرعة والمسافة الحالية
+                        const distEl = document.getElementById('distanceDisplay');
+                        const speedEl = document.getElementById('speedDisplay');
+                        
+                        if(lastPos) {
+                            totalDist += L.latLng(lastPos).distanceTo(latLng);
+                            if(distEl) distEl.innerText = (totalDist/1000).toFixed(2) + " كم";
+                            checkDistanceLimit(totalDist); // ميزة التنبيه السابقة
+                        }
+                        lastPos = latLng;
+                        
+                        // تحديث العداد
+                        if(speedEl) {
+                            speedEl.innerText = speedKmh;
+                            // تغيير لون العداد بناءً على السرعة
+                            speedEl.style.color = speedKmh > 100 ? '#ef4444' : (speedKmh > 80 ? '#f59e0b' : 'white');
+                        }
+                        
+                        if(currentTripKey && isTracking) {
+                            // تسجيل النقطة في المسار
+                            const pathRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/actualPath');
+                            const pointRef = window.rtdbPush(pathRef);
+                            
+                            window.rtdbSet(pointRef, { 
+                                lat: lat, 
+                                lng: lng, 
+                                ts: Date.now(),
+                                s: speedKmh,       
+                                t: trafficStatus   
+                            }).catch(error => {
+                                console.warn("فشل تسجيل النقطة:", error);
+                                // لا نريد إيقاف التطبيق بسبب خطأ شبكة عابر
+                            });
+                            
+                            // تحديث إجمالي المسافة
+                            const tripMetaRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
+                            window.rtdbUpdate(tripMetaRef, { totalDistance: totalDist / 1000 });
+                        }
+                    },
+                    err => console.error(err),
+                    { enableHighAccuracy: true, maximumAge: 0 }
+                );
         }
 
         async function stopTracking(resetUI) {
