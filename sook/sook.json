@@ -1,0 +1,19 @@
+{
+  "splash": {
+    "imageUrl": "https://example.com/splash_bg.jpg",
+    "logoUrl": "https://example.com/logo.png",
+    "duration": 3000
+  },
+  "onboarding": [
+    {
+      "title": "تتبع لحظي",
+      "desc": "نظام تتبع فائق الدقة يعمل في الخلفية",
+      "imageUrl": "https://example.com/intro1.png"
+    },
+    {
+      "title": "تواصل مستمر",
+      "desc": "ابقى على اتصال دائم مع المشرفين",
+      "imageUrl": "https://example.com/intro2.png"
+    }
+  ]
+}
