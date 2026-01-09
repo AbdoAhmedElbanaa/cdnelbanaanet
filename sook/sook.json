@@ -1,19 +1,45 @@
 {
   "splash": {
-    "imageUrl": "https://example.com/splash_bg.jpg",
-    "logoUrl": "https://example.com/logo.png",
-    "duration": 3000
+    "imageUrl": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1080&auto=format&fit=crop",
+    "logoUrl": "",
+    "duration": 5000
   },
-  "onboarding": [
+  "intro": [
     {
-      "title": "تتبع لحظي",
-      "desc": "نظام تتبع فائق الدقة يعمل في الخلفية",
-      "imageUrl": "https://example.com/intro1.png"
+      "title": "مرحباً بك في Sook",
+      "desc": "منصة السائق الذكية لإدارة الرحلات المدرسية باحترافية وأمان.",
+      "imageUrl": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1080&auto=format&fit=crop"
     },
     {
-      "title": "تواصل مستمر",
-      "desc": "ابقى على اتصال دائم مع المشرفين",
-      "imageUrl": "https://example.com/intro2.png"
+      "title": "تتبع دقيق",
+      "desc": "نظام تتبع لحظي يعمل في الخلفية لضمان سلامة الطلاب وطمأنة أولياء الأمور.",
+      "imageUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1080&auto=format&fit=crop"
+    }
+  ],
+  "permissions": [
+    {
+      "type": "location",
+      "title": "صلاحية الموقع",
+      "desc": "نحتاج للوصول لموقعك 'طوال الوقت' لكي يعمل التتبع في الخلفية بدقة.",
+      "imageUrl": "https://cdn-icons-png.flaticon.com/512/854/854878.png"
+    },
+    {
+      "type": "notification",
+      "title": "الإشعارات",
+      "desc": "اسمح بالإشعارات لتستقبل تحديثات الرحلة وتنبيهات الطلاب.",
+      "imageUrl": "https://cdn-icons-png.flaticon.com/512/3239/3239952.png"
+    },
+    {
+      "type": "battery",
+      "title": "العمل في الخلفية",
+      "desc": "يجب استثناء التطبيق من موفر البطارية لضمان عدم توقف التتبع.",
+      "imageUrl": "https://cdn-icons-png.flaticon.com/512/3103/3103460.png"
+    },
+    {
+      "type": "warning",
+      "title": "تنبيه هام جداً",
+      "desc": "سيتم ربط حسابك بهذا الجهاز فقط. لا يمكنك تسجيل الدخول من جهاز آخر بعد الموافقة.",
+      "imageUrl": "https://cdn-icons-png.flaticon.com/512/10009/10009596.png"
     }
   ]
 }
