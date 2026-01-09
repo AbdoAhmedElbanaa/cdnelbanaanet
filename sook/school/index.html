@@ -26,6 +26,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
 
     <style>
         body {
@@ -281,7 +284,7 @@
         #toast-container {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            right: 20px;
             z-index: 100;
             display: flex;
             flex-direction: column;
@@ -351,6 +354,17 @@
         transition: transform 0.6s;
     }
     .group:hover .card-shine { transform: translateX(100%); }
+    .flatpickr-calendar {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    }
+    .flatpickr-day.selected {
+        background: #06b6d4 !important; /* Cyan-500 */
+        border-color: #06b6d4 !important;
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    }
     </style>
 </head>
 <body class="text-slate-200">
@@ -359,7 +373,7 @@
     <div id="app" class="relative min-h-screen flex overflow-hidden">
         
         <!-- Toast Container -->
-        <div id="toast-container"></div>
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2"></div>
 
         <!-- Loading Screen -->
         <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a] transition-opacity duration-500">
@@ -428,6 +442,10 @@
                     <button onclick="App.navigate('students')" id="nav-students" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
                         <i class="ph ph-student text-2xl lg:ml-3"></i>
                         <span class="hidden lg:block font-medium">الطلاب</span>
+                    </button>
+                    <button onclick="App.navigate('settings')" id="nav-settings" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <i class="ph ph-gear text-2xl lg:ml-3"></i>
+                        <span class="hidden lg:block font-medium">إعدادات الخرائط</span>
                     </button>
                 </nav>
 
@@ -615,73 +633,48 @@
                     <div class="glass-morphism rounded-3xl p-8 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[100px] rounded-full -mr-20 -mt-20"></div>
                         
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between mb-8">
-                                <h3 class="text-2xl font-bold text-white flex items-center gap-3">
-                                    <span class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                                        <i class="ph ph-pulse text-xl"></i>
-                                        <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-                                        </span>
-                                    </span>
-                                    مراقبة الأسطول
-                                    <span class="text-xs font-normal text-slate-400 mr-2 bg-slate-800/50 px-2 py-1 rounded-lg border border-slate-700">تحديث لحظي</span>
-                                </h3>
-                                
-                                <div class="flex gap-2">
-                                    <button class="p-2 rounded-lg bg-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors border border-slate-700/50">
-                                        <i class="ph ph-squares-four"></i>
-                                    </button>
-                                </div>
-                            </div>
+<div class="col-span-12 lg:col-span-8 space-y-6 relative">
+    
+    <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-4 relative z-20">
+        <div>
+            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                <div class="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                    <i class="ph ph-radar text-cyan-400 animate-pulse"></i>
+                </div>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">مراقبة الأسطول</span>
+            </h3>
+        </div>
 
-                            <div id="recent-activity-body" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                
-                                <div class="group relative bg-slate-800/40 hover:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 overflow-hidden">
-                                    
-                                    <i class="ph ph-car-profile absolute -left-4 -bottom-4 text-[80px] text-white/5 group-hover:text-white/10 group-hover:-rotate-12 transition-all duration-500"></i>
-                                    
-                                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+        <div class="flex items-center gap-3 bg-slate-900/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-xl">
+            
+            <div class="relative group">
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-cyan-400">
+                    <i class="ph ph-calendar-star text-lg"></i>
+                </div>
+                <input type="text" id="fleet-date-picker" 
+                       class="bg-white/5 text-white text-xs font-bold rounded-xl pr-10 pl-3 py-2.5 border border-white/5 focus:border-cyan-500/50 focus:bg-white/10 focus:outline-none transition-all w-40 cursor-pointer text-right hover:border-white/20 placeholder-slate-500"
+                       placeholder="اختر التاريخ">
+            </div>
 
-                                    <div class="flex items-start justify-between mb-4 relative z-10">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-indigo-500/20">
-                                                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-indigo-300 font-bold text-lg">
-                                                    A </div>
-                                            </div>
-                                            <div>
-                                                <h4 class="text-white font-bold text-base leading-tight">أحمد محمد</h4> <span class="text-xs text-slate-400 mt-1 block">رقم المركبة: 4580</span>
-                                            </div>
-                                        </div>
-                                        <div class="flex flex-col items-end gap-1">
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                متصل
-                                            </span>
-                                        </div>
-                                    </div>
+            <div class="w-px h-8 bg-white/10 mx-1"></div>
 
-                                    <hr class="border-white/5 mb-4" />
+            <div class="flex bg-black/20 rounded-xl p-1">
+                <button onclick="App.FleetFeed.setView('cards')" id="btn-view-cards" class="w-9 h-9 flex items-center justify-center rounded-lg text-cyan-400 bg-white/10 shadow-lg transition-all hover:scale-105">
+                    <i class="ph ph-grid-four text-xl"></i>
+                </button>
+                <button onclick="App.FleetFeed.setView('list')" id="btn-view-list" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-white transition-all hover:bg-white/5">
+                    <i class="ph ph-list-dashes text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-                                    <div class="grid grid-cols-2 gap-4 relative z-10">
-                                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-blue-500/20 transition-colors">
-                                            <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
-                                                <i class="ph ph-speedometer text-blue-400"></i> السرعة
-                                            </p>
-                                            <p class="text-xl font-mono font-bold text-white tracking-wider">65 <span class="text-xs font-sans text-slate-500">كم/س</span></p>
-                                        </div>
-                                        
-                                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
-                                            <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
-                                                <i class="ph ph-clock text-purple-400"></i> آخر تحديث
-                                            </p>
-                                            <p class="text-sm font-bold text-slate-200 mt-1">منذ دقيقتين</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-                        </div>
+    <div id="fleet-feed-container" class="grid grid-cols-1 md:grid-cols-2 gap-5 min-h-[400px] perspective-1000 relative z-10">
+        </div>
+
+    <div id="fleet-pagination" class="flex justify-center items-center gap-2 pt-6">
+        </div>
+</div>
                     </div>  
 
                     </div>
@@ -1050,7 +1043,260 @@
                             <p class="text-slate-500">لا يوجد طلاب مطابقين للبحث</p>
                         </div>
                     </div>
+                    <!-- Settings Button -->
+<div id="view-settings" class="view-section hidden space-y-8 relative min-h-screen pb-20">
+    
+    <div class="absolute top-0 left-0 w-full h-[600px] bg-indigo-900/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 
+    <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10 mb-8">
+        <div>
+            <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600/20 border border-indigo-500/30">
+                    <i class="ph ph-sliders-horizontal text-3xl text-indigo-400"></i>
+                </div>
+                <div>
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-l from-indigo-200 to-white">مركز إعدادات API</span>
+                    <span class="text-xs text-slate-400 font-normal">التحكم في خدمات ومنتجات TomTom</span>
+                </div>
+            </h2>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="App.Settings.enableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">تفعيل الكل</button>
+            <button onclick="App.Settings.disableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">إيقاف الكل</button>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="ph ph-map-trifold"></i> الخرائط والمرور
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mapDisplay')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><i class="ph ph-map text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mapDisplay-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mapDisplay-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Map Display API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">عرض الخرائط الأساسية وطبقات التجانب.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-red-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('traffic')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"><i class="ph ph-traffic-signal text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-traffic-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-traffic-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Traffic API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">بيانات التدفق المروري والحوادث الحية.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-green-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('evCharging')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20"><i class="ph ph-charging-station text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-evCharging-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-evCharging-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">EV Charging Stations</h4>
+                <p class="text-[10px] text-slate-400 mt-1">توافر محطات شحن السيارات الكهربائية.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="ph ph-arrows-split"></i> التوجيه والمسارات
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('routing')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-path text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-routing-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-routing-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Routing API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">حساب المسارات الدقيقة والوقت المتوقع.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('extendedRouting')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-arrows-merge text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-extendedRouting-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-extendedRouting-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Extended Routing API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">توجيه متخصص للمسافات الطويلة والشاحنات.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('matrixRouting')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-grid-four text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-matrixRouting-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-matrixRouting-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Matrix Routing v2</h4>
+                <p class="text-[10px] text-slate-400 mt-1">حساب المصفوفات المعقدة (One-to-Many).</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('snapRoads')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-magnet text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-snapRoads-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-snapRoads-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Snap to Roads API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">مطابقة نقاط GPS مع شبكة الطرق الفعلية.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('waypointOptimization')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-list-numbers text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-waypointOptimization-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-waypointOptimization-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Waypoint Optimization</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تحسين ترتيب نقاط التوقف في الرحلة.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="ph ph-magnifying-glass"></i> البحث والعناوين
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('search')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-magnifying-glass text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-search-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-search-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Search API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">البحث عن الأماكن والعناوين والنقاط الهامة.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geocoding')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geocoding-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geocoding-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Geocoding API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تحويل العناوين إلى إحداثيات جغرافية.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('reverseGeocoding')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin-line text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-reverseGeocoding-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-reverseGeocoding-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Reverse Geocoding</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تحويل الإحداثيات إلى عناوين مقروءة.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('batchSearch')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-stack text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-batchSearch-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-batchSearch-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Batch Search API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تنفيذ عمليات بحث متعددة في طلب واحد.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="ph ph-package"></i> الأصول والبنية التحتية
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('assets')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-truck text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-assets-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-assets-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Assets API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تتبع وإدارة الأصول المتحركة.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geofencing')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-polygon text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geofencing-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geofencing-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Geofencing API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تحديد النطاقات الجغرافية والتنبيهات.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('locationHistory')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-clock-counter-clockwise text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-locationHistory-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-locationHistory-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Location History API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">تخزين وتحليل تاريخ تحركات الأسطول.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-orange-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('notifications')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20"><i class="ph ph-bell text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-notifications-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-notifications-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">Notifications API</h4>
+                <p class="text-[10px] text-slate-400 mt-1">إدارة الإشعارات والتنبيهات الفورية.</p>
+            </div>
+
+            <div class="glass-morphism p-5 rounded-2xl group hover:border-slate-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mcpServer')">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="p-2.5 rounded-xl bg-slate-500/10 text-slate-300 border border-slate-500/20"><i class="ph ph-server-cloud text-xl"></i></div>
+                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mcpServer-bg">
+                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mcpServer-dot"></span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-white">MCP Server</h4>
+                <p class="text-[10px] text-slate-400 mt-1">الاتصال بخوادم TomTom السحابية.</p>
+            </div>
+        </div>
+    </div>
+    <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('satelliteMode')">
+    <div class="flex justify-between items-start mb-3">
+        <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <i class="ph ph-globe-hemisphere-east text-xl"></i>
+        </div>
+        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-satelliteMode-bg">
+            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-satelliteMode-dot"></span>
+        </div>
+    </div>
+    <h4 class="font-bold text-white">وضع القمر الصناعي</h4>
+    <p class="text-[10px] text-slate-400 mt-1">عرض صور حقيقية للمباني والتضاريس (Satellite).</p>
+</div>
+</div>
                 </div>
             </main>
         </div>
@@ -1434,7 +1680,13 @@
                 homeMarkers: {},
                 trackingMarkers: {},
                 currentTrackingDriverId: null,
-                currentViewDriverId: null // Used for Reset Device logic
+                currentViewDriverId: null, // Used for Reset Device logic
+                mapLayers: {
+                    evMarkers: [],   // لتخزين ماركرات الشواحن
+                    poiMarkers: [],  // لتخزين ماركرات البحث
+                    assetsLayer: null, // طبقة الأصول
+                    geofenceLayer: null // طبقة السياج الجغرافي
+                },
             },
 
             // --- REPLAY MODULE ---
@@ -1616,61 +1868,838 @@
                     }, 1000 / 30);
                 },
                 
-                updateFrame: function() {
-                    if (!this.tripData || !this.tripData.points) return;
-                    
-                    const idx = Math.floor(this.currentIndex);
-                    const currentPoint = this.tripData.points[idx];
-                    if (!currentPoint) return;
-                    
-                    // Update Map Position
-                    const lngLat = [currentPoint.lng, currentPoint.lat];
-                    if (App.state.trackingMarkers['car']) {
-                        App.state.trackingMarkers['car'].setLngLat(lngLat);
-                        App.state.trackingMap.panTo(lngLat);
+            updateFrame: function() {
+                if (!this.tripData || !this.tripData.points) return;
+
+                const idx = Math.floor(this.currentIndex);
+                const currentPoint = this.tripData.points[idx];
+                if (!currentPoint) return;
+
+                // ============================================================
+                // 1. (جديد) تحديث السرعة الفعلية في العداد
+                // ============================================================
+                // قراءة السرعة من النقطة الحالية أو وضع 0
+                const actualSpeed = currentPoint.s !== undefined ? currentPoint.s : 0;
+                const speedEl = document.getElementById('track-speed');
+                
+                if (speedEl) {
+                    speedEl.textContent = actualSpeed;
+                    // تغيير لون العداد للأحمر إذا تجاوزت السرعة 100
+                    if (actualSpeed > 100) {
+                        speedEl.style.color = '#ef4444';
+                        speedEl.style.textShadow = '0 0 20px rgba(239, 68, 68, 0.6)';
+                    } else {
+                        speedEl.style.color = 'white';
+                        speedEl.style.textShadow = 'none';
                     }
-                    
-                    // Draw Trail up to current point
-                    const pathSoFar = this.tripData.points.slice(0, idx + 1).map(p => [p.lng, p.lat]);
-                    const trailData = {
-                        type: 'Feature',
-                        geometry: { type: 'LineString', coordinates: pathSoFar }
-                    };
-                    const source = App.state.trackingMap.getSource('trail');
-                    if (source) source.setData(trailData);
-                    
-                    // Update Timeline UI
-                    const percent = (idx / (this.totalPoints - 1)) * 100;
-                    document.getElementById('timeline-progress').style.width = `${percent}%`;
-                    document.getElementById('timeline-thumb').style.left = `${100 - percent}%`; 
-                    
-                    // Update Status text
-                    const time = new Date(currentPoint.ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-                    document.getElementById('replay-current-status').textContent = time;
+                }
 
-                    // *** Update Student Timeline Status ***
-                    const timelineItems = document.querySelectorAll('#track-timeline .dt-item');
-                    timelineItems.forEach(item => {
-                        const eventTs = parseInt(item.dataset.ts);
-                        const statusLabel = item.querySelector('.status-label');
-                        
-                        // Fix: Skip if no status label (e.g., Start Node)
-                        if (!statusLabel) return;
+                // ============================================================
+                // 2. (جديد) تحديث حالة المرور (زحام/سالك)
+                // ============================================================
+                if (currentPoint.t) {
+                    const statusEl = document.getElementById('track-status');
+                    if (statusEl) {
+                        let statusText = 'مراجعة المسار';
+                        let statusClass = 'bg-gray-500/20 text-gray-400 border-gray-500/30';
 
-                        if (currentPoint.ts >= eventTs) {
-                            item.classList.remove('inactive');
-                            item.classList.add('active');
-                            statusLabel.innerHTML = '<i class="ph ph-check-circle text-emerald-400"></i> تم الركوب';
-                            statusLabel.classList.remove('text-slate-500');
-                            statusLabel.classList.add('text-emerald-400');
+                        if (currentPoint.t === 'jammed') {
+                            statusText = '⚠️ زحام شديد';
+                            statusClass = 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse';
+                        } else if (currentPoint.t === 'heavy') {
+                            statusText = '🚗 حركة بطيئة';
+                            statusClass = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+                        } else if (currentPoint.t === 'clear') {
+                            statusText = '✅ طريق سالك';
+                            statusClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                        }
+
+                        statusEl.textContent = statusText;
+                        statusEl.className = `px-3 py-1 rounded-full text-xs transition-colors duration-300 border ${statusClass}`;
+                    }
+                }
+
+                // ============================================================
+                // 3. الكود الأصلي (تحديث الخريطة، المسار، والطلاب)
+                // ============================================================
+
+                // Update Map Position
+                const lngLat = [currentPoint.lng, currentPoint.lat];
+                if (App.state.trackingMarkers['car']) {
+                    App.state.trackingMarkers['car'].setLngLat(lngLat);
+                    App.state.trackingMap.panTo(lngLat);
+                }
+
+                // Draw Trail up to current point
+                const pathSoFar = this.tripData.points.slice(0, idx + 1).map(p => [p.lng, p.lat]);
+                const trailData = {
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: pathSoFar }
+                };
+                const source = App.state.trackingMap.getSource('trail');
+                if (source) source.setData(trailData);
+
+                // Update Timeline UI
+                const percent = (idx / (this.totalPoints - 1)) * 100;
+                document.getElementById('timeline-progress').style.width = `${percent}%`;
+                document.getElementById('timeline-thumb').style.left = `${100 - percent}%`;
+
+                // Update Status text (Time)
+                const time = new Date(currentPoint.ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+                document.getElementById('replay-current-status').textContent = time;
+
+                // *** Update Student Timeline Status ***
+                const timelineItems = document.querySelectorAll('#track-timeline .dt-item');
+                timelineItems.forEach(item => {
+                    const eventTs = parseInt(item.dataset.ts);
+                    const statusLabel = item.querySelector('.status-label');
+
+                    // Fix: Skip if no status label (e.g., Start Node)
+                    if (!statusLabel) return;
+
+                    if (currentPoint.ts >= eventTs) {
+                        item.classList.remove('inactive');
+                        item.classList.add('active');
+                        statusLabel.innerHTML = '<i class="ph ph-check-circle text-emerald-400"></i> تم الركوب';
+                        statusLabel.classList.remove('text-slate-500');
+                        statusLabel.classList.add('text-emerald-400');
+                    } else {
+                        item.classList.remove('active');
+                        item.classList.add('inactive');
+                        statusLabel.innerHTML = '<i class="ph ph-clock text-slate-500"></i> لم يركب بعد';
+                        statusLabel.classList.remove('text-emerald-400');
+                        statusLabel.classList.add('text-slate-500');
+                    }
+                });
+            }
+            },
+
+            // --- SETTINGS MODULE (EXPANDED) ---
+            Settings: {
+                // الإعدادات الافتراضية
+                config: {
+                    assets: false,
+                    batchSearch: true,
+                    evCharging: false,
+                    extendedRouting: false,
+                    geocoding: true,
+                    geofencing: false,
+                    locationHistory: true,
+                    mapDisplay: true,
+                    matrixRouting: false,
+                    mcpServer: true,
+                    notifications: true,
+                    reverseGeocoding: true,
+                    routing: true,
+                    search: true,
+                    snapRoads: false,
+                    traffic: false,
+                    waypointOptimization: false,
+                    satelliteMode: false // الوضع الجديد
+                },
+
+                _debounceTimer: null,
+
+                // --- دالة تحميل الإعدادات من التخزين المحلي ---
+                load: function() {
+                    const savedSettings = localStorage.getItem('school_dashboard_settings');
+                    if (savedSettings) {
+                        try {
+                            // دمج الإعدادات المحفوظة مع الافتراضية لضمان وجود كل المفاتيح
+                            this.config = { ...this.config, ...JSON.parse(savedSettings) };
+                            console.log("✅ Settings loaded from LocalStorage");
+                        } catch (e) {
+                            console.error("Error parsing settings:", e);
+                        }
+                    }
+                    // تحديث أزرار الواجهة لتعكس الحالة المحفوظة
+                    this.initUI();
+                },
+
+                // --- دالة حفظ الإعدادات ---
+                save: function() {
+                    localStorage.setItem('school_dashboard_settings', JSON.stringify(this.config));
+                },
+
+                // دالة التبديل (محدثة للحفظ)
+                toggle: function(key) {
+                    this.config[key] = !this.config[key];
+                    
+                    this.save(); // <--- حفظ التغيير فوراً
+                    this.updateUI(key);
+                    
+                    const status = this.config[key] ? 'تم التفعيل' : 'تم الإيقاف';
+                    App.Toast.show(`${key}: ${status}`, this.config[key] ? 'success' : 'info');
+
+                    // Debounce (تأخير) لتجنب الحظر 429
+                    if (this._debounceTimer) clearTimeout(this._debounceTimer);
+                    this._debounceTimer = setTimeout(() => {
+                        App.Toast.show('جاري تحديث الخرائط...', 'info');
+                        this.applyToAllMaps();
+                    }, 1000);
+                },
+
+                updateUI: function(key) {
+                    const bg = document.getElementById(`toggle-${key}-bg`);
+                    const dot = document.getElementById(`toggle-${key}-dot`);
+                    
+                    if (bg && dot) {
+                        if (this.config[key]) {
+                            bg.classList.remove('bg-slate-700');
+                            bg.classList.add('bg-indigo-600');
+                            dot.classList.remove('left-1');
+                            dot.classList.add('left-6');
                         } else {
-                            item.classList.remove('active');
-                            item.classList.add('inactive');
-                            statusLabel.innerHTML = '<i class="ph ph-clock text-slate-500"></i> لم يركب بعد';
-                            statusLabel.classList.remove('text-emerald-400');
-                            statusLabel.classList.add('text-slate-500');
+                            bg.classList.add('bg-slate-700');
+                            bg.classList.remove('bg-indigo-600');
+                            dot.classList.add('left-1');
+                            dot.classList.remove('left-6');
+                        }
+                    }
+                },
+
+                initUI: function() {
+                    Object.keys(this.config).forEach(key => this.updateUI(key));
+                },
+
+                applyToAllMaps: function() {
+                    const activeMaps = [App.state.map, App.state.homeMap, App.state.trackingMap].filter(m => !!m);
+                    
+                    // Staggering updates (تحديث متتابع)
+                    activeMaps.forEach((mapInstance, index) => {
+                        setTimeout(() => {
+                            this.applyToMap(mapInstance);
+                        }, index * 600); 
+                    });
+                },
+
+                applyToMap: function(map) {
+                    if (!map) return;
+
+                    // 1. Traffic
+                    if (this.config.traffic) {
+                        map.showTrafficFlow();
+                        map.showTrafficIncidents();
+                    } else {
+                        map.hideTrafficFlow();
+                        map.hideTrafficIncidents();
+                    }
+
+                    // 2. Satellite Mode (مع إصلاح 400 Bad Request)
+                    const satSourceId = 'tomtom-satellite-source';
+                    const satLayerId = 'tomtom-satellite-layer';
+
+                    if (this.config.satelliteMode) {
+                        if (!map.getSource(satSourceId)) {
+                            map.addSource(satSourceId, {
+                                type: 'raster',
+                                tiles: [`https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=${TOMTOM_KEY}`],
+                                tileSize: 256,
+                                minzoom: 0,
+                                maxzoom: 19 // منع طلب مستويات غير موجودة
+                            });
+                        }
+                        if (!map.getLayer(satLayerId)) {
+                            const layers = map.getStyle().layers;
+                            let firstSymbolId = null;
+                            for (const layer of layers) {
+                                if (layer.type === 'symbol') { firstSymbolId = layer.id; break; }
+                            }
+                            map.addLayer({
+                                id: satLayerId, type: 'raster', source: satSourceId,
+                                paint: { 'raster-opacity': 1, 'raster-fade-duration': 300 }
+                            }, firstSymbolId);
+                        }
+                    } else {
+                        if (map.getLayer(satLayerId)) map.removeLayer(satLayerId);
+                    }
+
+                    // 3. POIs & EV
+                    if (this.config.evCharging) {
+                        this.handlePOILayer(map, 'evCharging', 'electric vehicle station', '#10b981');
+                    } else {
+                        this.clearLayer(map, 'evCharging');
+                    }
+
+                    if (this.config.search) {
+                        this.handlePOILayer(map, 'search', 'gas station', '#3b82f6');
+                    } else {
+                        this.clearLayer(map, 'search');
+                    }
+
+                    // 4. Geofencing & Assets
+                    this.handleGeofenceLayer(map);
+                    this.handleAssetsLayer(map);
+                },
+
+                clearLayer: function(map, configKey) {
+                    const layerKey = configKey + '_' + map.getContainer().id;
+                    if (App.state.mapLayers[layerKey]) {
+                        App.state.mapLayers[layerKey].forEach(m => m.remove());
+                        App.state.mapLayers[layerKey] = [];
+                    }
+                },
+
+                handlePOILayer: function(map, configKey, query, color) {
+                    const layerKey = configKey + '_' + map.getContainer().id;
+                    this.clearLayer(map, configKey);
+                    if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
+
+                    if (this.config[configKey]) {
+                        const center = map.getCenter();
+                        tt.services.fuzzySearch({
+                            key: TOMTOM_KEY, query: query, center: center, radius: 5000, limit: 10
+                        }).then(response => {
+                            response.results.forEach(result => {
+                                const el = document.createElement('div');
+                                el.className = 'w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center';
+                                el.style.backgroundColor = color;
+                                el.innerHTML = `<i class="ph ph-map-pin text-white text-xs"></i>`;
+                                const marker = new tt.Marker({ element: el })
+                                    .setLngLat(result.position)
+                                    .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs font-bold p-1">${result.poi.name}</div>`))
+                                    .addTo(map);
+                                App.state.mapLayers[layerKey].push(marker);
+                            });
+                        }).catch(err => {
+                            if (err.detailedError && err.detailedError.code === '429') {
+                                App.Toast.show('الرجاء الانتظار، الخدمة مشغولة حالياً', 'error');
+                            }
+                        });
+                    }
+                },
+
+                handleGeofenceLayer: function(map) {
+                    const layerId = 'geofence-fill-' + map.getContainer().id;
+                    const outlineId = 'geofence-line-' + map.getContainer().id;
+
+                    if (map.getLayer(layerId)) map.removeLayer(layerId);
+                    if (map.getLayer(outlineId)) map.removeLayer(outlineId);
+                    if (map.getSource(layerId)) map.removeSource(layerId);
+
+                    if (this.config.geofencing) {
+                        const center = map.getCenter();
+                        const circleGeoJSON = this.createGeoJSONCircle([center.lng, center.lat], 2);
+
+                        map.addSource(layerId, { type: 'geojson', data: circleGeoJSON });
+                        map.addLayer({
+                            'id': layerId, 'type': 'fill', 'source': layerId,
+                            'layout': {}, 'paint': { 'fill-color': '#f59e0b', 'fill-opacity': 0.2 }
+                        });
+                        map.addLayer({
+                            'id': outlineId, 'type': 'line', 'source': layerId,
+                            'layout': {}, 'paint': { 'line-color': '#f59e0b', 'line-width': 2, 'line-dasharray': [2, 2] }
+                        });
+                    }
+                },
+
+                handleAssetsLayer: function(map) {
+                    const layerKey = 'assets_' + map.getContainer().id;
+                    if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
+                    
+                    App.state.mapLayers[layerKey].forEach(m => m.remove());
+                    App.state.mapLayers[layerKey] = [];
+
+                    if (this.config.assets) {
+                        const center = map.getCenter();
+                        const assets = [
+                            { lng: center.lng + 0.01, lat: center.lat + 0.01, name: 'Truck A1' },
+                            { lng: center.lng - 0.015, lat: center.lat - 0.005, name: 'Van B2' }
+                        ];
+                        assets.forEach(asset => {
+                            const el = document.createElement('div');
+                            el.innerHTML = '<div class="w-8 h-8 bg-yellow-500 rounded-lg border-2 border-white flex items-center justify-center shadow-lg"><i class="ph ph-truck text-white"></i></div>';
+                            const marker = new tt.Marker({ element: el })
+                                .setLngLat([asset.lng, asset.lat])
+                                .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs p-1"><b>${asset.name}</b><br>Asset Tracked</div>`))
+                                .addTo(map);
+                            App.state.mapLayers[layerKey].push(marker);
+                        });
+                    }
+                },
+
+                createGeoJSONCircle: function(center, radiusInKm, points = 64) {
+                    const coords = { latitude: center[1], longitude: center[0] };
+                    const km = radiusInKm;
+                    const ret = [];
+                    const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
+                    const distanceY = km / 110.574;
+
+                    let theta, x, y;
+                    for (let i = 0; i < points; i++) {
+                        theta = (i / points) * (2 * Math.PI);
+                        x = distanceX * Math.cos(theta);
+                        y = distanceY * Math.sin(theta);
+                        ret.push([coords.longitude + x, coords.latitude + y]);
+                    }
+                    ret.push(ret[0]);
+                    return { type: "Feature", geometry: { type: "Polygon", coordinates: [ret] } };
+                },
+
+                enableAll: function() {
+                    Object.keys(this.config).forEach(k => { this.config[k] = true; this.updateUI(k); });
+                    this.save(); // حفظ
+                    
+                    if (this._debounceTimer) clearTimeout(this._debounceTimer);
+                    this._debounceTimer = setTimeout(() => {
+                        App.Toast.show('جاري تفعيل جميع الخدمات...', 'info');
+                        this.applyToAllMaps();
+                    }, 1000);
+                },
+
+                disableAll: function() {
+                    Object.keys(this.config).forEach(k => { this.config[k] = false; this.updateUI(k); });
+                    this.save(); // حفظ
+                    this.applyToAllMaps();
+                    App.Toast.show('تم إيقاف جميع الخدمات', 'info');
+                }
+            },
+            // --- MODULE: FLEET FEED (ADVANCED) ---
+            FleetFeed: {
+                state: {
+                    viewMode: 'cards',
+                    selectedDate: new Date(),
+                    currentPage: 1,
+                    itemsPerPage: 4,
+                    allTrips: []
+                },
+
+                init: function() {
+                    // تهيئة Flatpickr
+                    if (typeof flatpickr !== 'undefined') {
+                        flatpickr("#fleet-date-picker", {
+                            locale: "ar",
+                            defaultDate: "today",
+                            dateFormat: "Y-m-d",
+                            theme: "dark",
+                            onChange: (selectedDates, dateStr) => {
+                                this.filterByDate(dateStr);
+                            }
+                        });
+                    }
+                    this.refreshData();
+                },
+
+                refreshData: function() {
+                    let rawTrips = [];
+                    const drivers = App.state.drivers || {};
+                    
+                    Object.values(drivers).forEach(driver => {
+                        if(driver.trips) {
+                            Object.entries(driver.trips).forEach(([id, trip]) => {
+                                trip.id = id;
+                                trip.driverName = driver.profile.name;
+                                trip.driverPhoto = `https://ui-avatars.com/api/?name=${driver.profile.name}&background=random`;
+                                trip.driverId = driver.profile.id;
+                                rawTrips.push(trip);
+                            });
                         }
                     });
+
+                    const targetDateStr = this.state.selectedDate instanceof Date 
+                        ? this.state.selectedDate.toISOString().split('T')[0] 
+                        : this.state.selectedDate;
+
+                    this.state.allTrips = rawTrips.filter(trip => {
+                        const tripDate = new Date(trip.startTime).toISOString().split('T')[0];
+                        return tripDate === targetDateStr;
+                    }).sort((a, b) => b.startTime - a.startTime);
+
+                    this.state.currentPage = 1;
+                    this.render();
+                },
+
+                filterByDate: function(dateStr) {
+                    this.state.selectedDate = dateStr;
+                    this.refreshData();
+                },
+
+                setView: function(mode) {
+                    this.state.viewMode = mode;
+                    const btnCards = document.getElementById('btn-view-cards');
+                    const btnList = document.getElementById('btn-view-list');
+                    const container = document.getElementById('fleet-feed-container');
+
+                    if (!container) return;
+
+                    const activeClass = "text-cyan-400 bg-white/10 shadow-lg scale-105";
+                    const inactiveClass = "text-slate-500 hover:text-white hover:bg-white/5";
+
+                    if(mode === 'cards') {
+                        btnCards.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${activeClass}`;
+                        btnList.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${inactiveClass}`;
+                        container.className = "grid grid-cols-1 md:grid-cols-2 gap-5 perspective-1000";
+                        this.state.itemsPerPage = 4;
+                    } else {
+                        btnCards.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${inactiveClass}`;
+                        btnList.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${activeClass}`;
+                        container.className = "flex flex-col space-y-3";
+                        this.state.itemsPerPage = 6;
+                    }
+                    
+                    this.state.currentPage = 1;
+                    this.render();
+                },
+
+                setPage: function(page) {
+                    this.state.currentPage = page;
+                    this.render();
+                },
+
+                render: function() {
+                    const container = document.getElementById('fleet-feed-container');
+                    if(!container) return;
+
+                    container.innerHTML = '';
+
+                    const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
+                    const endIndex = startIndex + this.state.itemsPerPage;
+                    const tripsToShow = this.state.allTrips.slice(startIndex, endIndex);
+
+                    if (tripsToShow.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                                <i class="ph ph-ghost text-6xl mb-4 opacity-50 animate-bounce"></i>
+                                <p class="text-lg">لا توجد رحلات في هذا التاريخ</p>
+                            </div>
+                        `;
+                        this.renderPagination(0);
+                        return;
+                    }
+
+                    tripsToShow.forEach((trip) => {
+                        const html = this.state.viewMode === 'cards' ? this.getCardHTML(trip) : this.getListHTML(trip);
+                        const wrapper = document.createElement('div');
+                        wrapper.style.opacity = '0';
+                        wrapper.innerHTML = html;
+                        container.appendChild(wrapper.firstElementChild);
+                    });
+
+                    if(typeof gsap !== 'undefined') {
+                        gsap.to("#fleet-feed-container > div", {
+                            y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: "back.out(1.2)",
+                            startAt: { y: 30, opacity: 0, scale: 0.9 }
+                        });
+                    }
+
+                    this.renderPagination(Math.ceil(this.state.allTrips.length / this.state.itemsPerPage));
+                    this.attachParticleEffects();
+                },
+
+                renderPagination: function(totalPages) {
+                    const container = document.getElementById('fleet-pagination');
+                    if(!container) return;
+                    container.innerHTML = '';
+                    if(totalPages <= 1) return;
+
+                    // زر السابق
+                    const createBtn = (icon, onClick, disabled) => {
+                        const btn = document.createElement('button');
+                        btn.innerHTML = `<i class="ph ${icon}"></i>`;
+                        btn.className = `w-8 h-8 rounded-lg flex items-center justify-center border border-white/10 transition-all ${disabled ? 'text-slate-600 cursor-not-allowed' : 'text-white hover:bg-white/10 hover:border-cyan-500/50'}`;
+                        if(!disabled) btn.onclick = onClick;
+                        return btn;
+                    };
+
+                    container.appendChild(createBtn('ph-caret-right', () => this.setPage(this.state.currentPage - 1), this.state.currentPage === 1));
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement('button');
+                        btn.innerText = i;
+                        const isActive = i === this.state.currentPage;
+                        btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all border ${
+                            isActive 
+                            ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-110' 
+                            : 'bg-slate-800/50 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white'
+                        }`;
+                        btn.onclick = () => this.setPage(i);
+                        container.appendChild(btn);
+                    }
+
+                    container.appendChild(createBtn('ph-caret-left', () => this.setPage(this.state.currentPage + 1), this.state.currentPage === totalPages));
+                },
+
+                // --- دالة مساعدة لتحديد حالة الرحلة وتصميمها ---
+                getStatusConfig: function(trip, speed) {
+                    // 1. مكتملة
+                    if (trip.status === 'completed') {
+                        return {
+                            text: 'مكتملة',
+                            icon: 'ph-check-circle',
+                            colorClass: 'text-blue-400',
+                            bgClass: 'bg-blue-500/10 border-blue-500/20',
+                            glow: 'shadow-blue-500/10',
+                            dot: 'bg-blue-500',
+                            borderHover: 'group-hover:border-blue-500/30'
+                        };
+                    }
+                    
+                    // 2. نشطة (نتحقق من السرعة)
+                    if (trip.status === 'active' || (trip.startTime && !trip.endTime)) {
+                        // أ) خاملة (السرعة 0)
+                        if (speed <= 0) {
+                            return {
+                                text: 'خاملة (واقفة)',
+                                icon: 'ph-hand-palm',
+                                colorClass: 'text-amber-400',
+                                bgClass: 'bg-amber-500/10 border-amber-500/20 animate-pulse', // وميض للخاملة
+                                glow: 'shadow-amber-500/20',
+                                dot: 'bg-amber-500 animate-ping',
+                                borderHover: 'group-hover:border-amber-500/50'
+                            };
+                        } 
+                        // ب) جارية (تتحرك)
+                        else {
+                            return {
+                                text: 'جارية الآن',
+                                icon: 'ph-navigation-arrow',
+                                colorClass: 'text-emerald-400',
+                                bgClass: 'bg-emerald-500/10 border-emerald-500/20',
+                                glow: 'shadow-emerald-500/20',
+                                dot: 'bg-emerald-500 animate-pulse',
+                                borderHover: 'group-hover:border-emerald-500/50'
+                            };
+                        }
+                    }
+
+                    // 3. افتراضي (مجدولة/أخرى)
+                    return {
+                        text: 'مجدولة',
+                        icon: 'ph-calendar',
+                        colorClass: 'text-slate-400',
+                        bgClass: 'bg-slate-500/10 border-slate-500/20',
+                        glow: '',
+                        dot: 'bg-slate-500',
+                        borderHover: 'group-hover:border-slate-500/30'
+                    };
+                },
+
+                // --- HTML TEMPLATES ---
+
+                getCardHTML: function(trip) {
+                    const date = new Date(trip.startTime).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                    // حساب السرعة كرقم
+                    const speedVal = parseFloat(App.Utils.calculateSpeed(trip.actualPath));
+                    const speedDisplay = isNaN(speedVal) ? 0 : speedVal;
+                    
+                    // جلب إعدادات التصميم بناءً على الحالة والسرعة
+                    const status = this.getStatusConfig(trip, speedDisplay);
+                    
+                    return `
+                    <div class="fleet-card group relative bg-slate-900/40 backdrop-blur-xl rounded-[2rem] p-6 border border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${status.borderHover} cursor-pointer overflow-hidden" onclick="App.navigate('tracking-detail', '${trip.driverId}')">
+                        
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent blur-[50px] rounded-full group-hover:blur-[60px] transition-all"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        <div class="w-14 h-14 rounded-2xl bg-slate-800 p-0.5 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                            <img src="${trip.driverPhoto}" class="w-full h-full rounded-[10px] object-cover filter grayscale group-hover:grayscale-0 transition-all duration-300">
+                                        </div>
+                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-slate-900 rounded-full flex items-center justify-center border border-white/10">
+                                            <div class="w-2.5 h-2.5 rounded-full ${status.dot}"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-bold text-lg group-hover:text-cyan-300 transition-colors">${trip.driverName}</h4>
+                                        <div class="flex items-center gap-1 text-xs text-slate-400 font-mono mt-0.5">
+                                            <i class="ph ph-hash"></i> ${trip.id.substring(0,6)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col items-end gap-1">
+                                    <span class="px-3 py-1.5 rounded-xl text-[10px] font-bold border flex items-center gap-2 ${status.bgClass} ${status.colorClass} shadow-lg ${status.glow}">
+                                        <i class="ph ${status.icon} text-sm"></i>
+                                        ${status.text}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-black/20 rounded-2xl p-3 border border-white/5 group-hover:border-cyan-500/20 transition-colors">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="ph ph-speedometer text-cyan-400"></i>
+                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">السرعة</span>
+                                    </div>
+                                    <div class="text-xl font-bold text-white font-mono flex items-baseline gap-1">
+                                        ${speedDisplay} <span class="text-[10px] font-sans text-slate-500">km/h</span>
+                                    </div>
+                                </div>
+                                <div class="bg-black/20 rounded-2xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="ph ph-clock text-purple-400"></i>
+                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">البدء</span>
+                                    </div>
+                                    <div class="text-lg font-bold text-white font-mono">
+                                        ${date}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                getListHTML: function(trip) {
+                    const date = new Date(trip.startTime).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                    const speedVal = parseFloat(App.Utils.calculateSpeed(trip.actualPath));
+                    const speedDisplay = isNaN(speedVal) ? 0 : speedVal;
+                    
+                    // استخدام نفس إعدادات التصميم
+                    const status = this.getStatusConfig(trip, speedDisplay);
+                    
+                    return `
+                    <div class="fleet-list-item group flex items-center justify-between p-4 rounded-2xl bg-slate-800/40 border border-white/5 hover:bg-white/5 ${status.borderHover} cursor-pointer transition-all duration-300 hover:shadow-lg hover:translate-x-1" onclick="App.navigate('tracking-detail', '${trip.driverId}')">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-slate-700/50 flex items-center justify-center border border-white/10 group-hover:scale-105 transition-transform relative overflow-hidden">
+                                <img src="${trip.driverPhoto}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm group-hover:text-cyan-300 transition-colors">${trip.driverName}</h4>
+                                <div class="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                    <span class="flex items-center gap-1"><i class="ph ph-clock"></i> ${date}</span>
+                                    <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+                                    <span class="flex items-center gap-1 font-mono text-cyan-200/70"><i class="ph ph-speedometer"></i> ${speedDisplay} km/h</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold border flex items-center gap-1.5 ${status.bgClass} ${status.colorClass}">
+                                <span class="w-1.5 h-1.5 rounded-full ${status.dot}"></span>
+                                ${status.text}
+                            </span>
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                                <i class="ph ph-caret-left"></i>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                attachParticleEffects: function() {
+                    const cards = document.querySelectorAll('.fleet-card');
+                    cards.forEach(card => {
+                        card.addEventListener('mouseenter', (e) => {
+                            for(let i=0; i<6; i++) {
+                                this.createParticle(card);
+                            }
+                        });
+                    });
+                },
+
+                createParticle: function(card) {
+                    const icons = ['ph-sparkle', 'ph-star', 'ph-lightning', 'ph-circle'];
+                    const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                    const colors = ['text-cyan-400', 'text-purple-400', 'text-amber-400', 'text-emerald-400']; // ألوان متنوعة
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                    const particle = document.createElement('i');
+                    particle.className = `ph ${randomIcon} ${randomColor} absolute text-[10px] pointer-events-none z-20`;
+                    
+                    const rect = card.getBoundingClientRect();
+                    // إطلاق الجزيئات من الأسفل أو عشوائياً
+                    const x = Math.random() * rect.width;
+                    const y = rect.height; 
+
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    
+                    card.appendChild(particle);
+
+                    gsap.to(particle, {
+                        y: - (Math.random() * 80 + 40),
+                        x: (Math.random() - 0.5) * 60,
+                        rotation: Math.random() * 360,
+                        opacity: 0,
+                        scale: 0,
+                        duration: 0.8 + Math.random(),
+                        ease: "power2.out",
+                        onComplete: () => {
+                            particle.remove();
+                        }
+                    });
+                }
+            },
+            
+            // --- MODULE: TRIP MONITOR (Live Alerts & Sounds) ---
+            TripMonitor: {
+                previousStates: {}, 
+                isInitialized: false, 
+
+                scan: function(drivers) {
+                    if (!drivers) return;
+
+                    Object.values(drivers).forEach(driver => {
+                        const driverId = driver.profile.id;
+                        const driverName = driver.profile.name;
+                        
+                        let currentStatus = 'idle';
+                        if (driver.trips) {
+                            const trips = Object.values(driver.trips);
+                            const lastTrip = trips[trips.length - 1];
+                            if (lastTrip) {
+                                currentStatus = lastTrip.status;
+                            }
+                        }
+
+                        if (this.previousStates[driverId]) {
+                            const prevStatus = this.previousStates[driverId];
+
+                            // 1. بدء رحلة
+                            if (prevStatus !== 'active' && currentStatus === 'active') {
+                                if (this.isInitialized) {
+                                    this.showNotification(driverName, 'started');
+                                    // تشغيل صوت النجاح عند البدء
+                                    this.playSound('done.mp3'); 
+                                }
+                            }
+
+                            // 2. انتهاء رحلة
+                            if (prevStatus === 'active' && currentStatus === 'completed') {
+                                if (this.isInitialized) {
+                                    this.showNotification(driverName, 'ended');
+                                    // تشغيل صوت النجاح عند الانتهاء
+                                    this.playSound('done.mp3');
+                                }
+                            }
+                        }
+
+                        this.previousStates[driverId] = currentStatus;
+                    });
+
+                    this.isInitialized = true;
+                },
+
+                showNotification: function(driverName, type) {
+                    const isStart = type === 'started';
+                    const msg = isStart 
+                        ? `بدأ السائق <b>${driverName}</b> رحلته الآن 🚀` 
+                        : `وصل السائق <b>${driverName}</b> إلى وجهته ✅`;
+                    const color = isStart ? 'success' : 'info';
+
+                    // عرض التوست
+                    App.Toast.show(msg, color);
+                },
+
+                // --- دالة تشغيل الصوت الجديدة ---
+                playSound: function(filename) {
+                    try {
+                        // المسار الذي حددته
+                        const audioPath = `assets/sounds/${filename}`;
+                        const audio = new Audio(audioPath);
+                        
+                        // محاولة التشغيل (مع معالجة قيود المتصفح)
+                        const playPromise = audio.play();
+
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.warn("تنبيه: تم منع الصوت تلقائياً من المتصفح (يجب تفاعل المستخدم أولاً).", error);
+                            });
+                        }
+                    } catch (e) {
+                        console.error("خطأ في تشغيل ملف الصوت:", e);
+                    }
                 }
             },
 
@@ -1690,7 +2719,8 @@
                         this.showAuth();
                     }
                 });
-
+                    this.Settings.load();
+                    App.FleetFeed.init();
                 // Event Listeners
                 document.getElementById('login-form').addEventListener('submit', this.handleLogin.bind(this));
                 document.getElementById('driver-form').addEventListener('submit', this.handleSaveDriver.bind(this));
@@ -1850,7 +2880,8 @@
                     'drivers': 'إدارة السائقين', 
                     'students': 'إدارة الطلاب', 
                     'tracking': 'تتبع الرحلات', 
-                    'tracking-detail': 'مراقبة الرحلة' 
+                    'tracking-detail': 'مراقبة الرحلة' ,
+                    'settings': 'إعدادات الخرائط' // <--- أضف هذا العنوان
                 };
                 document.getElementById('page-title').textContent = titles[viewId] || 'النظام';
 
@@ -1858,7 +2889,9 @@
                 if (viewId !== 'tracking-detail') {
                     App.Replay.stop();
                 }
-
+                if (viewId === 'settings') {
+                        App.Settings.initUI(); // <--- أضف هذا السطر لتهيئة أزرار التبديل
+                    }
                 if (viewId === 'map') {
                     setTimeout(() => {
                         if (!this.state.map) this.initMap();
@@ -1878,29 +2911,45 @@
             },
 
             // --- DATA & REALTIME ---
-            setupRealtimeListeners: function() {
-                db.ref('drivers').on('value', (snapshot) => {
-                    this.state.drivers = snapshot.val() || {};
-                    this.updateStats();
-                    this.updateDriversUI();
-                    this.updateMapMarkers();
-                    this.updateHomeMapMarkers();
-                    
-                    if (!document.getElementById('view-tracking').classList.contains('hidden')) {
-                        this.updateTrackingListUI();
-                    }
-                    if(this.state.currentTrackingDriverId) {
-                        this.updateTrackingDetailMap(this.state.currentTrackingDriverId);
-                    }
-                });
+setupRealtimeListeners: function() {
+    // الاستماع لتغييرات السائقين
+    db.ref('drivers').on('value', (snapshot) => {
+        // تخزين البيانات في متغير لاستخدامه لاحقاً
+        const driversData = snapshot.val() || {};
+        
+        this.state.drivers = driversData;
+        
+        this.updateStats();
+        this.updateDriversUI();
+        this.updateMapMarkers();
+        this.updateHomeMapMarkers();
+        
+        if (!document.getElementById('view-tracking').classList.contains('hidden')) {
+            this.updateTrackingListUI();
+        }
+        if(this.state.currentTrackingDriverId) {
+            this.updateTrackingDetailMap(this.state.currentTrackingDriverId);
+        }
 
-                db.ref('students').on('value', (snapshot) => {
-                    this.state.students = snapshot.val() || {};
-                    this.updateStats();
-                    this.updateStudentsUI();
-                });
-            },
+        // تحديث قائمة الرحلات الجديدة (FleetFeed)
+        if(this.FleetFeed) {
+            this.FleetFeed.refreshData();
+        }
 
+        // 👇👇👇 تشغيل المراقبة والتنبيهات (TripMonitor) 👇👇👇
+        // التعديل هنا: مررنا driversData بدلاً من data
+        if (this.TripMonitor) {
+            this.TripMonitor.scan(driversData);
+        }
+    });
+
+    // الاستماع لتغييرات الطلاب
+    db.ref('students').on('value', (snapshot) => {
+        this.state.students = snapshot.val() || {};
+        this.updateStats();
+        this.updateStudentsUI();
+    });
+},
             // --- DRIVER LOCATION SELECTION ---
             initDriverLocationMap: function() {
                 if(this.state.driverLocationMap) return;
@@ -2145,147 +3194,169 @@
                 this.state.trackingMap.addControl(new tt.NavigationControl());
                 
                 map.on('load', () => {
+                 App.Settings.applyToMap(map); // <--- أضف هذا السطر
                     if (onLoaded) onLoaded();
-                });
+                  });
             },
 
             updateTrackingDetailMap: function(driverId) {
-                // If Replay is playing, do not update map with live data
-                if(App.Replay.isPlaying) return;
+    // If Replay is playing, do not update map with live data
+    if(App.Replay.isPlaying) return;
 
-                const driver = this.state.drivers[driverId];
-                if(!driver || !driver.trips || !this.state.trackingMap) return;
+    const driver = this.state.drivers[driverId];
+    if(!driver || !driver.trips || !this.state.trackingMap) return;
+    
+    if (!this.state.trackingMap.getStyle) return;
+
+    document.getElementById('track-driver-name').textContent = driver.profile.name;
+    
+    // Get active trip or last trip
+    const tripKeys = Object.keys(driver.trips);
+    const currentTrip = driver.trips[tripKeys[tripKeys.length - 1]];
+    const endBtn = document.getElementById('btn-end-trip');
+    const deleteBtn = document.getElementById('btn-delete-trip');
+    
+    if(!currentTrip || !currentTrip.actualPath) return;
+
+    // --- Real-time Status Update Logic ---
+    const statusEl = document.getElementById('track-status');
+    if (statusEl) {
+        if (currentTrip.status === 'completed') {
+            if(endBtn) endBtn.classList.add('hidden');
+            if(deleteBtn) deleteBtn.classList.remove('hidden');
+            statusEl.textContent = 'مكتملة';
+            statusEl.className = 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs transition-colors duration-300';
+            
+            // *** Init Replay if completed ***
+            if(!App.Replay.tripData) App.Replay.init(currentTrip);
+
+        } else if (currentTrip.status === 'active') {
+            if(endBtn) endBtn.classList.remove('hidden');
+            if(deleteBtn) deleteBtn.classList.remove('hidden');
+            statusEl.textContent = 'نشطة الآن';
+            statusEl.className = 'bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs transition-colors duration-300 animate-pulse';
+            
+            // Hide Replay if active
+            App.Replay.stop();
+        } else {
+            statusEl.textContent = 'غير معروف';
+        }
+    }
+
+    const speed = App.Utils.calculateSpeed(currentTrip.actualPath);
+    document.getElementById('track-speed').textContent = speed;
+
+    // Start Timer
+    App.startTripTimer(currentTrip.startTime, currentTrip.status);
+
+    // Path Data
+    const points = Object.values(currentTrip.actualPath).sort((a,b) => a.ts - b.ts);
+    const coordinates = points.map(p => [p.lng, p.lat]);
+    const lastPos = coordinates[coordinates.length-1];
+    
+    // 1. Draw Actual Trail (Raw GPS)
+    const trailData = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: coordinates }
+    };
+
+    try {
+        if (this.state.trackingMap.getLayer('trail')) {
+            this.state.trackingMap.getSource('trail').setData(trailData);
+        } else {
+            this.state.trackingMap.addSource('trail', { type: 'geojson', data: trailData });
+            this.state.trackingMap.addLayer({
+                'id': 'trail',
+                'type': 'line',
+                'source': 'trail',
+                'layout': { 'line-cap': 'round', 'line-join': 'round' },
+                'paint': { 'line-color': '#4f46e5', 'line-width': 6 }
+            });
+        }
+
+        // ============================================================
+        // 2. Draw Projected Route (Updated with Real Settings)
+        // ============================================================
+        const destination = driver.profile.destination;
+        if (destination && destination.lat && destination.lng) {
+            
+            // إعداد خيارات التوجيه بناءً على الإعدادات المحفوظة
+            const routeOptions = {
+                key: TOMTOM_KEY,
+                locations: `${lastPos[0]},${lastPos[1]}:${destination.lng},${destination.lat}`,
                 
-                if (!this.state.trackingMap.getStyle) return;
-
-                document.getElementById('track-driver-name').textContent = driver.profile.name;
+                // تطبيق إعداد Traffic API
+                traffic: App.Settings.config.traffic, 
                 
-                // Get active trip or last trip
-                const tripKeys = Object.keys(driver.trips);
-                const currentTrip = driver.trips[tripKeys[tripKeys.length - 1]];
-                const endBtn = document.getElementById('btn-end-trip');
-                const deleteBtn = document.getElementById('btn-delete-trip'); // الزر الجديد
-                if(!currentTrip || !currentTrip.actualPath) return;
+                // تطبيق إعداد Waypoint Optimization
+                computeBestOrder: App.Settings.config.waypointOptimization 
+            };
 
-                // --- Real-time Status Update Logic ---
-                const statusEl = document.getElementById('track-status');
-                if (statusEl) {
-                    if (currentTrip.status === 'completed') {
-                        // إذا كانت مكتملة: أخفِ زر الإنهاء، وأبقِ زر الحذف
-                        if(endBtn) endBtn.classList.add('hidden');
-                        if(deleteBtn) deleteBtn.classList.remove('hidden');
-                        statusEl.textContent = 'مكتملة';
-                        statusEl.className = 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs transition-colors duration-300';
-                        
-                        // *** Init Replay if completed ***
-                        if(!App.Replay.tripData) App.Replay.init(currentTrip);
+            // تطبيق إعداد Extended Routing API
+            if (App.Settings.config.extendedRouting) {
+                routeOptions.travelMode = 'truck'; // وضع الشاحنات كتمثيل للتوجيه الممتد
+                routeOptions.vehicleCommercial = true;
+            }
 
-                    } else if (currentTrip.status === 'active') {
-                                        // إذا كانت نشطة: أظهر زر الإنهاء وزر الحذف
-                        if(endBtn) endBtn.classList.remove('hidden');
-                        if(deleteBtn) deleteBtn.classList.remove('hidden');
-                        statusEl.textContent = 'نشطة الآن';
-                        statusEl.className = 'bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs transition-colors duration-300 animate-pulse';
-                        
-                        // Hide Replay if active
-                        App.Replay.stop();
-                    } else {
-                        statusEl.textContent = 'غير معروف';
-                    }
+            tt.services.calculateRoute(routeOptions).then(response => {
+                const geojson = response.toGeoJson();
+                
+                // ملاحظة: Routing API يقوم تلقائياً بـ Snap to Roads للمسار المتوقع
+                
+                if (this.state.trackingMap.getLayer('projected')) {
+                    this.state.trackingMap.getSource('projected').setData(geojson);
+                } else {
+                    this.state.trackingMap.addSource('projected', { type: 'geojson', data: geojson });
+                    this.state.trackingMap.addLayer({
+                        'id': 'projected',
+                        'type': 'line',
+                        'source': 'projected',
+                        'layout': { 'line-cap': 'round' },
+                        'paint': { 
+                            'line-color': '#94a3b8', 
+                            'line-width': 4,
+                            'line-dasharray': [2, 2] 
+                        }
+                    });
                 }
 
-                const speed = App.Utils.calculateSpeed(currentTrip.actualPath);
-                document.getElementById('track-speed').textContent = speed;
-
-                // Start Timer
-                App.startTripTimer(currentTrip.startTime, currentTrip.status);
-
-                // Path Data
-                const points = Object.values(currentTrip.actualPath).sort((a,b) => a.ts - b.ts);
-                const coordinates = points.map(p => [p.lng, p.lat]);
-                const lastPos = coordinates[coordinates.length-1];
-                
-                // 1. Draw Actual Trail (Raw GPS)
-                const trailData = {
-                    type: 'Feature',
-                    geometry: { type: 'LineString', coordinates: coordinates }
-                };
-
-                try {
-                    if (this.state.trackingMap.getLayer('trail')) {
-                        this.state.trackingMap.getSource('trail').setData(trailData);
-                    } else {
-                        this.state.trackingMap.addSource('trail', { type: 'geojson', data: trailData });
-                        this.state.trackingMap.addLayer({
-                            'id': 'trail',
-                            'type': 'line',
-                            'source': 'trail',
-                            'layout': { 'line-cap': 'round', 'line-join': 'round' },
-                            'paint': { 'line-color': '#4f46e5', 'line-width': 6 }
-                        });
-                    }
-
-                    // 2. Draw Projected Route
-                    const destination = driver.profile.destination;
-                    if (destination && destination.lat && destination.lng) {
-                        tt.services.calculateRoute({
-                            key: TOMTOM_KEY,
-                            locations: `${lastPos[0]},${lastPos[1]}:${destination.lng},${destination.lat}`
-                        }).then(response => {
-                            const geojson = response.toGeoJson();
-                            if (this.state.trackingMap.getLayer('projected')) {
-                                this.state.trackingMap.getSource('projected').setData(geojson);
-                            } else {
-                                this.state.trackingMap.addSource('projected', { type: 'geojson', data: geojson });
-                                this.state.trackingMap.addLayer({
-                                    'id': 'projected',
-                                    'type': 'line',
-                                    'source': 'projected',
-                                    'layout': { 'line-cap': 'round' },
-                                    'paint': { 
-                                        'line-color': '#94a3b8', 
-                                        'line-width': 4,
-                                        'line-dasharray': [2, 2] 
-                                    }
-                                });
-                            }
-                            
-                            if(!this.state.trackingMarkers['dest']) {
-                                const el = document.createElement('div');
-                                el.innerHTML = '<i class="ph ph-flag-checkered text-2xl text-red-500"></i>';
-                                this.state.trackingMarkers['dest'] = new tt.Marker({ element: el })
-                                    .setLngLat([destination.lng, destination.lat])
-                                    .addTo(this.state.trackingMap);
-                            }
-                        }).catch(err => console.warn("Routing ignored"));
-                    }
-
-                    // 3. Update Car Marker
-                    if(this.state.trackingMarkers['car']) {
-                        this.state.trackingMarkers['car'].setLngLat(lastPos);
-                    } else {
-                        const el = document.createElement('div');
-                        el.className = 'marker-icon';
-                        el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${driver.profile.name}&background=4f46e5&color=fff')`;
-                        el.style.border = '3px solid #fff';
-                        
-                        this.state.trackingMarkers['car'] = new tt.Marker({ element: el })
-                            .setLngLat(lastPos)
-                            .addTo(this.state.trackingMap);
-                    }
-
-                    // 4. Update Student Boarding Markers (Pass current trip events)
-                    const currentTripEvents = currentTrip.events ? Object.values(currentTrip.events) : [];
-                    this.updateStudentMarkers(currentTripEvents);
-
-                    this.state.trackingMap.panTo(lastPos);
-                } catch(e) {
-                    console.warn("Map update skipped:", e);
+                if(!this.state.trackingMarkers['dest']) {
+                    const el = document.createElement('div');
+                    el.innerHTML = '<i class="ph ph-flag-checkered text-2xl text-red-500"></i>';
+                    this.state.trackingMarkers['dest'] = new tt.Marker({ element: el })
+                        .setLngLat([destination.lng, destination.lat])
+                        .addTo(this.state.trackingMap);
                 }
-                this.updateAttendanceUI(currentTrip, driverId);
-                this.renderStudentTimeline(currentTrip);
-            },
+            }).catch(err => console.warn("Routing calculation failed or ignored", err));
+        }
+        // ============================================================
 
+        // 3. Update Car Marker
+        if(this.state.trackingMarkers['car']) {
+            this.state.trackingMarkers['car'].setLngLat(lastPos);
+        } else {
+            const el = document.createElement('div');
+            el.className = 'marker-icon';
+            el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${driver.profile.name}&background=4f46e5&color=fff')`;
+            el.style.border = '3px solid #fff';
+            
+            this.state.trackingMarkers['car'] = new tt.Marker({ element: el })
+                .setLngLat(lastPos)
+                .addTo(this.state.trackingMap);
+        }
+
+        // 4. Update Student Boarding Markers
+        const currentTripEvents = currentTrip.events ? Object.values(currentTrip.events) : [];
+        this.updateStudentMarkers(currentTripEvents);
+
+        this.state.trackingMap.panTo(lastPos);
+    } catch(e) {
+        console.warn("Map update skipped:", e);
+    }
+    this.updateAttendanceUI(currentTrip, driverId);
+    this.renderStudentTimeline(currentTrip);
+},
+            
             updateStudentMarkers: function(events) {
                 // Clear old student markers except car/dest
                 Object.keys(this.state.trackingMarkers).forEach(key => {
@@ -2728,119 +3799,48 @@
             },
 
             updateStats: function() {
-                const drivers = Object.values(this.state.drivers);
-                const students = Object.values(this.state.students);
-                
-                // تحديث العدادات العلوية
-                this.animateValue('stat-drivers', drivers.length);
+    const drivers = Object.values(this.state.drivers || {});
+    const students = Object.values(this.state.students || {});
+    
+    // 1. تحديث عداد السائقين
+    this.animateValue('stat-drivers', drivers.length);
 
-                let activeCount = 0;
-                drivers.forEach(d => {
-                    if (d.trips) {
-                        const trips = Object.values(d.trips);
-                        const active = trips.find(t => t.status === 'started' || (t.startTime && !t.endTime));
-                        if (active) activeCount++;
-                    }
-                });
-                this.animateValue('stat-active', activeCount);
+    // 2. حساب وتحديث الرحلات النشطة
+    let activeCount = 0;
+    drivers.forEach(d => {
+        if (d.trips) {
+            const trips = Object.values(d.trips);
+            // البحث عن أي رحلة حالتها active أو بدأت ولم تنته
+            const active = trips.find(t => t.status === 'active' || (t.startTime && !t.endTime));
+            if (active) activeCount++;
+        }
+    });
+    this.animateValue('stat-active', activeCount);
 
-                this.animateValue('stat-students', students.length);
-                const boys = students.filter(s => s.gender === 'male').length; 
-                const girls = students.filter(s => s.gender === 'female').length;
-                document.getElementById('stat-boys').innerText = boys;
-                document.getElementById('stat-girls').innerText = girls;
+    // 3. تحديث إحصائيات الطلاب (بنين/بنات)
+    this.animateValue('stat-students', students.length);
+    const boys = students.filter(s => s.gender === 'male').length; 
+    const girls = students.filter(s => s.gender === 'female').length;
+    
+    // استخدام Safe Update لتجنب الأخطاء إذا كانت العناصر غير موجودة
+    const setSafeText = (id, val) => {
+        const el = document.getElementById(id);
+        if(el) el.innerText = val;
+    };
+    
+    setSafeText('stat-boys', boys);
+    setSafeText('stat-girls', girls);
 
-                // --- بداية الجزء المعدل (نظام الكاردات) ---
-                const container = document.getElementById('recent-activity-body');
-                container.innerHTML = ''; // مسح المحتوى القديم
-                
-                let recentActivities = [];
-                drivers.forEach(d => {
-                    if(d.trips) {
-                        const trips = Object.entries(d.trips).map(([id, t]) => ({...t, id, driverName: d.profile?.name, actualPath: t.actualPath}));
-                        recentActivities = [...recentActivities, ...trips];
-                    }
-                });
-                
-                // ترتيب حسب الأحدث
-                recentActivities.sort((a, b) => b.startTime - a.startTime);
-                
-                // عرض أحدث 6 بطاقات بدلاً من 5 لتناسب الشبكة (Grid)
-                recentActivities.slice(0, 6).forEach(trip => {
-                    const date = new Date(trip.startTime).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
-                    const speed = App.Utils.calculateSpeed(trip.actualPath);
-                    const driverName = trip.driverName || 'غير معروف';
-                    const driverInitial = driverName.charAt(0);
-                    
-                    // تحديد الألوان والحالة بناءً على حالة الرحلة
-                    const isCompleted = trip.status === 'completed';
-                    
-                    // تصميم الحالة (نشط = أخضر، مكتمل = أزرق باهت)
-                    const statusConfig = isCompleted 
-                        ? { 
-                            text: 'مكتملة', 
-                            classes: 'bg-slate-700/50 text-slate-400 border-slate-600', 
-                            dot: 'bg-slate-500' 
-                        }
-                        : { 
-                            text: 'نشطة الآن', 
-                            classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]', 
-                            dot: 'bg-emerald-500 animate-pulse' 
-                        };
+    // --- ملاحظة هامة ---
+    // تم حذف كود رسم البطاقات من هنا (recent-activity-body)
+    // لأن الوحدة الجديدة App.FleetFeed ستقوم بهذه المهمة
+    
+    // نقوم بتحديث قائمة الرحلات الجديدة إذا كانت مفعلة
+    if (App.FleetFeed && typeof App.FleetFeed.refreshData === 'function') {
+        App.FleetFeed.refreshData();
+    }
+},
 
-                    // قالب الكارد الجديد
-                    const cardHtml = `
-                        <div class="group relative bg-slate-800/40 hover:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 overflow-hidden">
-                            
-                            <i class="ph ph-car-profile absolute -left-4 -bottom-4 text-[80px] text-white/5 group-hover:text-white/10 group-hover:-rotate-12 transition-all duration-500"></i>
-                            
-                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-
-                            <div class="flex items-start justify-between mb-4 relative z-10">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-indigo-500/20">
-                                        <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-indigo-300 font-bold text-lg">
-                                            ${driverInitial}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-white font-bold text-base leading-tight">${driverName}</h4>
-                                        <span class="text-[10px] text-slate-400 mt-1 block font-mono opacity-70">ID: ${trip.id.substring(0, 8)}...</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex flex-col items-end gap-1">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border flex items-center gap-1.5 ${statusConfig.classes}">
-                                        <span class="w-1.5 h-1.5 rounded-full ${statusConfig.dot}"></span>
-                                        ${statusConfig.text}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <hr class="border-white/5 mb-4" />
-
-                            <div class="grid grid-cols-2 gap-4 relative z-10">
-                                <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-blue-500/20 transition-colors">
-                                    <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
-                                        <i class="ph ph-speedometer text-blue-400"></i> السرعة
-                                    </p>
-                                    <p class="text-xl font-mono font-bold text-white tracking-wider">${speed} <span class="text-xs font-sans text-slate-500">كم/س</span></p>
-                                </div>
-                                
-                                <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
-                                    <p class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
-                                        <i class="ph ph-clock text-purple-400"></i> التوقيت
-                                    </p>
-                                    <p class="text-sm font-bold text-slate-200 mt-1 font-mono">${date}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    container.innerHTML += cardHtml;
-                });
-            },
-            
             updateDriversUI: function() {
                 const grid = document.getElementById('drivers-grid');
                 // حماية للكود في حال لم يتم تحميل العنصر
@@ -3275,7 +4275,10 @@
                 
                 this.state.map.addControl(new tt.FullscreenControl());
                 this.state.map.addControl(new tt.NavigationControl());
-                this.updateMapMarkers();
+                this.state.map.on('load', () => {
+                    this.updateMapMarkers();
+                    App.Settings.applyToMap(this.state.map); // <--- أضف هذا السطر
+                });
             },
 
             initHomeMap: function() {
@@ -3296,7 +4299,10 @@
                     }
                 });
                 this.state.homeMap.addControl(new tt.NavigationControl());
-                this.updateHomeMapMarkers();
+                this.state.homeMap.on('load', () => {
+                    this.updateHomeMapMarkers();
+                    App.Settings.applyToMap(this.state.homeMap); // <--- أضف هذا السطر
+                });
             },
 
             updateMapMarkers: function() {
@@ -3603,31 +4609,70 @@
                     }, 300); // نفس مدة الـ transition في CSS
                 }
             },
-            Toast: {
-                show: function(msg, type = 'success') {
-                    const container = document.getElementById('toast-container');
-                    const toast = document.createElement('div');
-                    
-                    const bgClass = type === 'success' ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50';
-                    const iconClass = type === 'success' ? 'text-green-400' : 'text-red-400';
-                    const icon = type === 'success' ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-warning-circle"></i>';
-
-                    toast.className = `toast glass-panel p-4 rounded-xl border flex items-center gap-3 shadow-lg w-72 ${bgClass}`;
-                    toast.innerHTML = `
-                        <div class="text-2xl ${iconClass}">${icon}</div>
-                        <div class="text-sm font-bold text-white">${msg}</div>
-                    `;
-
-                    container.appendChild(toast);
-
-                    requestAnimationFrame(() => toast.classList.add('show'));
-
-                    setTimeout(() => {
-                        toast.classList.remove('show');
-                        setTimeout(() => toast.remove(), 300);
-                    }, 3000);
-                }
+Toast: {
+    show: function(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        // إعدادات الأنماط المختلفة (أضفنا info و warning)
+        const styles = {
+            success: {
+                classes: 'bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]',
+                iconColor: 'text-emerald-400',
+                icon: '<i class="ph ph-check-circle"></i>'
             },
+            error: {
+                classes: 'bg-red-500/20 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]',
+                iconColor: 'text-red-400',
+                icon: '<i class="ph ph-warning-circle"></i>'
+            },
+            info: { // هذا النوع مهم جداً لميزة التنبيهات الجديدة
+                classes: 'bg-cyan-500/20 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.2)]',
+                iconColor: 'text-cyan-400',
+                icon: '<i class="ph ph-info"></i>'
+            },
+            warning: {
+                classes: 'bg-amber-500/20 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
+                iconColor: 'text-amber-400',
+                icon: '<i class="ph ph-bell-ringing"></i>'
+            }
+        };
+
+        // اختيار الستايل المناسب أو الافتراضي
+        const style = styles[type] || styles['info'];
+
+        // تصميم العنصر (Glass Panel + Animations)
+        toast.className = `toast glass-panel p-4 rounded-2xl border flex items-center gap-4 shadow-xl w-auto min-w-[320px] max-w-md backdrop-blur-xl transition-all duration-500 transform translate-x-full opacity-0 mb-3 ${style.classes}`;
+        
+        toast.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-2xl ${style.iconColor} shrink-0 border border-white/5">
+                ${style.icon}
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-bold text-white leading-relaxed">${msg}</div>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // تشغيل الأنيميشن (الدخول)
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+        });
+
+        // تشغيل الصوت إذا لم يكن قد تم تشغيله عبر TripMonitor
+        // (اختياري: إذا أردت صوتاً لكل أنواع التوست)
+        // const audio = new Audio('assets/sounds/notification.mp3');
+        // audio.play().catch(() => {});
+
+        // الإزالة التلقائية
+        setTimeout(() => {
+            // أنيميشن الخروج
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 500); // الانتظار حتى ينتهي الأنيميشن
+        }, 4000); // زيادة الوقت قليلاً للقراءة
+    }
+},
             
             Utils: {
                 generateId: function() {
