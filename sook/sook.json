@@ -46,5 +46,13 @@
       "desc": "بالضغط على موافق، سيتم تحديث أيقونة التطبيق، وتثبيت الحساب على هذا الهاتف فقط.",
       "imageUrl": "https://cdn-icons-png.flaticon.com/512/10695/10695914.png"
     }
-  ]
+  ],
+  "update": {
+    "latestVersionCode": 2,
+    "versionName": "2.0.0 (V3 Update)",
+    "title": "تحديث هام متوفر!",
+    "desc": "تم إضافة نظام الإشعارات الجديد وتحسينات في الأداء.",
+    "isMandatory": true,
+    "apkUrl": "https://example.com/SookDriver_v2.apk" 
+  }
 }
