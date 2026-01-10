@@ -29,12 +29,6 @@
     "imageUrl": "https://cdn-icons-png.flaticon.com/512/854/854878.png"
   },
   {
-    "type": "location_background",
-    "title": "السماح بالموقع طوال الوقت",
-    "desc": "يجب اختيار (السماح دائمًا) ليستمر التتبع في الخلفية.",
-    "imageUrl": "https://cdn-icons-png.flaticon.com/512/684/684908.png"
-  },
-  {
     "type": "notification",
     "title": "تفعيل الإشعارات",
     "desc": "لتلقي تنبيهات الرحلة والطوارئ.",
