@@ -177,51 +177,121 @@
         }
 
         /* --- Toast Container & Animation --- */
-        #toastContainer {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 90%;
-            max-width: 400px;
-            pointer-events: none;
-        }
+#toastContainer {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000; /* أعلى من كل الطبقات */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    pointer-events: none; /* يسمح بالضغط من خلاله */
+    width: 100%;
+    max-width: 400px;
+}
 
-        .toast-item {
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        
-        /* حالة التحذير المميزة للرحلات غير المكتملة */
-        .toast-warning {
-            border-color: rgba(245, 158, 11, 0.5);
-            background: rgba(40, 20, 10, 0.95);
-        }
+.premium-toast {
+    position: relative;
+    pointer-events: auto;
+    width: 90%;
+    background: rgba(15, 23, 42, 0.85); /* Slate Dark Glass */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px; /* Padding for the inner border effect */
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+    overflow: visible; /* للسماح للجزيئات بالخروج */
+    transform-origin: center top;
+}
 
-        .toast-item.hide {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
+.toast-inner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+    border-radius: 16px;
+    padding: 12px 16px;
+    position: relative;
+    z-index: 10;
+}
 
-        @keyframes toastSlideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+/* Icon Container */
+.toast-icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.toast-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    line-height: 1.4;
+}
+
+/* خلفية التوهج */
+.toast-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    opacity: 0.4;
+    filter: blur(20px);
+    z-index: 0;
+}
+
+/* الجزيئات المتطايرة */
+.toast-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    z-index: -1; /* خلف التنبيه */
+    pointer-events: none;
+}
+
+/* Themes */
+.toast-success .toast-icon-box { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
+.toast-success .toast-glow { background: #10b981; }
+.toast-success .toast-title { color: #34d399; }
+
+.toast-error .toast-icon-box { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); }
+.toast-error .toast-glow { background: #ef4444; }
+.toast-error .toast-title { color: #f87171; }
+
+.toast-warning .toast-icon-box { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); }
+.toast-warning .toast-glow { background: #f59e0b; }
+.toast-warning .toast-title { color: #fbbf24; }
+
+.toast-info .toast-icon-box { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+.toast-info .toast-glow { background: #3b82f6; }
+.toast-info .toast-title { color: #60a5fa; }
 
         /* --- Analytics Charts --- */
         .pie-chart {
@@ -1664,39 +1734,110 @@
             `;
         }
         // --- TOAST SYSTEM ---
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast-item';
-            
-            let icon = '';
-            let colorClass = 'text-blue-400';
-            
-            if (type === 'success') {
-                icon = '<i class="fas fa-check-circle"></i>';
-                colorClass = 'text-emerald-400';
-            } else if (type === 'error') {
-                icon = '<i class="fas fa-exclamation-circle"></i>';
-                colorClass = 'text-red-400';
-            } else if (type === 'warning') {
-                icon = '<i class="fas fa-exclamation-triangle"></i>';
-                colorClass = 'text-amber-400';
-                toast.classList.add('toast-warning');
-            } else {
-                icon = '<i class="fas fa-info-circle"></i>';
-            }
+        /* =========================================================
+        PREMIUM GSAP TOAST SYSTEM
+        ========================================================= */
 
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            
+            // إعداد البيانات حسب النوع
+            const configs = {
+                success: { icon: 'fa-check', title: 'تمت العملية', class: 'toast-success', color: '#10b981' },
+                error:   { icon: 'fa-times', title: 'حدث خطأ', class: 'toast-error', color: '#ef4444' },
+                warning: { icon: 'fa-exclamation', title: 'تنبيه', class: 'toast-warning', color: '#f59e0b' },
+                info:    { icon: 'fa-info', title: 'معلومة', class: 'toast-info', color: '#3b82f6' }
+            };
+            
+            const config = configs[type] || configs.info;
+
+            // إنشاء العنصر
+            const toast = document.createElement('div');
+            toast.className = `premium-toast ${config.class}`;
+            
             toast.innerHTML = `
-                <div class="${colorClass} text-lg">${icon}</div>
-                <div class="text-sm font-semibold">${message}</div>
+                <div class="toast-glow"></div>
+                <div class="toast-inner">
+                    <div class="toast-icon-box">
+                        <i class="fas ${config.icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <span class="toast-title">${config.title}</span>
+                        <span class="toast-message">${message}</span>
+                    </div>
+                </div>
+                <div class="particles-container absolute inset-0 pointer-events-none flex justify-center items-center"></div>
             `;
 
-            toastContainer.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
+            container.appendChild(toast);
 
+            // --- GSAP Entrance Animation ---
+            const tl = gsap.timeline();
+
+            // 1. هبوط التنبيه مع تأثير مطاطي
+            tl.fromTo(toast, 
+                { y: -100, opacity: 0, scale: 0.8, rotationX: 45 },
+                { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 0.8, ease: "elastic.out(1, 0.6)" }
+            );
+
+            // 2. حركة الأيقونة (نبض)
+            tl.fromTo(toast.querySelector('.toast-icon-box'),
+                { scale: 0, rotation: -180 },
+                { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(2)" },
+                "-=0.6"
+            );
+
+            // --- Particle Explosion Effect (خلف التوست) ---
+            const particlesContainer = toast.querySelector('.particles-container');
+            const particleCount = 12; // عدد الجزيئات
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.className = 'toast-particle';
+                
+                // تنويع الأشكال (دائرة، مربع)
+                if(Math.random() > 0.5) p.style.borderRadius = '2px'; 
+                
+                p.style.backgroundColor = config.color;
+                p.style.boxShadow = `0 0 10px ${config.color}`;
+                particlesContainer.appendChild(p);
+
+                // زوايا عشوائية للانفجار
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 60 + Math.random() * 40; // مسافة الانتشار
+                
+                gsap.to(p, {
+                    x: Math.cos(angle) * velocity,
+                    y: Math.sin(angle) * velocity,
+                    opacity: 0,
+                    scale: 0,
+                    rotation: Math.random() * 360,
+                    duration: 0.8 + Math.random() * 0.5,
+                    ease: "power2.out"
+                });
+            }
+
+            // --- الخروج التلقائي ---
+            const removeToast = () => {
+                gsap.to(toast, {
+                    y: -50,
+                    opacity: 0,
+                    scale: 0.9,
+                    duration: 0.4,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        if(toast.parentNode) toast.parentNode.removeChild(toast);
+                    }
+                });
+            };
+
+            // إخفاء بعد 4 ثواني
+            setTimeout(removeToast, 4000);
+
+            // إخفاء عند النقر
+            toast.onclick = removeToast;
+        }
+                
         // --- SHIFT LOGIC ---
         function checkShiftTime() {
             if (!driverData || !driverData.shift) return true; 
