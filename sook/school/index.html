@@ -105,8 +105,8 @@
             z-index: 1;
         }
         /* CSS Filter for Dark Mode Map */
-        .map-container canvas, #driver-location-map canvas {
-            filter: invert(100%) hue-rotate(180deg) brightness(0.95) contrast(90%);
+        .tomtom-map canvas {
+            filter: none !important;
         }
 
         .marker-icon {
@@ -365,6 +365,24 @@
         border-color: #06b6d4 !important;
         box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
     }
+    /* --- ستايل الوضع الليلي الذكي --- */
+.map-night-mode canvas {
+    filter: invert(100%) hue-rotate(180deg) brightness(0.85) contrast(1.1) !important;
+    transition: filter 0.5s ease;
+}
+
+/* استثناء العناصر المهمة (السيارات، الماركر، النصوص) من القلب اللوني */
+.map-night-mode .mapboxgl-marker,
+.map-night-mode .mapboxgl-popup,
+.map-night-mode .mapboxgl-control-container,
+.map-night-mode .marker-element { /* الكلاس الخاص بأيقوناتك */
+    filter: invert(100%) hue-rotate(180deg) contrast(0.9) brightness(1.1) !important;
+}
+
+/* تحسين شكل الخريطة في الوضع الليلي */
+.map-night-mode {
+    background-color: #0f172a !important; /* لون خلفية داكن لملء الفراغات */
+}
     </style>
 </head>
 <body class="text-slate-200">
@@ -1295,7 +1313,34 @@
     </div>
     <h4 class="font-bold text-white">وضع القمر الصناعي</h4>
     <p class="text-[10px] text-slate-400 mt-1">عرض صور حقيقية للمباني والتضاريس (Satellite).</p>
+    </div>
+
+    <div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('nightMode')">
+    <div class="flex justify-between items-start mb-3">
+        <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <i class="ph ph-moon-stars text-xl"></i>
+        </div>
+        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-nightMode-bg">
+            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-nightMode-dot"></span>
+        </div>
+    </div>
+    <h4 class="font-bold text-white">الوضع الليلي</h4>
+    <p class="text-[10px] text-slate-400 mt-1">تفعيل نمط الألوان الداكنة للخرائط (Night Style).</p>
 </div>
+
+<div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('buildings3D')">
+    <div class="flex justify-between items-start mb-3">
+        <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <i class="ph ph-buildings text-xl"></i>
+        </div>
+        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-buildings3D-bg">
+            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-buildings3D-dot"></span>
+        </div>
+    </div>
+    <h4 class="font-bold text-white">مباني 3D</h4>
+    <p class="text-[10px] text-slate-400 mt-1">عرض المباني بشكل مجسم وثلاثي الأبعاد.</p>
+</div>
+
 </div>
                 </div>
             </main>
@@ -1995,54 +2040,56 @@
                     snapRoads: false,
                     traffic: false,
                     waypointOptimization: false,
-                    satelliteMode: false // الوضع الجديد
+                    satelliteMode: false,
+                    nightMode: false,
+                    buildings3D: false // مفعل افتراضياً
                 },
 
                 _debounceTimer: null,
 
-                // --- دالة تحميل الإعدادات من التخزين المحلي ---
+                // --- تحميل الإعدادات ---
                 load: function() {
                     const savedSettings = localStorage.getItem('school_dashboard_settings');
                     if (savedSettings) {
                         try {
-                            // دمج الإعدادات المحفوظة مع الافتراضية لضمان وجود كل المفاتيح
                             this.config = { ...this.config, ...JSON.parse(savedSettings) };
-                            console.log("✅ Settings loaded from LocalStorage");
-                        } catch (e) {
-                            console.error("Error parsing settings:", e);
-                        }
+                        } catch (e) { console.error(e); }
                     }
-                    // تحديث أزرار الواجهة لتعكس الحالة المحفوظة
                     this.initUI();
                 },
 
-                // --- دالة حفظ الإعدادات ---
+                // --- حفظ الإعدادات ---
                 save: function() {
                     localStorage.setItem('school_dashboard_settings', JSON.stringify(this.config));
                 },
 
-                // دالة التبديل (محدثة للحفظ)
+                // --- دالة التبديل ---
                 toggle: function(key) {
                     this.config[key] = !this.config[key];
                     
-                    this.save(); // <--- حفظ التغيير فوراً
+                    // عند تفعيل القمر الصناعي، نلغي المباني الـ 3D
+                    if (key === 'satelliteMode' && this.config.satelliteMode) {
+                        this.config.buildings3D = false;
+                        this.updateUI('buildings3D');
+                    }
+
+                    this.save();
                     this.updateUI(key);
-                    
+
                     const status = this.config[key] ? 'تم التفعيل' : 'تم الإيقاف';
                     App.Toast.show(`${key}: ${status}`, this.config[key] ? 'success' : 'info');
 
-                    // Debounce (تأخير) لتجنب الحظر 429
+                    // تحديث الخرائط
                     if (this._debounceTimer) clearTimeout(this._debounceTimer);
                     this._debounceTimer = setTimeout(() => {
                         App.Toast.show('جاري تحديث الخرائط...', 'info');
                         this.applyToAllMaps();
-                    }, 1000);
+                    }, 300);
                 },
 
                 updateUI: function(key) {
                     const bg = document.getElementById(`toggle-${key}-bg`);
                     const dot = document.getElementById(`toggle-${key}-dot`);
-                    
                     if (bg && dot) {
                         if (this.config[key]) {
                             bg.classList.remove('bg-slate-700');
@@ -2062,74 +2109,142 @@
                     Object.keys(this.config).forEach(key => this.updateUI(key));
                 },
 
+                // --- تطبيق التغييرات على جميع الخرائط ---
                 applyToAllMaps: function() {
-                    const activeMaps = [App.state.map, App.state.homeMap, App.state.trackingMap].filter(m => !!m);
+                    const allMaps = [
+                        App.state.map,               
+                        App.state.homeMap,           
+                        App.state.trackingMap,       
+                        App.state.driverLocationMap  
+                    ];
                     
-                    // Staggering updates (تحديث متتابع)
-                    activeMaps.forEach((mapInstance, index) => {
-                        setTimeout(() => {
+                    allMaps.forEach(mapInstance => {
+                        if (mapInstance) {
                             this.applyToMap(mapInstance);
-                        }, index * 600); 
+                        }
                     });
                 },
 
+                // --- الدالة الأساسية لتطبيق الستايل والمباني ---
                 applyToMap: function(map) {
                     if (!map) return;
+                    
+                    const container = map.getContainer();
 
-                    // 1. Traffic
-                    if (this.config.traffic) {
-                        map.showTrafficFlow();
-                        map.showTrafficIncidents();
-                    } else {
-                        map.hideTrafficFlow();
-                        map.hideTrafficIncidents();
-                    }
-
-                    // 2. Satellite Mode (مع إصلاح 400 Bad Request)
+                    // 1. معالجة القمر الصناعي
                     const satSourceId = 'tomtom-satellite-source';
                     const satLayerId = 'tomtom-satellite-layer';
+                    const isSatellite = this.config.satelliteMode;
 
-                    if (this.config.satelliteMode) {
+                    if (isSatellite) {
+                        container.classList.remove('map-night-mode');
                         if (!map.getSource(satSourceId)) {
                             map.addSource(satSourceId, {
                                 type: 'raster',
                                 tiles: [`https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=${TOMTOM_KEY}`],
-                                tileSize: 256,
-                                minzoom: 0,
-                                maxzoom: 19 // منع طلب مستويات غير موجودة
+                                tileSize: 256, minzoom: 0, maxzoom: 19
                             });
                         }
                         if (!map.getLayer(satLayerId)) {
-                            const layers = map.getStyle().layers;
-                            let firstSymbolId = null;
-                            for (const layer of layers) {
-                                if (layer.type === 'symbol') { firstSymbolId = layer.id; break; }
-                            }
                             map.addLayer({
                                 id: satLayerId, type: 'raster', source: satSourceId,
-                                paint: { 'raster-opacity': 1, 'raster-fade-duration': 300 }
-                            }, firstSymbolId);
+                                paint: { 'raster-opacity': 1, 'raster-fade-duration': 500 }
+                            });
                         }
                     } else {
                         if (map.getLayer(satLayerId)) map.removeLayer(satLayerId);
+
+                        // 2. معالجة الوضع الليلي (CSS Filter)
+                        if (this.config.nightMode) {
+                            container.classList.add('map-night-mode');
+                        } else {
+                            container.classList.remove('map-night-mode');
+                        }
                     }
 
-                    // 3. POIs & EV
-                    if (this.config.evCharging) {
-                        this.handlePOILayer(map, 'evCharging', 'electric vehicle station', '#10b981');
+                    // 3. معالجة المباني 3D (الإضافة الجديدة مع الإمالة)
+                    this.handleBuildingsLayer(map);
+
+                    // 4. المرور
+                    if (this.config.traffic) {
+                        try { map.showTrafficFlow(); map.showTrafficIncidents(); } catch(e){}
                     } else {
-                        this.clearLayer(map, 'evCharging');
+                        try { map.hideTrafficFlow(); map.hideTrafficIncidents(); } catch(e){}
                     }
 
-                    if (this.config.search) {
-                        this.handlePOILayer(map, 'search', 'gas station', '#3b82f6');
-                    } else {
-                        this.clearLayer(map, 'search');
-                    }
+                    // 5. الطبقات الإضافية
+                    if (this.config.evCharging) this.handlePOILayer(map, 'evCharging', 'electric vehicle station', '#10b981');
+                    else this.clearLayer(map, 'evCharging');
 
-                    // 4. Geofencing & Assets
+                    if (this.config.search) this.handlePOILayer(map, 'search', 'gas station', '#3b82f6');
+                    else this.clearLayer(map, 'search');
+
                     this.handleGeofenceLayer(map);
                     this.handleAssetsLayer(map);
+                },
+
+                // --- دالة إضافة المباني ثلاثية الأبعاد + الإمالة التلقائية ---
+                handleBuildingsLayer: function(map) {
+                    const layerId = '3d-buildings-' + map.getContainer().id;
+                    
+                    // تنظيف الطبقة القديمة
+                    if (map.getLayer(layerId)) {
+                        map.removeLayer(layerId);
+                    }
+
+                    // إذا كانت الخاصية مفعلة (وليست قمر صناعي)
+                    if (this.config.buildings3D && !this.config.satelliteMode) {
+                        
+                        // 1. إمالة الخريطة تلقائياً لرؤية المباني (Pitch)
+                        // نتحقق إذا كانت الخريطة مسطحة (pitch < 30) نقوم بإمالتها لـ 60
+                        if (map.getPitch() < 30) {
+                            map.easeTo({ pitch: 60, duration: 1000 });
+                        }
+
+                        // 2. إضافة طبقة المباني من بيانات TomTom Vector
+                        if (map.getSource('vector')) {
+                            // البحث عن طبقة النصوص لوضع المباني تحتها
+                            const layers = map.getStyle().layers;
+                            let labelLayerId;
+                            for (let i = 0; i < layers.length; i++) {
+                                if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                                    labelLayerId = layers[i].id;
+                                    break;
+                                }
+                            }
+
+                            map.addLayer({
+                                'id': layerId,
+                                'source': 'vector',
+                                'source-layer': 'Building', // هذا هو اسم الطبقة الرسمي في TomTom API
+                                'filter': ['==', 'extrude', 'true'], // فقط المباني التي لها ارتفاع
+                                'type': 'fill-extrusion',
+                                'minzoom': 13, 
+                                'paint': {
+                                    // لون المباني: رمادي فاتح (يتحول لغامق في الوضع الليلي تلقائياً)
+                                    'fill-extrusion-color': '#e5e7eb', 
+                                    
+                                    // استخراج الارتفاع من بيانات API
+                                    'fill-extrusion-height': [
+                                        'interpolate', ['linear'], ['zoom'],
+                                        13, 0,
+                                        13.05, ['get', 'height']
+                                    ],
+                                    'fill-extrusion-base': [
+                                        'interpolate', ['linear'], ['zoom'],
+                                        13, 0,
+                                        13.05, ['get', 'min_height']
+                                    ],
+                                    'fill-extrusion-opacity': 0.8
+                                }
+                            }, labelLayerId); // وضعها قبل النصوص
+                        }
+                    } else {
+                        // إذا تم إيقاف الميزة، نعيد الخريطة للوضع المسطح (اختياري)
+                        if (!this.config.buildings3D && map.getPitch() > 50) {
+                            map.easeTo({ pitch: 0, duration: 1000 });
+                        }
+                    }
                 },
 
                 clearLayer: function(map, configKey) {
@@ -2143,6 +2258,7 @@
                 handlePOILayer: function(map, configKey, query, color) {
                     const layerKey = configKey + '_' + map.getContainer().id;
                     this.clearLayer(map, configKey);
+                    
                     if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
 
                     if (this.config[configKey]) {
@@ -2161,11 +2277,7 @@
                                     .addTo(map);
                                 App.state.mapLayers[layerKey].push(marker);
                             });
-                        }).catch(err => {
-                            if (err.detailedError && err.detailedError.code === '429') {
-                                App.Toast.show('الرجاء الانتظار، الخدمة مشغولة حالياً', 'error');
-                            }
-                        });
+                        }).catch(err => {});
                     }
                 },
 
@@ -2195,10 +2307,9 @@
 
                 handleAssetsLayer: function(map) {
                     const layerKey = 'assets_' + map.getContainer().id;
+                    this.clearLayer(map, 'assets');
+
                     if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
-                    
-                    App.state.mapLayers[layerKey].forEach(m => m.remove());
-                    App.state.mapLayers[layerKey] = [];
 
                     if (this.config.assets) {
                         const center = map.getCenter();
@@ -2238,7 +2349,7 @@
 
                 enableAll: function() {
                     Object.keys(this.config).forEach(k => { this.config[k] = true; this.updateUI(k); });
-                    this.save(); // حفظ
+                    this.save();
                     
                     if (this._debounceTimer) clearTimeout(this._debounceTimer);
                     this._debounceTimer = setTimeout(() => {
@@ -2249,12 +2360,14 @@
 
                 disableAll: function() {
                     Object.keys(this.config).forEach(k => { this.config[k] = false; this.updateUI(k); });
-                    this.save(); // حفظ
+                    this.save();
                     this.applyToAllMaps();
                     App.Toast.show('تم إيقاف جميع الخدمات', 'info');
                 }
             },
-            // --- MODULE: FLEET FEED (ADVANCED) ---
+                        
+
+            // --- FLEET FEED MODULE ---
             FleetFeed: {
                 state: {
                     viewMode: 'cards',
@@ -2968,6 +3081,9 @@ setupRealtimeListeners: function() {
                 
                 this.state.driverLocationMap.on('click', (e) => {
                     this.setDestination(e.lngLat);
+                });
+                this.state.driverLocationMap.on('load', () => {
+                    App.Settings.applyToMap(this.state.driverLocationMap); // <--- هذا السطر مهم جداً
                 });
             },
 
@@ -3843,21 +3959,37 @@ setupRealtimeListeners: function() {
 
             updateDriversUI: function() {
                 const grid = document.getElementById('drivers-grid');
-                // حماية للكود في حال لم يتم تحميل العنصر
                 if (!grid) return;
                 
                 grid.innerHTML = '';
                 
+                // 1. الحصول على نص البحث وتنظيفه
+                const searchInput = document.getElementById('driver-search');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
                 const select = document.getElementById('student-driver-select');
                 if(select) select.innerHTML = '<option value="">اختر السائق...</option>';
 
-                // استخدام Object.entries لضمان الحصول على الـ ID والبيانات بشكل سليم
+                let hasResults = false;
+
                 Object.entries(this.state.drivers || {}).forEach(([key, driverData]) => {
-                    // دمج المعرف (ID) داخل بيانات السائق
                     const driver = { ...driverData, id: driverData.profile?.id || key };
                     const profile = driver.profile || {};
                     
-                    // تحديث القائمة المنسدلة (Dropdown) - منطقك القديم
+                    // --- منطق البحث الجديد ---
+                    const name = (profile.name || '').toLowerCase();
+                    const email = (profile.email || '').toLowerCase();
+                    const phone = (profile.phone || '').toLowerCase();
+                    const idStr = String(driver.id).toLowerCase();
+
+                    // إذا كان هناك نص بحث ولم يتطابق مع الاسم، البريد، الهاتف، أو المعرف -> تخطى هذا السائق
+                    if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm) && !phone.includes(searchTerm) && !idStr.includes(searchTerm)) {
+                        return; 
+                    }
+
+                    hasResults = true;
+
+                    // تحديث القائمة المنسدلة للطلاب (فقط للسائقين المطابقين للبحث)
                     if(select) {
                         const opt = document.createElement('option');
                         opt.value = driver.id;
@@ -3865,19 +3997,13 @@ setupRealtimeListeners: function() {
                         select.appendChild(opt);
                     }
 
-                    // --- إعداد متغيرات التصميم ---
-                    // استخدام صورة السائق أو صورة افتراضية ملونة باستخدام اسمه
+                    // --- باقي كود إنشاء البطاقة كما هو ---
                     const avatarUrl = profile.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'User')}&background=random&color=fff`;
-                    
-                    // افتراض الحالة (يمكنك ربطها بمنطق الاتصال الحقيقي لديك)
-                    const isActive = true; 
-                    const statusColor = isActive ? 'emerald' : 'slate';
+                    const statusColor = 'emerald'; 
 
                     const card = document.createElement('div');
-                    // تطبيق كلاسات التصميم الجديد (Neo-Glassmorphism)
                     card.className = 'group relative bg-[#0f172a]/60 backdrop-blur-xl rounded-3xl border border-white/5 hover:border-indigo-500/30 p-5 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10';
                     
-                    // بناء الـ HTML الداخلي للبطاقة
                     card.innerHTML = `
                         <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-indigo-900/20 to-transparent opacity-50 pointer-events-none"></div>
                         <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-[40px] rounded-full group-hover:bg-blue-500/20 transition-all pointer-events-none"></div>
@@ -3887,15 +4013,11 @@ setupRealtimeListeners: function() {
                                 <div class="w-16 h-16 rounded-2xl bg-slate-800 bg-cover bg-center border-2 border-transparent group-hover:border-indigo-500/50 transition-all shadow-lg" 
                                     style="background-image: url('${avatarUrl}');">
                                 </div>
-                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#0f172a] rounded-full flex items-center justify-center">
-                                    <div class="w-3 h-3 rounded-full bg-${statusColor}-500 animate-pulse shadow-[0_0_8px_#10b981]"></div>
-                                </div>
                             </div>
 
                             <div class="flex-1 min-w-0 pt-1">
                                 <h4 class="text-white font-bold text-lg truncate leading-tight">${profile.name || 'غير معروف'}</h4>
                                 <p class="text-xs text-slate-400 truncate mt-1 font-mono opacity-80">${profile.email || 'لا يوجد بريد'}</p>
-                                
                                 <div class="flex items-center gap-2 mt-2">
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 flex items-center gap-1">
                                         <i class="ph ph-clock"></i> ${profile.shift || 'غير محدد'}
@@ -3907,7 +4029,7 @@ setupRealtimeListeners: function() {
                         <div class="grid grid-cols-2 gap-2 mb-5">
                             <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
                                 <span class="text-[10px] text-slate-500 block mb-1">المدرسة</span>
-                                <span class="text-xs font-bold text-slate-200 truncate block" title="${profile.school}">${profile.school || '---'}</span>
+                                <span class="text-xs font-bold text-slate-200 truncate block">${profile.school || '---'}</span>
                             </div>
                             <div class="bg-black/20 rounded-xl p-2.5 border border-white/5 group-hover:border-white/10 transition-colors">
                                 <span class="text-[10px] text-slate-500 block mb-1">ID</span>
@@ -3918,10 +4040,9 @@ setupRealtimeListeners: function() {
                         <div class="flex gap-2 border-t border-white/5 pt-4">
                             <button onclick="App.openDriverDetails('${driver.id}')" class="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 group/btn">
                                 <i class="ph ph-user-list text-lg group-hover/btn:scale-110 transition-transform"></i>
-                                التفاصيل الكاملة
+                                التفاصيل
                             </button>
-                            
-                            <button onclick="App.openDriverEdit('${driver.id}')" class="px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white transition-all border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
+                            <button onclick="App.openDriverEdit('${driver.id}')" class="px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white transition-all border border-indigo-500/20">
                                 <i class="ph ph-pencil-simple text-lg"></i>
                             </button>
                         </div>
@@ -3929,8 +4050,13 @@ setupRealtimeListeners: function() {
                     
                     grid.appendChild(card);
                 });
-            },
 
+                if (!hasResults) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500">لا توجد نتائج مطابقة للبحث</div>`;
+                }
+            },
+                        
+                        
             openDriverDetails: function(driverId) {
                 const driver = this.state.drivers[driverId];
                 if(!driver) return;
