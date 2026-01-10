@@ -716,6 +716,19 @@
     z-index: 50;
     box-shadow: 0 0 10px currentColor;
 }
+/* Logout Floating Icons */
+.floating-logout-icon {
+    position: absolute;
+    font-size: 2.5rem;
+    opacity: 0.15;
+    filter: blur(0.2px);
+}
+
+/* Logout View Override */
+#logoutView {
+    z-index: 50;
+}
+
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden bg-slate-900 text-white">
@@ -739,6 +752,43 @@
         </button>
     </div>
 
+<!-- ================= LOGOUT VIEW ================= -->
+<div id="logoutView" class="view-section view-hidden flex items-center justify-center overflow-hidden">
+
+    <!-- Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black"></div>
+
+    <!-- Floating Icons -->
+    <div class="absolute inset-0 pointer-events-none">
+        <i class="fas fa-lock floating-logout-icon text-emerald-400"></i>
+        <i class="fas fa-mobile-alt floating-logout-icon text-indigo-400"></i>
+        <i class="fas fa-shield-halved floating-logout-icon text-amber-400"></i>
+    </div>
+
+    <!-- Card -->
+    <div class="relative z-10 glass-card rounded-[2.5rem] p-10 text-center max-w-sm w-full border border-white/10">
+
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.4)]">
+            <i class="fas fa-sign-out-alt text-4xl text-emerald-400"></i>
+        </div>
+
+        <h2 class="text-2xl font-black mb-2">جاري تسجيل الخروج</h2>
+
+        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+            يتم إنهاء الجلسة بأمان<br>
+            <span class="text-emerald-400 font-bold">سيظل هذا الجهاز موثوقًا</span><br>
+            لتسجيل دخول أسرع لاحقًا
+        </p>
+
+        <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+            <div id="logoutProgress" class="h-full w-0 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+        </div>
+
+        <p class="text-[10px] text-gray-500 mt-4 font-mono">
+            Secured Device Session ✓
+        </p>
+    </div>
+</div>
 
     <!-- ================= VIEW 0: SPLASH SCREEN ================= -->
 <div id="splashView" class="view-section view-active flex flex-col items-center justify-center bg-slate-900">
@@ -1437,6 +1487,7 @@
         </div>
     </div>
 
+
     <!-- Student Detail Modal -->
     <div id="studentModal" class="fixed inset-0 z-[250] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 p-4">
         <div class="glass-modal w-full max-w-sm rounded-[2.5rem] overflow-hidden transform scale-95 transition-all duration-300 relative bg-slate-900 border border-white/10" id="studentModalContent">
@@ -1530,6 +1581,9 @@
         let aiInterval = null;
         let lastGeminiCall = 0;
         let lastGeminiResult = null;
+        let homeTimeline = null;
+        let floatingIconsTween = null;
+        let floatingIconsDelayedTween = null;
         let tripStatusUnsubscribe = null; // متغير جديد لحفظ دالة إيقاف المراقبة
         // Timer For Alerting Prolonged Stops
         let lastMovePosition = null;
@@ -1593,7 +1647,8 @@
             loading: document.getElementById('loadingView'), // هام جداً
             login: document.getElementById('loginView'),
             home: document.getElementById('homeView'),
-            map: document.getElementById('mapView')
+            map: document.getElementById('mapView'),
+            logout: document.getElementById('logoutView')
         };
         
         const actionBtn = document.getElementById('actionBtn');
@@ -2168,38 +2223,91 @@
         }
 
 function logout() {
-    // 1. إخفاء شاشة التحميل فوراً
-    const loadingView = document.getElementById('loadingView');
-    if(loadingView) {
-        loadingView.classList.remove('view-active');
-        loadingView.classList.add('view-hidden');
-    }
 
-    window.signOut(window.auth).then(() => {
-        currentDriverId = null;
-        driverData = {};
-        
-        // إعادة تعيين زر الدخول
-        const btn = document.getElementById('loginBtn');
-        if(btn) {
-            btn.innerHTML = '<span class="font-bold text-white text-lg tracking-wide">تسجيل الدخول</span><i class="fas fa-arrow-left text-white/80 transition-transform"></i>';
-            btn.disabled = false;
-        }
+     if (currentView === 'logout') return;
 
-        // تصفير شاشة التحميل
-        const progressBar = document.getElementById('dataLoadProgress');
-        const statusText = document.getElementById('loadingStatusText');
-        if(progressBar) progressBar.style.width = '0%';
-        if(statusText) statusText.innerText = "تهيئة الاتصال...";
+    showView('logout');
 
-        // الانتقال لصفحة الدخول
-        showView('login');
-        
-        setTimeout(() => {
-            if(typeof initLoginAnimations === 'function') initLoginAnimations();
-        }, 100);
+    // GSAP Animations
+    gsap.fromTo(
+        '#logoutView .glass-card',
+        { scale: 0.85, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    );
+
+    gsap.to('#logoutProgress', {
+        width: '100%',
+        duration: 1.6,
+        ease: 'power2.inOut'
     });
+
+    gsap.utils.toArray('.floating-logout-icon').forEach((icon, i) => {
+        gsap.fromTo(icon,
+            {
+                x: Math.random() * window.innerWidth,
+                y: window.innerHeight + 100,
+                rotation: 0
+            },
+            {
+                y: -200,
+                rotation: 360,
+                duration: 6 + i,
+                repeat: -1,
+                ease: 'none'
+            }
+        );
+    });
+
+    // تنفيذ تسجيل الخروج بعد الأنيميشن
+    setTimeout(() => {
+        window.signOut(window.auth).then(() => {
+
+            currentDriverId = null;
+            driverData = {};
+
+            const btn = document.getElementById('loginBtn');
+            if (btn) {
+btn.innerHTML = `
+<div class="relative w-full h-16 rounded-2xl overflow-hidden group shadow-lg shadow-emerald-900/30 active:scale-95 transition-transform duration-200">
+
+    <!-- Glow -->
+    <div class="absolute -inset-1 bg-emerald-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+    <!-- Background -->
+    <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 group-hover:scale-105 transition-transform duration-500"></div>
+
+    <!-- Noise / Texture -->
+    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+
+    <!-- Shine -->
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
+                -translate-x-full group-hover:translate-x-full transition-transform duration-1000 skew-x-12"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex items-center justify-center gap-3 h-full">
+        <span class="font-black text-white text-lg tracking-wide">تسجيل الدخول</span>
+        <i class="fas fa-arrow-left text-white/80 group-hover:-translate-x-1 transition-transform duration-300"></i>
+    </div>
+</div>
+`;
+
+                btn.disabled = false;
+            }
+
+    // 2. إظهار شاشة الفحص الأمني (Scanner)
+    const overlay = document.getElementById('biometricOverlay');
+    const scannerLine = document.getElementById('scannerLine');
+    
+    gsap.to(overlay, { opacity: 0, duration: 0 });
+    gsap.fromTo(scannerLine, { top: "0%" }, { top: "100%", duration: 1.5, repeat: -1, ease: "linear" });
+
+            showView('login');
+
+
+        });
+    }, 1800);
 }
+
 
         // --- FETCH & HISTORY & STUDENTS ---
         function fetchStudents(driverId) {
