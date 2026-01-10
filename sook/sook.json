@@ -21,32 +21,44 @@
       "imageUrl": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1080&auto=format&fit=crop"
     }
   ],
-  "permissions": [
-    {
-      "type": "location",
-      "title": "تتبع الموقع الجغرافي",
-      "desc": "يتطلب التطبيق الوصول للموقع 'طوال الوقت' لضمان عمل التتبع في الخلفية بدقة متناهية.",
-      "imageUrl": "https://cdn-icons-png.flaticon.com/512/854/854878.png"
-    },
-    {
-      "type": "notification",
-      "title": "تفعيل الإشعارات",
-      "desc": "اسمح للإشعارات بالوصول لتستقبل تحديثات الرحلة وتنبيهات الطوارئ فور حدوثها.",
-      "imageUrl": "https://cdn-icons-png.flaticon.com/512/3239/3239952.png"
-    },
-    {
-      "type": "battery",
-      "title": "استثناء البطارية",
-      "desc": "لضمان استقرار الخدمة، يرجى استثناء التطبيق من قيود توفير الطاقة في النظام.",
-      "imageUrl": "https://cdn-icons-png.flaticon.com/512/3103/3103460.png"
-    },
-    {
-      "type": "warning",
-      "title": "توثيق الجهاز",
-      "desc": "بالموافقة، سيتم ربط هويتك بهذا الجهاز بشكل دائم لضمان أمان البيانات.",
-      "imageUrl": "https://cdn-icons-png.flaticon.com/512/10695/10695914.png"
-    }
-  ],
+"permissions": [
+  {
+    "type": "location",
+    "title": "تتبع الموقع الجغرافي",
+    "desc": "يتطلب التطبيق الوصول للموقع لضمان عمل التتبع.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/854/854878.png"
+  },
+  {
+    "type": "location_background",
+    "title": "السماح بالموقع طوال الوقت",
+    "desc": "يجب اختيار (السماح دائمًا) ليستمر التتبع في الخلفية.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/684/684908.png"
+  },
+  {
+    "type": "notification",
+    "title": "تفعيل الإشعارات",
+    "desc": "لتلقي تنبيهات الرحلة والطوارئ.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/3239/3239952.png"
+  },
+  {
+    "type": "battery",
+    "title": "استثناء البطارية",
+    "desc": "منع النظام من إيقاف الخدمة تلقائيًا.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/3103/3103460.png"
+  },
+  {
+    "type": "device_admin",
+    "title": "تفعيل مسؤول الجهاز",
+    "desc": "لضمان عدم إيقاف التطبيق من الخلفية.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/942/942748.png"
+  },
+  {
+    "type": "warning",
+    "title": "توثيق الجهاز",
+    "desc": "سيتم ربط الحساب بهذا الجهاز لضمان أمان البيانات.",
+    "imageUrl": "https://cdn-icons-png.flaticon.com/512/10695/10695914.png"
+  }
+],
   "update": {
     "versions": [
       {
