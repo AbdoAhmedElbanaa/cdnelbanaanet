@@ -1404,6 +1404,53 @@
     <p class="text-[10px] text-slate-400 mt-1">عرض المباني بشكل مجسم وثلاثي الأبعاد.</p>
 </div>
 
+
+<div class="glass-morphism rounded-3xl p-6 space-y-6 max-w-3xl">
+
+    <h3 class="text-xl font-bold text-white flex items-center gap-3">
+        <i class="ph ph-map-pin text-indigo-400 text-2xl"></i>
+        إعدادات خرائط OSM
+    </h3>
+
+    <!-- Map Style -->
+    <div class="space-y-2">
+        <label class="text-sm text-slate-400">نمط الخريطة</label>
+        <select id="osm-style" class="glass-input w-full px-4 py-3 rounded-xl">
+            <option value="dark">داكن (Dark)</option>
+            <option value="light">فاتح (Light)</option>
+            <option value="satellite">قمر صناعي (Satellite)</option>
+        </select>
+    </div>
+
+    <!-- Night Mode -->
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="font-bold text-sm">الوضع الليلي الذكي</p>
+            <p class="text-xs text-slate-400">تحسين الرؤية الليلية بدون تغيير الطبقات</p>
+        </div>
+        <input type="checkbox" id="osm-night-mode" class="scale-125 accent-indigo-500">
+    </div>
+
+    <!-- Zoom -->
+    <div class="space-y-2">
+        <label class="text-sm text-slate-400">مستوى التكبير الافتراضي</label>
+        <input id="osm-zoom" type="range" min="8" max="18" value="13"
+               class="w-full accent-indigo-500">
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center justify-between">
+        <span class="text-sm">إظهار أدوات التحكم</span>
+        <input type="checkbox" id="osm-controls" checked class="scale-125 accent-indigo-500">
+    </div>
+
+    <button onclick="App.OSMSettings.apply()"
+            class="glass-btn w-full py-3 rounded-xl font-bold">
+        تطبيق الإعدادات على جميع الخرائط
+    </button>
+
+</div>
+
 </div>
                 </div>
             </main>
@@ -1764,7 +1811,7 @@
             appId: "1:611309810028:web:e817a023fc50b42959c349",
             measurementId: "G-60987892BP"
         };
-        const TOMTOM_KEY = ''; 
+        const TOMTOM_KEY = 'lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu'; 
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -1799,1012 +1846,1078 @@
                 mapProvider: 'tomtom', // القيمة الافتراضية
                 activeTileLayer: null, // لتخزين طبقة OSM الحالية (للتبديل بين قمر صناعي ومظلم)
             },
-// --- MODULE: MAP HANDLER (UPDATED) ---
-// --- MODULE: MAP HANDLER (UPDATED FOR MULTI-COLOR PATHS) ---
-MapHandler: {
-    isTomTomAvailable: function() {
-        return (typeof tt !== 'undefined' && typeof TOMTOM_KEY !== 'undefined' && TOMTOM_KEY.length > 5);
-    },
-
-    init: function(containerId, center, zoom) {
-        if (this.isTomTomAvailable()) {
-            App.state.mapProvider = 'tomtom';
-            const map = tt.map({
-                key: TOMTOM_KEY,
-                container: containerId,
-                center: center,
-                zoom: zoom,
-                language: 'ar',
-                theme: { style: 'main', layer: 'basic', source: 'vector' }
-            });
-            map.addControl(new tt.NavigationControl());
-            return map;
-        } else {
-            App.state.mapProvider = 'osm';
-            if (!document.getElementById(containerId)) return null;
-            const map = L.map(containerId).setView([center[1], center[0]], zoom);
-            const darkLayer = L.tileLayer(
-                'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20 }
-            );
-            darkLayer.addTo(map);
-
-            // تخزين الطبقة الحالية
-            map._baseLayer = darkLayer;
-            return map;
-        }
-    },
-
-    // ===============================
-    // ✅ FIX: Satellite Mode Support
-    // ===============================
-    setSatelliteMode: function(map, enabled) {
-        if (!map) return;
-
-        // --- TomTom ---
-        if (App.state.mapProvider === 'tomtom') {
-            try {
-                map.setStyle({
-                    style: 'main',
-                    layer: enabled ? 'satellite' : 'basic',
-                    source: 'vector'
-                });
-            } catch (e) {
-                console.warn('TomTom satellite mode not supported:', e);
-            }
-        }
-
-        // --- Leaflet / OSM ---
-        else {
-            if (!map._satelliteLayer) {
-                map._satelliteLayer = L.tileLayer(
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    {
-                        attribution: '&copy; Esri',
-                        maxZoom: 20
-                    }
-                );
-            }
-
-            if (enabled) {
-                if (map._baseLayer) map.removeLayer(map._baseLayer);
-                map._satelliteLayer.addTo(map);
-            } else {
-                if (map._satelliteLayer) map.removeLayer(map._satelliteLayer);
-                if (map._baseLayer) map._baseLayer.addTo(map);
-            }
-        }
-    },
-
-    routeCache: {},
-    _getRouteKey: function(start, end) {
-        return `${start[0].toFixed(4)},${start[1].toFixed(4)}-${end[0].toFixed(4)},${end[1].toFixed(4)}`;
-    },
-    // --- الدالة الذكية الجديدة لرسم المسارات الملونة ---
-    drawSmartTrail: async function(map, coordinates) {
-        if (!map || !coordinates || coordinates.length === 0) return;
-
-        // 1. تعريف الطبقات (Layers)
-        // Green: Actual GPS points (مسار فعلي)
-        // Purple: Corrected Road gaps (مسار مصحح)
-        
-        let actualSegments = [];
-        let correctedSegments = [];
-
-        // إذا كانت النقاط قليلة جداً، نعتبرها مساراً فعلياً فقط
-        if (coordinates.length < 2) {
-            this.drawRoute(map, coordinates, '#10b981', 'trail-actual'); // Emerald Green
-            return;
-        }
-
-        // 2. تحليل المسار وتقسيمه
-        for (let i = 0; i < coordinates.length - 1; i++) {
-            const currentPoint = coordinates[i];
-            const nextPoint = coordinates[i+1];
-            
-            // حساب المسافة
-            const dist = App.Utils.calculateDistance(
-                {lng: currentPoint[0], lat: currentPoint[1]}, 
-                {lng: nextPoint[0], lat: nextPoint[1]}
-            );
-
-            // إذا كانت الفجوة أكبر من 150 متر -> هذا مسار مصحح (Smart Correction)
-            if (dist > 0.15) {
-                // نحاول جلب المسار من الطريق
-                try {
-                    const roadPath = await this.fillRouteGap(currentPoint, nextPoint);
-                    // نضيفه لقائمة المصحح (Purple)
-                    correctedSegments.push(roadPath);
-                } catch(e) {
-                    // في حال الفشل، نصله بخط عادي (Green)
-                    actualSegments.push([currentPoint, nextPoint]);
-                }
-            } else {
-                // مسافة قصيرة وطبيعية -> مسار فعلي (Green)
-                actualSegments.push([currentPoint, nextPoint]);
-            }
-        }
-
-        // 3. الرسم على الخريطة (Multi-LineString)
-        // رسم الأجزاء الفعلية (أخضر)
-        this.drawMultiSegmentRoute(map, actualSegments, '#10b981', 'trail-actual', 6);
-        
-        // رسم الأجزاء المصححة (بنفسجي)
-        this.drawMultiSegmentRoute(map, correctedSegments, '#8b5cf6', 'trail-corrected', 5, [2, 2]); // خط متقطع قليلاً أو أنحف
-    },
-
-    // دالة مساعدة لملء الفراغات
-    fillRouteGap: async function(startCoords, endCoords) {
-        const key = this._getRouteKey(startCoords, endCoords);
-        if (this.routeCache[key]) return this.routeCache[key];
-
-        try {
-            const route = await this.fetchRoute(startCoords, endCoords);
-            this.routeCache[key] = route;
-            return route;
-        } catch (e) {
-            return [startCoords, endCoords];
-        }
-    },
-
-    // --- دالة رسم محسنة تدعم MultiLineString ---
-    drawMultiSegmentRoute: function(map, segments, color, layerId, width = 6, dashArray = []) {
-        if (!map || segments.length === 0) {
-            // تنظيف الطبقة إذا كانت فارغة
-            if (App.state.mapProvider === 'tomtom') {
-                if (map.getLayer(layerId)) {
-                     map.getSource(layerId).setData({ type: 'FeatureCollection', features: [] });
-                }
-            }
-            return;
-        }
-
-        if (App.state.mapProvider === 'tomtom') {
-            // TomTom (Mapbox GL JS Style)
-            const geoJson = {
-                type: 'Feature',
-                geometry: {
-                    type: 'MultiLineString',
-                    coordinates: segments
-                }
-            };
-
-            if (map.getLayer(layerId)) {
-                map.getSource(layerId).setData(geoJson);
-            } else {
-                map.addSource(layerId, { type: 'geojson', data: geoJson });
-                
-                const paint = {
-                    'line-color': color,
-                    'line-width': width,
-                    'line-opacity': 0.8
-                };
-                
-                // إضافة Dash Array إذا طلب ذلك (للمسار المصحح مثلاً)
-                if(dashArray && dashArray.length > 0) {
-                    // TomTom Basic Style قد لا يدعم dash-array مباشرة بسهولة في كل النسخ، لكن نجرب
-                    // paint['line-dasharray'] = dashArray; 
-                }
-
-                map.addLayer({
-                    'id': layerId,
-                    'type': 'line',
-                    'source': layerId,
-                    'layout': { 'line-cap': 'round', 'line-join': 'round' },
-                    'paint': paint
-                });
-            }
-        } else {
-            // Leaflet Implementation
-            const storageKey = `leaflet_layer_${layerId}`;
-            // إزالة الطبقة القديمة
-            if (App.state[storageKey]) {
-                map.removeLayer(App.state[storageKey]);
-            }
-            
-            // تحويل Coordinates إلى صيغة Leaflet [lat, lng]
-            const latLngSegments = segments.map(seg => seg.map(coord => [coord[1], coord[0]]));
-            
-            const polyline = L.polyline(latLngSegments, {
-                color: color,
-                weight: width,
-                opacity: 0.8,
-                dashArray: dashArray.length > 0 ? '5, 10' : null,
-                lineCap: 'round'
-            }).addTo(map);
-            
-            App.state[storageKey] = polyline;
-        }
-    },
-
-    // دالة الرسم العادية (للمسار المتوقع - خط واحد)
-drawRoute: function(map, coordinates, color, layerId, isDashed = false) {
-    if (!map || !coordinates || coordinates.length === 0) return;
-
-    if (App.state.mapProvider === 'tomtom') {
-        const geoJson = {
-            'type': 'Feature',
-            'geometry': { 'type': 'LineString', 'coordinates': coordinates }
-        };
-
-        if (map.getLayer(layerId)) {
-            map.getSource(layerId).setData(geoJson);
-        } else {
-            map.addSource(layerId, { 'type': 'geojson', 'data': geoJson });
-            map.addLayer({
-                'id': layerId,
-                'type': 'line',
-                'source': layerId,
-                'layout': { 'line-cap': 'round', 'line-join': 'round' },
-                'paint': {
-                    'line-color': color,
-                    'line-width': isDashed ? 3 : 5,
-                    'line-opacity': color === '#f59e0b' ? 0.9 : 0.7, // زيادة وضوح البرتقالي
-                    'line-dasharray': isDashed ? [2, 2] : [1]
-                }
-            });
-
-            // إضافة تأثير التكبير والتصغير السلس (Interpolation)
-            map.setPaintProperty(layerId, 'line-width', [
-                'interpolate', ['linear'], ['zoom'],
-                10, isDashed ? 2 : 4,
-                15, isDashed ? 5 : 8
-            ]);
-        }
-    } else {
-        // Leaflet version
-        const storageKey = `leaflet_layer_${layerId}`;
-        if (App.state[storageKey]) map.removeLayer(App.state[storageKey]);
-
-        const latLngs = coordinates.map(c => [c[1], c[0]]);
-        App.state[storageKey] = L.polyline(latLngs, {
-            color: color,
-            weight: isDashed ? 3 : 5,
-            opacity: 0.6,
-            dashArray: isDashed ? '5, 10' : null,
-            lineJoin: 'round'
-        }).addTo(map);
-    }
-},
-
-    fetchRoute: async function(startCoords, endCoords) {
-        if (App.state.mapProvider === 'tomtom') {
-            const routeOptions = {
-                key: TOMTOM_KEY,
-                locations: `${startCoords[0]},${startCoords[1]}:${endCoords[0]},${endCoords[1]}`,
-                traffic: false
-            };
-            try {
-                const response = await tt.services.calculateRoute(routeOptions);
-                const geojson = response.toGeoJson();
-                if(geojson.features && geojson.features[0]) {
-                    return geojson.features[0].geometry.coordinates;
-                }
-            } catch (e) { return [startCoords, endCoords]; }
-        } else {
-            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startCoords[0]},${startCoords[1]};${endCoords[0]},${endCoords[1]}?overview=full&geometries=geojson`;
-            try {
-                const response = await fetch(osrmUrl);
-                const data = await response.json();
-                if (data.code === 'Ok' && data.routes && data.routes[0]) {
-                    return data.routes[0].geometry.coordinates;
-                }
-            } catch (e) { return [startCoords, endCoords]; }
-        }
-        return [startCoords, endCoords];
-    },
-
-    resizeMap: function(map) {
-        if (!map) return;
-        if (App.state.mapProvider === 'tomtom') map.resize();
-        else setTimeout(() => map.invalidateSize(), 100);
-    },
-    
-    addMarker: function(map, lngLat, element, popupHTML) {
-        if (App.state.mapProvider === 'tomtom') {
-            const popup = new tt.Popup({ offset: 35 }).setHTML(popupHTML || '');
-            return new tt.Marker({ element: element }).setLngLat(lngLat).setPopup(popup).addTo(map);
-        } else {
-            const tempDiv = document.createElement('div');
-            tempDiv.className = element.className;
-            tempDiv.style.cssText = element.style.cssText;
-            tempDiv.innerHTML = element.innerHTML;
-            const customIcon = L.divIcon({
-                html: tempDiv.outerHTML, className: 'leaflet-custom-marker-wrapper',
-                iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -30]
-            });
-            const marker = L.marker([lngLat[1], lngLat[0]], { icon: customIcon }).addTo(map);
-            if (popupHTML) marker.bindPopup(popupHTML);
-            marker.setLngLat = function(newLngLat) { this.setLatLng([newLngLat[1], newLngLat[0]]); return this; };
-            return marker;
-        }
-    }
-},
-
-// --- REPLAY MODULE ---
-// استبدل كائن Replay بالكامل بهذا الكود المطور
-// --- REPLAY MODULE (UPDATED WITH MULTI-COLOR SUPPORT) ---
-Replay: {
-    tripData: null,
-    isPlaying: false,
-    playbackSpeed: 1,
-    currentIndex: 0,
-    totalPoints: 0,
-    animationFrame: null,
-    isDragging: false,
-    
-    // دالة التهيئة
-    init: async function(trip) {
-        this.stop(); 
-        if (!trip || !trip.actualPath) return;
-        
-        App.Toast.show('جاري تجهيز مسار المراجعة وتحليل البيانات...', 'info');
-        
-        // 1. تجهيز نقاط المسار
-        let rawPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
-        if (rawPoints.length < 2) return;
-
-        // 2. معالجة البيانات وملء الفجوات (توليد النقاط البنفسجية)
-        const enrichedPoints = await this.enrichTripData(rawPoints);
-        
-        this.tripData = {
-            points: enrichedPoints,
-            events: trip.events ? Object.values(trip.events) : [],
-            startTime: rawPoints[0].ts,
-            endTime: rawPoints[rawPoints.length-1].ts,
-            startCoord: [rawPoints[0].lng, rawPoints[0].lat],
-            endCoord: [rawPoints[rawPoints.length-1].lng, rawPoints[rawPoints.length-1].lat]
-        };
-        this.totalPoints = enrichedPoints.length;
-        this.currentIndex = 0;
-        
-        // 3. إظهار واجهة التحكم
-        const controls = document.getElementById('replay-controls');
-        if (controls) {
-            controls.classList.remove('hidden');
-            controls.classList.add('flex');
-        }
-        
-        // 4. تحديث النصوص الزمنية
-        document.getElementById('replay-start-time').textContent = new Date(this.tripData.startTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
-        document.getElementById('replay-end-time').textContent = new Date(this.tripData.endTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
-        
-        // 5. رسم "المسار المحدد" (الرصاصي) في الخلفية - المسار الكلي المتوقع
-        // نقوم برسم خط رمادي يربط بداية الرحلة بنهايتها (أو المسار المثالي إن وجد)
-        // داخل Replay.init
-        if (this.tripData.startCoord && this.tripData.endCoord) {
-            App.MapHandler.fetchRoute(this.tripData.startCoord, this.tripData.endCoord).then(route => {
-                // تغيير اللون من #94a3b8 (رصاصي) إلى #f59e0b (برتقالي)
-                // مع إبقاء البارامتر الأخير true ليكون منقطاً
-                App.MapHandler.drawRoute(App.state.trackingMap, route, '#f59e0b', 'replay-planned', true);
-            });
-        }
-
-        // 6. وضع السيارة في البداية
-        const startPt = enrichedPoints[0];
-        const startLngLat = [startPt.lng, startPt.lat];
-        
-        if (!App.state.trackingMarkers['car']) {
-             const el = document.createElement('div');
-             el.className = 'marker-icon';
-             el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=Replay&background=f59e0b&color=fff')`;
-             el.style.border = '3px solid #fff';
-             el.style.width = '40px'; el.style.height = '40px'; el.style.borderRadius = '50%'; el.style.backgroundSize = 'cover';
-             App.state.trackingMarkers['car'] = App.MapHandler.addMarker(App.state.trackingMap, startLngLat, el);
-        } else {
-            App.state.trackingMarkers['car'].setLngLat(startLngLat);
-        }
-
-        // 7. تحريك الكاميرا
-        if (App.state.mapProvider === 'tomtom') {
-            App.state.trackingMap.panTo(startLngLat);
-        } else {
-            App.state.trackingMap.panTo([startLngLat[1], startLngLat[0]]);
-        }
-        if (this.tripData.endCoord) {
-            const el = document.createElement('div');
-            el.className = 'destination-pin-container';
-            el.innerHTML = `
-                <div class="pin-pulse"></div>
-                <div class="relative bg-indigo-600 p-2 rounded-full border-2 border-white shadow-2xl">
-                    <i class="ph-fill ph-flag-checkered text-white text-xl"></i>
-                </div>
-            `;
-            // إذا كنت تريدها Pin برتقالي أيضاً، غير indigo-600 و ph-flag-checkered
-        }
-        this.setupDragEvents();
-        this.setSpeed(1);
-        this.updatePlayIcon(false);
-        
-        // رسم الإطار الأول
-        this.updateFrame();
-
-        App.Toast.show('المسار جاهز للعرض', 'success');
-    },
-
-    // دالة حشو النقاط (Gap Filling) مع تمييز النقاط المولدة
-    enrichTripData: async function(rawPoints) {
-        let finalPoints = [];
-        // إضافة خاصية generated: false للنقاط الأصلية
-        finalPoints.push({...rawPoints[0], generated: false});
-
-        for (let i = 0; i < rawPoints.length - 1; i++) {
-            const p1 = rawPoints[i];
-            const p2 = rawPoints[i+1];
-            const dist = App.Utils.calculateDistance(p1, p2);
-            
-            // إذا كانت المسافة أكبر من 150 متر -> نولد نقاط (بنفسجي)
-            if (dist > 0.15) {
-                try {
-                    const routeCoords = await App.MapHandler.fetchRoute([p1.lng, p1.lat], [p2.lng, p2.lat]);
-                    if (routeCoords && routeCoords.length > 2) {
-                        const timeDiff = p2.ts - p1.ts;
-                        const stepTime = timeDiff / routeCoords.length;
-                        
-                        // نضيف النقاط الوسيطة ونميزها بـ generated: true
-                        for (let j = 1; j < routeCoords.length - 1; j++) {
-                            const coord = routeCoords[j];
-                            finalPoints.push({
-                                lat: coord[1], lng: coord[0],
-                                ts: p1.ts + (stepTime * j), 
-                                s: p1.s || 60, 
-                                generated: true // هذه النقطة محاكاة
-                            });
-                        }
-                    }
-                } catch (e) {
-                    console.warn("Gap skip", e);
-                }
-            }
-            // النقطة الأصلية التالية
-            finalPoints.push({...p2, generated: false});
-        }
-        return finalPoints;
-    },
-    
-    // --- دوال التحكم (Play/Pause/Stop) ---
-    toggle: function() { this.isPlaying ? this.pause() : this.play(); },
-    
-    play: function() {
-        if (!this.tripData) return;
-        this.isPlaying = true;
-        this.updatePlayIcon(true);
-        this.loop();
-    },
-    
-    pause: function() {
-        this.isPlaying = false;
-        this.updatePlayIcon(false);
-        if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
-    },
-    
-    stop: function() {
-        this.pause();
-        this.currentIndex = 0;
-        
-        const progress = document.getElementById('timeline-progress');
-        if(progress) progress.style.width = '0%';
-        
-        // مسح الطبقات عند الإيقاف
-        if(App.state.trackingMap) {
-             // استخدام الدالة الجديدة لمسح الطبقات المتعددة
-             App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, [], '', 'trail-actual');
-             App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, [], '', 'trail-corrected');
-             // يمكن إبقاء المسار المخطط (الرصاصي) أو مسحه حسب الرغبة
-             // App.MapHandler.drawRoute(App.state.trackingMap, [], '', 'replay-planned');
-        }
-        
-        const controls = document.getElementById('replay-controls');
-        if(controls) {
-            controls.classList.add('hidden');
-            controls.classList.remove('flex');
-        }
-    },
-
-    updatePlayIcon: function(isPlaying) {
-        const iconContainer = document.getElementById('replay-play-icon');
-        if (!iconContainer) return;
-        iconContainer.innerHTML = isPlaying 
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 5v14M16 5v14"/></svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/></svg>`;
-    },
-
-    setSpeed: function(speed) {
-        this.playbackSpeed = parseFloat(speed);
-        document.querySelectorAll('.speed-btn').forEach(btn => {
-            const btnSpeed = parseFloat(btn.dataset.speed);
-            btn.classList.toggle('text-white', btnSpeed === this.playbackSpeed);
-            btn.classList.toggle('bg-indigo-500/20', btnSpeed === this.playbackSpeed);
-            btn.classList.toggle('text-slate-400', btnSpeed !== this.playbackSpeed);
-        });
-    },
-
-    jump: function(amount) {
-        if (!this.tripData) return;
-        let newIndex = this.currentIndex + (amount * 10);
-        newIndex = Math.max(0, Math.min(newIndex, this.totalPoints - 1));
-        this.currentIndex = newIndex;
-        this.updateFrame();
-    },
-
-    setupDragEvents: function() {
-        const track = document.getElementById('timeline-track');
-        if (!track || track.dataset.hasListeners) return;
-        
-        const handleMove = (clientX) => {
-            if (!this.tripData) return;
-            const rect = track.getBoundingClientRect();
-            let percent = (clientX - rect.left) / rect.width;
-            percent = Math.max(0, Math.min(1, percent));
-            this.currentIndex = Math.floor(percent * (this.totalPoints - 1));
-            this.updateFrame();
-        };
-
-        track.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
-            this.wasPlaying = this.isPlaying;
-            this.pause();
-            handleMove(e.clientX);
-        });
-        window.addEventListener('mousemove', (e) => { if (this.isDragging) handleMove(e.clientX); });
-        window.addEventListener('mouseup', () => {
-            if (this.isDragging) {
-                this.isDragging = false;
-                if (this.wasPlaying) this.play();
-            }
-        });
-        track.dataset.hasListeners = 'true';
-    },
-
-    loop: function() {
-        if (!this.isPlaying || this.isDragging) return;
-        
-        this.currentIndex += this.playbackSpeed; 
-        
-        if (this.currentIndex >= this.totalPoints) {
-            this.currentIndex = this.totalPoints - 1;
-            this.updateFrame();
-            this.pause();
-            return; 
-        }
-        this.updateFrame();
-        this.animationFrame = requestAnimationFrame(() => this.loop());
-    },
-    
-    // --- تحديث الإطار (الرسم بالألوان) ---
-    updateFrame: function() {
-        if (!this.tripData || !this.tripData.points) return;
-
-        const idx = Math.floor(this.currentIndex);
-        const currentPoint = this.tripData.points[idx];
-        if (!currentPoint) return;
-
-        // 1. تحديث النصوص
-        const speedEl = document.getElementById('track-speed');
-        if (speedEl) speedEl.textContent = Math.round(currentPoint.s || 0);
-
-        const lngLat = [currentPoint.lng, currentPoint.lat];
-
-        // 2. تحريك السيارة
-        if (App.state.trackingMarkers['car']) {
-            App.state.trackingMarkers['car'].setLngLat(lngLat);
-            if (idx % 10 === 0) { // تحسين الأداء: لا تحرك الكاميرا في كل إطار
-                if (App.state.mapProvider === 'tomtom') {
-                    App.state.trackingMap.panTo(lngLat, { duration: 100 });
-                } else {
-                    App.state.trackingMap.panTo([lngLat[1], lngLat[0]], { animate: false });
-                }
-            }
-        }
-
-        // 3. رسم المسار الملون (أخضر وبنفسجي)
-        // نقوم بتقسيم المسار الذي تم قطعه حتى الآن (من 0 إلى idx)
-        const pathPoints = this.tripData.points.slice(0, idx + 1);
-        
-        let actualSegments = [];
-        let correctedSegments = [];
-
-        for(let i=0; i < pathPoints.length - 1; i++) {
-            const p1 = pathPoints[i];
-            const p2 = pathPoints[i+1];
-            const segment = [[p1.lng, p1.lat], [p2.lng, p2.lat]];
-
-            // إذا كانت النقطة الثانية مولدة، نعتبر الخط "مصحح/محاكى"
-            if (p2.generated) {
-                correctedSegments.push(segment);
-            } else {
-                actualSegments.push(segment);
-            }
-        }
-
-        // رسم الطبقتين
-        // الأخضر: المسار الفعلي
-        App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, actualSegments, '#10b981', 'trail-actual', 6);
-        // البنفسجي: المسار المحاكى (المصحح)
-        App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, correctedSegments, '#8b5cf6', 'trail-corrected', 5, [2, 2]);
-
-        // 4. تحديث شريط التقدم
-        const percent = (idx / (this.totalPoints - 1)) * 100;
-        document.getElementById('timeline-progress').style.width = `${percent}%`;
-        document.getElementById('timeline-thumb').style.left = `${100 - percent}%`; // (تصحيح اتجاه RTL)
-        
-        document.getElementById('replay-current-status').textContent = 
-            new Date(currentPoint.ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-
-        this.checkStudentEvents(currentPoint.ts);
-    },
-
-    checkStudentEvents: function(currentTs) {
-        // ... (نفس منطق تحديث الطلاب السابق) ...
-        const timelineItems = document.querySelectorAll('#track-timeline .dt-item');
-        timelineItems.forEach(item => {
-            const eventTs = parseInt(item.dataset.ts);
-            const statusLabel = item.querySelector('.status-label');
-            if (!statusLabel) return;
-
-            if (currentTs >= eventTs) {
-                if (!item.classList.contains('active')) {
-                    item.classList.remove('inactive');
-                    item.classList.add('active');
-                    statusLabel.innerHTML = '<i class="ph ph-check-circle text-emerald-400"></i> تم الركوب';
-                    statusLabel.className = 'status-label text-xs font-bold flex items-center gap-1 text-emerald-400';
-                    gsap.fromTo(item, {scale: 1.2}, {scale: 1, duration: 0.3});
-                }
-            } else {
-                item.classList.remove('active');
-                item.classList.add('inactive');
-                statusLabel.innerHTML = '<i class="ph ph-clock text-slate-500"></i> لم يركب بعد';
-                statusLabel.className = 'status-label text-xs font-bold flex items-center gap-1 text-slate-500';
-            }
-        });
-    }
-},
-// --- SETTINGS MODULE ---
-
-Settings: {
-                // الإعدادات الافتراضية
-                config: {
-                    assets: false,
-                    batchSearch: true,
-                    evCharging: false,
-                    extendedRouting: false,
-                    geocoding: true,
-                    geofencing: false,
-                    locationHistory: true,
-                    mapDisplay: true,
-                    matrixRouting: false,
-                    mcpServer: true,
-                    notifications: true,
-                    reverseGeocoding: true,
-                    routing: true,
-                    search: true,
-                    snapRoads: false,
-                    traffic: false,
-                    waypointOptimization: false,
-                    satelliteMode: false,
-                    nightMode: false,
-                    buildings3D: true // الوضع الجديد: مفعل افتراضياً لجمالية الخريطة
+            // --- MODULE: MAP HANDLER (UPDATED FOR MULTI-COLOR PATHS) ---
+            MapHandler: {
+                isTomTomAvailable: function() {
+                    return (typeof tt !== 'undefined' && typeof TOMTOM_KEY !== 'undefined' && TOMTOM_KEY.length > 5);
                 },
 
-                _debounceTimer: null,
-
-                // --- تحميل الإعدادات ---
-                load: function() {
-                    const savedSettings = localStorage.getItem('school_dashboard_settings');
-                    if (savedSettings) {
-                        try {
-                            this.config = { ...this.config, ...JSON.parse(savedSettings) };
-                        } catch (e) { console.error(e); }
-                    }
-                    this.initUI();
-                },
-
-                // --- حفظ الإعدادات ---
-                save: function() {
-                    localStorage.setItem('school_dashboard_settings', JSON.stringify(this.config));
-                },
-
-                // --- دالة التبديل ---
-                toggle: function(key) {
-                    this.config[key] = !this.config[key];
-                    
-                    // عند تفعيل القمر الصناعي، نلغي المباني الـ 3D لأنها لا تتناسب معه بصرياً
-                    if (key === 'satelliteMode' && this.config.satelliteMode) {
-                        this.config.buildings3D = false;
-                        this.updateUI('buildings3D');
-                    }
-
-                    this.save();
-                    this.updateUI(key);
-
-                    const status = this.config[key] ? 'تم التفعيل' : 'تم الإيقاف';
-                    App.Toast.show(`${key}: ${status}`, this.config[key] ? 'success' : 'info');
-
-                    if (this._debounceTimer) clearTimeout(this._debounceTimer);
-                    this._debounceTimer = setTimeout(() => {
-                        App.Toast.show('جاري تحديث الخرائط...', 'info');
-                        this.applyToAllMaps();
-                    }, 300);
-                },
-
-                updateUI: function(key) {
-                    const bg = document.getElementById(`toggle-${key}-bg`);
-                    const dot = document.getElementById(`toggle-${key}-dot`);
-                    if (bg && dot) {
-                        if (this.config[key]) {
-                            bg.classList.remove('bg-slate-700');
-                            bg.classList.add('bg-indigo-600');
-                            dot.classList.remove('left-1');
-                            dot.classList.add('left-6');
-                        } else {
-                            bg.classList.add('bg-slate-700');
-                            bg.classList.remove('bg-indigo-600');
-                            dot.classList.add('left-1');
-                            dot.classList.remove('left-6');
-                        }
-                    }
-                },
-
-                initUI: function() {
-                    Object.keys(this.config).forEach(key => this.updateUI(key));
-                },
-
-                // --- تطبيق التغييرات على جميع الخرائط ---
-                applyToAllMaps: function() {
-                    const allMaps = [
-                        App.state.map,               
-                        App.state.homeMap,           
-                        App.state.trackingMap,       
-                        App.state.driverLocationMap  
-                    ];
-                    
-                    allMaps.forEach(mapInstance => {
-                        if (mapInstance) {
-                            this.applyToMap(mapInstance);
-                        }
-                    });
-                },
-
-                // --- الدالة الأساسية ---
-                applyToMap: function(map) {
-                    if (!map) return;
-                    if (App.state.mapProvider === 'osm') {
-        // Satellite Mode Logic for OSM
-        if (this.config.satelliteMode) {
-            App.MapHandler.setSatelliteMode(map, true);
-        } else {
-            App.MapHandler.setSatelliteMode(map, false);
-        }
-        
-        // Traffic / 3D Buildings غير مدعومة مباشرة في OSM المجاني
-        // يمكن إضافة تنبيه للمستخدم عند محاولة تفعيلها
-        return; 
-    }
-                    const container = map.getContainer();
-
-                    // 1. معالجة القمر الصناعي
-                    const satSourceId = 'tomtom-satellite-source';
-                    const satLayerId = 'tomtom-satellite-layer';
-                    const isSatellite = this.config.satelliteMode;
-
-                    if (isSatellite) {
-                        container.classList.remove('map-night-mode');
-                        if (!map.getSource(satSourceId)) {
-                            map.addSource(satSourceId, {
-                                type: 'raster',
-                                tiles: [`https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=${TOMTOM_KEY}`],
-                                tileSize: 256, minzoom: 0, maxzoom: 19
-                            });
-                        }
-                        if (!map.getLayer(satLayerId)) {
-                            map.addLayer({
-                                id: satLayerId, type: 'raster', source: satSourceId,
-                                paint: { 'raster-opacity': 1, 'raster-fade-duration': 500 }
-                            });
-                        }
+                init: function(containerId, center, zoom) {
+                    if (this.isTomTomAvailable()) {
+                        App.state.mapProvider = 'tomtom';
+                        const map = tt.map({
+                            key: TOMTOM_KEY,
+                            container: containerId,
+                            center: center,
+                            zoom: zoom,
+                            language: 'ar',
+                            theme: { style: 'main', layer: 'basic', source: 'vector' }
+                        });
+                        map.addControl(new tt.NavigationControl());
+                        return map;
                     } else {
-                        if (map.getLayer(satLayerId)) map.removeLayer(satLayerId);
-
-                        // 2. معالجة الوضع الليلي (CSS Filter)
-                        if (this.config.nightMode) {
-                            container.classList.add('map-night-mode');
-                        } else {
-                            container.classList.remove('map-night-mode');
-                        }
-                    }
-
-                    // 3. معالجة المباني 3D (جديد)
-                    this.handleBuildingsLayer(map);
-
-                    // 4. المرور
-                    if (this.config.traffic) {
-                        try { map.showTrafficFlow(); map.showTrafficIncidents(); } catch(e){}
-                    } else {
-                        try { map.hideTrafficFlow(); map.hideTrafficIncidents(); } catch(e){}
-                    }
-
-                    // 5. الطبقات الإضافية
-                    if (this.config.evCharging) this.handlePOILayer(map, 'evCharging', 'electric vehicle station', '#10b981');
-                    else this.clearLayer(map, 'evCharging');
-
-                    if (this.config.search) this.handlePOILayer(map, 'search', 'gas station', '#3b82f6');
-                    else this.clearLayer(map, 'search');
-
-                    this.handleGeofenceLayer(map);
-                    this.handleAssetsLayer(map);
-                },
-
-                // --- دالة إضافة المباني ثلاثية الأبعاد ---
-                handleBuildingsLayer: function(map) {
-                    const layerId = '3d-buildings-' + map.getContainer().id;
-                    
-                    // إزالة الطبقة القديمة إن وجدت
-                    if (map.getLayer(layerId)) {
-                        map.removeLayer(layerId);
-                    }
-
-                    // إذا كانت الخاصية مفعلة ولسنا في وضع القمر الصناعي
-                    if (this.config.buildings3D && !this.config.satelliteMode) {
-                        
-                        // التأكد من أن مصدر البيانات (vector) موجود
-                        if (map.getSource('vector')) {
-                            // البحث عن أول طبقة نصية (Label) لوضع المباني تحتها
-                            // حتى لا تغطي المباني أسماء الشوارع
-                            const layers = map.getStyle().layers;
-                            let labelLayerId;
-                            for (let i = 0; i < layers.length; i++) {
-                                if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-                                    labelLayerId = layers[i].id;
-                                    break;
+                        App.state.mapProvider = 'osm';
+                        if (!document.getElementById(containerId)) return null;
+                        const map = L.map(containerId).setView([center[1], center[0]], zoom);
+                            // ✅ تعريف الطبقة قبل استخدامها
+                            const darkLayer = L.tileLayer(
+                                'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                                {
+                                    subdomains: 'abcd',
+                                    maxZoom: 20
                                 }
+                            );
+
+                            // إضافتها للخريطة
+                            darkLayer.addTo(map);
+
+                            // حفظها كـ baseLayer
+                            map._baseLayer = darkLayer;
+
+                            // 🔗 تسجيل الخريطة في النظام
+                            if (!App.state.allMaps) App.state.allMaps = [];
+                            App.state.allMaps.push(map);
+
+                            // 🎯 تطبيق إعدادات OSM الحالية إن وجدت
+                            if (App.OSMSettings) {
+                                App.OSMSettings.applyToMap(map);
+                            }
+
+                            return map;
+
+                    }
+                },
+
+                // ===============================
+                // ✅ FIX: Satellite Mode Support
+                // ===============================
+                setSatelliteMode: function(map, enabled) {
+                    if (!map) return;
+
+                    // --- TomTom ---
+                    if (App.state.mapProvider === 'tomtom') {
+                        try {
+                            map.setStyle({
+                                style: 'main',
+                                layer: enabled ? 'satellite' : 'basic',
+                                source: 'vector'
+                            });
+                        } catch (e) {
+                            console.warn('TomTom satellite mode not supported:', e);
+                        }
+                    }
+
+                    // --- Leaflet / OSM ---
+                    else {
+                        if (!map._satelliteLayer) {
+                            map._satelliteLayer = L.tileLayer(
+                                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                                {
+                                    attribution: '&copy; Esri',
+                                    maxZoom: 20
+                                }
+                            );
+                        }
+
+                        if (enabled) {
+                            if (map._baseLayer) map.removeLayer(map._baseLayer);
+                            map._satelliteLayer.addTo(map);
+                        } else {
+                            if (map._satelliteLayer) map.removeLayer(map._satelliteLayer);
+                            if (map._baseLayer) map._baseLayer.addTo(map);
+                        }
+                    }
+                },
+
+                routeCache: {},
+                _getRouteKey: function(start, end) {
+                    return `${start[0].toFixed(4)},${start[1].toFixed(4)}-${end[0].toFixed(4)},${end[1].toFixed(4)}`;
+                },
+                // --- الدالة الذكية الجديدة لرسم المسارات الملونة ---
+                drawSmartTrail: async function(map, coordinates) {
+                    if (!map || !coordinates || coordinates.length === 0) return;
+
+                    // 1. تعريف الطبقات (Layers)
+                    // Green: Actual GPS points (مسار فعلي)
+                    // Purple: Corrected Road gaps (مسار مصحح)
+                    
+                    let actualSegments = [];
+                    let correctedSegments = [];
+
+                    // إذا كانت النقاط قليلة جداً، نعتبرها مساراً فعلياً فقط
+                    if (coordinates.length < 2) {
+                        this.drawRoute(map, coordinates, '#10b981', 'trail-actual'); // Emerald Green
+                        return;
+                    }
+
+                    // 2. تحليل المسار وتقسيمه
+                    for (let i = 0; i < coordinates.length - 1; i++) {
+                        const currentPoint = coordinates[i];
+                        const nextPoint = coordinates[i+1];
+                        
+                        // حساب المسافة
+                        const dist = App.Utils.calculateDistance(
+                            {lng: currentPoint[0], lat: currentPoint[1]}, 
+                            {lng: nextPoint[0], lat: nextPoint[1]}
+                        );
+
+                        // إذا كانت الفجوة أكبر من 150 متر -> هذا مسار مصحح (Smart Correction)
+                        if (dist > 0.15) {
+                            // نحاول جلب المسار من الطريق
+                            try {
+                                const roadPath = await this.fillRouteGap(currentPoint, nextPoint);
+                                // نضيفه لقائمة المصحح (Purple)
+                                correctedSegments.push(roadPath);
+                            } catch(e) {
+                                // في حال الفشل، نصله بخط عادي (Green)
+                                actualSegments.push([currentPoint, nextPoint]);
+                            }
+                        } else {
+                            // مسافة قصيرة وطبيعية -> مسار فعلي (Green)
+                            actualSegments.push([currentPoint, nextPoint]);
+                        }
+                    }
+
+                    // 3. الرسم على الخريطة (Multi-LineString)
+                    // رسم الأجزاء الفعلية (أخضر)
+                    this.drawMultiSegmentRoute(map, actualSegments, '#10b981', 'trail-actual', 6);
+                    
+                    // رسم الأجزاء المصححة (بنفسجي)
+                    this.drawMultiSegmentRoute(map, correctedSegments, '#8b5cf6', 'trail-corrected', 5, [2, 2]); // خط متقطع قليلاً أو أنحف
+                },
+
+                // دالة مساعدة لملء الفراغات
+                fillRouteGap: async function(startCoords, endCoords) {
+                    const key = this._getRouteKey(startCoords, endCoords);
+                    if (this.routeCache[key]) return this.routeCache[key];
+
+                    try {
+                        const route = await this.fetchRoute(startCoords, endCoords);
+                        this.routeCache[key] = route;
+                        return route;
+                    } catch (e) {
+                        return [startCoords, endCoords];
+                    }
+                },
+
+                // --- دالة رسم محسنة تدعم MultiLineString ---
+                drawMultiSegmentRoute: function(map, segments, color, layerId, width = 6, dashArray = []) {
+                    if (!map || segments.length === 0) {
+                        // تنظيف الطبقة إذا كانت فارغة
+                        if (App.state.mapProvider === 'tomtom') {
+                            if (map.getLayer(layerId)) {
+                                map.getSource(layerId).setData({ type: 'FeatureCollection', features: [] });
+                            }
+                        }
+                        return;
+                    }
+
+                    if (App.state.mapProvider === 'tomtom') {
+                        // TomTom (Mapbox GL JS Style)
+                        const geoJson = {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'MultiLineString',
+                                coordinates: segments
+                            }
+                        };
+
+                        if (map.getLayer(layerId)) {
+                            map.getSource(layerId).setData(geoJson);
+                        } else {
+                            map.addSource(layerId, { type: 'geojson', data: geoJson });
+                            
+                            const paint = {
+                                'line-color': color,
+                                'line-width': width,
+                                'line-opacity': 0.8
+                            };
+                            
+                            // إضافة Dash Array إذا طلب ذلك (للمسار المصحح مثلاً)
+                            if(dashArray && dashArray.length > 0) {
+                                // TomTom Basic Style قد لا يدعم dash-array مباشرة بسهولة في كل النسخ، لكن نجرب
+                                // paint['line-dasharray'] = dashArray; 
                             }
 
                             map.addLayer({
                                 'id': layerId,
-                                'source': 'vector',
-                                'source-layer': 'Building', // اسم الطبقة في بيانات TomTom
-                                'filter': ['==', 'extrude', 'true'], // فقط المباني القابلة للبثق
-                                'type': 'fill-extrusion',
-                                'minzoom': 13, // إظهارها عند التقريب فقط للحفاظ على الأداء
-                                'paint': {
-                                    'fill-extrusion-color': '#d1d5db', // لون رمادي فاتح (يصبح غامقاً مع فلتر الوضع الليلي)
-                                    
-                                    // استخدام ارتفاع المبنى الحقيقي إذا وجد، أو قيمة افتراضية
-                                    'fill-extrusion-height': [
-                                        'interpolate', ['linear'], ['zoom'],
-                                        13, 0,
-                                        13.05, ['get', 'height']
-                                    ],
-                                    'fill-extrusion-base': [
-                                        'interpolate', ['linear'], ['zoom'],
-                                        13, 0,
-                                        13.05, ['get', 'min_height']
-                                    ],
-                                    'fill-extrusion-opacity': 0.8
-                                }
-                            }, labelLayerId); // الإضافة قبل طبقة النصوص
+                                'type': 'line',
+                                'source': layerId,
+                                'layout': { 'line-cap': 'round', 'line-join': 'round' },
+                                'paint': paint
+                            });
+                        }
+                    } else {
+                        // Leaflet Implementation
+                        const storageKey = `leaflet_layer_${layerId}`;
+                        // إزالة الطبقة القديمة
+                        if (App.state[storageKey]) {
+                            map.removeLayer(App.state[storageKey]);
+                        }
+                        
+                        // تحويل Coordinates إلى صيغة Leaflet [lat, lng]
+                        const latLngSegments = segments.map(seg => seg.map(coord => [coord[1], coord[0]]));
+                        
+                        const polyline = L.polyline(latLngSegments, {
+                            color: color,
+                            weight: width,
+                            opacity: 0.8,
+                            dashArray: dashArray.length > 0 ? '5, 10' : null,
+                            lineCap: 'round'
+                        }).addTo(map);
+                        
+                        App.state[storageKey] = polyline;
+                    }
+                },
+
+                // دالة الرسم العادية (للمسار المتوقع - خط واحد)
+            drawRoute: function(map, coordinates, color, layerId, isDashed = false) {
+                if (!map || !coordinates || coordinates.length === 0) return;
+
+                if (App.state.mapProvider === 'tomtom') {
+                    const geoJson = {
+                        'type': 'Feature',
+                        'geometry': { 'type': 'LineString', 'coordinates': coordinates }
+                    };
+
+                    if (map.getLayer(layerId)) {
+                        map.getSource(layerId).setData(geoJson);
+                    } else {
+                        map.addSource(layerId, { 'type': 'geojson', 'data': geoJson });
+                        map.addLayer({
+                            'id': layerId,
+                            'type': 'line',
+                            'source': layerId,
+                            'layout': { 'line-cap': 'round', 'line-join': 'round' },
+                            'paint': {
+                                'line-color': color,
+                                'line-width': isDashed ? 3 : 5,
+                                'line-opacity': color === '#f59e0b' ? 0.9 : 0.7, // زيادة وضوح البرتقالي
+                                'line-dasharray': isDashed ? [2, 2] : [1]
+                            }
+                        });
+
+                        // إضافة تأثير التكبير والتصغير السلس (Interpolation)
+                        map.setPaintProperty(layerId, 'line-width', [
+                            'interpolate', ['linear'], ['zoom'],
+                            10, isDashed ? 2 : 4,
+                            15, isDashed ? 5 : 8
+                        ]);
+                    }
+                } else {
+                    // Leaflet version
+                    const storageKey = `leaflet_layer_${layerId}`;
+                    if (App.state[storageKey]) map.removeLayer(App.state[storageKey]);
+
+                    const latLngs = coordinates.map(c => [c[1], c[0]]);
+                    App.state[storageKey] = L.polyline(latLngs, {
+                        color: color,
+                        weight: isDashed ? 3 : 5,
+                        opacity: 0.6,
+                        dashArray: isDashed ? '5, 10' : null,
+                        lineJoin: 'round'
+                    }).addTo(map);
+                }
+            },
+
+                fetchRoute: async function(startCoords, endCoords) {
+                    if (App.state.mapProvider === 'tomtom') {
+                        const routeOptions = {
+                            key: TOMTOM_KEY,
+                            locations: `${startCoords[0]},${startCoords[1]}:${endCoords[0]},${endCoords[1]}`,
+                            traffic: false
+                        };
+                        try {
+                            const response = await tt.services.calculateRoute(routeOptions);
+                            const geojson = response.toGeoJson();
+                            if(geojson.features && geojson.features[0]) {
+                                return geojson.features[0].geometry.coordinates;
+                            }
+                        } catch (e) { return [startCoords, endCoords]; }
+                    } else {
+                        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startCoords[0]},${startCoords[1]};${endCoords[0]},${endCoords[1]}?overview=full&geometries=geojson`;
+                        try {
+                            const response = await fetch(osrmUrl);
+                            const data = await response.json();
+                            if (data.code === 'Ok' && data.routes && data.routes[0]) {
+                                return data.routes[0].geometry.coordinates;
+                            }
+                        } catch (e) { return [startCoords, endCoords]; }
+                    }
+                    return [startCoords, endCoords];
+                },
+
+                resizeMap: function(map) {
+                    if (!map) return;
+                    if (App.state.mapProvider === 'tomtom') map.resize();
+                    else setTimeout(() => map.invalidateSize(), 100);
+                },
+                
+                addMarker: function(map, lngLat, element, popupHTML) {
+                    if (App.state.mapProvider === 'tomtom') {
+                        const popup = new tt.Popup({ offset: 35 }).setHTML(popupHTML || '');
+                        return new tt.Marker({ element: element }).setLngLat(lngLat).setPopup(popup).addTo(map);
+                    } else {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.className = element.className;
+                        tempDiv.style.cssText = element.style.cssText;
+                        tempDiv.innerHTML = element.innerHTML;
+                        const customIcon = L.divIcon({
+                            html: tempDiv.outerHTML, className: 'leaflet-custom-marker-wrapper',
+                            iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -30]
+                        });
+                        const marker = L.marker([lngLat[1], lngLat[0]], { icon: customIcon }).addTo(map);
+                        if (popupHTML) marker.bindPopup(popupHTML);
+                        marker.setLngLat = function(newLngLat) { this.setLatLng([newLngLat[1], newLngLat[0]]); return this; };
+                        return marker;
+                    }
+                },
+                applyOSMSettings: function(map, settings) {
+                    if (!map || App.state.mapProvider !== 'osm') return;
+
+                    /* ========= STYLE ========= */
+                    if (map._baseLayer) {
+                        map.removeLayer(map._baseLayer);
+                        map._baseLayer = null;
+                    }
+
+                    if (settings.style === 'dark') {
+                        map._baseLayer = L.tileLayer(
+                            'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                            { maxZoom: 20 }
+                        );
+                    } 
+                    else if (settings.style === 'light') {
+                        map._baseLayer = L.tileLayer(
+                            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            { maxZoom: 20 }
+                        );
+                    } 
+                    else if (settings.style === 'satellite') {
+                        map._baseLayer = L.tileLayer(
+                            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                            { maxZoom: 20 }
+                        );
+                    }
+
+                    if (map._baseLayer) map._baseLayer.addTo(map);
+
+                    /* ========= NIGHT MODE ========= */
+                    const container = map.getContainer();
+                    if (settings.nightMode) {
+                        container.classList.add('map-night-mode');
+                    } else {
+                        container.classList.remove('map-night-mode');
+                    }
+
+                    /* ========= ZOOM ========= */
+                    if (typeof settings.zoom === 'number') {
+                        map.setZoom(settings.zoom, { animate: true });
+                    }
+
+                    /* ========= CONTROLS ========= */
+                    if (settings.controls === false) {
+                        if (map.zoomControl) map.zoomControl.remove();
+                    } else {
+                        if (map.zoomControl && !map.hasLayer(map.zoomControl)) {
+                            map.zoomControl.addTo(map);
                         }
                     }
-                },
-
-                clearLayer: function(map, configKey) {
-                    const layerKey = configKey + '_' + map.getContainer().id;
-                    if (App.state.mapLayers[layerKey]) {
-                        App.state.mapLayers[layerKey].forEach(m => m.remove());
-                        App.state.mapLayers[layerKey] = [];
-                    }
-                },
-
-                handlePOILayer: function(map, configKey, query, color) {
-                    const layerKey = configKey + '_' + map.getContainer().id;
-                    this.clearLayer(map, configKey);
-                    
-                    if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
-
-                    if (this.config[configKey]) {
-                        const center = map.getCenter();
-                        tt.services.fuzzySearch({
-                            key: TOMTOM_KEY, query: query, center: center, radius: 5000, limit: 10
-                        }).then(response => {
-                            response.results.forEach(result => {
-                                const el = document.createElement('div');
-                                el.className = 'w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center';
-                                el.style.backgroundColor = color;
-                                el.innerHTML = `<i class="ph ph-map-pin text-white text-xs"></i>`;
-                                const marker = new tt.Marker({ element: el })
-                                    .setLngLat(result.position)
-                                    .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs font-bold p-1">${result.poi.name}</div>`))
-                                    .addTo(map);
-                                App.state.mapLayers[layerKey].push(marker);
-                            });
-                        }).catch(err => {});
-                    }
-                },
-
-                handleGeofenceLayer: function(map) {
-                    const layerId = 'geofence-fill-' + map.getContainer().id;
-                    const outlineId = 'geofence-line-' + map.getContainer().id;
-
-                    if (map.getLayer(layerId)) map.removeLayer(layerId);
-                    if (map.getLayer(outlineId)) map.removeLayer(outlineId);
-                    if (map.getSource(layerId)) map.removeSource(layerId);
-
-                    if (this.config.geofencing) {
-                        const center = map.getCenter();
-                        const circleGeoJSON = this.createGeoJSONCircle([center.lng, center.lat], 2);
-
-                        map.addSource(layerId, { type: 'geojson', data: circleGeoJSON });
-                        map.addLayer({
-                            'id': layerId, 'type': 'fill', 'source': layerId,
-                            'layout': {}, 'paint': { 'fill-color': '#f59e0b', 'fill-opacity': 0.2 }
-                        });
-                        map.addLayer({
-                            'id': outlineId, 'type': 'line', 'source': layerId,
-                            'layout': {}, 'paint': { 'line-color': '#f59e0b', 'line-width': 2, 'line-dasharray': [2, 2] }
-                        });
-                    }
-                },
-
-                handleAssetsLayer: function(map) {
-                    const layerKey = 'assets_' + map.getContainer().id;
-                    this.clearLayer(map, 'assets');
-
-                    if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
-
-                    if (this.config.assets) {
-                        const center = map.getCenter();
-                        const assets = [
-                            { lng: center.lng + 0.01, lat: center.lat + 0.01, name: 'Truck A1' },
-                            { lng: center.lng - 0.015, lat: center.lat - 0.005, name: 'Van B2' }
-                        ];
-                        assets.forEach(asset => {
-                            const el = document.createElement('div');
-                            el.innerHTML = '<div class="w-8 h-8 bg-yellow-500 rounded-lg border-2 border-white flex items-center justify-center shadow-lg"><i class="ph ph-truck text-white"></i></div>';
-                            const marker = new tt.Marker({ element: el })
-                                .setLngLat([asset.lng, asset.lat])
-                                .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs p-1"><b>${asset.name}</b><br>Asset Tracked</div>`))
-                                .addTo(map);
-                            App.state.mapLayers[layerKey].push(marker);
-                        });
-                    }
-                },
-
-                createGeoJSONCircle: function(center, radiusInKm, points = 64) {
-                    const coords = { latitude: center[1], longitude: center[0] };
-                    const km = radiusInKm;
-                    const ret = [];
-                    const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
-                    const distanceY = km / 110.574;
-
-                    let theta, x, y;
-                    for (let i = 0; i < points; i++) {
-                        theta = (i / points) * (2 * Math.PI);
-                        x = distanceX * Math.cos(theta);
-                        y = distanceY * Math.sin(theta);
-                        ret.push([coords.longitude + x, coords.latitude + y]);
-                    }
-                    ret.push(ret[0]);
-                    return { type: "Feature", geometry: { type: "Polygon", coordinates: [ret] } };
-                },
-
-                enableAll: function() {
-                    Object.keys(this.config).forEach(k => { this.config[k] = true; this.updateUI(k); });
-                    this.save();
-                    
-                    if (this._debounceTimer) clearTimeout(this._debounceTimer);
-                    this._debounceTimer = setTimeout(() => {
-                        App.Toast.show('جاري تفعيل جميع الخدمات...', 'info');
-                        this.applyToAllMaps();
-                    }, 1000);
-                },
-
-                disableAll: function() {
-                    Object.keys(this.config).forEach(k => { this.config[k] = false; this.updateUI(k); });
-                    this.save();
-                    this.applyToAllMaps();
-                    App.Toast.show('تم إيقاف جميع الخدمات', 'info');
                 }
-            }, 
+            },
+
+            // --- REPLAY MODULE (UPDATED WITH MULTI-COLOR SUPPORT) ---
+            Replay: {
+                tripData: null,
+                isPlaying: false,
+                playbackSpeed: 1,
+                currentIndex: 0,
+                totalPoints: 0,
+                animationFrame: null,
+                isDragging: false,
+                
+                // دالة التهيئة
+                init: async function(trip) {
+                    this.stop(); 
+                    if (!trip || !trip.actualPath) return;
+                    
+                    App.Toast.show('جاري تجهيز مسار المراجعة وتحليل البيانات...', 'info');
+                    
+                    // 1. تجهيز نقاط المسار
+                    let rawPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
+                    if (rawPoints.length < 2) return;
+
+                    // 2. معالجة البيانات وملء الفجوات (توليد النقاط البنفسجية)
+                    const enrichedPoints = await this.enrichTripData(rawPoints);
+                    
+                    this.tripData = {
+                        points: enrichedPoints,
+                        events: trip.events ? Object.values(trip.events) : [],
+                        startTime: rawPoints[0].ts,
+                        endTime: rawPoints[rawPoints.length-1].ts,
+                        startCoord: [rawPoints[0].lng, rawPoints[0].lat],
+                        endCoord: [rawPoints[rawPoints.length-1].lng, rawPoints[rawPoints.length-1].lat]
+                    };
+                    this.totalPoints = enrichedPoints.length;
+                    this.currentIndex = 0;
+                    
+                    // 3. إظهار واجهة التحكم
+                    const controls = document.getElementById('replay-controls');
+                    if (controls) {
+                        controls.classList.remove('hidden');
+                        controls.classList.add('flex');
+                    }
+                    
+                    // 4. تحديث النصوص الزمنية
+                    document.getElementById('replay-start-time').textContent = new Date(this.tripData.startTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+                    document.getElementById('replay-end-time').textContent = new Date(this.tripData.endTime).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+                    
+                    // 5. رسم "المسار المحدد" (الرصاصي) في الخلفية - المسار الكلي المتوقع
+                    // نقوم برسم خط رمادي يربط بداية الرحلة بنهايتها (أو المسار المثالي إن وجد)
+                    // داخل Replay.init
+                    if (this.tripData.startCoord && this.tripData.endCoord) {
+                        App.MapHandler.fetchRoute(this.tripData.startCoord, this.tripData.endCoord).then(route => {
+                            // تغيير اللون من #94a3b8 (رصاصي) إلى #f59e0b (برتقالي)
+                            // مع إبقاء البارامتر الأخير true ليكون منقطاً
+                            App.MapHandler.drawRoute(App.state.trackingMap, route, '#f59e0b', 'replay-planned', true);
+                        });
+                    }
+
+                    // 6. وضع السيارة في البداية
+                    const startPt = enrichedPoints[0];
+                    const startLngLat = [startPt.lng, startPt.lat];
+                    
+                    if (!App.state.trackingMarkers['car']) {
+                        const el = document.createElement('div');
+                        el.className = 'marker-icon';
+                        el.style.backgroundImage = `url('https://ui-avatars.com/api/?name=Replay&background=f59e0b&color=fff')`;
+                        el.style.border = '3px solid #fff';
+                        el.style.width = '40px'; el.style.height = '40px'; el.style.borderRadius = '50%'; el.style.backgroundSize = 'cover';
+                        App.state.trackingMarkers['car'] = App.MapHandler.addMarker(App.state.trackingMap, startLngLat, el);
+                    } else {
+                        App.state.trackingMarkers['car'].setLngLat(startLngLat);
+                    }
+
+                    // 7. تحريك الكاميرا
+                    if (App.state.mapProvider === 'tomtom') {
+                        App.state.trackingMap.panTo(startLngLat);
+                    } else {
+                        App.state.trackingMap.panTo([startLngLat[1], startLngLat[0]]);
+                    }
+                    if (this.tripData.endCoord) {
+                        const el = document.createElement('div');
+                        el.className = 'destination-pin-container';
+                        el.innerHTML = `
+                            <div class="pin-pulse"></div>
+                            <div class="relative bg-indigo-600 p-2 rounded-full border-2 border-white shadow-2xl">
+                                <i class="ph-fill ph-flag-checkered text-white text-xl"></i>
+                            </div>
+                        `;
+                        // إذا كنت تريدها Pin برتقالي أيضاً، غير indigo-600 و ph-flag-checkered
+                    }
+                    this.setupDragEvents();
+                    this.setSpeed(1);
+                    this.updatePlayIcon(false);
+                    
+                    // رسم الإطار الأول
+                    this.updateFrame();
+
+                    App.Toast.show('المسار جاهز للعرض', 'success');
+                },
+
+                // دالة حشو النقاط (Gap Filling) مع تمييز النقاط المولدة
+                enrichTripData: async function(rawPoints) {
+                    let finalPoints = [];
+                    // إضافة خاصية generated: false للنقاط الأصلية
+                    finalPoints.push({...rawPoints[0], generated: false});
+
+                    for (let i = 0; i < rawPoints.length - 1; i++) {
+                        const p1 = rawPoints[i];
+                        const p2 = rawPoints[i+1];
+                        const dist = App.Utils.calculateDistance(p1, p2);
+                        
+                        // إذا كانت المسافة أكبر من 150 متر -> نولد نقاط (بنفسجي)
+                        if (dist > 0.15) {
+                            try {
+                                const routeCoords = await App.MapHandler.fetchRoute([p1.lng, p1.lat], [p2.lng, p2.lat]);
+                                if (routeCoords && routeCoords.length > 2) {
+                                    const timeDiff = p2.ts - p1.ts;
+                                    const stepTime = timeDiff / routeCoords.length;
+                                    
+                                    // نضيف النقاط الوسيطة ونميزها بـ generated: true
+                                    for (let j = 1; j < routeCoords.length - 1; j++) {
+                                        const coord = routeCoords[j];
+                                        finalPoints.push({
+                                            lat: coord[1], lng: coord[0],
+                                            ts: p1.ts + (stepTime * j), 
+                                            s: p1.s || 60, 
+                                            generated: true // هذه النقطة محاكاة
+                                        });
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn("Gap skip", e);
+                            }
+                        }
+                        // النقطة الأصلية التالية
+                        finalPoints.push({...p2, generated: false});
+                    }
+                    return finalPoints;
+                },
+                
+                // --- دوال التحكم (Play/Pause/Stop) ---
+                toggle: function() { this.isPlaying ? this.pause() : this.play(); },
+                
+                play: function() {
+                    if (!this.tripData) return;
+                    this.isPlaying = true;
+                    this.updatePlayIcon(true);
+                    this.loop();
+                },
+                
+                pause: function() {
+                    this.isPlaying = false;
+                    this.updatePlayIcon(false);
+                    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+                },
+                
+                stop: function() {
+                    this.pause();
+                    this.currentIndex = 0;
+                    
+                    const progress = document.getElementById('timeline-progress');
+                    if(progress) progress.style.width = '0%';
+                    
+                    // مسح الطبقات عند الإيقاف
+                    if(App.state.trackingMap) {
+                        // استخدام الدالة الجديدة لمسح الطبقات المتعددة
+                        App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, [], '', 'trail-actual');
+                        App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, [], '', 'trail-corrected');
+                        // يمكن إبقاء المسار المخطط (الرصاصي) أو مسحه حسب الرغبة
+                        // App.MapHandler.drawRoute(App.state.trackingMap, [], '', 'replay-planned');
+                    }
+                    
+                    const controls = document.getElementById('replay-controls');
+                    if(controls) {
+                        controls.classList.add('hidden');
+                        controls.classList.remove('flex');
+                    }
+                },
+
+                updatePlayIcon: function(isPlaying) {
+                    const iconContainer = document.getElementById('replay-play-icon');
+                    if (!iconContainer) return;
+                    iconContainer.innerHTML = isPlaying 
+                        ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 5v14M16 5v14"/></svg>`
+                        : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/></svg>`;
+                },
+
+                setSpeed: function(speed) {
+                    this.playbackSpeed = parseFloat(speed);
+                    document.querySelectorAll('.speed-btn').forEach(btn => {
+                        const btnSpeed = parseFloat(btn.dataset.speed);
+                        btn.classList.toggle('text-white', btnSpeed === this.playbackSpeed);
+                        btn.classList.toggle('bg-indigo-500/20', btnSpeed === this.playbackSpeed);
+                        btn.classList.toggle('text-slate-400', btnSpeed !== this.playbackSpeed);
+                    });
+                },
+
+                jump: function(amount) {
+                    if (!this.tripData) return;
+                    let newIndex = this.currentIndex + (amount * 10);
+                    newIndex = Math.max(0, Math.min(newIndex, this.totalPoints - 1));
+                    this.currentIndex = newIndex;
+                    this.updateFrame();
+                },
+
+                setupDragEvents: function() {
+                    const track = document.getElementById('timeline-track');
+                    if (!track || track.dataset.hasListeners) return;
+                    
+                    const handleMove = (clientX) => {
+                        if (!this.tripData) return;
+                        const rect = track.getBoundingClientRect();
+                        let percent = (clientX - rect.left) / rect.width;
+                        percent = Math.max(0, Math.min(1, percent));
+                        this.currentIndex = Math.floor(percent * (this.totalPoints - 1));
+                        this.updateFrame();
+                    };
+
+                    track.addEventListener('mousedown', (e) => {
+                        this.isDragging = true;
+                        this.wasPlaying = this.isPlaying;
+                        this.pause();
+                        handleMove(e.clientX);
+                    });
+                    window.addEventListener('mousemove', (e) => { if (this.isDragging) handleMove(e.clientX); });
+                    window.addEventListener('mouseup', () => {
+                        if (this.isDragging) {
+                            this.isDragging = false;
+                            if (this.wasPlaying) this.play();
+                        }
+                    });
+                    track.dataset.hasListeners = 'true';
+                },
+
+                loop: function() {
+                    if (!this.isPlaying || this.isDragging) return;
+                    
+                    this.currentIndex += this.playbackSpeed; 
+                    
+                    if (this.currentIndex >= this.totalPoints) {
+                        this.currentIndex = this.totalPoints - 1;
+                        this.updateFrame();
+                        this.pause();
+                        return; 
+                    }
+                    this.updateFrame();
+                    this.animationFrame = requestAnimationFrame(() => this.loop());
+                },
+                
+                // --- تحديث الإطار (الرسم بالألوان) ---
+                updateFrame: function() {
+                    if (!this.tripData || !this.tripData.points) return;
+
+                    const idx = Math.floor(this.currentIndex);
+                    const currentPoint = this.tripData.points[idx];
+                    if (!currentPoint) return;
+
+                    // 1. تحديث النصوص
+                    const speedEl = document.getElementById('track-speed');
+                    if (speedEl) speedEl.textContent = Math.round(currentPoint.s || 0);
+
+                    const lngLat = [currentPoint.lng, currentPoint.lat];
+
+                    // 2. تحريك السيارة
+                    if (App.state.trackingMarkers['car']) {
+                        App.state.trackingMarkers['car'].setLngLat(lngLat);
+                        if (idx % 10 === 0) { // تحسين الأداء: لا تحرك الكاميرا في كل إطار
+                            if (App.state.mapProvider === 'tomtom') {
+                                App.state.trackingMap.panTo(lngLat, { duration: 100 });
+                            } else {
+                                App.state.trackingMap.panTo([lngLat[1], lngLat[0]], { animate: false });
+                            }
+                        }
+                    }
+
+                    // 3. رسم المسار الملون (أخضر وبنفسجي)
+                    // نقوم بتقسيم المسار الذي تم قطعه حتى الآن (من 0 إلى idx)
+                    const pathPoints = this.tripData.points.slice(0, idx + 1);
+                    
+                    let actualSegments = [];
+                    let correctedSegments = [];
+
+                    for(let i=0; i < pathPoints.length - 1; i++) {
+                        const p1 = pathPoints[i];
+                        const p2 = pathPoints[i+1];
+                        const segment = [[p1.lng, p1.lat], [p2.lng, p2.lat]];
+
+                        // إذا كانت النقطة الثانية مولدة، نعتبر الخط "مصحح/محاكى"
+                        if (p2.generated) {
+                            correctedSegments.push(segment);
+                        } else {
+                            actualSegments.push(segment);
+                        }
+                    }
+
+                    // رسم الطبقتين
+                    // الأخضر: المسار الفعلي
+                    App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, actualSegments, '#10b981', 'trail-actual', 6);
+                    // البنفسجي: المسار المحاكى (المصحح)
+                    App.MapHandler.drawMultiSegmentRoute(App.state.trackingMap, correctedSegments, '#8b5cf6', 'trail-corrected', 5, [2, 2]);
+
+                    // 4. تحديث شريط التقدم
+                    const percent = (idx / (this.totalPoints - 1)) * 100;
+                    document.getElementById('timeline-progress').style.width = `${percent}%`;
+                    document.getElementById('timeline-thumb').style.left = `${100 - percent}%`; // (تصحيح اتجاه RTL)
+                    
+                    document.getElementById('replay-current-status').textContent = 
+                        new Date(currentPoint.ts).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+                    this.checkStudentEvents(currentPoint.ts);
+                },
+
+                checkStudentEvents: function(currentTs) {
+                    // ... (نفس منطق تحديث الطلاب السابق) ...
+                    const timelineItems = document.querySelectorAll('#track-timeline .dt-item');
+                    timelineItems.forEach(item => {
+                        const eventTs = parseInt(item.dataset.ts);
+                        const statusLabel = item.querySelector('.status-label');
+                        if (!statusLabel) return;
+
+                        if (currentTs >= eventTs) {
+                            if (!item.classList.contains('active')) {
+                                item.classList.remove('inactive');
+                                item.classList.add('active');
+                                statusLabel.innerHTML = '<i class="ph ph-check-circle text-emerald-400"></i> تم الركوب';
+                                statusLabel.className = 'status-label text-xs font-bold flex items-center gap-1 text-emerald-400';
+                                gsap.fromTo(item, {scale: 1.2}, {scale: 1, duration: 0.3});
+                            }
+                        } else {
+                            item.classList.remove('active');
+                            item.classList.add('inactive');
+                            statusLabel.innerHTML = '<i class="ph ph-clock text-slate-500"></i> لم يركب بعد';
+                            statusLabel.className = 'status-label text-xs font-bold flex items-center gap-1 text-slate-500';
+                        }
+                    });
+                }
+            },
+
+            // --- SETTINGS MODULE ---
+            Settings: {
+                            // الإعدادات الافتراضية
+                            config: {
+                                assets: false,
+                                batchSearch: true,
+                                evCharging: false,
+                                extendedRouting: false,
+                                geocoding: true,
+                                geofencing: false,
+                                locationHistory: true,
+                                mapDisplay: true,
+                                matrixRouting: false,
+                                mcpServer: true,
+                                notifications: true,
+                                reverseGeocoding: true,
+                                routing: true,
+                                search: true,
+                                snapRoads: false,
+                                traffic: false,
+                                waypointOptimization: false,
+                                satelliteMode: false,
+                                nightMode: false,
+                                buildings3D: true // الوضع الجديد: مفعل افتراضياً لجمالية الخريطة
+                            },
+
+                            _debounceTimer: null,
+
+                            // --- تحميل الإعدادات ---
+                            load: function() {
+                                const savedSettings = localStorage.getItem('school_dashboard_settings');
+                                if (savedSettings) {
+                                    try {
+                                        this.config = { ...this.config, ...JSON.parse(savedSettings) };
+                                    } catch (e) { console.error(e); }
+                                }
+                                this.initUI();
+                            },
+
+                            // --- حفظ الإعدادات ---
+                            save: function() {
+                                localStorage.setItem('school_dashboard_settings', JSON.stringify(this.config));
+                            },
+
+                            // --- دالة التبديل ---
+                            toggle: function(key) {
+                                this.config[key] = !this.config[key];
+                                
+                                // عند تفعيل القمر الصناعي، نلغي المباني الـ 3D لأنها لا تتناسب معه بصرياً
+                                if (key === 'satelliteMode' && this.config.satelliteMode) {
+                                    this.config.buildings3D = false;
+                                    this.updateUI('buildings3D');
+                                }
+
+                                this.save();
+                                this.updateUI(key);
+
+                                const status = this.config[key] ? 'تم التفعيل' : 'تم الإيقاف';
+                                App.Toast.show(`${key}: ${status}`, this.config[key] ? 'success' : 'info');
+
+                                if (this._debounceTimer) clearTimeout(this._debounceTimer);
+                                this._debounceTimer = setTimeout(() => {
+                                    App.Toast.show('جاري تحديث الخرائط...', 'info');
+                                    this.applyToAllMaps();
+                                }, 300);
+                            },
+
+                            updateUI: function(key) {
+                                const bg = document.getElementById(`toggle-${key}-bg`);
+                                const dot = document.getElementById(`toggle-${key}-dot`);
+                                if (bg && dot) {
+                                    if (this.config[key]) {
+                                        bg.classList.remove('bg-slate-700');
+                                        bg.classList.add('bg-indigo-600');
+                                        dot.classList.remove('left-1');
+                                        dot.classList.add('left-6');
+                                    } else {
+                                        bg.classList.add('bg-slate-700');
+                                        bg.classList.remove('bg-indigo-600');
+                                        dot.classList.add('left-1');
+                                        dot.classList.remove('left-6');
+                                    }
+                                }
+                            },
+
+                            initUI: function() {
+                                Object.keys(this.config).forEach(key => this.updateUI(key));
+                            },
+
+                            // --- تطبيق التغييرات على جميع الخرائط ---
+                            applyToAllMaps: function() {
+                                const allMaps = [
+                                    App.state.map,               
+                                    App.state.homeMap,           
+                                    App.state.trackingMap,       
+                                    App.state.driverLocationMap  
+                                ];
+                                
+                                allMaps.forEach(mapInstance => {
+                                    if (mapInstance) {
+                                        this.applyToMap(mapInstance);
+                                    }
+                                });
+                            },
+
+                            // --- الدالة الأساسية ---
+                            applyToMap: function(map) {
+                                if (!map) return;
+                                if (App.state.mapProvider === 'osm') {
+                    // Satellite Mode Logic for OSM
+                    if (this.config.satelliteMode) {
+                        App.MapHandler.setSatelliteMode(map, true);
+                    } else {
+                        App.MapHandler.setSatelliteMode(map, false);
+                    }
+                    
+                    // Traffic / 3D Buildings غير مدعومة مباشرة في OSM المجاني
+                    // يمكن إضافة تنبيه للمستخدم عند محاولة تفعيلها
+                    return; 
+                }
+                                const container = map.getContainer();
+
+                                // 1. معالجة القمر الصناعي
+                                const satSourceId = 'tomtom-satellite-source';
+                                const satLayerId = 'tomtom-satellite-layer';
+                                const isSatellite = this.config.satelliteMode;
+
+                                if (isSatellite) {
+                                    container.classList.remove('map-night-mode');
+                                    if (!map.getSource(satSourceId)) {
+                                        map.addSource(satSourceId, {
+                                            type: 'raster',
+                                            tiles: [`https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=${TOMTOM_KEY}`],
+                                            tileSize: 256, minzoom: 0, maxzoom: 19
+                                        });
+                                    }
+                                    if (!map.getLayer(satLayerId)) {
+                                        map.addLayer({
+                                            id: satLayerId, type: 'raster', source: satSourceId,
+                                            paint: { 'raster-opacity': 1, 'raster-fade-duration': 500 }
+                                        });
+                                    }
+                                } else {
+                                    if (map.getLayer(satLayerId)) map.removeLayer(satLayerId);
+
+                                    // 2. معالجة الوضع الليلي (CSS Filter)
+                                    if (this.config.nightMode) {
+                                        container.classList.add('map-night-mode');
+                                    } else {
+                                        container.classList.remove('map-night-mode');
+                                    }
+                                }
+
+                                // 3. معالجة المباني 3D (جديد)
+                                this.handleBuildingsLayer(map);
+
+                                // 4. المرور
+                                if (this.config.traffic) {
+                                    try { map.showTrafficFlow(); map.showTrafficIncidents(); } catch(e){}
+                                } else {
+                                    try { map.hideTrafficFlow(); map.hideTrafficIncidents(); } catch(e){}
+                                }
+
+                                // 5. الطبقات الإضافية
+                                if (this.config.evCharging) this.handlePOILayer(map, 'evCharging', 'electric vehicle station', '#10b981');
+                                else this.clearLayer(map, 'evCharging');
+
+                                if (this.config.search) this.handlePOILayer(map, 'search', 'gas station', '#3b82f6');
+                                else this.clearLayer(map, 'search');
+
+                                this.handleGeofenceLayer(map);
+                                this.handleAssetsLayer(map);
+                            },
+
+                            // --- دالة إضافة المباني ثلاثية الأبعاد ---
+                            handleBuildingsLayer: function(map) {
+                                const layerId = '3d-buildings-' + map.getContainer().id;
+                                
+                                // إزالة الطبقة القديمة إن وجدت
+                                if (map.getLayer(layerId)) {
+                                    map.removeLayer(layerId);
+                                }
+
+                                // إذا كانت الخاصية مفعلة ولسنا في وضع القمر الصناعي
+                                if (this.config.buildings3D && !this.config.satelliteMode) {
+                                    
+                                    // التأكد من أن مصدر البيانات (vector) موجود
+                                    if (map.getSource('vector')) {
+                                        // البحث عن أول طبقة نصية (Label) لوضع المباني تحتها
+                                        // حتى لا تغطي المباني أسماء الشوارع
+                                        const layers = map.getStyle().layers;
+                                        let labelLayerId;
+                                        for (let i = 0; i < layers.length; i++) {
+                                            if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                                                labelLayerId = layers[i].id;
+                                                break;
+                                            }
+                                        }
+
+                                        map.addLayer({
+                                            'id': layerId,
+                                            'source': 'vector',
+                                            'source-layer': 'Building', // اسم الطبقة في بيانات TomTom
+                                            'filter': ['==', 'extrude', 'true'], // فقط المباني القابلة للبثق
+                                            'type': 'fill-extrusion',
+                                            'minzoom': 13, // إظهارها عند التقريب فقط للحفاظ على الأداء
+                                            'paint': {
+                                                'fill-extrusion-color': '#d1d5db', // لون رمادي فاتح (يصبح غامقاً مع فلتر الوضع الليلي)
+                                                
+                                                // استخدام ارتفاع المبنى الحقيقي إذا وجد، أو قيمة افتراضية
+                                                'fill-extrusion-height': [
+                                                    'interpolate', ['linear'], ['zoom'],
+                                                    13, 0,
+                                                    13.05, ['get', 'height']
+                                                ],
+                                                'fill-extrusion-base': [
+                                                    'interpolate', ['linear'], ['zoom'],
+                                                    13, 0,
+                                                    13.05, ['get', 'min_height']
+                                                ],
+                                                'fill-extrusion-opacity': 0.8
+                                            }
+                                        }, labelLayerId); // الإضافة قبل طبقة النصوص
+                                    }
+                                }
+                            },
+
+                            clearLayer: function(map, configKey) {
+                                const layerKey = configKey + '_' + map.getContainer().id;
+                                if (App.state.mapLayers[layerKey]) {
+                                    App.state.mapLayers[layerKey].forEach(m => m.remove());
+                                    App.state.mapLayers[layerKey] = [];
+                                }
+                            },
+
+                            handlePOILayer: function(map, configKey, query, color) {
+                                const layerKey = configKey + '_' + map.getContainer().id;
+                                this.clearLayer(map, configKey);
+                                
+                                if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
+
+                                if (this.config[configKey]) {
+                                    const center = map.getCenter();
+                                    tt.services.fuzzySearch({
+                                        key: TOMTOM_KEY, query: query, center: center, radius: 5000, limit: 10
+                                    }).then(response => {
+                                        response.results.forEach(result => {
+                                            const el = document.createElement('div');
+                                            el.className = 'w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center';
+                                            el.style.backgroundColor = color;
+                                            el.innerHTML = `<i class="ph ph-map-pin text-white text-xs"></i>`;
+                                            const marker = new tt.Marker({ element: el })
+                                                .setLngLat(result.position)
+                                                .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs font-bold p-1">${result.poi.name}</div>`))
+                                                .addTo(map);
+                                            App.state.mapLayers[layerKey].push(marker);
+                                        });
+                                    }).catch(err => {});
+                                }
+                            },
+
+                            handleGeofenceLayer: function(map) {
+                                const layerId = 'geofence-fill-' + map.getContainer().id;
+                                const outlineId = 'geofence-line-' + map.getContainer().id;
+
+                                if (map.getLayer(layerId)) map.removeLayer(layerId);
+                                if (map.getLayer(outlineId)) map.removeLayer(outlineId);
+                                if (map.getSource(layerId)) map.removeSource(layerId);
+
+                                if (this.config.geofencing) {
+                                    const center = map.getCenter();
+                                    const circleGeoJSON = this.createGeoJSONCircle([center.lng, center.lat], 2);
+
+                                    map.addSource(layerId, { type: 'geojson', data: circleGeoJSON });
+                                    map.addLayer({
+                                        'id': layerId, 'type': 'fill', 'source': layerId,
+                                        'layout': {}, 'paint': { 'fill-color': '#f59e0b', 'fill-opacity': 0.2 }
+                                    });
+                                    map.addLayer({
+                                        'id': outlineId, 'type': 'line', 'source': layerId,
+                                        'layout': {}, 'paint': { 'line-color': '#f59e0b', 'line-width': 2, 'line-dasharray': [2, 2] }
+                                    });
+                                }
+                            },
+
+                            handleAssetsLayer: function(map) {
+                                const layerKey = 'assets_' + map.getContainer().id;
+                                this.clearLayer(map, 'assets');
+
+                                if (!App.state.mapLayers[layerKey]) App.state.mapLayers[layerKey] = [];
+
+                                if (this.config.assets) {
+                                    const center = map.getCenter();
+                                    const assets = [
+                                        { lng: center.lng + 0.01, lat: center.lat + 0.01, name: 'Truck A1' },
+                                        { lng: center.lng - 0.015, lat: center.lat - 0.005, name: 'Van B2' }
+                                    ];
+                                    assets.forEach(asset => {
+                                        const el = document.createElement('div');
+                                        el.innerHTML = '<div class="w-8 h-8 bg-yellow-500 rounded-lg border-2 border-white flex items-center justify-center shadow-lg"><i class="ph ph-truck text-white"></i></div>';
+                                        const marker = new tt.Marker({ element: el })
+                                            .setLngLat([asset.lng, asset.lat])
+                                            .setPopup(new tt.Popup({ offset: 25 }).setHTML(`<div class="text-black text-xs p-1"><b>${asset.name}</b><br>Asset Tracked</div>`))
+                                            .addTo(map);
+                                        App.state.mapLayers[layerKey].push(marker);
+                                    });
+                                }
+                            },
+
+                            createGeoJSONCircle: function(center, radiusInKm, points = 64) {
+                                const coords = { latitude: center[1], longitude: center[0] };
+                                const km = radiusInKm;
+                                const ret = [];
+                                const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
+                                const distanceY = km / 110.574;
+
+                                let theta, x, y;
+                                for (let i = 0; i < points; i++) {
+                                    theta = (i / points) * (2 * Math.PI);
+                                    x = distanceX * Math.cos(theta);
+                                    y = distanceY * Math.sin(theta);
+                                    ret.push([coords.longitude + x, coords.latitude + y]);
+                                }
+                                ret.push(ret[0]);
+                                return { type: "Feature", geometry: { type: "Polygon", coordinates: [ret] } };
+                            },
+
+                            enableAll: function() {
+                                Object.keys(this.config).forEach(k => { this.config[k] = true; this.updateUI(k); });
+                                this.save();
+                                
+                                if (this._debounceTimer) clearTimeout(this._debounceTimer);
+                                this._debounceTimer = setTimeout(() => {
+                                    App.Toast.show('جاري تفعيل جميع الخدمات...', 'info');
+                                    this.applyToAllMaps();
+                                }, 1000);
+                            },
+
+                            disableAll: function() {
+                                Object.keys(this.config).forEach(k => { this.config[k] = false; this.updateUI(k); });
+                                this.save();
+                                this.applyToAllMaps();
+                                App.Toast.show('تم إيقاف جميع الخدمات', 'info');
+                            }
+                        }, 
 
 
             // --- FLEET FEED MODULE ---
@@ -3256,6 +3369,56 @@ Settings: {
                 }
             },
 
+            // --- MODULE: OSM SETTINGS HANDLER ---
+            OSMSettings: {
+
+                defaults: {
+                    style: 'dark',        // dark | light | satellite
+                    nightMode: false,     // true | false
+                    zoom: 13,             // 8 → 18
+                    controls: true        // true | false
+                },
+
+                getSettings: function() {
+                    return {
+                        style: document.getElementById('osm-style')?.value || this.defaults.style,
+                        nightMode: document.getElementById('osm-night-mode')?.checked ?? this.defaults.nightMode,
+                        zoom: parseInt(document.getElementById('osm-zoom')?.value || this.defaults.zoom),
+                        controls: document.getElementById('osm-controls')?.checked ?? this.defaults.controls
+                    };
+                },
+
+                apply: function() {
+                    const settings = this.getSettings();
+                    App.state.osmSettings = settings;
+
+                    if (!App.state.allMaps || !Array.isArray(App.state.allMaps)) return;
+
+                    App.state.allMaps.forEach(map => {
+                        App.MapHandler.applyOSMSettings(map, settings);
+                    });
+
+                    App.Toast.show('✅ تم تطبيق إعدادات خرائط OSM على جميع الخرائط', 'success');
+                },
+
+                applyToMap: function(map) {
+                    if (!map) return;
+                    const settings = App.state.osmSettings || this.defaults;
+                    App.MapHandler.applyOSMSettings(map, settings);
+                },
+
+                reset: function() {
+                    App.state.osmSettings = { ...this.defaults };
+
+                    if (!App.state.allMaps) return;
+                    App.state.allMaps.forEach(map => {
+                        App.MapHandler.applyOSMSettings(map, this.defaults);
+                    });
+
+                    App.Toast.show('↩️ تم إعادة تعيين إعدادات OSM للوضع الافتراضي', 'info');
+                }
+            },
+
             // --- INIT ---
             init: function() {
                 // GSAP Animations Setup
@@ -3511,7 +3674,10 @@ initDriverLocationMap: function() {
     const center = [30.9122484, 29.9560651]; // تعديل الترتيب
     
     this.state.driverLocationMap = this.MapHandler.init('driver-location-map', center, 10);
-    
+    if (App.OSMSettings && App.state.allMaps) {
+    App.state.allMaps.forEach(map => App.OSMSettings.applyToMap(map));
+}
+
     // التعامل مع النقر (Click Event) يختلف قليلاً
     if (App.state.mapProvider === 'tomtom') {
         this.state.driverLocationMap.on('click', (e) => {
@@ -3748,6 +3914,10 @@ initTrackingMap: function(onLoaded) {
              if (onLoaded) onLoaded(); 
         }, 100);
     }
+    if (App.OSMSettings && App.state.allMaps) {
+    App.state.allMaps.forEach(map => App.OSMSettings.applyToMap(map));
+}
+
 },
 updateTrackingDetailMap: function(driverId) {
     if(App.Replay.isPlaying) return;
@@ -4831,6 +5001,10 @@ initMap: function() {
             if(App.Settings.config.satelliteMode) this.MapHandler.setSatelliteMode(this.state.map, true);
         }, 500);
     }
+    if (App.OSMSettings && App.state.allMaps) {
+    App.state.allMaps.forEach(map => App.OSMSettings.applyToMap(map));
+}
+
 },
 initHomeMap: function() {
     if (this.state.homeMap) return;
@@ -4846,6 +5020,10 @@ initHomeMap: function() {
     } else {
         setTimeout(() => this.updateHomeMapMarkers(), 500);
     }
+    if (App.OSMSettings && App.state.allMaps) {
+    App.state.allMaps.forEach(map => App.OSMSettings.applyToMap(map));
+}
+
 },
             updateMapMarkers: function() {
                 this._updateMarkers(this.state.map, this.state.markers);
