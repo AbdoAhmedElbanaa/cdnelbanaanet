@@ -1552,6 +1552,17 @@
         const FIXED_SCHOOL_LOCATION = { lat: 29.939433605939247, lng: 30.941213714457312 };
         const GEMINI_MIN_INTERVAL = 60 * 1000; // Gemini مرة كل دقيقة
         const TOMTOM_INTERVAL = 5000;   // TomTom Layer Update Interval
+        // أضف هذه المتغيرات مع باقي المتغيرات في الأعلى
+        let globalDestination = null; // لتخزين إحداثيات الوجهة
+        let currentSpeedKmh = 0;      // السرعة الحالية للسائق
+        let currentTripDist = 0;      // المسافة المقطوعة فعلياً
+        let tomTomBaseData = {        // بيانات من TomTom تتحدث كل فترة
+            travelTime: 0,            // الوقت المتوقع حسب المرور (ثانية)
+            trafficDelay: 0           // تأخير الزحام
+        };
+        
+        let analyticsInterval = null; // للتحديث اللحظي (1 ثانية)
+        let tomtomInterval = null;    // لتحديث حالة المرور (30 ثانية)
 
         //Speed AI Analytics Data
         const STOP_DISTANCE_THRESHOLD = 3;       // متر (أقل من كده = ثابت)
@@ -2762,55 +2773,62 @@ function logout() {
             }
         }
         
-        async function calculateRoute(destLat, destLng) {
-            if (currentPos.lat === 0) { showToast('جاري تحديد موقعك...', 'info'); locateUser(); return; }
-            loadingRoute.classList.remove('hidden');
-            
-            if (API_KEYS.tomtom) {
-                try {
-                    const url = `https://api.tomtom.com/routing/1/calculateRoute/${currentPos.lat},${currentPos.lng}:${destLat},${destLng}/json?key=${API_KEYS.tomtom}&traffic=true&travelMode=car`;
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    
-                    if(data.routes && data.routes.length > 0) {
-                        const route = data.routes[0];
-                        const points = route.legs[0].points.map(p => [p.latitude, p.longitude]);
-                        
-                        if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-                        if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
-                        
-                        window.currentRouteLayer = L.polyline(points, {
-                            color: '#3b82f6', 
-                            weight: 6, 
-                            opacity: 0.8
-                        }).addTo(map);
-                        
-                        map.fitBounds(window.currentRouteLayer.getBounds(), {padding: [50, 50]});
+    /* --- تحديث دالة حساب المسار لحفظ البيانات --- */
+    async function calculateRoute(destLat, destLng) {
+        if (currentPos.lat === 0) { showToast('جاري تحديد موقعك...', 'info'); locateUser(); return; }
+        loadingRoute.classList.remove('hidden');
+        
+        // حفظ الوجهة عالمياً لاستخدامها في التحليل
+        globalDestination = { lat: destLat, lng: destLng };
 
-                        const summary = route.summary;
-                        const distKm = (summary.lengthInMeters / 1000).toFixed(1);
-                        allowedRouteDistance = summary.lengthInMeters;
-                        const timeMin = Math.round(summary.travelTimeInSeconds / 60);
-                        
-                        routeInfo.classList.remove('hidden');
-                        routeInfo.classList.add('flex');
-                        const rSummary = document.getElementById('routeSummary');
-                        const rTime = document.getElementById('routeTime');
-                        if(rSummary) rSummary.innerText = `${distKm} كم`;
-                        if(rTime) rTime.innerText = `${timeMin} د`;
-                        loadingRoute.classList.add('hidden');
-                    } else {
-                        throw new Error("No route found");
-                    }
-                } catch(e) {
-                    console.error("TomTom Routing Error", e);
-                    useOSRM(destLat, destLng);
+        if (API_KEYS.tomtom) {
+            try {
+                const url = `https://api.tomtom.com/routing/1/calculateRoute/${currentPos.lat},${currentPos.lng}:${destLat},${destLng}/json?key=${API_KEYS.tomtom}&traffic=true&travelMode=car`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if(data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const points = route.legs[0].points.map(p => [p.latitude, p.longitude]);
+                    
+                    if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+                    if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
+                    
+                    window.currentRouteLayer = L.polyline(points, {
+                        color: '#3b82f6', weight: 6, opacity: 0.8
+                    }).addTo(map);
+                    
+                    map.fitBounds(window.currentRouteLayer.getBounds(), {padding: [50, 50]});
+
+                    const summary = route.summary;
+                    
+                    // --- التعديل هنا: حفظ المسافة الإجمالية ---
+                    allowedRouteDistance = summary.lengthInMeters; 
+                    
+                    const distKm = (summary.lengthInMeters / 1000).toFixed(1);
+                    const timeMin = Math.round(summary.travelTimeInSeconds / 60);
+                    
+                    // تحديث بيانات TomTom الأولية
+                    tomTomBaseData.travelTime = summary.travelTimeInSeconds;
+                    tomTomBaseData.trafficDelay = summary.trafficDelayInSeconds;
+
+                    routeInfo.classList.remove('hidden');
+                    routeInfo.classList.add('flex');
+                    document.getElementById('routeSummary').innerText = `${distKm} كم`;
+                    document.getElementById('routeTime').innerText = `${timeMin} د`;
+                    loadingRoute.classList.add('hidden');
+                } else {
+                    throw new Error("No route found");
                 }
-            } else {
+            } catch(e) {
+                console.error("TomTom Routing Error", e);
                 useOSRM(destLat, destLng);
             }
+        } else {
+            useOSRM(destLat, destLng);
         }
-        
+    }
+
         function useOSRM(destLat, destLng) {
             if (routingControl) { map.removeControl(routingControl); routingControl = null; }
             if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
@@ -3512,6 +3530,10 @@ function startLocationWatcher() {
             const rawSpeed = pos.coords.speed || 0;
             const speedKmh = Math.round(rawSpeed * 3.6); 
             const trafficStatus = estimateTrafficLevel(speedKmh);
+
+            // تحديث المتغيرات العالمية للتحليل
+            currentSpeedKmh = speedKmh; 
+            currentTripDist = totalDist; // totalDist هو المتغير المحلي داخل الدالة الذي يحسب المسافة المقطوعة
 
             currentPos = {lat, lng};
             userMarker.setLatLng(latLng);
@@ -4380,116 +4402,126 @@ if (typeof _originalHandleLogin === 'undefined') {
         }
 
 
-/* =========================================================
-   TOMTOM ROUTE
-   ========================================================= */
-async function fetchTomTomRoute() {
-    if (!currentPos?.lat) throw new Error("GPS not ready");
 
-    const { lat, lng } = currentPos;
-    const d = FIXED_SCHOOL_LOCATION;
+        /* =========================================================
+        NEW ADVANCED TRIP ANALYTICS (TOMTOM + REALTIME MATH)
+        ========================================================= */
 
-    const url = `https://api.tomtom.com/routing/1/calculateRoute/${lat},${lng}:${d.lat},${d.lng}/json?traffic=true&key=${API_KEYS.tomtom}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const s = data?.routes?.[0]?.summary;
-    if (!s) throw new Error("No route");
-
-    return {
-        distanceKm: s.lengthInMeters / 1000,
-        travelTimeMin: s.travelTimeInSeconds / 60,
-        delayMin: s.trafficDelayInSeconds / 60
-    };
-}
-
-/* =========================================================
-   GEMINI – SAFE CALL
-   ========================================================= */
-async function analyzeWithGeminiSafe(route) {
-    const now = Date.now();
-
-    /* Rate limit protection */
-    if (now - lastGeminiCall < GEMINI_MIN_INTERVAL) {
-        return lastGeminiResult;
+       // 1. دالة التحديث اللحظي (تعمل كل ثانية)
+function updateRealtimeDashboard() {
+    // --- إضافة مراقب التوقف هنا ليعمل بانتظام ---
+    if (typeof monitorStopByLocation === 'function') {
+        monitorStopByLocation();
     }
 
-    lastGeminiCall = now;
+    // التحقق من وجود مسار ومسافة
+    if (!allowedRouteDistance || allowedRouteDistance === 0) {
+        if(aiEtaEl) aiEtaEl.innerText = "--";
+        if(aiDistanceEl) aiDistanceEl.innerText = "--";
+        if(aiSpeedEl) aiSpeedEl.innerText = "--";
+        return;
+    }
 
-    try {
-        const prompt = `
-حلل الرحلة باختصار:
-المسافة: ${route.distanceKm.toFixed(1)} كم
-الوقت: ${Math.round(route.travelTimeMin)} دقيقة
-تأخير المرور: ${Math.round(route.delayMin)} دقيقة
-`;
+    // 1. المسافة المتبقية
+    let remainingMeters = allowedRouteDistance - currentTripDist;
+    if (remainingMeters < 0) remainingMeters = 0;
+    
+    if(aiDistanceEl) aiDistanceEl.innerText = `${(remainingMeters / 1000).toFixed(2)} كم`;
 
-        const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEYS.gemini}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+    // 2. الوقت المقدر للوصول (ETA)
+    let etaText = "--";
+    
+    if (currentSpeedKmh > 5) {
+        const speedMs = currentSpeedKmh / 3.6;
+        const timeSeconds = remainingMeters / speedMs;
+        
+        if (timeSeconds < 60) {
+            etaText = "أقل من دقيقة";
+        } else if (timeSeconds < 3600) {
+            etaText = `${Math.round(timeSeconds / 60)} دقيقة`;
+        } else {
+            const h = Math.floor(timeSeconds / 3600);
+            const m = Math.round((timeSeconds % 3600) / 60);
+            etaText = `${h}س ${m}د`;
+        }
+    } else {
+        if (tomTomBaseData.travelTime > 0) {
+             const timeMin = Math.round(tomTomBaseData.travelTime / 60);
+             etaText = `~${timeMin} د (تقدير الطريق)`;
+        } else {
+             etaText = "واقف";
+        }
+    }
+    if(aiEtaEl) aiEtaEl.innerText = etaText;
+
+    // 3. السرعة المتوقعة
+    let requiredSpeed = "--";
+    if (tomTomBaseData.travelTime > 0 && remainingMeters > 0) {
+        const speed = (remainingMeters / tomTomBaseData.travelTime) * 3.6;
+        let colorClass = "text-emerald-400";
+        if (speed > 100) colorClass = "text-red-400";
+        else if (speed > 80) colorClass = "text-orange-400";
+        
+        requiredSpeed = Math.round(speed);
+        if(aiSpeedEl) aiSpeedEl.innerHTML = `<span class="${colorClass}">${requiredSpeed} كم/س</span>`;
+    } else {
+        if(aiSpeedEl) aiSpeedEl.innerText = "--";
+    }
+}
+
+        // 2. دالة تحديث بيانات المرور من TomTom (تعمل كل 30 ثانية لتوفير الـ API)
+        async function refreshTomTomTrafficData() {
+            if (!currentPos.lat || !globalDestination || !API_KEYS.tomtom) return;
+
+            try {
+                const url = `https://api.tomtom.com/routing/1/calculateRoute/${currentPos.lat},${currentPos.lng}:${globalDestination.lat},${globalDestination.lng}/json?key=${API_KEYS.tomtom}&traffic=true&travelMode=car`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.routes && data.routes.length > 0) {
+                    const summary = data.routes[0].summary;
+                    
+                    // تحديث البيانات الأساسية التي تستخدمها دالة الـ 1 ثانية
+                    tomTomBaseData.travelTime = summary.travelTimeInSeconds; // الزمن المتبقي الفعلي حسب الزحام
+                    tomTomBaseData.trafficDelay = summary.trafficDelayInSeconds;
+                    
+                    // تصحيح المسافة المتبقية بدقة من API لو حصل انحراف بسيط
+                    // (اختياري: يمكن الاعتماد على الطرح المحلي للحفاظ على السلاسة)
+                    // allowedRouteDistance = currentTripDist + summary.lengthInMeters; 
+                }
+            } catch (e) {
+                console.warn("TomTom Background Update Failed", e);
             }
-        );
+        }
 
-        if (!res.ok) throw new Error("Gemini rate limit");
+        // 3. دوال التشغيل والإيقاف
+        function startAIAnalytics() {
+            if (analyticsInterval) return; // منع التكرار
+            
+            // تشغيل التحديث اللحظي (كل ثانية)
+            updateRealtimeDashboard();
+            analyticsInterval = setInterval(updateRealtimeDashboard, 1000);
 
-        const data = await res.json();
-        lastGeminiResult =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+            // تشغيل تحديث المرور (كل 30 ثانية)
+            refreshTomTomTrafficData();
+            tomtomInterval = setInterval(refreshTomTomTrafficData, 30000);
+        }
 
-        return lastGeminiResult;
+        function stopAIAnalytics() {
+            if (analyticsInterval) {
+                clearInterval(analyticsInterval);
+                analyticsInterval = null;
+            }
+            if (tomtomInterval) {
+                clearInterval(tomtomInterval);
+                tomtomInterval = null;
+            }
+            // تصفير الواجهة
+            aiEtaEl.innerText = "--";
+            aiDistanceEl.innerText = "--";
+            aiSpeedEl.innerText = "--";
+        }
 
-    } catch (e) {
-        console.warn("Gemini throttled – using cached data");
-        return lastGeminiResult;
-    }
-}
-
-/* =========================================================
-   MAIN LOOP
-   ========================================================= */
-async function updateTripAnalytics() {
-    try {
-        const route = await fetchTomTomRoute();
-
-        /* حساب السرعة */
-        const speed =
-            route.travelTimeMin > 0
-                ? route.distanceKm / (route.travelTimeMin / 60)
-                : 0;
-
-        /* تحديث الواجهة */
-        aiEtaEl.innerText = `${Math.round(route.travelTimeMin)} د`;
-        aiDistanceEl.innerText = `${route.distanceKm.toFixed(1)} كم`;
-        aiSpeedEl.innerText = `${speed.toFixed(1)} كم/س`;
-
-        /* Gemini تحليل ذكي (غير إلزامي) */
-        analyzeWithGeminiSafe(route);
-
-    } catch (e) {
-        console.warn("Trip Analytics skipped:", e.message);
-    }
-}
-
-/* =========================================================
-   CONTROLLER
-   ========================================================= */
-function startAIAnalytics() {
-    if (aiInterval) return;
-    updateTripAnalytics();
-    aiInterval = setInterval(updateTripAnalytics, TOMTOM_INTERVAL);
-}
-
-function stopAIAnalytics() {
-    if (aiInterval) {
-        clearInterval(aiInterval);
-        aiInterval = null;
-    }
-}
 
 
 /* =========================================================
@@ -4628,14 +4660,6 @@ function closeCustomModal() {
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
-/* =========================================================
-   INTEGRATION (WITHOUT TOUCHING OLD CODE)
-   ========================================================= */
-const ___updateTripAnalytics = updateTripAnalytics;
-updateTripAnalytics = async function () {
-    await ___updateTripAnalytics();
-    monitorStopByLocation();
-};
 
         // Drag Logic & Bottom Sheet
         let startY = 0; let isDragging = false; let isExpanded = false;
