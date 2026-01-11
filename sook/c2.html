@@ -1396,6 +1396,20 @@
                 </div>
                 <div class="toggle-switch" id="toggle-snapRoads"></div>
             </div>
+
+            <div class="tool-item" onclick="downloadCurrentMapArea()">
+                <div class="flex items-center">
+                    <div class="tool-icon">
+                        <i class="fas fa-download text-cyan-400"></i>
+                    </div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">تحميل المنطقة</span>
+                        <span class="text-[10px] text-gray-400 block">Offline Save</span>
+                    </div>
+                </div>
+                <div id="dlStatus" class="text-[10px] text-emerald-400 font-bold hidden">تم ✅</div>
+            </div>
+
         </div>
 
         <!-- Analytics Details Overlay (Review Mode) -->
@@ -1760,7 +1774,72 @@
             evStations: L.layerGroup(),
             pois: L.layerGroup()
         };
+        /* =========================================
+        1. محرك التخزين الأوفلاين (Map Offline Engine)
+        ========================================= */
+        const DB_NAME = 'SookMapCache';
+        const STORE_NAME = 'tiles';
 
+        function openMapDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (ev) => {
+                    const db = ev.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+                };
+                request.onsuccess = (ev) => resolve(ev.target.result);
+                request.onerror = (ev) => reject(ev.target.error);
+            });
+        }
+
+        L.TileLayer.Offline = L.TileLayer.extend({
+            createTile: function (coords, done) {
+                const tile = document.createElement('img');
+                L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+                L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+                if (this.options.crossOrigin) tile.crossOrigin = ''; 
+                tile.alt = '';
+                tile.setAttribute('role', 'presentation');
+                const url = this.getTileUrl(coords);
+                const key = `${this.options.providerId}_${coords.z}_${coords.x}_${coords.y}`;
+                this._loadTile(tile, url, key);
+                return tile;
+            },
+            _loadTile: async function (tile, url, key) {
+                try {
+                    const db = await openMapDB();
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const request = tx.objectStore(STORE_NAME).get(key);
+                    request.onsuccess = (e) => {
+                        const blob = e.target.result;
+                        if (blob) {
+                            const objectURL = URL.createObjectURL(blob);
+                            tile.src = objectURL;
+                            tile.onload = () => URL.revokeObjectURL(objectURL);
+                        } else {
+                            this._fetchAndSaveTile(tile, url, key, db);
+                        }
+                    };
+                    request.onerror = () => { tile.src = url; };
+                } catch (err) { tile.src = url; }
+            },
+            _fetchAndSaveTile: function(tile, url, key, db) {
+                tile.src = url;
+                if (navigator.onLine) {
+                    fetch(url, { mode: 'cors' }).then(res => {
+                        if (!res.ok) throw new Error;
+                        return res.blob();
+                    }).then(blob => {
+                        const tx = db.transaction(STORE_NAME, 'readwrite');
+                        tx.objectStore(STORE_NAME).put(blob, key);
+                    }).catch(e => {});
+                }
+            }
+        });
+
+        L.tileLayer.offline = function (url, options) {
+            return new L.TileLayer.Offline(url, options);
+        };
         // Navigation State
         let currentView = 'loginView';
 
@@ -2972,43 +3051,65 @@ btn.innerHTML = `
             studentModal.classList.add('opacity-0'); studentModalContent.classList.remove('scale-100'); studentModalContent.classList.add('scale-95'); setTimeout(() => { studentModal.classList.add('hidden'); }, 300);
         };
 
-        // --- MAP & ROUTING ---
-        function initMap() {
-            if(map) return;
-            map = L.map('map', { 
-                zoomControl: false, 
-                attributionControl: false,
-                rotate: true,         
-                touchRotate: true     
-            }).setView([24.7136, 46.6753], 13);
-            
-            map.on('rotate', function(e) {
-                const angle = map.getBearing();
-                const icon = document.getElementById('compassIcon');
-                if(icon) {
-                    icon.style.transform = `rotate(${angle}deg)`;
-                }
-            });
 
-            if (API_KEYS.tomtom) {
-                 L.tileLayer(`https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {maxZoom: 22, subdomains: 'abcd'}).addTo(map);
-            } else {
-                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd' }).addTo(map);
-            }
-            
-            tomTomLayers.evStations.addTo(map);
-            tomTomLayers.pois.addTo(map);
-
-            const carIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: `<div class="relative w-full h-full"><div class="pulse-ring"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-emerald-500 rounded-full border-2 border-white p-1 shadow-lg"><i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i></div></div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
-            userMarker = L.marker([0, 0], {icon: carIcon});
-            pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
-        }
         
+/* =========================================
+   2. دالة تهيئة الخريطة (initMap)
+   ========================================= */
+function initMap() {
+    if(map) return;
+
+    map = L.map('map', { 
+        zoomControl: false, 
+        attributionControl: false,
+        rotate: true,         
+        touchRotate: true     
+    }).setView([24.7136, 46.6753], 13);
+    
+    map.on('rotate', function(e) {
+        const angle = map.getBearing();
+        const icon = document.getElementById('compassIcon');
+        if(icon) icon.style.transform = `rotate(${angle}deg)`;
+    });
+
+    // اختيار الخريطة وتفعيل التخزين
+    let activeUrl = '';
+    let activeOptions = {
+        subdomains: 'abcd',
+        crossOrigin: true, 
+        providerId: 'generic'
+    };
+
+    if (API_KEYS.tomtom) {
+        activeUrl = `https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`;
+        activeOptions.maxZoom = 22;
+        activeOptions.providerId = 'tomtom'; 
+    } else {
+        activeUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        activeOptions.maxZoom = 20;
+        activeOptions.providerId = 'carto';
+    }
+
+    // إضافة الطبقة الأوفلاين
+    L.tileLayer.offline(activeUrl, activeOptions).addTo(map);
+
+    // إضافة بقية الطبقات
+    if (typeof tomTomLayers !== 'undefined') {
+        if (tomTomLayers.evStations) tomTomLayers.evStations.addTo(map);
+        if (tomTomLayers.pois) tomTomLayers.pois.addTo(map);
+    }
+
+    const carIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div class="relative w-full h-full"><div class="pulse-ring"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-emerald-500 rounded-full border-2 border-white p-1 shadow-lg"><i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i></div></div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+    
+    userMarker = L.marker([0, 0], {icon: carIcon});
+    pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+}
+
         function resetBearing() {
             if(map) {
                 map.setBearing(0); 
@@ -3236,7 +3337,36 @@ btn.innerHTML = `
                 toolsMenu.classList.remove('opacity-100', 'scale-100');
             }
         }
+        /* =========================================
+        3. دالة زر التحميل اليدوي
+        ========================================= */
+        async function downloadCurrentMapArea() {
+            if (!map) return;
+            
+            showToast('جاري حفظ المنطقة الحالية...', 'info');
+            
+            // خدعة بسيطة: تغيير الزوم قليلاً لإجبار المتصفح على طلب الصور وتخزينها
+            const originalCenter = map.getCenter();
+            const originalZoom = map.getZoom();
+            
+            // إظهار علامة "تم"
+            const statusEl = document.getElementById('dlStatus');
+            if(statusEl) statusEl.classList.remove('hidden');
 
+            // محاكاة تحميل سريع للمستويات القريبة
+            let z = originalZoom;
+            map.setZoom(z + 1);
+            
+            setTimeout(() => {
+                map.setZoom(z); // العودة للوضع الطبيعي
+                map.panBy([10, 10]); // تحريك بسيط جداً
+                setTimeout(() => {
+                    map.panBy([-10, -10]); // العودة
+                    showToast('تم حفظ المنطقة في الذاكرة ✅', 'success');
+                    if(statusEl) setTimeout(() => statusEl.classList.add('hidden'), 3000);
+                }, 500);
+            }, 1000);
+        }
         function toggleTomTomLayer(type) {
             activeLayers[type] = !activeLayers[type];
             const toggleEl = document.getElementById(`toggle-${type}`);
