@@ -4434,12 +4434,12 @@ initDriverLocationMap: function() {
                 });
             },
 
-// --- دالة تحديث قائمة التتبع (المصححة) ---
+// --- دالة تحديث قائمة التتبع (مع إصلاح قراءة الإحداثيات من البروفايل) ---
 updateTrackingListUI: function() {
     const list = document.getElementById('tracking-list');
     if (!list) return;
 
-    // 1. جلب حالة البحث والفلتر
+    // 1. إعدادات البحث والفلترة
     const searchInput = document.getElementById('tracking-search');
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     
@@ -4452,20 +4452,20 @@ updateTrackingListUI: function() {
     const validCardIds = new Set();
     let hasResults = false;
 
-    // --- دالة توليد HTML الداخلي للكارت (تم التحديث لإضافة المدرسة والإحداثيات) ---
+    // --- دالة HTML للكارت (ثابتة) ---
     const getInnerHtml = (driver, isActive, currentSpeed, lastUpdate, theme, glowColor, statusText, displayId, driverPhoto, schoolName, destinationStr) => {
         return `
             <div class="absolute inset-0 bg-gradient-to-b from-${theme}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="absolute -right-16 -top-16 w-48 h-48 bg-${theme}-500/10 blur-[80px] rounded-full group-hover:bg-${theme}-500/20 transition-all duration-700"></div>
+            <div class="absolute -right-20 -top-20 w-56 h-56 bg-${theme}-500/10 blur-[90px] rounded-full group-hover:bg-${theme}-500/20 transition-all duration-700"></div>
             
-            <i class="ph-duotone ph-steering-wheel absolute top-4 left-4 text-6xl text-white/5 group-hover:text-${theme}-500/10 group-hover:rotate-45 transition-all duration-700 animate-float"></i>
+            <i class="ph-duotone ph-steering-wheel absolute top-4 left-4 text-7xl text-white/5 group-hover:text-${theme}-500/10 group-hover:rotate-45 transition-all duration-700 animate-float"></i>
             
             <div class="relative p-6 pb-2 flex items-start gap-4 z-10">
                 <div class="relative shrink-0">
-                    <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-white/10 to-transparent border border-white/10 group-hover:border-${theme}-400/50 transition-all shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-                        <img src="${driverPhoto}" class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    <div class="w-16 h-16 rounded-2xl p-1 bg-gradient-to-br from-white/10 to-transparent border border-white/10 group-hover:border-${theme}-400/50 transition-all shadow-lg">
+                        <img src="${driverPhoto}" class="w-full h-full rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
                     </div>
-                    <div class="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center">
+                    <div class="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center">
                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-${theme}-400 opacity-75"></span>
                          <span class="relative inline-flex h-4 w-4 rounded-full bg-${theme}-500 border-2 border-[#1e293b]"></span>
                     </div>
@@ -4477,8 +4477,8 @@ updateTrackingListUI: function() {
                         <span class="px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-black/40 text-slate-400 border border-white/5 group-hover:border-${theme}-500/30 group-hover:text-${theme}-400 transition-all">#${displayId}</span>
                     </div>
                     
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-${theme}-500/10 text-${theme}-400 border border-${theme}-500/20 flex items-center gap-1.5 shadow-[0_0_10px_${glowColor}]">
+                    <div class="flex items-center gap-2 mt-1.5">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] bg-${theme}-500/10 text-${theme}-400 border border-${theme}-500/20 flex items-center gap-1.5 shadow-[0_0_10px_${glowColor}]">
                             <i class="ph-fill ph-${isActive ? 'broadcast' : 'prohibit'}"></i>
                             ${statusText}
                         </span>
@@ -4488,61 +4488,57 @@ updateTrackingListUI: function() {
 
             <div class="px-6 py-2 grid grid-cols-2 gap-3 relative z-10">
                 <div class="bg-[#0f172a]/40 rounded-2xl p-2 pr-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                    <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 shrink-0">
                         <i class="ph-fill ph-speedometer text-lg"></i>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-slate-500 font-medium">السرعة</p>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-slate-500 font-medium truncate">السرعة</p>
                         <p class="text-sm font-bold text-white font-mono leading-none mt-0.5">${currentSpeed} <span class="text-[9px] text-slate-400">km/h</span></p>
                     </div>
                 </div>
 
                 <div class="bg-[#0f172a]/40 rounded-2xl p-2 pr-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
-                    <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20 group-hover:scale-110 transition-transform">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20 shrink-0">
                         <i class="ph-fill ph-clock text-lg"></i>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-slate-500 font-medium">التحديث</p>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-slate-500 font-medium truncate">التحديث</p>
                         <p class="text-sm font-bold text-white font-mono leading-none mt-0.5">${lastUpdate}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 pb-2 pt-1 grid grid-cols-1 gap-2 relative z-10">
+            <div class="px-6 pb-2 pt-1 grid grid-cols-1 gap-2.5 relative z-10">
                 
-                <div class="bg-[#0f172a]/60 rounded-2xl p-3 flex items-center gap-3 border border-white/5 group-hover:border-purple-500/30 transition-all relative overflow-hidden">
-                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-purple-500/50"></div>
-                    
-                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shrink-0">
-                        <i class="ph-fill ph-student text-xl"></i>
+                <div class="relative bg-gradient-to-r from-[#0f172a]/80 to-[#1e293b]/80 rounded-2xl p-3 flex items-center gap-3 border border-white/5 hover:border-purple-500/30 transition-all overflow-hidden group/school">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500/50"></div>
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shrink-0 shadow-lg shadow-purple-900/20">
+                        <i class="ph-duotone ph-student text-xl group-hover/school:scale-110 transition-transform"></i>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-[10px] text-slate-500 font-medium flex justify-between">
-                            <span>المدرسة التابع لها</span>
-                            <i class="ph-bold ph-buildings text-purple-500/50"></i>
-                        </p>
-                        <p class="text-sm font-bold text-white truncate leading-tight mt-0.5">${schoolName}</p>
+                        <p class="text-[10px] text-slate-500 font-medium">المدرسة التابع لها</p>
+                        <p class="text-sm font-bold text-white truncate leading-tight mt-0.5 group-hover/school:text-purple-200 transition-colors">${schoolName}</p>
                     </div>
                 </div>
 
-                <div class="bg-[#0f172a]/40 rounded-2xl p-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
-                    <div class="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 shrink-0">
-                        <i class="ph-fill ph-map-pin-line text-lg animate-pulse"></i>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-[10px] text-slate-500 font-medium">إحداثيات الوجهة الحالية</p>
-                        <div class="flex items-center gap-2 mt-0.5">
-                            <p class="text-xs font-bold text-white font-mono tracking-wider truncate dir-ltr text-right">${destinationStr}</p>
+                <div class="bg-[#0f172a]/40 rounded-2xl p-2.5 flex items-center justify-between gap-3 border border-white/5 hover:border-cyan-500/30 transition-colors group/coords">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 shrink-0">
+                            <i class="ph-bold ph-crosshair text-base group-hover/coords:rotate-90 transition-transform duration-500"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[9px] text-slate-500 font-medium">وجهة الرحلة (Lat, Lng)</p>
+                            <p class="text-[11px] font-bold text-cyan-100 font-mono tracking-wider truncate dir-ltr text-left mt-0.5 opacity-90">${destinationStr}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="p-4 mt-2 border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent relative z-10">
-                <button id="btn-${driver.id}" class="w-full group/btn relative flex items-center justify-center gap-2 py-3 rounded-xl bg-${theme}-600 hover:bg-${theme}-500 text-white font-bold text-xs overflow-hidden transition-all shadow-lg shadow-${theme}-900/20">
+                <button id="btn-${driver.id}" class="w-full group/btn relative flex items-center justify-center gap-2 py-3 rounded-xl bg-${theme}-600 hover:bg-${theme}-500 text-white font-bold text-xs overflow-hidden transition-all shadow-lg shadow-${theme}-900/20 active:scale-[0.98]">
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[100%] group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
-                    <i class="ph-bold ph-crosshair-simple text-lg group-hover/btn:animate-spin"></i>
-                    <span class="relative">فتح مركز التتبع</span>
+                    <i class="ph-bold ph-map-trifold text-lg"></i>
+                    <span class="relative">تتبع المسار المباشر</span>
                 </button>
             </div>
             
@@ -4550,7 +4546,7 @@ updateTrackingListUI: function() {
         `;
     };
 
-    // 2. معالجة البيانات
+    // --- معالجة البيانات ---
     if (driverEntries.length === 0) {
         list.innerHTML = this.getEmptyStateHTML('لا توجد بيانات للسائقين حالياً');
         return;
@@ -4558,43 +4554,50 @@ updateTrackingListUI: function() {
 
     driverEntries.forEach(([driverId, driverData]) => {
         const driver = { ...driverData, id: driverId };
-        const profile = driver.profile || { name: 'غير معروف' };
+        const profile = driver.profile || {};
         const driverName = profile.name || 'بدون اسم';
         
-        // --- استخراج البيانات الجديدة (المدرسة والوجهة) ---
-        // استخدام بيانات افتراضية إذا لم تكن موجودة في الداتابيز
-        const schoolName = profile.school || 'مدرسة المستقبل الدولية'; 
+        // --- 1. استخراج البيانات (التعديل هنا) ---
         
-        // حساب الإحداثيات والوجهة
+        // اسم المدرسة
+        const schoolName = profile.school || 'غير محدد';
+        
+        // إحداثيات الوجهة: نقرأها أولاً من driver.profile.destination
+        let destinationStr = '--.----, --.----'; 
+        
+        if (profile.destination && profile.destination.lat && profile.destination.lng) {
+            const lat = Number(profile.destination.lat).toFixed(5);
+            const lng = Number(profile.destination.lng).toFixed(5);
+            destinationStr = `${lat}, ${lng}`;
+        }
+
+        // باقي الحسابات
         let currentSpeed = 0;
         let lastUpdate = 'غير متوفر';
         let isActive = false;
-        let destinationStr = '--.----, --.----'; // القيمة الافتراضية
 
         if(driver.trips) {
             const tripKeys = Object.keys(driver.trips);
             if (tripKeys.length > 0) {
                 const lastTrip = driver.trips[tripKeys[tripKeys.length - 1]];
                 
-                // محاولة استخراج الوجهة من بيانات الرحلة الأخيرة
-                if (lastTrip && lastTrip.destination) {
-                    // إذا كان هناك كائن وجهة مخزن
-                    destinationStr = `${Number(lastTrip.destination.lat).toFixed(4)}, ${Number(lastTrip.destination.lng).toFixed(4)}`;
-                } else if (lastTrip && lastTrip.actualPath) {
-                    // أو نستخدم آخر نقطة وصل لها كوجهة حالية
+                // إذا لم نجد وجهة في البروفايل، نحاول إيجادها في آخر رحلة (كخيار بديل)
+                if (destinationStr === '--.----, --.----' && lastTrip && lastTrip.destination && lastTrip.destination.lat) {
+                    const lat = Number(lastTrip.destination.lat).toFixed(5);
+                    const lng = Number(lastTrip.destination.lng).toFixed(5);
+                    destinationStr = `${lat}, ${lng}`;
+                }
+
+                if(lastTrip && lastTrip.actualPath) {
+                    currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
                     const pathKeys = Object.keys(lastTrip.actualPath);
                     if (pathKeys.length > 0) {
                         const lastPoint = lastTrip.actualPath[pathKeys[pathKeys.length - 1]];
-                        if (lastPoint) {
-                            if (lastPoint.ts) {
-                                lastUpdate = new Date(lastPoint.ts).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
-                                isActive = (Date.now() - lastPoint.ts) < 5 * 60 * 1000;
-                            }
-                            // تحديث الوجهة بآخر نقطة معروفة كإحداثيات
-                            // destinationStr = `${Number(lastPoint.lat).toFixed(4)}, ${Number(lastPoint.lng).toFixed(4)}`;
+                        if (lastPoint && lastPoint.ts) {
+                            lastUpdate = new Date(lastPoint.ts).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                            isActive = (Date.now() - lastPoint.ts) < 5 * 60 * 1000;
                         }
                     }
-                    currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
                 }
             }
         }
@@ -4604,7 +4607,8 @@ updateTrackingListUI: function() {
         if (filterMode === 'stopped' && isActive) return;
 
         const searchMatch = driverName.toLowerCase().includes(searchTerm) || 
-                            String(driver.id).includes(searchTerm);
+                            String(driver.id).includes(searchTerm) ||
+                            schoolName.toLowerCase().includes(searchTerm);
         if (searchTerm && !searchMatch) return;
 
         hasResults = true;
@@ -4620,26 +4624,28 @@ updateTrackingListUI: function() {
 
         // التحديث الذكي
         let cardWrapper = document.getElementById(cardDomId);
-        
-        // تمرير البيانات الجديدة لدالة HTML
         const newInnerHTML = getInnerHtml(
             driver, isActive, currentSpeed, lastUpdate, theme, glowColor, statusText, displayId, driverPhoto, 
             schoolName, destinationStr
         );
 
         if (cardWrapper) {
-            if (cardWrapper.innerHTML !== newInnerHTML) {
-                cardWrapper.innerHTML = newInnerHTML;
-                const btn = cardWrapper.querySelector(`#btn-${driver.id}`);
-                if(btn) btn.onclick = (e) => { e.stopPropagation(); App.openTrackingDetail(driver.id); };
+            // تحديث المحتوى الداخلي فقط
+            const innerContainer = cardWrapper.firstElementChild;
+            if (innerContainer) {
+                if (innerContainer.innerHTML !== newInnerHTML) {
+                    innerContainer.innerHTML = newInnerHTML;
+                    const btn = innerContainer.querySelector(`#btn-${driver.id}`);
+                    if(btn) btn.onclick = (e) => { e.stopPropagation(); App.openTrackingDetail(driver.id); };
+                }
+                // تحديث الإطار
+                const baseClasses = `group relative w-full bg-[#1e293b]/60 backdrop-blur-2xl rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl`;
+                const activeClasses = `border border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]`;
+                const inactiveClasses = `border border-white/5 hover:border-slate-500/30`;
+                innerContainer.className = isActive ? `${baseClasses} ${activeClasses}` : `${baseClasses} ${inactiveClasses}`;
             }
-            // تحديث الإطار الأخضر
-            const baseClasses = `group relative w-full bg-[#1e293b]/60 backdrop-blur-2xl rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl`;
-            const activeClasses = `border border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]`;
-            const inactiveClasses = `border border-white/5 hover:border-slate-500/30`;
-            cardWrapper.firstElementChild.className = isActive ? `${baseClasses} ${activeClasses}` : `${baseClasses} ${inactiveClasses}`;
-
         } else {
+            // إنشاء كارت جديد
             cardWrapper = document.createElement('div');
             cardWrapper.id = cardDomId;
             cardWrapper.className = `tracking-card-item opacity-0 transform translate-y-8`;
@@ -4658,7 +4664,7 @@ updateTrackingListUI: function() {
         }
     });
 
-    // 3. التنظيف
+    // التنظيف
     Array.from(list.children).forEach(child => {
         if (child.id === 'tracking-empty-state') return;
         if (!child.id || !child.id.startsWith('tracking-card-') || !validCardIds.has(child.id)) {
@@ -4666,7 +4672,7 @@ updateTrackingListUI: function() {
         }
     });
 
-    // 4. حالة الفراغ
+    // حالة الفراغ
     const emptyStateId = 'tracking-empty-state';
     let emptyState = document.getElementById(emptyStateId);
     
@@ -4682,6 +4688,7 @@ updateTrackingListUI: function() {
         if (emptyState) emptyState.remove();
     }
 },
+
 // دالة HTML لحالة الفراغ
 getEmptyStateHTML: function(message) {
     return `
