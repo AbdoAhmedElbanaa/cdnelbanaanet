@@ -729,9 +729,97 @@
     z-index: 50;
 }
 
+/* --- Offline Mode Styles --- */
+
+/* الشريط العلوي للتنبيه بوضع عدم الاتصال */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(
+        45deg,
+        #f59e0b,
+        #f59e0b 10px,
+        #d97706 10px,
+        #d97706 20px
+    );
+    z-index: 10001;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.offline-active .offline-banner {
+    transform: translateY(0);
+}
+
+/* تعديل زر الأكشن الرئيسي في وضع الاوفلاين */
+.action-btn-offline {
+    background: linear-gradient(to right, #f59e0b, #d97706) !important;
+    border-color: #fcd34d !important;
+}
+
+/* أيقونة التخزين المحلي */
+.local-storage-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fbbf24;
+    z-index: 50;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s;
+}
+
+.offline-active .local-storage-icon {
+    opacity: 1;
+    transform: scale(1);
+    animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* تنسيق زر التحقق من الانترنت */
+.check-net-btn {
+    position: relative;
+    overflow: hidden;
+}
+.check-net-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden bg-slate-900 text-white">
+
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner"></div>
+
+    <!-- Local Storage Indicator -->
+    <div id="localStorageIndicator" class="local-storage-icon">
+        <i class="fas fa-sd-card"></i>
+    </div>
 
     <!-- Toast Container -->
     <div id="toastContainer"></div>
@@ -752,193 +840,194 @@
         </button>
     </div>
 
-<!-- ================= LOGOUT VIEW ================= -->
-<div id="logoutView" class="view-section view-hidden flex items-center justify-center overflow-hidden">
+    <!-- ================= VIEW 0: LOGOUT VIEW ================= -->
+    <div id="logoutView" class="view-section view-hidden flex items-center justify-center overflow-hidden">
 
-    <!-- Background -->
-    <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black"></div>
+        <!-- Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black"></div>
 
-    <!-- Floating Icons -->
-    <div class="absolute inset-0 pointer-events-none">
-        <i class="fas fa-lock floating-logout-icon text-emerald-400"></i>
-        <i class="fas fa-mobile-alt floating-logout-icon text-indigo-400"></i>
-        <i class="fas fa-shield-halved floating-logout-icon text-amber-400"></i>
-    </div>
-
-    <!-- Card -->
-    <div class="relative z-10 glass-card rounded-[2.5rem] p-10 text-center max-w-sm w-full border border-white/10">
-
-        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.4)]">
-            <i class="fas fa-sign-out-alt text-4xl text-emerald-400"></i>
+        <!-- Floating Icons -->
+        <div class="absolute inset-0 pointer-events-none">
+            <i class="fas fa-lock floating-logout-icon text-emerald-400"></i>
+            <i class="fas fa-mobile-alt floating-logout-icon text-indigo-400"></i>
+            <i class="fas fa-shield-halved floating-logout-icon text-amber-400"></i>
         </div>
 
-        <h2 class="text-2xl font-black mb-2">جاري تسجيل الخروج</h2>
+        <!-- Card -->
+        <div class="relative z-10 glass-card rounded-[2.5rem] p-10 text-center max-w-sm w-full border border-white/10">
 
-        <p class="text-gray-400 text-sm leading-relaxed mb-6">
-            يتم إنهاء الجلسة بأمان<br>
-            <span class="text-emerald-400 font-bold">سيظل هذا الجهاز موثوقًا</span><br>
-            لتسجيل دخول أسرع لاحقًا
-        </p>
-
-        <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-            <div id="logoutProgress" class="h-full w-0 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
-        </div>
-
-        <p class="text-[10px] text-gray-500 mt-4 font-mono">
-            Secured Device Session ✓
-        </p>
-    </div>
-</div>
-
-    <!-- ================= VIEW 0: SPLASH SCREEN ================= -->
-<div id="splashView" class="view-section view-active flex flex-col items-center justify-center bg-slate-900">
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse"></div>
-    </div>
-
-    <div class="relative z-10 flex flex-col items-center">
-        <div class="relative w-32 h-32 mb-8">
-            <div class="absolute inset-0 bg-emerald-500 blur-2xl opacity-20"></div>
-            <div class="relative w-full h-full bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-white/10 rounded-[2.5rem] flex items-center justify-center shadow-2xl">
-                <i class="fas fa-bus-alt text-5xl text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-200"></i>
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.4)]">
+                <i class="fas fa-sign-out-alt text-4xl text-emerald-400"></i>
             </div>
-        </div>
 
-        <h1 class="text-3xl font-black text-white tracking-tighter mb-4">
-            Sook <span class="text-emerald-500">Driver</span>
-        </h1>
+            <h2 class="text-2xl font-black mb-2">جاري تسجيل الخروج</h2>
 
-        <div class="flex items-center gap-3 bg-slate-800/50 px-5 py-2 rounded-full border border-white/5 backdrop-blur-md">
-            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-            <span id="splashStatus" class="text-xs font-mono text-emerald-400 tracking-widest">CHECKING SESSION...</span>
-        </div>
-        
-        <div class="w-48 h-1 bg-slate-800 rounded-full mt-6 overflow-hidden">
-            <div id="splashProgress" class="h-full bg-emerald-500 w-0 transition-all duration-1000 ease-out"></div>
-        </div>
-    </div>
-</div>
+            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                يتم إنهاء الجلسة بأمان<br>
+                <span class="text-emerald-400 font-bold">سيظل هذا الجهاز موثوقًا</span><br>
+                لتسجيل دخول أسرع لاحقًا
+            </p>
 
-<div id="loadingView" class="view-section view-hidden flex flex-col items-center justify-center bg-slate-900">
-    <div class="relative z-10 flex flex-col items-center w-full max-w-xs px-6">
-        <div class="relative w-20 h-20 mb-8">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <i class="fas fa-database text-white/50 text-xl animate-pulse"></i>
+            <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <div id="logoutProgress" class="h-full w-0 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
             </div>
-        </div>
 
-        <h2 class="text-xl font-bold text-white mb-2">جاري تجهيز المنصة</h2>
-        <p id="loadingStatusText" class="text-sm text-emerald-400 font-mono mb-6 h-6 text-center">تهيئة الاتصال...</p>
-        
-        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-            <div id="dataLoadProgress" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 w-0 transition-all duration-300 ease-out"></div>
-        </div>
-    </div>
-</div>
-
-    <!-- ================= VIEW 1: LOGIN ================= -->
-<div id="loginView" class="view-section view-hidden relative w-full h-full overflow-hidden bg-slate-900 perspective-1000">
-    
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div id="blob1" class="absolute -top-[20%] -left-[20%] w-[90vw] h-[90vw] bg-emerald-500/20 rounded-full blur-[80px]"></div>
-        <div id="blob2" class="absolute top-[40%] -right-[20%] w-[70vw] h-[70vw] bg-indigo-500/20 rounded-full blur-[70px] opacity-60"></div>
-        <div id="blob3" class="absolute bottom-[-20%] left-[20%] w-[60vw] h-[60vw] bg-teal-500/10 rounded-full blur-[60px]"></div>
-        
-        <div id="particlesContainer" class="absolute inset-0"></div>
-        
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.04]"></div>
-    </div>
-
-    <div id="biometricOverlay" class="absolute inset-0 z-50 pointer-events-none opacity-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-        <div class="relative w-64 h-64 border-2 border-emerald-500/30 rounded-3xl overflow-hidden flex items-center justify-center">
-            <div class="absolute inset-0 border-[4px] border-emerald-500 rounded-3xl opacity-50 scanner-border"></div>
-            <i class="fas fa-fingerprint text-8xl text-emerald-500/20 animate-pulse"></i>
-            <div id="scannerLine" class="absolute top-0 left-0 w-full h-1 bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,1)]"></div>
-            <div class="absolute bottom-4 text-emerald-400 font-mono text-xs tracking-widest">VERIFYING ID...</div>
+            <p class="text-[10px] text-gray-500 mt-4 font-mono">
+                Secured Device Session ✓
+            </p>
         </div>
     </div>
 
-    <div class="relative z-10 flex flex-col h-full justify-between">
-        
-        <div id="logoSection" class="flex-1 flex flex-col items-center justify-center pt-10 pb-6 opacity-0">
-            <div id="logoContainer" class="relative mb-6 group cursor-pointer">
-                <div class="absolute inset-0 bg-emerald-500 blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                
-                <div class="relative w-32 h-32 bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-white/10 rounded-[2.5rem] flex items-center justify-center shadow-2xl transform-style-3d">
-                    <div class="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-emerald-500/20 to-transparent opacity-50"></div>
-                    <i class="fas fa-bus-alt text-6xl text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-200 filter drop-shadow-lg translate-z-20"></i>
+    <!-- ================= VIEW 1: SPLASH SCREEN ================= -->
+    <div id="splashView" class="view-section view-active flex flex-col items-center justify-center bg-slate-900">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center">
+            <div class="relative w-32 h-32 mb-8">
+                <div class="absolute inset-0 bg-emerald-500 blur-2xl opacity-20"></div>
+                <div class="relative w-full h-full bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-white/10 rounded-[2.5rem] flex items-center justify-center shadow-2xl">
+                    <i class="fas fa-bus-alt text-5xl text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-200"></i>
                 </div>
-                
-                <div class="floating-orb absolute -top-4 -right-4 w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-300 rounded-full shadow-lg border border-white/20"></div>
-                <div class="floating-orb absolute bottom-2 -left-6 w-3 h-3 bg-indigo-400 rounded-full shadow-lg"></div>
             </div>
 
-            <h1 class="text-5xl font-black text-white tracking-tighter mb-2 logo-text">
+            <h1 class="text-3xl font-black text-white tracking-tighter mb-4">
                 Sook <span class="text-emerald-500">Driver</span>
             </h1>
-            <div class="logo-badge flex items-center gap-2 bg-slate-800/60 px-4 py-1.5 rounded-full border border-white/5 backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-slate-300 text-xs font-bold tracking-wide">SYSTEM ONLINE</span>
-            </div>
-        </div>
 
-        <div id="loginFormSheet" class="w-full bg-slate-800/40 backdrop-blur-2xl border-t border-white/10 rounded-t-[3.5rem] p-8 shadow-[0_-20px_60px_rgba(0,0,0,0.4)] transform translate-y-[100%]">
+            <div class="flex items-center gap-3 bg-slate-800/50 px-5 py-2 rounded-full border border-white/5 backdrop-blur-md">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                <span id="splashStatus" class="text-xs font-mono text-emerald-400 tracking-widest">CHECKING SESSION...</span>
+            </div>
             
-            <div class="w-16 h-1.5 bg-white/10 rounded-full mx-auto mb-10"></div>
-
-            <div class="space-y-6">
-                <div class="input-group group relative">
-                    <label class="absolute -top-3 right-4 bg-slate-900/90 px-2 text-[10px] font-bold text-emerald-500 rounded border border-emerald-500/20 z-10 transition-all group-focus-within:text-emerald-400">البريد الإلكتروني</label>
-                    <div class="relative overflow-hidden rounded-2xl bg-[#0f172a]/60 border border-white/5 group-focus-within:border-emerald-500/50 group-focus-within:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fas fa-envelope text-slate-500 group-focus-within:text-emerald-400 transition-colors"></i>
-                        </div>
-                        <input type="email" id="loginEmail" 
-                            class="w-full bg-transparent text-white text-right py-4 pl-12 pr-5 focus:outline-none placeholder-slate-600 font-medium"
-                            placeholder="username@sook.com">
-                        <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-emerald-500 transition-all duration-500 group-focus-within:w-full"></div>
-                    </div>
-                </div>
-
-                <div class="input-group group relative">
-                    <label class="absolute -top-3 right-4 bg-slate-900/90 px-2 text-[10px] font-bold text-emerald-500 rounded border border-emerald-500/20 z-10 transition-all group-focus-within:text-emerald-400">كلمة المرور</label>
-                    <div class="relative overflow-hidden rounded-2xl bg-[#0f172a]/60 border border-white/5 group-focus-within:border-emerald-500/50 group-focus-within:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fas fa-lock text-slate-500 group-focus-within:text-emerald-400 transition-colors"></i>
-                        </div>
-                        <input type="password" id="loginPass" 
-                            class="w-full bg-transparent text-white text-right py-4 pl-12 pr-5 focus:outline-none placeholder-slate-600 font-medium tracking-widest"
-                            placeholder="••••••">
-                         <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-emerald-500 transition-all duration-500 group-focus-within:w-full"></div>
-                    </div>
-                </div>
-
-                <button onclick="animateLoginProcess()" id="loginBtn" class="input-group relative w-full h-16 rounded-2xl overflow-hidden group shadow-lg shadow-emerald-900/20 active:scale-95 transition-transform duration-200">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-all duration-300 group-hover:scale-105"></div>
-                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                    
-                    <div id="btnContent" class="relative flex items-center justify-center gap-3 h-full w-full">
-                        <span class="font-bold text-white text-lg tracking-wide">تسجيل الدخول</span>
-                        <i class="fas fa-arrow-left text-white/80 group-hover:-translate-x-1 transition-transform"></i>
-                    </div>
-
-                    <div id="btnLoader" class="absolute inset-0 flex items-center justify-center bg-emerald-700 opacity-0 pointer-events-none">
-                        <i class="fas fa-circle-notch fa-spin text-white text-xl"></i>
-                    </div>
-                </button>
-            </div>
-
-            <div class="mt-8 flex justify-between items-center text-[10px] text-slate-500 font-mono opacity-0 input-group">
-                <span>V2.5.0 STABLE</span>
-                <span class="flex items-center gap-1"><i class="fas fa-shield-alt"></i> SSL SECURE</span>
+            <div class="w-48 h-1 bg-slate-800 rounded-full mt-6 overflow-hidden">
+                <div id="splashProgress" class="h-full bg-emerald-500 w-0 transition-all duration-1000 ease-out"></div>
             </div>
         </div>
     </div>
-</div>
 
-    <!-- ================= VIEW 2: HOME ================= -->
+    <!-- ================= VIEW 2: LOADING DATA ================= -->
+    <div id="loadingView" class="view-section view-hidden flex flex-col items-center justify-center bg-slate-900">
+        <div class="relative z-10 flex flex-col items-center w-full max-w-xs px-6">
+            <div class="relative w-20 h-20 mb-8">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas fa-database text-white/50 text-xl animate-pulse"></i>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-white mb-2">جاري تجهيز المنصة</h2>
+            <p id="loadingStatusText" class="text-sm text-emerald-400 font-mono mb-6 h-6 text-center">تهيئة الاتصال...</p>
+            
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div id="dataLoadProgress" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 w-0 transition-all duration-300 ease-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW 3: LOGIN ================= -->
+    <div id="loginView" class="view-section view-hidden relative w-full h-full overflow-hidden bg-slate-900 perspective-1000">
+        
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <div id="blob1" class="absolute -top-[20%] -left-[20%] w-[90vw] h-[90vw] bg-emerald-500/20 rounded-full blur-[80px]"></div>
+            <div id="blob2" class="absolute top-[40%] -right-[20%] w-[70vw] h-[70vw] bg-indigo-500/20 rounded-full blur-[70px] opacity-60"></div>
+            <div id="blob3" class="absolute bottom-[-20%] left-[20%] w-[60vw] h-[60vw] bg-teal-500/10 rounded-full blur-[60px]"></div>
+            
+            <div id="particlesContainer" class="absolute inset-0"></div>
+            
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.04]"></div>
+        </div>
+
+        <div id="biometricOverlay" class="absolute inset-0 z-50 pointer-events-none opacity-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+            <div class="relative w-64 h-64 border-2 border-emerald-500/30 rounded-3xl overflow-hidden flex items-center justify-center">
+                <div class="absolute inset-0 border-[4px] border-emerald-500 rounded-3xl opacity-50 scanner-border"></div>
+                <i class="fas fa-fingerprint text-8xl text-emerald-500/20 animate-pulse"></i>
+                <div id="scannerLine" class="absolute top-0 left-0 w-full h-1 bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,1)]"></div>
+                <div class="absolute bottom-4 text-emerald-400 font-mono text-xs tracking-widest">VERIFYING ID...</div>
+            </div>
+        </div>
+
+        <div class="relative z-10 flex flex-col h-full justify-between">
+            
+            <div id="logoSection" class="flex-1 flex flex-col items-center justify-center pt-10 pb-6 opacity-0">
+                <div id="logoContainer" class="relative mb-6 group cursor-pointer">
+                    <div class="absolute inset-0 bg-emerald-500 blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                    
+                    <div class="relative w-32 h-32 bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-white/10 rounded-[2.5rem] flex items-center justify-center shadow-2xl transform-style-3d">
+                        <div class="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-emerald-500/20 to-transparent opacity-50"></div>
+                        <i class="fas fa-bus-alt text-6xl text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-200 filter drop-shadow-lg translate-z-20"></i>
+                    </div>
+                    
+                    <div class="floating-orb absolute -top-4 -right-4 w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-300 rounded-full shadow-lg border border-white/20"></div>
+                    <div class="floating-orb absolute bottom-2 -left-6 w-3 h-3 bg-indigo-400 rounded-full shadow-lg"></div>
+                </div>
+
+                <h1 class="text-5xl font-black text-white tracking-tighter mb-2 logo-text">
+                    Sook <span class="text-emerald-500">Driver</span>
+                </h1>
+                <div class="logo-badge flex items-center gap-2 bg-slate-800/60 px-4 py-1.5 rounded-full border border-white/5 backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-slate-300 text-xs font-bold tracking-wide">SYSTEM ONLINE</span>
+                </div>
+            </div>
+
+            <div id="loginFormSheet" class="w-full bg-slate-800/40 backdrop-blur-2xl border-t border-white/10 rounded-t-[3.5rem] p-8 shadow-[0_-20px_60px_rgba(0,0,0,0.4)] transform translate-y-[100%]">
+                
+                <div class="w-16 h-1.5 bg-white/10 rounded-full mx-auto mb-10"></div>
+
+                <div class="space-y-6">
+                    <div class="input-group group relative">
+                        <label class="absolute -top-3 right-4 bg-slate-900/90 px-2 text-[10px] font-bold text-emerald-500 rounded border border-emerald-500/20 z-10 transition-all group-focus-within:text-emerald-400">البريد الإلكتروني</label>
+                        <div class="relative overflow-hidden rounded-2xl bg-[#0f172a]/60 border border-white/5 group-focus-within:border-emerald-500/50 group-focus-within:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-slate-500 group-focus-within:text-emerald-400 transition-colors"></i>
+                            </div>
+                            <input type="email" id="loginEmail" 
+                                class="w-full bg-transparent text-white text-right py-4 pl-12 pr-5 focus:outline-none placeholder-slate-600 font-medium"
+                                placeholder="username@sook.com">
+                            <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-emerald-500 transition-all duration-500 group-focus-within:w-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group group relative">
+                        <label class="absolute -top-3 right-4 bg-slate-900/90 px-2 text-[10px] font-bold text-emerald-500 rounded border border-emerald-500/20 z-10 transition-all group-focus-within:text-emerald-400">كلمة المرور</label>
+                        <div class="relative overflow-hidden rounded-2xl bg-[#0f172a]/60 border border-white/5 group-focus-within:border-emerald-500/50 group-focus-within:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-slate-500 group-focus-within:text-emerald-400 transition-colors"></i>
+                            </div>
+                            <input type="password" id="loginPass" 
+                                class="w-full bg-transparent text-white text-right py-4 pl-12 pr-5 focus:outline-none placeholder-slate-600 font-medium tracking-widest"
+                                placeholder="••••••">
+                            <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-emerald-500 transition-all duration-500 group-focus-within:w-full"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="animateLoginProcess()" id="loginBtn" class="input-group relative w-full h-16 rounded-2xl overflow-hidden group shadow-lg shadow-emerald-900/20 active:scale-95 transition-transform duration-200">
+                        <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-all duration-300 group-hover:scale-105"></div>
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                        
+                        <div id="btnContent" class="relative flex items-center justify-center gap-3 h-full w-full">
+                            <span class="font-bold text-white text-lg tracking-wide">تسجيل الدخول</span>
+                            <i class="fas fa-arrow-left text-white/80 group-hover:-translate-x-1 transition-transform"></i>
+                        </div>
+
+                        <div id="btnLoader" class="absolute inset-0 flex items-center justify-center bg-emerald-700 opacity-0 pointer-events-none">
+                            <i class="fas fa-circle-notch fa-spin text-white text-xl"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="mt-8 flex justify-between items-center text-[10px] text-slate-500 font-mono opacity-0 input-group">
+                    <span>V2.5.0 STABLE</span>
+                    <span class="flex items-center gap-1"><i class="fas fa-shield-alt"></i> SSL SECURE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW 4: HOME ================= -->
     <div id="homeView" class="view-section view-active pt-safe pb-safe px-5 overflow-y-auto overflow-x-hidden hide-scrollbar">
         <div class="fixed top-[-10%] right-[-10%] w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
 <div class="fixed bottom-[-10%] left-[-10%] w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
@@ -1210,7 +1299,7 @@
     </div>
 </div>
 
-    <!-- ================= VIEW 3: MAP VIEW ================= -->
+    <!-- ================= VIEW 5: MAP VIEW ================= -->
     <div id="mapView" class="view-section view-hidden">
         <div id="map"></div>
         
@@ -1550,6 +1639,33 @@
         </div>
     </div>
 
+    <!-- Offline Mode Modal -->
+    <div id="offlineModal" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 p-6">
+        <div class="glass-modal w-full max-w-sm rounded-[2rem] p-6 text-center border border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+            <div class="w-20 h-20 mx-auto mb-4 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/20">
+                <i class="fas fa-wifi-slash text-4xl text-amber-500 animate-pulse"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-white mb-2">انقطع الاتصال بالإنترنت</h3>
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+                أنت الآن في وضع غير متصل. لا تقلق، يمكنك الاستمرار في الرحلة وسيتم حفظ البيانات محلياً على جهازك.
+            </p>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="startOfflineRecording()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    تسجيل الرحلة محلياً
+                </button>
+                
+                <button id="retryNetBtn" onclick="checkConnectionManual()" class="check-net-btn w-full py-3.5 rounded-xl bg-white/10 border border-white/10 text-white font-bold hover:bg-white/20 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>تحقق من الاتصال</span>
+                    <span id="retryCountBadge" class="hidden text-[10px] bg-white/20 px-2 py-0.5 rounded-full">0/3</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- AOS INIT ---
         AOS.init({ once: true, offset: 50, duration: 800 });
@@ -1614,7 +1730,7 @@
             travelTime: 0,            // الوقت المتوقع حسب المرور (ثانية)
             trafficDelay: 0           // تأخير الزحام
         };
-        
+        let isNetworkMonitorActive = false;
         let analyticsInterval = null; // للتحديث اللحظي (1 ثانية)
         let tomtomInterval = null;    // لتحديث حالة المرور (30 ثانية)
 
@@ -1623,6 +1739,13 @@
         const STOP_INFO_TIME = 60 * 1000;        // 1 دقيقة
         const STOP_WARNING_TIME = 120 * 1000;    // 2 دقيقة
 
+        // --- OFFLINE MODE VARIABLES ---
+        let isOfflineMode = false;
+        let offlineRetryCount = 0;
+        const MAX_RETRIES = 3;
+        const OFFLINE_STORAGE_KEY = 'sook_offline_trip_data';
+
+        // دالة مساعدة لحفظ الدالة الأصلية (لمنع التكرار)
         // TomTom Layer State
         let activeLayers = {
             trafficFlow: false,
@@ -2798,37 +2921,48 @@ btn.innerHTML = `
         };
         
         function markStudentBoarded(studentId) {
-            if (!currentTripKey) {
+            if (!currentTripKey && !isOfflineMode) {
                 showToast('يجب بدء الرحلة أولاً لتسجيل الحضور', 'error');
                 return; 
             }
+
             const studentIndex = currentTripStudents.findIndex(s => s.id === studentId);
+            
             if(studentIndex > -1) {
                 currentTripStudents[studentIndex].status = 'boarded';
                 currentTripStudents[studentIndex].boardTime = Date.now();
-                
                 const eventData = { 
                     type: 'boarding', 
                     studentId: studentId, 
-                    ts: Date.now() 
+                    ts: Date.now(),
+                    lat: (currentPos && currentPos.lat) ? currentPos.lat : 0,
+                    lng: (currentPos && currentPos.lng) ? currentPos.lng : 0
                 };
+                
                 currentTripEvents.push(eventData);
-
                 renderStudentsList(false);
-            
-                if(navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(pos => {
-                        eventData.lat = pos.coords.latitude;
-                        eventData.lng = pos.coords.longitude;
+
+                if (isOfflineMode) {
+                    try {
+                        let localData = JSON.parse(localStorage.getItem(OFFLINE_STORAGE_KEY) || '{}');
+                        if(!localData.events) localData.events = [];
                         
-                        // الكتابة في Firebase
+                        localData.events.push(eventData);
+                        localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(localData));
+                        
+                        showToast('تم حفظ الحضور محلياً 💾', 'info');
+                    } catch (e) {
+                        console.error("Local save error:", e);
+                        showToast('حدث خطأ في الحفظ المحلي', 'error');
+                    }
+                } else {
+                    if (currentTripKey) {
                         const eventsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/events');
                         window.rtdbPush(eventsRef, eventData).catch(e => console.error("Error logging boarding:", e));
-                    });
+                    }
                 }
             }
-        }
-        
+        };
         function showStudentDetails(student) {
             studentName.innerText = student.name; studentGrade.innerText = student.grade; studentBadge.innerText = student.badgeId; studentParentPhone.innerText = student.parentPhone; studentAddress.innerText = student.address; studentPhoto.src = student.photo || 'https://via.placeholder.com/150'; callParentBtn.href = `tel:${student.parentPhone}`;
             studentModal.classList.remove('hidden');
@@ -3009,7 +3143,7 @@ btn.innerHTML = `
 
     // 2. إظهار النافذة المنبثقة مع الأزرار الثلاثة
     showCustomModal({
-        icon: '<div class="relative"><i class="fas fa-route text-red-500 text-5xl"></i><i class="fas fa-ban absolute -bottom-2 -right-2 text-white text-2xl bg-red-600 rounded-full p-1 border-2 border-[#1e293b]"></i></div>',
+        icon: '⚠',
         title: 'تنبيه: خروج عن المسار',
         message: `لقد تجاوزت المسافة المقدرة للرحلة (${(allowedRouteDistance/1000).toFixed(1)} كم).\n المسافة الحالية: ${(current/1000).toFixed(1)} كم.\n اختر إجراء لتصحيح الوضع:`,
         actions: [
@@ -3553,30 +3687,106 @@ btn.innerHTML = `
             startAIAnalytics();
         }
 
-        async function toggleTracking() {
-            if (!isTracking) {
-                if (!navigator.geolocation) return;
-                isTracking = true;
-                
-                renderStudentsList(false);
+// المتغير المساعد لحفظ الدالة الأصلية لم يعد له داعٍ الآن، احذفه إن وجد (_superToggleTracking)
 
-                try {
-                    const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
-                    const newTripRef = window.rtdbPush(tripsRef);
-                    currentTripKey = newTripRef.key;
-                    await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
-                    monitorTripStatus(currentTripKey);
-                } catch(e) { console.error("Error creating trip", e); }
-                
-                updateTrackingUI(true);
-                pathLine.setLatLngs([]);
-                startLocationWatcher();
-                startAIAnalytics();
-            } else {
-                stopTracking(true);
-            }
+toggleTracking = async function() {
+    // 1. التحقق: العمل فقط داخل الخريطة
+    if (typeof currentView !== 'undefined' && currentView !== 'map') return;
+
+    // 2. التحقق من دعم الموقع الجغرافي
+    if (!navigator.geolocation) {
+        showToast('الموقع الجغرافي غير مدعوم في هذا المتصفح', 'error');
+        return;
+    }
+
+    // ============================================================
+    // A. منطق إيقاف الرحلة (STOPPING)
+    // ============================================================
+    if (isTracking) {
+        // استدعاء دالة الإيقاف الأصلية (التي تقوم بتصفير العدادات وتحديث الواجهة)
+        // تأكد أن دالة stopTracking(true) تقوم بتحديث isTracking = false
+        if (typeof stopTracking === 'function') {
+            await stopTracking(true);
+        } else {
+            // كود احتياطي للإيقاف اليدوي إذا لم توجد stopTracking
+            isTracking = false;
+            updateTrackingUI(false);
         }
         
+        // تنظيف حالة الأوفلاين والشبكة
+        isOfflineMode = false;
+        deactivateNetworkMonitorForTrip();
+        document.body.classList.remove('offline-active');
+        const btn = document.getElementById('actionBtn');
+        if(btn) btn.classList.remove('action-btn-offline');
+
+        // تنظيف بيانات الاسترداد (Recovery Cleanup)
+        localStorage.removeItem('sook_saved_trip_key');
+        localStorage.removeItem('sook_is_tracking');
+
+        return; // خروج من الدالة
+    }
+
+    // ============================================================
+    // B. منطق بدء الرحلة (STARTING)
+    // ============================================================
+
+    // 1. فحص الإنترنت أولاً
+    if (!navigator.onLine) {
+        console.log("⚠️ محاولة بدء الرحلة بدون إنترنت.");
+        showOfflineModal(); // إظهار النافذة ليسأله: هل تريد التسجيل محلياً؟
+        return; // نتوقف هنا، والمودال هو من سيكمل العملية عبر startOfflineRecording
+    }
+
+    // 2. إذا كان متصلاً -> البدء الفعلي (Online Start)
+    try {
+        isTracking = true;
+        
+        // تحديث قائمة الطلاب (تجهيزها)
+        if (typeof renderStudentsList === 'function') renderStudentsList(false);
+
+        // إنشاء الرحلة في Firebase
+        const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
+        const newTripRef = window.rtdbPush(tripsRef);
+        currentTripKey = newTripRef.key;
+
+        // حفظ بيانات الاسترداد (Recovery Logic) - هام جداً
+        localStorage.setItem('sook_saved_trip_key', currentTripKey);
+        localStorage.setItem('sook_saved_driver_id', currentDriverId);
+        localStorage.setItem('sook_is_tracking', 'true');
+
+        // إرسال البيانات الأولية
+        await window.rtdbSet(newTripRef, { 
+            startTime: Date.now(), 
+            status: 'active', 
+            totalDistance: 0 
+        });
+
+        // مراقبة حالة الرحلة (إذا كانت الدالة موجودة)
+        if (typeof monitorTripStatus === 'function') monitorTripStatus(currentTripKey);
+
+    } catch(e) { 
+        console.error("Error creating trip in Firebase:", e);
+        showToast('حدث خطأ في إنشاء الرحلة، تأكد من الصلاحيات', 'error');
+        isTracking = false;
+        return;
+    }
+    
+    // 3. تحديث الواجهة والخرائط وتشغيل المراقبين
+    updateTrackingUI(true);
+    
+    if (pathLine) pathLine.setLatLngs([]); // تصفير الخط على الخريطة
+    
+    // بدء استقبال الإحداثيات (الدالة التي عدلناها سابقاً)
+    startLocationWatcher(); 
+    
+    // بدء الذكاء الاصطناعي (إذا وجد)
+    if (typeof startAIAnalytics === 'function') startAIAnalytics();
+
+    // تفعيل مراقب الشبكة (للانتقال للأوفلاين إذا قطع النت لاحقاً)
+    activateNetworkMonitorForTrip();
+};
+
         function updateTrackingUI(isActive) {
             const btnSpan = actionBtn ? actionBtn.querySelector('span') : null;
             const btnIcon = actionBtn ? actionBtn.querySelector('i') : null;
@@ -3602,117 +3812,115 @@ btn.innerHTML = `
             return 'clear';                     // سالك (أخضر)
         }
 
-/* =========================================================
-   UPDATED TRACKING WATCHER
-   ========================================================= */
-function startLocationWatcher() {
-    if (watchId) navigator.geolocation.clearWatch(watchId);
-    
-    // متغيرات محلية لتتبع الحالة
-    let lastPos = null; // سيتم تحديثه بأول قراءة أو آخر نقطة من Firebase
-    let totalDist = 0;
-    
-    // محاولة جلب آخر نقطة مسجلة من Firebase عند بدء التتبع (في حالة استئناف الرحلة)
-    if (currentTripKey && currentDriverId) {
-        const pathRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${currentTripKey}/actualPath`);
-        const lastPointQuery = window.rtdbQuery(pathRef, window.rtdbOrderByChild('ts'), window.rtdbLimitToLast(1));
-        
-        window.rtdbGet(lastPointQuery).then(snapshot => {
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    lastPos = child.val(); // تعيين آخر نقطة معروفة
+        /* =========================================================
+        UPDATED TRACKING WATCHER
+        ========================================================= */
+        function startLocationWatcher() {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            
+            // متغيرات محلية لتتبع الحالة
+            let lastPos = null; 
+            let totalDist = 0;
+            
+            // --- 1. استعادة الحالة عند البدء ---
+            
+            // أ) حالة الأونلاين: محاولة جلب آخر نقطة من Firebase
+            if (currentTripKey && currentDriverId && !isOfflineMode) {
+                const pathRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${currentTripKey}/actualPath`);
+                const lastPointQuery = window.rtdbQuery(pathRef, window.rtdbOrderByChild('ts'), window.rtdbLimitToLast(1));
+                
+                window.rtdbGet(lastPointQuery).then(snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(child => {
+                            lastPos = child.val(); // تعيين آخر نقطة معروفة
+                        });
+                    }
                 });
             }
-        });
-    }
-
-    // GAP_THRESHOLD: المسافة بالمتر التي نعتبرها "انقطاع" وتستوجب الترميم
-    const GAP_THRESHOLD = 50; 
-
-    watchId = navigator.geolocation.watchPosition(
-        async pos => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const latLng = [lat, lng];
-            
-            const rawSpeed = pos.coords.speed || 0;
-            const speedKmh = Math.round(rawSpeed * 3.6); 
-            const trafficStatus = estimateTrafficLevel(speedKmh);
-
-            // تحديث المتغيرات العالمية للتحليل
-            currentSpeedKmh = speedKmh; 
-            currentTripDist = totalDist; // totalDist هو المتغير المحلي داخل الدالة الذي يحسب المسافة المقطوعة
-
-            currentPos = {lat, lng};
-            userMarker.setLatLng(latLng);
-            map.panTo(latLng, {animate: true});
-            
-            // --- منطق كشف الانقطاع (Gap Detection) ---
-            if (lastPos) {
-                // 1. حساب المسافة بين النقطة الحالية والسابقة
-                const dist = getDistanceInMeters(lastPos, {lat, lng});
-                
-                // 2. التحقق مما إذا كانت المسافة كبيرة جداً (انقطاع إنترنت/إغلاق تطبيق)
-                if (dist > GAP_THRESHOLD) {
-                    console.log(`Gap detected: ${dist.toFixed(0)} meters. Restoring path...`);
-                    // إيقاف التحديث المؤقت لمنع التداخل أثناء جلب المسار
-                    // (نقوم باستدعاء الدالة وننتظرها)
-                    await processPathGap(lastPos, {lat, lng}, speedKmh);
-                    
-                    // تحديث المسافة الإجمالية بمسافة الطريق الفعلي (تقريبي هنا بناءً على المسافة المستقيمة + معامل تصحيح)
-                    // أو يمكن الاعتماد على مصفوفة النقاط العائدة من processPathGap لدقة أكبر
-                    totalDist += dist * 1.2; // 1.2 معامل تعويض تعرجات الطريق
-                } else {
-                    // الوضع الطبيعي: رسم خط مباشر
-                    pathLine.addLatLng(latLng);
-                    totalDist += dist;
+            // ب) حالة الأوفلاين: محاولة جلب آخر نقطة من التخزين المحلي
+            else if (isOfflineMode) {
+                try {
+                    const localData = JSON.parse(localStorage.getItem(OFFLINE_STORAGE_KEY) || '{"path":[]}');
+                    if (localData.path && localData.path.length > 0) {
+                        lastPos = localData.path[localData.path.length - 1];
+                    }
+                } catch (e) {
+                    console.error("Error retrieving local offline path", e);
                 }
-            } else {
-                // أول نقطة في الجلسة
-                pathLine.addLatLng(latLng);
             }
+            // GAP_THRESHOLD: المسافة بالمتر التي نعتبرها "انقطاع" وتستوجب الترميم
+            const GAP_THRESHOLD = 50; 
 
-            // تحديث الواجهة
-            const distEl = document.getElementById('distanceDisplay');
-            const speedEl = document.getElementById('speedDisplay');
+            watchId = navigator.geolocation.watchPosition(
+                async pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const latLng = [lat, lng];
+                    
+                    const rawSpeed = pos.coords.speed || 0;
+                    const speedKmh = Math.round(rawSpeed * 3.6); 
+                    const trafficStatus = estimateTrafficLevel(speedKmh);
 
-            if(distEl) distEl.innerText = (totalDist/1000).toFixed(2) + " كم";
-            checkDistanceLimit(totalDist);
-            
-            if(speedEl) {
-                speedEl.innerText = speedKmh;
-                speedEl.style.color = speedKmh > 100 ? '#ef4444' : (speedKmh > 80 ? '#f59e0b' : 'white');
-            }
-            
-            // تخزين النقطة الحالية لتكون "السابقة" في الدورة القادمة
-            const currentPointData = { 
-                lat: lat, 
-                lng: lng, 
-                ts: Date.now(),
-                s: speedKmh,       
-                t: trafficStatus   
-            };
+                    // تحديث المتغيرات العالمية للتحليل
+                    currentSpeedKmh = speedKmh; 
+                    currentTripDist = totalDist; 
 
-            // الحفظ في Firebase
-            if(currentTripKey && isTracking) {
-                const pathRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/actualPath');
-                window.rtdbPush(pathRef, currentPointData).catch(error => {
-                    console.warn("فشل تسجيل النقطة:", error);
-                });
-                
-                const tripMetaRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
-                window.rtdbUpdate(tripMetaRef, { totalDistance: totalDist / 1000 });
-            }
+                    currentPos = {lat, lng};
+                    userMarker.setLatLng(latLng);
+                    map.panTo(latLng, {animate: true});
+                    
+                    // --- منطق كشف الانقطاع (Gap Detection) ---
+                    if (lastPos) {
+                        const dist = getDistanceInMeters(lastPos, {lat, lng});
+                        
+                        // التعديل: تفعيل الترميم فقط إذا كنا متصلين بالانترنت (!isOfflineMode)
+                        // لأن الترميم يتطلب جلب بيانات من سيرفرات الخرائط
+                        if (dist > GAP_THRESHOLD && !isOfflineMode) {
+                            console.log(`Gap detected: ${dist.toFixed(0)} meters. Restoring path...`);
+                            await processPathGap(lastPos, {lat, lng}, speedKmh);
+                            totalDist += dist * 1.2; 
+                        } else {
+                            // الوضع الطبيعي أو وضع الأوفلاين (رسم خط مباشر)
+                            pathLine.addLatLng(latLng);
+                            totalDist += dist;
+                        }
+                    } else {
+                        // أول نقطة في الجلسة
+                        pathLine.addLatLng(latLng);
+                    }
 
-            // تحديث lastPos للنقطة القادمة
-            lastPos = currentPointData;
-        },
-        err => console.error(err),
-        { enableHighAccuracy: true, maximumAge: 0 }
-    );
-}
+                    // تحديث الواجهة
+                    const distEl = document.getElementById('distanceDisplay');
+                    const speedEl = document.getElementById('speedDisplay');
+
+                    if(distEl) distEl.innerText = (totalDist/1000).toFixed(2) + " كم";
+                    checkDistanceLimit(totalDist);
+                    
+                    if(speedEl) {
+                        speedEl.innerText = speedKmh;
+                        speedEl.style.color = speedKmh > 100 ? '#ef4444' : (speedKmh > 80 ? '#f59e0b' : 'white');
+                    }
+                    
+                    // --- التعديل الجوهري: استبدال كود Firebase المباشر باستدعاء الدالة الموحدة ---
+                    // هذه الدالة ستقرر الحفظ محلياً أو سحابياً بناءً على الحالة
+                    handleLocationUpdate(lat, lng, speedKmh, trafficStatus);
+
+                    // تحديث lastPos للنقطة القادمة
+                    lastPos = { 
+                        lat: lat, 
+                        lng: lng, 
+                        ts: Date.now(),
+                        s: speedKmh,       
+                        t: trafficStatus   
+                    };
+                },
+                err => console.error(err),
+                { enableHighAccuracy: true, maximumAge: 0 }
+            );
+        };
 
         async function stopTracking(resetUI) {
+            deactivateNetworkMonitorForTrip();
             if (tripStatusUnsubscribe) {
                 tripStatusUnsubscribe();
                 tripStatusUnsubscribe = null;
@@ -3738,6 +3946,8 @@ function startLocationWatcher() {
                 setTimeout(returnToHome, 1500);
             }
             stopAIAnalytics();
+            localStorage.removeItem('sook_saved_trip_key');
+            localStorage.removeItem('sook_is_tracking');
         }
         // --- ADMIN ACTION MONITORING ---
 
@@ -3945,51 +4155,109 @@ if (typeof _originalHandleLogin === 'undefined') {
 }
 
 
-            // --- INITIALIZATION (المنطق المصحح) ---
-            document.addEventListener('DOMContentLoaded', () => {
-                
-                // تحريك شريط البداية (Splash)
-                const splashProgress = document.getElementById('splashProgress');
-                if(splashProgress) setTimeout(() => splashProgress.style.width = '70%', 100);
+// ==========================================
+// ===     نقطة انطلاق النظام (MAIN)      ===
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
 
-                // التحقق من حالة المستخدم
-                if(window.auth) {
-                    window.onAuthStateChanged(window.auth, (user) => {
-                        const statusText = document.getElementById('splashStatus');
-                        
-                        if (user) {
-                            // === مسجل دخول ===
-                            if(statusText) statusText.innerText = "VERIFYING ID...";
-                            if(splashProgress) splashProgress.style.width = '100%';
+    // 1. تهيئة المكتبات الأساسية أولاً (مهم جداً للخريطة)
+    if(typeof AOS !== 'undefined') AOS.init();
+    if(typeof initMap === 'function') initMap(); 
 
-                            setTimeout(() => {
-                                // الدالة handleAutoLogin ستنادي loginSuccess التي ستفتح Loading View
-                                handleAutoLogin(user.uid); 
-                            }, 800); 
+    // 2. تحريك شريط البداية (من كودك الأصلي)
+    const splashProgress = document.getElementById('splashProgress');
+    if(splashProgress) setTimeout(() => splashProgress.style.width = '70%', 100);
 
-                        } else {
-                            // === غير مسجل ===
-                            setTimeout(() => {
-                                // إخفاء Splash وإظهار Login
-                                showView('login');
-                                
-                                // تشغيل أنيميشن الدخول
-                                if(typeof initLoginAnimations === 'function') {
-                                    initLoginAnimations();
-                                }
-                            }, 500);
-                        }
-                    });
-                } else {
-                    // Fallback
+    // 3. استرجاع بيانات الرحلة المحفوظة (للاسترداد)
+    const savedTripKey = localStorage.getItem('sook_saved_trip_key');
+    const savedDriverId = localStorage.getItem('sook_saved_driver_id');
+    const wasTracking = localStorage.getItem('sook_is_tracking') === 'true';
+
+    // تعيين المتغيرات العامة إذا وجدت
+    if (savedDriverId) currentDriverId = savedDriverId;
+    if (savedTripKey) currentTripKey = savedTripKey;
+
+    // ============================================================
+    // 🔴 المسار السريع: وضع أوفلاين + رحلة نشطة
+    // ============================================================
+    // إذا النت مقطوع والسائق كان في رحلة، ندخله فوراً دون انتظار Firebase
+    if (!navigator.onLine && (wasTracking || savedTripKey)) {
+        console.log("⚠️ وضع أوفلاين + رحلة نشطة: تجاوز الدخول واسترداد الجلسة.");
+        
+        // تحديث واجهة التحميل يدوياً
+        if(splashProgress) splashProgress.style.width = '100%';
+        const statusText = document.getElementById('splashStatus');
+        if(statusText) statusText.innerText = "OFFLINE RECOVERY...";
+
+        setTimeout(() => {
+            // استرداد الجلسة محلياً
+            restoreOfflineSession();
+            // الانتقال للخريطة
+            showView('map');
+        }, 500);
+
+        return; // ⛔ توقف هنا، لا تكمل لكود Auth بالأسفل
+    }
+
+    // ============================================================
+    // 🔵 المسار الطبيعي: التحقق من المستخدم (Firebase Auth)
+    // ============================================================
+    if(window.auth) {
+        window.onAuthStateChanged(window.auth, async (user) => {
+            const statusText = document.getElementById('splashStatus');
+            
+            if (user) {
+                // === (أ) المستخدم مسجل دخول ===
+                if(statusText) statusText.innerText = "VERIFYING ID...";
+                if(splashProgress) splashProgress.style.width = '100%';
+
+                // تشغيل منطق الدخول الخاص بك
+                setTimeout(() => {
+                    handleAutoLogin(user.uid); 
+                }, 800); 
+
+                // --- [إضافة جديدة] ---
+                // إذا كنا أونلاين، تحقق من المزامنة والاسترداد
+                if (navigator.onLine) {
+                    console.log("🟢 متصل: فحص المزامنة والاسترداد...");
+                    
+                    // 1. هل توجد بيانات "أوفلاين" تحتاج رفع؟
+                    await checkForPendingSync();
+
+                    // 2. هل كانت هناك رحلة أونلاين تحتاج استكمال؟
+                    if (wasTracking || currentTripKey) {
+                        // ننتظر قليلاً (1 ثانية) لضمان أن handleAutoLogin انتهى من جلب البيانات
+                        setTimeout(() => {
+                            restoreOnlineSession();
+                        }, 1200);
+                    }
+                }
+
+            } else {
+                // === (ب) المستخدم غير مسجل ===
+                setTimeout(() => {
+                    // إذا كنا أوفلاين ولا توجد رحلة، نعرض رسالة خطأ
+                    if (!navigator.onLine) {
+                        handleOfflineStatus();
+                    }
+
                     showView('login');
-                }
+                    if(typeof initLoginAnimations === 'function') {
+                        initLoginAnimations();
+                    }
+                }, 500);
+            }
+        });
+    } else {
+        // Fallback
+        showView('login');
+    }
 
-                // إعداد مستمع التايم لاين
-                if(typeof timelineSlider !== 'undefined' && timelineSlider) {
-                    timelineSlider.addEventListener('input', handleTimelineInput);
-                }
-            });
+    // إعداد مستمع التايم لاين (من كودك الأصلي)
+    if(typeof timelineSlider !== 'undefined' && timelineSlider) {
+        timelineSlider.addEventListener('input', handleTimelineInput);
+    }
+});
 
         /* =========================================================
             SMART SHIFT BUTTON LOGIC (GSAP POWERED)
@@ -4769,15 +5037,468 @@ function closeCustomModal() {
 }
 
 
-        // Drag Logic & Bottom Sheet
-        let startY = 0; let isDragging = false; let isExpanded = false;
-        dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
-        dragHandle.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); });
-        dragHandle.addEventListener('touchend', (e) => { isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.changedTouches[0].clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
-        dragHandle.addEventListener('mousedown', (e) => { startY = e.clientY; isDragging = true; panel.style.transition = 'none'; });
-        window.addEventListener('mouseup', (e) => { if(!isDragging) return; isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
-        function expandPanel() { panel.style.transform = 'translateY(0)'; isExpanded = true; expandedContent.style.opacity = '1'; }
-        function collapsePanel() { panel.style.transform = 'translateY(calc(85vh - 180px))'; isExpanded = false; expandedContent.style.opacity = '0.5'; panel.querySelector('.overflow-y-auto').scrollTop = 0; }
+// Drag Logic & Bottom Sheet
+let startY = 0; let isDragging = false; let isExpanded = false;
+
+// 1. Touch Start
+dragHandle.addEventListener('touchstart', (e) => { 
+    startY = e.touches[0].clientY; 
+    isDragging = true; 
+    panel.style.transition = 'none'; 
+}, { passive: true }); // passive: true هنا جيد للأداء
+
+// 2. Touch Move (التعديل هنا)
+dragHandle.addEventListener('touchmove', (e) => { 
+    if (!isDragging) return;
+    
+    // الحل للمشكلة: التحقق من قابلية الإلغاء
+    if (e.cancelable) {
+        e.preventDefault(); 
+    }
+    
+    // يمكنك إضافة منطق تحريك البانل هنا إذا أردت أن يتحرك مع اصبعك
+    // const currentY = e.touches[0].clientY;
+    // const delta = currentY - startY;
+    // panel.style.transform = ... 
+
+}, { passive: false }); // <--- هام جداً: هذا يحل مشكلة الـ Intervention
+
+// 3. Touch End
+dragHandle.addEventListener('touchend', (e) => { 
+    isDragging = false; 
+    panel.style.transition = 'transform 0.3s ease-out'; 
+    const dist = startY - e.changedTouches[0].clientY; 
+    if (dist > 50) expandPanel(); 
+    else if (dist < -50) collapsePanel(); 
+    else { if(isExpanded) expandPanel(); else collapsePanel(); } 
+});
+
+// Mouse Events (للكمبيوتر)
+dragHandle.addEventListener('mousedown', (e) => { startY = e.clientY; isDragging = true; panel.style.transition = 'none'; });
+window.addEventListener('mouseup', (e) => { if(!isDragging) return; isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
+
+function expandPanel() { panel.style.transform = 'translateY(0)'; isExpanded = true; expandedContent.style.opacity = '1'; }
+function collapsePanel() { panel.style.transform = 'translateY(calc(85vh - 180px))'; isExpanded = false; expandedContent.style.opacity = '0.5'; panel.querySelector('.overflow-y-auto').scrollTop = 0; }
+
+
+        // تهيئة النظام
+function initOfflineSystem() {
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOfflineStatus);
+
+    if (!navigator.onLine) {
+        handleOfflineStatus();
+    } else {
+        checkForPendingSync();
+    }
+}
+
+// التعامل مع انقطاع النت
+function handleOfflineStatus() {
+    isOfflineMode = true;
+    document.body.classList.add('offline-active');
+    
+    // تحديث الزر فقط إذا كنا في الخريطة
+    const btn = document.getElementById('actionBtn');
+    if(btn && currentView === 'map') {
+       btn.classList.add('action-btn-offline');
+       // تحديث النص أو الأيقونة ليشير للوضع المحلي إذا أردت
+       const btnSpan = btn.querySelector('span');
+       if(btnSpan && isTracking) btnSpan.innerText = "إنهاء الرحلة (وضع محلي)";
+    }
+}
+
+// التعامل مع عودة النت
+function handleOnlineStatus() {
+    isOfflineMode = false;
+    document.body.classList.remove('offline-active');
+    const btn = document.getElementById('actionBtn');
+    if(btn) btn.classList.remove('action-btn-offline');
+    
+    const modal = document.getElementById('offlineModal');
+    if(modal && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+        modal.classList.remove('opacity-100');
+    }
+    checkForPendingSync();
+}
+function restoreOfflineSession() {
+    console.log("♻️ استرداد الجلسة في وضع الأوفلاين...");
+    
+    // 1. تحديث المتغيرات
+    isTracking = true;
+    isOfflineMode = true;
+    
+    // 2. تحديث الواجهة (إظهار زر الإيقاف، إخفاء القوائم، إلخ)
+    updateTrackingUI(true); 
+    document.body.classList.add('offline-active');
+    
+    const btn = document.getElementById('actionBtn');
+    if(btn) btn.classList.add('action-btn-offline');
+    
+    const indicator = document.getElementById('localStorageIndicator');
+    if(indicator) indicator.style.opacity = '1';
+
+    showToast('تم استعادة الرحلة (وضع محلي) 💾', 'info');
+
+    // 3. التأكد من وجود ملف محلي، وإذا لم يوجد ننشئه بالمفتاح المسترجع
+    const rawData = localStorage.getItem(OFFLINE_STORAGE_KEY);
+    if (!rawData && currentTripKey) {
+        // حالة نادرة: انقطاع أثناء التحميل، ننشئ ملف طوارئ لاستكمال الرحلة
+        const localData = {
+            startTime: Date.now(), // وقت تقريبي
+            driverId: currentDriverId,
+            tripKey: currentTripKey, // المفتاح المسترجع
+            status: 'active',
+            path: [],
+            events: []
+        };
+        localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(localData));
+    }
+
+    // 4. تشغيل المراقبة
+    activateNetworkMonitorForTrip(); // لمراقبة عودة النت
+    startLocationWatcher(); // لبدء التسجيل
+}
+function restoreOnlineSession() {
+    if (!currentTripKey || !currentDriverId) return;
+
+    console.log("♻️ استرداد الجلسة من Firebase...");
+    isTracking = true;
+    isOfflineMode = false;
+    
+    updateTrackingUI(true);
+    activateNetworkMonitorForTrip(); // مهم جداً إضافتها هنا أيضاً
+
+    // إعادة الاستماع لبيانات الرحلة من Firebase
+    // (هنا تضع الكود الخاص بك الذي يرسم المسار القديم على الخريطة)
+    // مثال:
+    const tripRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${currentTripKey}`);
+    
+    // استرجاع المسار القديم لرسمه (اختياري)
+    window.rtdbGet(tripRef).then(snapshot => {
+        if(snapshot.exists()) {
+            const data = snapshot.val();
+            // منطق رسم المسار القديم على الخريطة if (data.actualPath) ...
+        }
+    });
+
+    // بدء التتبع الجديد
+    startLocationWatcher();
+}
+// التحقق اليدوي من الاتصال
+function checkConnectionManual() {
+    const btn = document.getElementById('retryNetBtn');
+    const btnText = btn.querySelector('span:first-of-type');
+    const icon = btn.querySelector('i');
+
+    icon.classList.add('fa-spin');
+    btnText.innerText = 'جاري التحقق...';
+    btn.disabled = true;
+
+    // محاولة الاتصال بصورة خفيفة للتأكد
+    fetch('https://www.google.com/favicon.ico?' + new Date().getTime(), { mode: 'no-cors' })
+        .then(() => {
+            setTimeout(() => {
+                showToast('تم الاتصال! 🟢', 'success');
+                // إذا كنا في وضع البدء ولم تبدأ الرحلة بعد
+                if(!isTracking) {
+                    const modal = document.getElementById('offlineModal');
+                    modal.classList.add('hidden');
+                    // يمكن استدعاء toggleTracking مرة أخرى لبدء الرحلة أونلاين
+                    toggleTracking();
+                } else {
+                    // إذا كنا أثناء الرحلة
+                    onTripConnectionRestored();
+                }
+                resetCheckBtn(btn, icon, btnText);
+            }, 1000);
+        })
+        .catch(() => {
+            setTimeout(() => {
+                showToast('ما زال الإنترنت مقطوعاً 🔴', 'error');
+                resetCheckBtn(btn, icon, btnText);
+            }, 1000);
+        });
+}
+
+
+function resetCheckBtn(btn, icon, btnText) {
+    icon.classList.remove('fa-spin');
+    btnText.innerText = 'تحقق من الاتصال';
+    btn.disabled = false;
+}
+
+// دالة بدء التسجيل المحلي (يتم استدعاؤها من زر داخل المودال)
+function startOfflineRecording() {
+    console.log("🚀 بدء التسجيل المحلي...");
+
+    // 1. إخفاء المودال
+    const modal = document.getElementById('offlineModal');
+    if(modal) { modal.classList.remove('opacity-100'); setTimeout(() => modal.classList.add('hidden'), 300); }
+
+    // 2. تحديث الحالة
+    isTracking = true;
+    isOfflineMode = true;
+    updateTrackingUI(true);
+    
+    // 3. تحديث الواجهة
+    updateTrackingUI(true); // دالة تحديث الزر للأحمر
+    
+    const indicator = document.getElementById('localStorageIndicator');
+    if(indicator) indicator.style.opacity = '1';
+    
+    document.body.classList.add('offline-active');
+    const btn = document.getElementById('actionBtn');
+    if(btn) btn.classList.add('action-btn-offline');
+
+    // 4. إنشاء ملف البيانات
+    const offlineTrip = {
+        startTime: Date.now(),
+        driverId: currentDriverId || 'unknown',
+        // هام جداً: حفظ المفتاح الحالي
+        tripKey: currentTripKey || null, 
+        status: 'active',
+        path: [],
+        events: []
+    };
+    
+    localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineTrip));
+    showToast('تم التحويل للوضع المحلي 💾', 'info');
+
+    // 5. تشغيل المراقبة
+    activateNetworkMonitorForTrip();
+    if (typeof startLocationWatcher === 'function') startLocationWatcher();
+};
+
+// ============================================================
+// 1. دالة تسجيل النقاط (الذكية)
+// ============================================================
+function handleLocationUpdate(lat, lng, speedKmh, trafficStatus) {
+    // تجهيز بيانات النقطة
+    const pointData = { 
+        lat: lat, 
+        lng: lng, 
+        ts: Date.now(), 
+        s: speedKmh, 
+        t: trafficStatus 
+    };
+
+    // أ) حالة الأوفلاين (التخزين المحلي)
+    if (isOfflineMode) {
+        try {
+            const rawData = localStorage.getItem(OFFLINE_STORAGE_KEY);
+            let localData = rawData ? JSON.parse(rawData) : null;
+
+            // إذا لم يوجد ملف (انقطع النت فجأة)، ننشئ واحداً ونحفظ مفتاح الرحلة الحالية
+            if (!localData) {
+                console.log("⚠️ إنشاء ملف طوارئ محلي...");
+                localData = {
+                    startTime: Date.now(),
+                    driverId: currentDriverId,
+                    // [هام جداً] نحفظ المفتاح الحالي لنعرف الرحلة التي سنكمل عليها
+                    tripKey: currentTripKey || null,
+                    status: 'active',
+                    path: [],
+                    events: []
+                };
+            }
+
+            if (!localData.path) localData.path = [];
+            
+            // إضافة النقطة للمصفوفة المحلية
+            localData.path.push(pointData);
+
+            // الحفظ الفعلي في المتصفح
+            localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(localData));
+
+        } catch (e) {
+            console.error("Local Save Error:", e);
+        }
+    } 
+    // ب) حالة الأونلاين (Firebase مباشر)
+    else {
+        if(currentTripKey) {
+            // نستخدم Push لإرسال النقطة فوراً
+            const pathRef = window.rtdbRef(window.db, `drivers/${currentDriverId}/trips/${currentTripKey}/actualPath`);
+            window.rtdbPush(pathRef, pointData).catch(() => {});
+        }
+    }
+}
+
+// ============================================================
+// 2. دالة المزامنة (الدمج والاستكمال)
+// ============================================================
+async function checkForPendingSync() {
+    // قراءة البيانات
+    const rawData = localStorage.getItem(OFFLINE_STORAGE_KEY);
+    if (!rawData) return;
+
+    const offlineData = JSON.parse(rawData);
+    
+    // تجاهل الملفات الفارغة
+    if ((!offlineData.path || offlineData.path.length === 0) && (!offlineData.events || offlineData.events.length === 0)) {
+        localStorage.removeItem(OFFLINE_STORAGE_KEY);
+        return;
+    }
+
+    // واجهة المستخدم (Toast + Icon)
+    showToast('جاري استكمال مسار الرحلة... ☁️', 'info');
+    const indicator = document.getElementById('localStorageIndicator');
+    if(indicator) indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+
+    try {
+        let tripRefPath; // سيحمل مسار الرحلة في قاعدة البيانات
+        const updates = {}; // لتجميع كل التحديثات وارسالها مرة واحدة
+
+        // ---------------------------------------------------------
+        // السيناريو (أ): الرحلة كانت قائمة ولدينا مفتاحها
+        // ---------------------------------------------------------
+        if (offlineData.tripKey) {
+            console.log("🔄 دمج نقاط مع رحلة موجودة:", offlineData.tripKey);
+            
+            // نستعيد المفتاح ونكمل عليه
+            currentTripKey = offlineData.tripKey;
+            
+            // نحدد المسار للرحلة الموجودة
+            tripRefPath = `drivers/${offlineData.driverId}/trips/${currentTripKey}`;
+
+            // *ملاحظة هامة*: لا نرسل startTime أو status لكي لا نعيد ضبط الرحلة
+        } 
+        // ---------------------------------------------------------
+        // السيناريو (ب): الرحلة بدأت والنترنت مقطوع (لا يوجد مفتاح)
+        // ---------------------------------------------------------
+        else {
+            console.log("✨ إنشاء رحلة جديدة (بدأت أوفلاين)");
+            
+            // ننشئ مفتاح جديد في فايربيس
+            const tripsRef = window.rtdbRef(window.db, `drivers/${offlineData.driverId}/trips`);
+            const newTripRef = window.rtdbPush(tripsRef);
+            currentTripKey = newTripRef.key;
+            tripRefPath = `drivers/${offlineData.driverId}/trips/${currentTripKey}`;
+
+            // هنا فقط نرسل البيانات التأسيسية
+            updates[`${tripRefPath}/startTime`] = offlineData.startTime;
+            updates[`${tripRefPath}/status`] = 'active'; 
+            updates[`${tripRefPath}/createdViaSync`] = true;
+        }
+
+        // ---------------------------------------------------------
+        // دمج النقاط (Core Logic)
+        // ---------------------------------------------------------
+        
+        // تسجيل وقت المزامنة
+        updates[`${tripRefPath}/lastSyncTime`] = Date.now();
+
+        // 1. دمج نقاط المسار (Coordinates)
+        if(offlineData.path && offlineData.path.length > 0) {
+            offlineData.path.forEach(p => {
+                // نولد مفتاح فريد (Push ID) لكل نقطة حتى تضاف للقائمة ولا تستبدلها
+                const newPointKey = window.rtdbPush(window.rtdbChild(window.rtdbRef(window.db), 'dummy')).key;
+                
+                // الصيغة: مسار_الرحلة / actualPath / المفتاح_الجديد = البيانات
+                updates[`${tripRefPath}/actualPath/${newPointKey}`] = p;
+            });
+        }
+        
+        // 2. دمج الأحداث (Events) مثل ركوب الطلاب
+        if (offlineData.events && offlineData.events.length > 0) {
+             offlineData.events.forEach(e => {
+                const newEventKey = window.rtdbPush(window.rtdbChild(window.rtdbRef(window.db), 'dummy')).key;
+                updates[`${tripRefPath}/events/${newEventKey}`] = e;
+            });
+        }
+
+        // ---------------------------------------------------------
+        // تنفيذ التحديث (Atomic Update)
+        // ---------------------------------------------------------
+        // نستخدم Ref للجذر لأن مفاتيح updates تحتوي على المسارات الكاملة
+        await window.rtdbUpdate(window.rtdbRef(window.db), updates);
+
+        // التنظيف والعودة للوضع الطبيعي
+        localStorage.removeItem(OFFLINE_STORAGE_KEY);
+        isOfflineMode = false;
+        
+        // إزالة مؤثرات الأوفلاين من الواجهة
+        document.body.classList.remove('offline-active');
+        const btn = document.getElementById('actionBtn');
+        if(btn) btn.classList.remove('action-btn-offline');
+        
+        showToast('تم دمج البيانات بنجاح ✅', 'success');
+        
+        if(indicator) {
+            indicator.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+        }
+
+    } catch (error) {
+        console.error("Sync Failed", error);
+        showToast('فشل المزامنة، سيتم المحاولة لاحقاً', 'error');
+    }
+}
+
+// اعتراض زر بدء الرحلة
+const _superToggleTracking = (typeof toggleTracking !== 'undefined') ? toggleTracking : null;
+
+
+// دالة لإظهار المودال
+function showOfflineModal() {
+    const modal = document.getElementById('offlineModal');
+    if(modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('opacity-100'), 10);
+    }
+    showToast('لا يوجد اتصال بالإنترنت! ⚠️', 'warning');
+}
+
+// تفعيل مراقبة الشبكة أثناء الرحلة
+function activateNetworkMonitorForTrip() {
+    if (isNetworkMonitorActive) return;
+    window.addEventListener('offline', onTripConnectionLost);
+    window.addEventListener('online', onTripConnectionRestored);
+    isNetworkMonitorActive = true;
+}
+
+// إلغاء مراقبة الشبكة عند الإيقاف
+function deactivateNetworkMonitorForTrip() {
+    window.removeEventListener('offline', onTripConnectionLost);
+    window.removeEventListener('online', onTripConnectionRestored);
+    isNetworkMonitorActive = false;
+}
+
+// === الحدث المهم: انقطاع النت أثناء السير ===
+function onTripConnectionLost() {
+    if (!isTracking) return;
+
+    console.log("⚠️ انقطع الاتصال أثناء الرحلة!");
+    
+    // 1. تحويل فوري للوضع المحلي (لعدم ضياع البيانات)
+    isOfflineMode = true;
+    document.body.classList.add('offline-active');
+    
+    // 2. إظهار المودال كما طلبت
+    showOfflineModal();
+    
+    // 3. رسالة توست
+    showToast('انقطع الإنترنت! يرجى تأكيد التسجيل المحلي', 'error');
+}
+
+// === الحدث المهم: عودة النت ===
+function onTripConnectionRestored() {
+    if (!isTracking) return;
+
+    console.log("🟢 عاد الاتصال!");
+    
+    // إخفاء المودال لو كان مفتوحاً
+    const modal = document.getElementById('offlineModal');
+    if(modal && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+    }
+
+    // بدء المزامنة
+    checkForPendingSync();
+}
+
     </script>
 </body>
 </html>
