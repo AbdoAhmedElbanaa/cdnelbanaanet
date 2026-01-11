@@ -499,6 +499,76 @@
         background: rgba(15, 23, 42, 0.85); /* Darker on mobile for readability */
     }
 }
+/* --- Dashboard Scrollbar --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+}
+
+/* --- Nav Item Active State --- */
+.nav-item-active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 100%);
+    border-right: 3px solid #6366f1;
+    color: white !important;
+}
+.nav-item-active i {
+    color: #818cf8; /* Indigo-400 */
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+}
+
+/* --- Sidebar Glass Enhancement --- */
+.sidebar-glass {
+    background: rgba(15, 23, 42, 0.6); /* Slate-900 with opacity */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+}
+
+/* --- Floating Header Glass --- */
+.header-glass {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+/* Fleet Feed Adjustments for Side Panel */
+.fleet-card {
+    /* تصغير الحواف والمسافات لتناسب العرض الجانبي */
+    border-radius: 1.5rem !important;
+    padding: 1.25rem !important; 
+}
+
+/* Ensure the map container fills the parent properly */
+#home-map canvas {
+    border-radius: 2rem;
+}
+
+/* Custom Scrollbar for the feed list */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+}
     </style>
 </head>
 <body class="text-slate-200">
@@ -653,317 +723,448 @@
 </section>
 
         <!-- Main Dashboard Layout -->
-        <div id="dashboard-layout" class="flex w-full hidden opacity-0">
+<div id="dashboard-layout" class="flex w-full h-screen hidden opacity-0 bg-[#0f172a] overflow-hidden relative">
+    
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <aside class="sidebar-glass w-20 lg:w-72 h-full flex flex-col transition-all duration-300 z-40 relative">
+        
+        <div class="h-24 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
-            <!-- Sidebar -->
-            <aside class="w-20 lg:w-64 glass-panel border-l border-white/10 flex flex-col transition-all duration-300 z-30">
-                <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-white/10">
-                    <i class="ph ph-steering-wheel text-3xl text-indigo-400 lg:ml-3"></i>
-                    <span class="font-bold text-lg hidden lg:block">النقل الذكي</span>
+            <div class="relative z-10 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <i class="ph-fill ph-steering-wheel text-white text-xl"></i>
+                </div>
+                <div class="hidden lg:block">
+                    <h1 class="font-bold text-lg text-white tracking-wide">النقل الذكي</h1>
+                    <p class="text-[10px] text-indigo-300 font-mono tracking-widest uppercase">Dashboard v2.0</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 py-8 px-4 space-y-2 overflow-y-auto custom-scrollbar">
+            
+            <p class="hidden lg:block text-[10px] font-bold text-slate-500 px-4 mb-2 uppercase tracking-wider">القائمة الرئيسية</p>
+
+            <button onclick="App.navigate('home')" id="nav-home" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-squares-four text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">الرئيسية</span>
+            </button>
+
+            <button onclick="App.navigate('tracking')" id="nav-tracking" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-crosshair text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">تتبع الرحلات</span>
+            </button>
+
+            <button onclick="App.navigate('map')" id="nav-map" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-map-trifold text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">الخريطة الكاملة</span>
+            </button>
+
+            <p class="hidden lg:block text-[10px] font-bold text-slate-500 px-4 mt-6 mb-2 uppercase tracking-wider">الإدارة</p>
+
+            <button onclick="App.navigate('drivers')" id="nav-drivers" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-steering-wheel text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">السائقين</span>
+            </button>
+
+            <button onclick="App.navigate('students')" id="nav-students" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-student text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">الطلاب</span>
+            </button>
+
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-4"></div>
+
+            <button onclick="App.navigate('settings')" id="nav-settings" class="sidebar-item w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-indigo-500/10 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
+                <i class="ph ph-gear text-2xl relative z-10 transition-colors"></i>
+                <span class="hidden lg:block font-medium text-sm relative z-10">الإعدادات</span>
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/5 bg-[#0f172a]/30">
+            <button onclick="App.toggleAdminMenu()" class="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group relative">
+                
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" class="w-10 h-10 rounded-full border-2 border-indigo-500/30 group-hover:border-indigo-400 transition-colors">
+                    <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-[#0f172a]"></span>
+                    </span>
+                </div>
+                
+                <div class="hidden lg:block flex-1 text-right min-w-0">
+                    <div class="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors" id="sidebar-admin-name">المدير العام</div>
+                    <div class="text-[10px] text-slate-400 truncate">مسؤول النظام</div>
+                </div>
+                
+                <i class="ph ph-caret-up text-slate-500 hidden lg:block transition-transform duration-300" id="admin-menu-arrow"></i>
+            </button>
+
+            <div id="admin-menu" class="absolute bottom-[85px] left-4 right-4 hidden opacity-0 transform translate-y-4 transition-all duration-300 z-50 origin-bottom">
+                <div class="glass-morphism p-1 rounded-2xl bg-[#1e1b4b]/90 border border-indigo-500/20 shadow-2xl backdrop-blur-2xl">
+                    <div class="p-3 border-b border-white/5 mb-1">
+                        <p class="text-[10px] text-slate-400">تم تسجيل الدخول كـ</p>
+                        <p class="text-xs font-bold text-white truncate" id="popup-admin-email">admin@school.com</p>
+                    </div>
+                    
+                    <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+                        <i class="ph ph-user"></i> الملف الشخصي
+                    </a>
+                    <button onclick="App.logout()" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors mt-1">
+                        <i class="ph ph-sign-out"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative z-10">
+        
+        <header class="h-auto pt-4 px-4 lg:px-8 z-30 shrink-0">
+            <div class="header-glass rounded-2xl px-6 py-4 flex items-center justify-between">
+                
+                <div class="flex items-center gap-4">
+                    <button class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-white">
+                        <i class="ph ph-list text-xl"></i>
+                    </button>
+                    
+                    <div>
+                        <h2 id="page-title" class="text-lg font-bold text-white tracking-wide">لوحة المعلومات</h2>
+                        <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                            <span class="text-indigo-400">النظام</span>
+                            <i class="ph-fill ph-caret-left text-[8px]"></i>
+                            <span>نظرة عامة</span>
+                        </div>
+                    </div>
                 </div>
 
-                <nav class="flex-1 py-6 space-y-2 px-2">
-                    <button onclick="App.navigate('home')" id="nav-home" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-squares-four text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">الرئيسية</span>
-                    </button>
-                    <button onclick="App.navigate('tracking')" id="nav-tracking" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-crosshair text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">تتبع الرحلات</span>
-                    </button>
-                    <button onclick="App.navigate('map')" id="nav-map" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-map-trifold text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">الخريطة الكاملة</span>
-                    </button>
-                    <button onclick="App.navigate('drivers')" id="nav-drivers" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-users-three text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">السائقين</span>
-                    </button>
-                    <button onclick="App.navigate('students')" id="nav-students" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-student text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">الطلاب</span>
-                    </button>
-                    <button onclick="App.navigate('settings')" id="nav-settings" class="sidebar-item w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                        <i class="ph ph-gear text-2xl lg:ml-3"></i>
-                        <span class="hidden lg:block font-medium">إعدادات الخرائط</span>
-                    </button>
-                </nav>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center bg-[#0f172a]/40 rounded-xl px-3 py-2 border border-white/5 focus-within:border-indigo-500/50 transition-colors w-64">
+                        <i class="ph ph-magnifying-glass text-slate-400"></i>
+                        <input type="text" placeholder="بحث سريع..." class="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:ring-0 w-full px-2">
+                        <span class="text-[10px] text-slate-600 bg-white/5 px-1.5 py-0.5 rounded">/</span>
+                    </div>
 
-                <div class="p-4 border-t border-white/10 relative">
-                    <button onclick="App.toggleAdminMenu()" class="w-full flex items-center justify-center lg:justify-start p-2 rounded-xl hover:bg-white/5 transition-all group">
-                        <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" class="w-10 h-10 rounded-full border-2 border-indigo-500/50">
-                            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0f172a] rounded-full flex items-center justify-center">
-                                <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-                            </span>
-                        </div>
-                        
-                        <div class="hidden lg:block mr-3 text-right flex-1 min-w-0">
-                            <div class="text-sm font-bold text-white truncate" id="sidebar-admin-name">المدير العام</div>
-                            <div class="text-[10px] text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-full w-fit mt-0.5 border border-indigo-500/20">
-                                مسئول المتابعة
-                            </div>
-                        </div>
-                        
-                        <i class="ph ph-caret-up text-slate-500 hidden lg:block transition-transform duration-300" id="admin-menu-arrow"></i>
-                    </button>
+                    <div class="h-8 w-px bg-white/10 mx-1"></div>
 
-                    <!-- Popup Menu -->
-                    <div id="admin-menu" class="absolute bottom-full left-0 w-[calc(100%-2rem)] mx-4 mb-2 hidden opacity-0 transform translate-y-2 transition-all duration-200 z-50">
-                        <div class="glass-panel p-4 rounded-xl bg-[#1e1b4b]/95 backdrop-blur-xl border border-white/10 shadow-2xl">
-                            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-white/10">
-                                <div class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-xl font-bold text-white">
-                                    <i class="ph ph-user-gear"></i>
-                                </div>
-                                <div>
-                                    <div class="text-white font-bold text-sm">بيانات المسؤول</div>
-                                    <div class="text-xs text-slate-400" id="popup-admin-email">admin@school.com</div>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-2">
-                                <button class="w-full flex items-center gap-2 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs">
-                                    <i class="ph ph-gear"></i> الإعدادات
-                                </button>
-                                <button onclick="App.logout()" class="w-full flex items-center gap-2 p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-xs font-bold">
-                                    <i class="ph ph-sign-out"></i> تسجيل الخروج
-                                </button>
-                            </div>
-                        </div>
+                    <button class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors relative flex items-center justify-center">
+                        <i class="ph ph-bell text-xl"></i>
+                        <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500 border border-[#1e1b4b]"></span>
+                    </button>
+                    
+                    <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-400">متصل</span>
                     </div>
                 </div>
-            </aside>
+            </div>
+        </header>
 
-            <!-- Main Content -->
-            <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-                <!-- Header -->
-                <header class="h-20 glass-panel border-b border-white/10 flex items-center justify-between px-8 z-20">
-                    <div class="flex items-center">
-                        <h2 id="page-title" class="text-xl font-bold">لوحة المعلومات</h2>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-3 px-4 py-2 glass-card rounded-full">
-                            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                            <span class="text-xs font-medium text-slate-300">النظام متصل</span>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-indigo-600/50 flex items-center justify-center border border-indigo-400/30">
-                            <i class="ph ph-user text-xl"></i>
-                        </div>
-                    </div>
-                </header>
-
-                <!-- Scrollable Content Area -->
-                <div id="content-area" class="flex-1 overflow-y-auto p-4 lg:p-8 relative scroll-smooth">
+        <div id="content-area" class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar scroll-smooth">
                        <!-- Home View  --> 
                     <div id="view-home" class="view-section space-y-8 p-2">
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            
-                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2">
-                                <div class="card-shine z-20 pointer-events-none"></div>
-                                <i class="ph ph-steering-wheel absolute -right-6 -bottom-6 text-9xl text-blue-600/10 group-hover:text-blue-500/20 transition-all duration-500 animate-float"></i>
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full group-hover:bg-blue-500/30 transition-all"></div>
-                                
-                                <div class="relative z-10 flex flex-col h-full justify-between">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                                            <i class="ph ph-users-three text-2xl"></i>
-                                        </div>
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-900/50 text-blue-300 border border-blue-500/20">نشط</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-400 text-sm font-medium mb-1">إجمالي السائقين</p>
-                                        <h3 id="stat-drivers" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-blue-200 drop-shadow-sm">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-500 hover:-translate-y-2">
-                                <div class="card-shine z-20 pointer-events-none"></div>
-                                <i class="ph ph-map-pin-line absolute -right-6 -bottom-6 text-9xl text-emerald-600/10 group-hover:text-emerald-500/20 transition-all duration-500 animate-float-reverse"></i>
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-600/20 blur-[60px] rounded-full group-hover:bg-emerald-500/30 transition-all"></div>
-                                
-                                <div class="relative z-10 flex flex-col h-full justify-between">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                                            <i class="ph ph-broadcast text-2xl animate-pulse"></i>
-                                        </div>
-                                        <span class="flex h-3 w-3 relative">
-                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-400 text-sm font-medium mb-1">رحلات نشطة الآن</p>
-                                        <h3 id="stat-active" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-emerald-200 drop-shadow-sm">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition-all duration-500 hover:-translate-y-2">
-                                <div class="card-shine z-20 pointer-events-none"></div>
-                                <i class="ph ph-graduation-cap absolute -right-6 -bottom-6 text-9xl text-purple-600/10 group-hover:text-purple-500/20 transition-all duration-500 animate-float-delayed"></i>
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-600/20 blur-[60px] rounded-full group-hover:bg-purple-500/30 transition-all"></div>
-                                
-                                <div class="relative z-10 flex flex-col h-full justify-between">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                                            <i class="ph ph-student text-2xl"></i>
-                                        </div>
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-500/20">مسجل</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-400 text-sm font-medium mb-1">إجمالي الطلاب</p>
-                                        <h3 id="stat-students" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-purple-200 drop-shadow-sm">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="glass-morphism rounded-3xl p-6 relative overflow-hidden group hover:border-pink-500/50 transition-all duration-500 hover:-translate-y-2">
-                                <div class="card-shine z-20 pointer-events-none"></div>
-                                <div class="absolute -right-10 -bottom-10 flex gap-4 opacity-10 group-hover:opacity-20 transition-all animate-float">
-                                    <i class="ph ph-gender-male text-8xl text-cyan-400"></i>
-                                    <i class="ph ph-gender-female text-8xl text-pink-400"></i>
-                                </div>
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-500/20 to-pink-500/20 blur-[60px] rounded-full"></div>
-                                
-                                <div class="relative z-10 flex flex-col h-full justify-between">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="p-3 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-pink-400 group-hover:bg-gradient-to-r group-hover:from-cyan-500 group-hover:to-pink-500 group-hover:text-white transition-all shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                                            <i class="ph ph-users text-2xl"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-400 text-sm font-medium mb-2">توزيع الطلاب</p>
-                                        <div class="flex items-center gap-4">
-                                            <div class="flex items-center gap-2 bg-cyan-950/40 px-3 py-1.5 rounded-lg border border-cyan-500/20">
-                                                <i class="ph ph-gender-male text-cyan-400 text-lg"></i>
-                                                <span id="stat-boys" class="text-xl font-bold text-white">0</span>
-                                            </div>
-                                            <div class="h-8 w-[1px] bg-white/10"></div>
-                                            <div class="flex items-center gap-2 bg-pink-950/40 px-3 py-1.5 rounded-lg border border-pink-500/20">
-                                                <i class="ph ph-gender-female text-pink-400 text-lg"></i>
-                                                <span id="stat-girls" class="text-xl font-bold text-white">0</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="glass-morphism rounded-3xl p-1.5 relative h-[500px] overflow-hidden group shadow-[0_0_40px_rgba(0,0,0,0.4)]">
-                            <div id="home-map" class="w-full h-full rounded-2xl opacity-80 hover:opacity-100 transition-opacity duration-700 bg-[#0f172a]"></div>
-                            
-                            <div class="absolute inset-0 pointer-events-none rounded-3xl border border-white/5 bg-gradient-to-b from-transparent via-transparent to-[#0f172a]/80"></div>
-
-                            <div class="absolute top-6 left-6 z-10">
-                                <div class="glass-morphism px-4 py-2 rounded-xl flex items-center gap-3 border-l-4 border-l-red-500 animate-float">
-                                    <span class="relative flex h-3 w-3">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                    </span>
-                                    <div>
-                                        <p class="text-xs text-slate-400 font-medium">حالة النظام</p>
-                                        <p class="text-sm font-bold text-white tracking-wide">تتبع مباشر</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    <div class="glass-morphism rounded-3xl p-8 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[100px] rounded-full -mr-20 -mt-20"></div>
-                        
-<div class="col-span-12 lg:col-span-8 space-y-6 relative">
-    
-    <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-4 relative z-20">
-        <div>
-            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
-                <div class="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                    <i class="ph ph-radar text-cyan-400 animate-pulse"></i>
+                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="stat-card glass-panel rounded-[2rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500 cursor-default border border-white/5 hover:border-blue-500/30">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full group-hover:bg-blue-500/30 transition-all duration-700"></div>
+            <i class="ph-duotone ph-steering-wheel absolute -right-4 -bottom-4 text-8xl text-blue-500/10 group-hover:text-blue-500/20 transition-all duration-500 group-hover:rotate-12 transform origin-bottom-right"></i>
+            
+            <div class="relative z-10 flex flex-col justify-between h-full">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/5 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+                        <i class="ph-fill ph-users-three text-2xl"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> نشط
+                    </span>
                 </div>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">مراقبة الأسطول</span>
-            </h3>
+                <div>
+                    <h4 class="text-slate-400 text-sm font-medium mb-1">إجمالي السائقين</h4>
+                    <div class="flex items-baseline gap-1">
+                        <span id="stat-drivers" class="text-4xl font-black text-white tracking-tight counter-anim">0</span>
+                        <span class="text-xs text-slate-500 font-bold uppercase">كابتن</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center gap-3 bg-slate-900/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-xl">
-            
-            <div class="relative group">
-                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-cyan-400">
-                    <i class="ph ph-calendar-star text-lg"></i>
+        <div class="stat-card glass-panel rounded-[2rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500 cursor-default border border-white/5 hover:border-emerald-500/30">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-600/20 blur-[60px] rounded-full group-hover:bg-emerald-500/30 transition-all duration-700"></div>
+            <i class="ph-duotone ph-road-horizon absolute -right-4 -bottom-4 text-8xl text-emerald-500/10 group-hover:text-emerald-500/20 transition-all duration-500 group-hover:scale-110"></i>
+
+            <div class="relative z-10 flex flex-col justify-between h-full">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                        <i class="ph-fill ph-navigation-arrow text-2xl"></i>
+                    </div>
+                    <div class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </div>
                 </div>
-                <input type="text" id="fleet-date-picker" 
-                       class="bg-white/5 text-white text-xs font-bold rounded-xl pr-10 pl-3 py-2.5 border border-white/5 focus:border-cyan-500/50 focus:bg-white/10 focus:outline-none transition-all w-40 cursor-pointer text-right hover:border-white/20 placeholder-slate-500"
-                       placeholder="اختر التاريخ">
+                <div>
+                    <h4 class="text-slate-400 text-sm font-medium mb-1">رحلات جارية</h4>
+                    <div class="flex items-baseline gap-1">
+                        <span id="stat-active" class="text-4xl font-black text-white tracking-tight counter-anim">0</span>
+                        <span class="text-xs text-slate-500 font-bold uppercase">رحلة</span>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div class="w-px h-8 bg-white/10 mx-1"></div>
+        <div class="stat-card glass-panel rounded-[2rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500 cursor-default border border-white/5 hover:border-purple-500/30">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-purple-600/20 blur-[60px] rounded-full group-hover:bg-purple-500/30 transition-all duration-700"></div>
+            <i class="ph-duotone ph-backpack absolute -right-4 -bottom-4 text-8xl text-purple-500/10 group-hover:text-purple-500/20 transition-all duration-500 group-hover:-rotate-12 transform origin-bottom-right"></i>
 
-            <div class="flex bg-black/20 rounded-xl p-1">
-                <button onclick="App.FleetFeed.setView('cards')" id="btn-view-cards" class="w-9 h-9 flex items-center justify-center rounded-lg text-cyan-400 bg-white/10 shadow-lg transition-all hover:scale-105">
-                    <i class="ph ph-grid-four text-xl"></i>
-                </button>
-                <button onclick="App.FleetFeed.setView('list')" id="btn-view-list" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-white transition-all hover:bg-white/5">
-                    <i class="ph ph-list-dashes text-xl"></i>
-                </button>
+            <div class="relative z-10 flex flex-col justify-between h-full">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/5 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+                        <i class="ph-fill ph-student text-2xl"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        الكل
+                    </span>
+                </div>
+                <div>
+                    <h4 class="text-slate-400 text-sm font-medium mb-1">إجمالي الطلاب</h4>
+                    <div class="flex items-baseline gap-1">
+                        <span id="stat-students" class="text-4xl font-black text-white tracking-tight counter-anim">0</span>
+                        <span class="text-xs text-slate-500 font-bold uppercase">طالب</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card glass-panel rounded-[2rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500 cursor-default border border-white/5 hover:border-pink-500/30">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            <div class="relative z-10 h-full flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
+                            <i class="ph-bold ph-gender-male"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-slate-400">بنين</span>
+                            <span id="stat-boys" class="text-lg font-bold text-white leading-none counter-anim">0</span>
+                        </div>
+                    </div>
+                    <div class="h-8 w-px bg-white/10"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 border border-pink-500/20">
+                            <i class="ph-bold ph-gender-female"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-slate-400">بنات</span>
+                            <span id="stat-girls" class="text-lg font-bold text-white leading-none counter-anim">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden flex mt-2">
+                    <div class="h-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]" style="width: 50%" id="bar-boys"></div>
+                    <div class="h-full bg-pink-500 shadow-[0_0_10px_#ec4899]" style="width: 50%" id="bar-girls"></div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-2 text-center">توزيع الطلاب حسب النوع</p>
             </div>
         </div>
     </div>
 
-    <div id="fleet-feed-container" class="grid grid-cols-1 md:grid-cols-2 gap-5 min-h-[400px] perspective-1000 relative z-10">
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-stretch h-auto xl:h-[600px]">
+
+    <div class="xl:col-span-2 glass-panel rounded-[2.5rem] p-1.5 relative overflow-hidden group border border-white/10 shadow-2xl flex flex-col h-[500px] xl:h-auto order-1">
+        
+        <div id="home-map" class="w-full h-full rounded-[2rem] bg-[#0f172a] relative z-0 filter brightness-90 group-hover:brightness-100 transition-all duration-700"></div>
+        
+        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#0f172a]/80 to-transparent pointer-events-none z-10 rounded-t-[2rem]"></div>
+
+        <div class="absolute top-6 left-6 z-20">
+            <div class="glass-morphism px-4 py-2.5 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg backdrop-blur-md animate-float-slow cursor-default hover:bg-white/10 transition-colors">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_#ef4444]"></span>
+                </span>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-1">حالة النظام</p>
+                    <p class="text-xs font-bold text-white leading-none">تتبع مباشر للمركبات</p>
+                </div>
+            </div>
         </div>
 
-    <div id="fleet-pagination" class="flex justify-center items-center gap-2 pt-6">
+        <button onclick="App.navigate('map')" class="absolute bottom-6 left-6 z-20 w-12 h-12 rounded-2xl bg-white/10 hover:bg-indigo-600 text-white flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg transition-all duration-300 hover:scale-110 group/expand" title="تكبير الخريطة">
+            <i class="ph-bold ph-arrows-out-simple text-xl group-hover/expand:rotate-90 transition-transform duration-300"></i>
+        </button>
+        
+        <div class="absolute inset-0 pointer-events-none opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+    </div>
+
+    <div class="xl:col-span-1 glass-panel rounded-[2.5rem] p-6 relative overflow-hidden border border-white/10 flex flex-col h-[600px] xl:h-auto order-2">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 blur-[80px] rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+        
+        <div class="relative z-10 mb-6 shrink-0">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                        <i class="ph-fill ph-radar text-indigo-400 text-lg animate-spin-slow"></i>
+                    </div>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">مراقبة الأسطول</span>
+                </h3>
+            </div>
+
+            <div class="flex items-center gap-2 bg-[#0f172a]/40 p-1.5 rounded-xl border border-white/5 backdrop-blur-md">
+                <div class="relative flex-1 group">
+                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-indigo-400">
+                        <i class="ph-bold ph-calendar-blank"></i>
+                    </div>
+                    <input type="text" id="fleet-date-picker" 
+                           class="w-full bg-white/5 text-white text-[10px] font-bold rounded-lg pr-9 pl-2 py-2 border border-white/5 focus:border-indigo-500/50 focus:bg-white/10 focus:outline-none transition-all cursor-pointer text-right placeholder-slate-500 hover:bg-white/10 truncate"
+                           placeholder="تاريخ اليوم">
+                </div>
+
+                <div class="flex bg-black/20 rounded-lg p-1 gap-1 shrink-0">
+                    <button onclick="App.FleetFeed.setView('cards')" id="btn-view-cards" class="w-7 h-7 flex items-center justify-center rounded-md text-indigo-400 bg-white/10 shadow-lg transition-all hover:scale-105 active:scale-95">
+                        <i class="ph-bold ph-grid-four"></i>
+                    </button>
+                    <button onclick="App.FleetFeed.setView('list')" id="btn-view-list" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-white transition-all hover:bg-white/5 hover:scale-105 active:scale-95">
+                        <i class="ph-bold ph-list-dashes"></i>
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <div class="relative z-10 flex-1 overflow-y-auto custom-scrollbar pr-1 -mr-1">
+            <div id="fleet-feed-container" class="grid grid-cols-1 gap-4 pb-4">
+                </div>
+        </div>
+
+        <div class="relative z-10 pt-4 mt-auto border-t border-white/5 bg-[#0f172a]/30 -mx-6 px-6 pb-2 backdrop-blur-sm">
+            <div id="fleet-pagination" class="flex justify-center items-center gap-2">
+                </div>
+        </div>
+    </div>
+
 </div>
-                    </div>  
 
                     </div>
 
                     <!-- View: Tracking (Drivers List) -->
-                    <div id="view-tracking" class="view-section hidden space-y-8 relative min-h-screen">
+                    <div id="view-tracking" class="view-section hidden relative min-h-screen p-4 lg:p-6 overflow-x-hidden">
                         
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+                        <div class="absolute top-0 left-1/4 w-[800px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse-slow"></div>
+                        <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
 
-                        <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+                        <div class="relative z-10 glass-panel rounded-[2.5rem] p-6 border border-white/10 shadow-2xl overflow-hidden group mb-8">
                             
-                            <div class="relative">
-                                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
-                                    <span class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/20 border border-blue-500/30">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24"><path fill="currentColor" d="M6.72 16.64a1 1 0 1 1 .56 1.92c-.5.146-.86.3-1.091.44c.238.143.614.303 1.136.452C8.48 19.782 10.133 20 12 20s3.52-.218 4.675-.548c.523-.149.898-.309 1.136-.452c-.23-.14-.59-.294-1.09-.44a1 1 0 0 1 .559-1.92c.668.195 1.28.445 1.75.766c.435.299.97.82.97 1.594c0 .783-.548 1.308-.99 1.607c-.478.322-1.103.573-1.786.768C15.846 21.77 14 22 12 22s-3.846-.23-5.224-.625c-.683-.195-1.308-.446-1.786-.768c-.442-.3-.99-.824-.99-1.607c0-.774.535-1.295.97-1.594c.47-.321 1.082-.571 1.75-.766M12 7.5c-1.54 0-2.502 1.667-1.732 3c.357.619 1.017 1 1.732 1c1.54 0 2.502-1.667 1.732-3A2 2 0 0 0 12 7.5" class="duoicon-primary-layer"/><path fill="currentColor" d="M12 2a7.5 7.5 0 0 1 7.5 7.5c0 2.568-1.4 4.656-2.85 6.14a16.4 16.4 0 0 1-1.853 1.615c-.594.446-1.952 1.282-1.952 1.282a1.71 1.71 0 0 1-1.69 0a21 21 0 0 1-1.952-1.282A16.4 16.4 0 0 1 7.35 15.64C5.9 14.156 4.5 12.068 4.5 9.5A7.5 7.5 0 0 1 12 2" class="duoicon-secondary-layer" opacity="0.3"/></svg>
-                                        <span class="absolute inset-0 rounded-2xl border border-blue-400/30 animate-ping" style="animation-duration: 2s;"></span>
-                                    </span>
-                                    <div>
-                                        <span class="block text-transparent bg-clip-text bg-gradient-to-l from-blue-200 to-white">تتبع المركبات</span>
-                                        <span class="text-xs text-slate-400 font-normal">نظام المراقبة الحية للأسطول</span>
-                                    </div>
-                                </h2>
-                                
-                                <i class="ph ph-map-trifold absolute -top-8 -left-12 text-6xl text-slate-700/20 animate-float"></i>
-                            </div>
+                            <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"></div>
+                            <i class="ph-duotone ph-map-pin-line absolute -left-6 -bottom-6 text-9xl text-indigo-500/5 group-hover:text-indigo-500/10 transition-all duration-700 animate-float"></i>
+                            <i class="ph-duotone ph-steering-wheel absolute right-10 -top-10 text-8xl text-blue-500/5 group-hover:text-blue-500/10 transition-all duration-700 animate-float-delayed"></i>
 
-                            <div class="relative w-full max-w-lg group">
-                                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                            <div class="flex flex-col xl:flex-row justify-between items-center gap-6 relative z-20">
                                 
-                                <div class="relative flex items-center glass-morphism rounded-xl p-1">
-                                    <div class="pl-4 pr-3 text-slate-400">
-                                        <i class="ph ph-magnifying-glass text-xl group-focus-within:text-blue-400 transition-colors"></i>
+                                <div class="flex items-center gap-5 w-full xl:w-auto">
+                                    <div class="relative group/icon">
+                                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.15)] group-hover/icon:scale-105 transition-all duration-300">
+                                            <i class="ph-fill ph-crosshair text-3xl text-indigo-400 group-hover/icon:rotate-90 transition-transform duration-500"></i>
+                                        </div>
+                                        <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-[#0f172a]"></span>
+                                        </span>
                                     </div>
-                                    <input type="text" 
-                                        id="tracking-search" 
-                                        placeholder="ابحث باسم السائق، رقم المركبة، أو المنطقة..." 
-                                        class="w-full bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 text-sm py-3 px-2">
-                                    
-                                    <div class="hidden md:flex items-center gap-2 px-3 border-r border-white/10">
-                                        <span class="text-[10px] bg-slate-800/50 text-slate-400 border border-white/10 px-2 py-1 rounded-md">CMD + K</span>
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-white tracking-wide">غرفة المراقبة</h2>
+                                        <p class="text-slate-400 text-xs mt-1 flex items-center gap-2">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                            تتبع حي ومباشر للأسطول
+                                        </p>
                                     </div>
                                 </div>
-                                
-                                <i class="ph ph-compass absolute -bottom-8 -right-8 text-5xl text-cyan-500/10 animate-float-reverse pointer-events-none"></i>
+
+                                <div class="w-full flex flex-col xl:flex-row items-center gap-4 bg-[#0f172a]/50 p-2.5 rounded-[20px] border border-white/5 backdrop-blur-md shadow-lg">
+
+    <div class="relative w-full xl:flex-1 group/search h-14">
+        
+        <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-blue-500 rounded-2xl opacity-0 group-focus-within/search:opacity-40 blur-md transition-opacity duration-500 -z-10"></div>
+
+        <div class="relative flex items-center w-full h-full bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg transition-all duration-300 group-focus-within/search:bg-[#0f172a] group-focus-within/search:border-indigo-500/30">
+            
+            <div class="flex items-center justify-center pl-4 pr-3 text-slate-500 transition-colors duration-300 group-focus-within/search:text-indigo-400">
+                <i class="ph-bold ph-magnifying-glass text-xl group-focus-within/search:scale-110 transition-transform duration-300"></i>
+            </div>
+
+            <input type="text" 
+                   id="tracking-search" 
+                   class="w-full h-full bg-transparent border-none text-white text-sm font-medium focus:ring-0 placeholder-slate-500/70 focus:placeholder-slate-400/50 transition-all"
+                   placeholder="بحث سريع (اسم، لوحة، منطقة)..."
+                   autocomplete="off">
+
+            <div class="hidden md:flex items-center gap-1 pr-4 pl-2 border-r border-white/5 h-3/5 my-auto ml-1">
+                <kbd class="hidden lg:inline-flex h-7 items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 font-mono text-[10px] font-medium text-slate-400 transition-colors group-hover/search:text-white group-hover/search:border-white/20">
+                    <span class="text-xs">⌘</span> K
+                </kbd>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden xl:block h-8 w-px bg-white/10 mx-1"></div>
+
+    <div class="grid grid-cols-3 p-1.5 gap-2 bg-[#0f172a]/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative w-full xl:w-auto xl:min-w-[380px] h-14 ring-1 ring-white/5" id="tracking-filters">
+        
+        <button class="filter-btn group relative flex items-center justify-center h-full rounded-xl text-xs font-bold text-white transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.4)] active" 
+                data-filter="all">
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 rounded-xl opacity-100 transition-opacity duration-300 bg-layer"></div>
+            <div class="relative z-10 flex items-center gap-2">
+                <i class="ph-bold ph-squares-four text-lg"></i>
+                <span class="tracking-wide">الكل</span>
+            </div>
+        </button>
+        
+        <button class="filter-btn group relative flex items-center justify-center h-full rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 hover:bg-white/5" 
+                data-filter="active">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 rounded-xl opacity-0 transition-opacity duration-300 bg-layer"></div>
+            <div class="relative z-10 flex items-center gap-2">
+                <div class="relative flex h-2.5 w-2.5 items-center justify-center">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75 group-[.active]:opacity-100 hidden group-[.active]:block"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 group-hover:bg-emerald-400 group-[.active]:bg-white shadow-[0_0_10px_#10b981] transition-colors"></span>
+                </div>
+                <span class="tracking-wide">نشط</span>
+            </div>
+        </button>
+        
+        <button class="filter-btn group relative flex items-center justify-center h-full rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all duration-300 hover:bg-white/5" 
+                data-filter="stopped">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-600 via-slate-500 to-zinc-600 rounded-xl opacity-0 transition-opacity duration-300 bg-layer"></div>
+            <div class="relative z-10 flex items-center gap-2">
+                <i class="ph-fill ph-stop-circle text-lg text-slate-500 group-hover:text-red-400 group-[.active]:text-white transition-colors duration-300"></i>
+                <span class="tracking-wide">متوقف</span>
+            </div>
+        </button>
+        
+    </div>
+</div>
+
                             </div>
                         </div>
 
-                        <div id="tracking-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-20">
+                        <div id="tracking-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-20 perspective-1000 min-h-[400px]">
+                            <div class="col-span-full flex flex-col items-center justify-center h-64 text-slate-500 animate-pulse">
+                                <i class="ph-duotone ph-circle-notch text-4xl mb-4 animate-spin text-indigo-500"></i>
+                                <p>جاري تحميل بيانات الأسطول...</p>
                             </div>
+                        </div>
+
                     </div>
 
                     <!-- View: Tracking Detail (Map + Stats + Timeline) -->
@@ -1292,333 +1493,333 @@
                         </div>
                     </div>
                     <!-- Settings Button -->
-<div id="view-settings" class="view-section hidden space-y-8 relative min-h-screen pb-20">
-    
-    <div class="absolute top-0 left-0 w-full h-[600px] bg-indigo-900/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+                    <div id="view-settings" class="view-section hidden space-y-8 relative min-h-screen pb-20">
+                        
+                        <div class="absolute top-0 left-0 w-full h-[600px] bg-indigo-900/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 
-    <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10 mb-8">
-        <div>
-            <h2 class="text-3xl font-bold text-white flex items-center gap-3">
-                <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600/20 border border-indigo-500/30">
-                    <i class="ph ph-sliders-horizontal text-3xl text-indigo-400"></i>
-                </div>
-                <div>
-                    <span class="block text-transparent bg-clip-text bg-gradient-to-l from-indigo-200 to-white">مركز إعدادات API</span>
-                    <span class="text-xs text-slate-400 font-normal">التحكم في خدمات ومنتجات TomTom</span>
-                </div>
-            </h2>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="App.Settings.enableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">تفعيل الكل</button>
-            <button onclick="App.Settings.disableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">إيقاف الكل</button>
-        </div>
-    </div>
+                        <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10 mb-8">
+                            <div>
+                                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                                    <div class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600/20 border border-indigo-500/30">
+                                        <i class="ph ph-sliders-horizontal text-3xl text-indigo-400"></i>
+                                    </div>
+                                    <div>
+                                        <span class="block text-transparent bg-clip-text bg-gradient-to-l from-indigo-200 to-white">مركز إعدادات API</span>
+                                        <span class="text-xs text-slate-400 font-normal">التحكم في خدمات ومنتجات TomTom</span>
+                                    </div>
+                                </h2>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="App.Settings.enableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">تفعيل الكل</button>
+                                <button onclick="App.Settings.disableAll()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 border border-white/5 transition">إيقاف الكل</button>
+                            </div>
+                        </div>
 
-    <div class="space-y-4">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="ph ph-map-trifold"></i> الخرائط والمرور
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mapDisplay')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><i class="ph ph-map text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mapDisplay-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mapDisplay-dot"></span>
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="ph ph-map-trifold"></i> الخرائط والمرور
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mapDisplay')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><i class="ph ph-map text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mapDisplay-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mapDisplay-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Map Display API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">عرض الخرائط الأساسية وطبقات التجانب.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-red-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('traffic')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"><i class="ph ph-traffic-signal text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-traffic-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-traffic-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Traffic API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">بيانات التدفق المروري والحوادث الحية.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-green-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('evCharging')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20"><i class="ph ph-charging-station text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-evCharging-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-evCharging-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">EV Charging Stations</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">توافر محطات شحن السيارات الكهربائية.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="ph ph-arrows-split"></i> التوجيه والمسارات
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('routing')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-path text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-routing-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-routing-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Routing API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">حساب المسارات الدقيقة والوقت المتوقع.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('extendedRouting')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-arrows-merge text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-extendedRouting-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-extendedRouting-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Extended Routing API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">توجيه متخصص للمسافات الطويلة والشاحنات.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('matrixRouting')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-grid-four text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-matrixRouting-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-matrixRouting-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Matrix Routing v2</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">حساب المصفوفات المعقدة (One-to-Many).</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('snapRoads')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-magnet text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-snapRoads-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-snapRoads-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Snap to Roads API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">مطابقة نقاط GPS مع شبكة الطرق الفعلية.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('waypointOptimization')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-list-numbers text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-waypointOptimization-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-waypointOptimization-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Waypoint Optimization</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تحسين ترتيب نقاط التوقف في الرحلة.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="ph ph-magnifying-glass"></i> البحث والعناوين
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('search')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-magnifying-glass text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-search-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-search-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Search API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">البحث عن الأماكن والعناوين والنقاط الهامة.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geocoding')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geocoding-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geocoding-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Geocoding API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تحويل العناوين إلى إحداثيات جغرافية.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('reverseGeocoding')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin-line text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-reverseGeocoding-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-reverseGeocoding-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Reverse Geocoding</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تحويل الإحداثيات إلى عناوين مقروءة.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('batchSearch')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-stack text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-batchSearch-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-batchSearch-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Batch Search API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تنفيذ عمليات بحث متعددة في طلب واحد.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="ph ph-package"></i> الأصول والبنية التحتية
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('assets')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-truck text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-assets-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-assets-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Assets API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تتبع وإدارة الأصول المتحركة.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geofencing')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-polygon text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geofencing-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geofencing-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Geofencing API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تحديد النطاقات الجغرافية والتنبيهات.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('locationHistory')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-clock-counter-clockwise text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-locationHistory-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-locationHistory-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Location History API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">تخزين وتحليل تاريخ تحركات الأسطول.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-orange-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('notifications')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20"><i class="ph ph-bell text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-notifications-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-notifications-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">Notifications API</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">إدارة الإشعارات والتنبيهات الفورية.</p>
+                                </div>
+
+                                <div class="glass-morphism p-5 rounded-2xl group hover:border-slate-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mcpServer')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="p-2.5 rounded-xl bg-slate-500/10 text-slate-300 border border-slate-500/20"><i class="ph ph-server-cloud text-xl"></i></div>
+                                        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mcpServer-bg">
+                                            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mcpServer-dot"></span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-white">MCP Server</h4>
+                                    <p class="text-[10px] text-slate-400 mt-1">الاتصال بخوادم TomTom السحابية.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('satelliteMode')">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                <i class="ph ph-globe-hemisphere-east text-xl"></i>
+                            </div>
+                            <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-satelliteMode-bg">
+                                <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-satelliteMode-dot"></span>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white">وضع القمر الصناعي</h4>
+                        <p class="text-[10px] text-slate-400 mt-1">عرض صور حقيقية للمباني والتضاريس (Satellite).</p>
+                        </div>
+
+                        <div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('nightMode')">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                <i class="ph ph-moon-stars text-xl"></i>
+                            </div>
+                            <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-nightMode-bg">
+                                <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-nightMode-dot"></span>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white">الوضع الليلي</h4>
+                        <p class="text-[10px] text-slate-400 mt-1">تفعيل نمط الألوان الداكنة للخرائط (Night Style).</p>
                     </div>
-                </div>
-                <h4 class="font-bold text-white">Map Display API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">عرض الخرائط الأساسية وطبقات التجانب.</p>
-            </div>
 
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-red-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('traffic')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"><i class="ph ph-traffic-signal text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-traffic-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-traffic-dot"></span>
+                    <div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('buildings3D')">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                <i class="ph ph-buildings text-xl"></i>
+                            </div>
+                            <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-buildings3D-bg">
+                                <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-buildings3D-dot"></span>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white">مباني 3D</h4>
+                        <p class="text-[10px] text-slate-400 mt-1">عرض المباني بشكل مجسم وثلاثي الأبعاد.</p>
                     </div>
-                </div>
-                <h4 class="font-bold text-white">Traffic API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">بيانات التدفق المروري والحوادث الحية.</p>
-            </div>
 
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-green-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('evCharging')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20"><i class="ph ph-charging-station text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-evCharging-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-evCharging-dot"></span>
+
+                    <div class="glass-morphism rounded-3xl p-6 space-y-6 max-w-3xl">
+
+                        <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                            <i class="ph ph-map-pin text-indigo-400 text-2xl"></i>
+                            إعدادات خرائط OSM
+                        </h3>
+
+                        <!-- Map Style -->
+                        <div class="space-y-2">
+                            <label class="text-sm text-slate-400">نمط الخريطة</label>
+                            <select id="osm-style" class="glass-input w-full px-4 py-3 rounded-xl">
+                                <option value="dark">داكن (Dark)</option>
+                                <option value="light">فاتح (Light)</option>
+                                <option value="satellite">قمر صناعي (Satellite)</option>
+                            </select>
+                        </div>
+
+                        <!-- Night Mode -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-sm">الوضع الليلي الذكي</p>
+                                <p class="text-xs text-slate-400">تحسين الرؤية الليلية بدون تغيير الطبقات</p>
+                            </div>
+                            <input type="checkbox" id="osm-night-mode" class="scale-125 accent-indigo-500">
+                        </div>
+
+                        <!-- Zoom -->
+                        <div class="space-y-2">
+                            <label class="text-sm text-slate-400">مستوى التكبير الافتراضي</label>
+                            <input id="osm-zoom" type="range" min="8" max="18" value="13"
+                                class="w-full accent-indigo-500">
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">إظهار أدوات التحكم</span>
+                            <input type="checkbox" id="osm-controls" checked class="scale-125 accent-indigo-500">
+                        </div>
+
+                        <button onclick="App.OSMSettings.apply()"
+                                class="glass-btn w-full py-3 rounded-xl font-bold">
+                            تطبيق الإعدادات على جميع الخرائط
+                        </button>
+
                     </div>
-                </div>
-                <h4 class="font-bold text-white">EV Charging Stations</h4>
-                <p class="text-[10px] text-slate-400 mt-1">توافر محطات شحن السيارات الكهربائية.</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="space-y-4">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="ph ph-arrows-split"></i> التوجيه والمسارات
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('routing')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-path text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-routing-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-routing-dot"></span>
                     </div>
-                </div>
-                <h4 class="font-bold text-white">Routing API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">حساب المسارات الدقيقة والوقت المتوقع.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('extendedRouting')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-arrows-merge text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-extendedRouting-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-extendedRouting-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Extended Routing API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">توجيه متخصص للمسافات الطويلة والشاحنات.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-purple-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('matrixRouting')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><i class="ph ph-grid-four text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-matrixRouting-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-matrixRouting-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Matrix Routing v2</h4>
-                <p class="text-[10px] text-slate-400 mt-1">حساب المصفوفات المعقدة (One-to-Many).</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('snapRoads')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-magnet text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-snapRoads-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-snapRoads-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Snap to Roads API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">مطابقة نقاط GPS مع شبكة الطرق الفعلية.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-pink-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('waypointOptimization')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><i class="ph ph-list-numbers text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-waypointOptimization-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-waypointOptimization-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Waypoint Optimization</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تحسين ترتيب نقاط التوقف في الرحلة.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="space-y-4">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="ph ph-magnifying-glass"></i> البحث والعناوين
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('search')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-magnifying-glass text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-search-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-search-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Search API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">البحث عن الأماكن والعناوين والنقاط الهامة.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geocoding')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geocoding-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geocoding-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Geocoding API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تحويل العناوين إلى إحداثيات جغرافية.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('reverseGeocoding')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-map-pin-line text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-reverseGeocoding-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-reverseGeocoding-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Reverse Geocoding</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تحويل الإحداثيات إلى عناوين مقروءة.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-cyan-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('batchSearch')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="ph ph-stack text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-batchSearch-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-batchSearch-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Batch Search API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تنفيذ عمليات بحث متعددة في طلب واحد.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="space-y-4">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="ph ph-package"></i> الأصول والبنية التحتية
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('assets')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-truck text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-assets-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-assets-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Assets API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تتبع وإدارة الأصول المتحركة.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('geofencing')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-polygon text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-geofencing-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-geofencing-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Geofencing API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تحديد النطاقات الجغرافية والتنبيهات.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-yellow-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('locationHistory')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><i class="ph ph-clock-counter-clockwise text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-locationHistory-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-locationHistory-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Location History API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">تخزين وتحليل تاريخ تحركات الأسطول.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-orange-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('notifications')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20"><i class="ph ph-bell text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-notifications-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-notifications-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">Notifications API</h4>
-                <p class="text-[10px] text-slate-400 mt-1">إدارة الإشعارات والتنبيهات الفورية.</p>
-            </div>
-
-            <div class="glass-morphism p-5 rounded-2xl group hover:border-slate-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('mcpServer')">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="p-2.5 rounded-xl bg-slate-500/10 text-slate-300 border border-slate-500/20"><i class="ph ph-server-cloud text-xl"></i></div>
-                    <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-mcpServer-bg">
-                        <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-mcpServer-dot"></span>
-                    </div>
-                </div>
-                <h4 class="font-bold text-white">MCP Server</h4>
-                <p class="text-[10px] text-slate-400 mt-1">الاتصال بخوادم TomTom السحابية.</p>
-            </div>
-        </div>
-    </div>
-    <div class="glass-morphism p-5 rounded-2xl group hover:border-blue-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('satelliteMode')">
-    <div class="flex justify-between items-start mb-3">
-        <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            <i class="ph ph-globe-hemisphere-east text-xl"></i>
-        </div>
-        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-satelliteMode-bg">
-            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-satelliteMode-dot"></span>
-        </div>
-    </div>
-    <h4 class="font-bold text-white">وضع القمر الصناعي</h4>
-    <p class="text-[10px] text-slate-400 mt-1">عرض صور حقيقية للمباني والتضاريس (Satellite).</p>
-    </div>
-
-    <div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('nightMode')">
-    <div class="flex justify-between items-start mb-3">
-        <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-            <i class="ph ph-moon-stars text-xl"></i>
-        </div>
-        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-nightMode-bg">
-            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-nightMode-dot"></span>
-        </div>
-    </div>
-    <h4 class="font-bold text-white">الوضع الليلي</h4>
-    <p class="text-[10px] text-slate-400 mt-1">تفعيل نمط الألوان الداكنة للخرائط (Night Style).</p>
-</div>
-
-<div class="glass-morphism p-5 rounded-2xl group hover:border-indigo-500/40 cursor-pointer transition-all" onclick="App.Settings.toggle('buildings3D')">
-    <div class="flex justify-between items-start mb-3">
-        <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-            <i class="ph ph-buildings text-xl"></i>
-        </div>
-        <div class="toggle-switch relative h-6 w-11 bg-slate-700 rounded-full transition-colors duration-300" id="toggle-buildings3D-bg">
-            <span class="absolute top-1 left-1 bg-white h-4 w-4 rounded-full transition-transform duration-300" id="toggle-buildings3D-dot"></span>
-        </div>
-    </div>
-    <h4 class="font-bold text-white">مباني 3D</h4>
-    <p class="text-[10px] text-slate-400 mt-1">عرض المباني بشكل مجسم وثلاثي الأبعاد.</p>
-</div>
-
-
-<div class="glass-morphism rounded-3xl p-6 space-y-6 max-w-3xl">
-
-    <h3 class="text-xl font-bold text-white flex items-center gap-3">
-        <i class="ph ph-map-pin text-indigo-400 text-2xl"></i>
-        إعدادات خرائط OSM
-    </h3>
-
-    <!-- Map Style -->
-    <div class="space-y-2">
-        <label class="text-sm text-slate-400">نمط الخريطة</label>
-        <select id="osm-style" class="glass-input w-full px-4 py-3 rounded-xl">
-            <option value="dark">داكن (Dark)</option>
-            <option value="light">فاتح (Light)</option>
-            <option value="satellite">قمر صناعي (Satellite)</option>
-        </select>
-    </div>
-
-    <!-- Night Mode -->
-    <div class="flex items-center justify-between">
-        <div>
-            <p class="font-bold text-sm">الوضع الليلي الذكي</p>
-            <p class="text-xs text-slate-400">تحسين الرؤية الليلية بدون تغيير الطبقات</p>
-        </div>
-        <input type="checkbox" id="osm-night-mode" class="scale-125 accent-indigo-500">
-    </div>
-
-    <!-- Zoom -->
-    <div class="space-y-2">
-        <label class="text-sm text-slate-400">مستوى التكبير الافتراضي</label>
-        <input id="osm-zoom" type="range" min="8" max="18" value="13"
-               class="w-full accent-indigo-500">
-    </div>
-
-    <!-- Controls -->
-    <div class="flex items-center justify-between">
-        <span class="text-sm">إظهار أدوات التحكم</span>
-        <input type="checkbox" id="osm-controls" checked class="scale-125 accent-indigo-500">
-    </div>
-
-    <button onclick="App.OSMSettings.apply()"
-            class="glass-btn w-full py-3 rounded-xl font-bold">
-        تطبيق الإعدادات على جميع الخرائط
-    </button>
-
-</div>
-
-</div>
                 </div>
             </main>
         </div>
@@ -3220,18 +3421,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (!container) return;
 
-                    const activeClass = "text-cyan-400 bg-white/10 shadow-lg scale-105";
+                    const activeClass = "text-indigo-400 bg-white/10 shadow-lg scale-105";
                     const inactiveClass = "text-slate-500 hover:text-white hover:bg-white/5";
 
+                    // تحديث حالة الأزرار
+                    if(btnCards && btnList) {
+                        if(mode === 'cards') {
+                            btnCards.className = `w-7 h-7 flex items-center justify-center rounded-md transition-all ${activeClass}`;
+                            btnList.className = `w-7 h-7 flex items-center justify-center rounded-md transition-all ${inactiveClass}`;
+                        } else {
+                            btnCards.className = `w-7 h-7 flex items-center justify-center rounded-md transition-all ${inactiveClass}`;
+                            btnList.className = `w-7 h-7 flex items-center justify-center rounded-md transition-all ${activeClass}`;
+                        }
+                    }
+
+                    // تحديث تخطيط الحاوية (دائماً عمود واحد في اللوحة الجانبية، لكن شكل العنصر يختلف)
                     if(mode === 'cards') {
-                        btnCards.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${activeClass}`;
-                        btnList.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${inactiveClass}`;
-                        container.className = "grid grid-cols-1 md:grid-cols-2 gap-5 perspective-1000";
-                        this.state.itemsPerPage = 4;
+                        container.className = "grid grid-cols-1 gap-4"; // بطاقات كبيرة فوق بعض
+                        this.state.itemsPerPage = 4; // عدد أقل للعرض الجانبي
                     } else {
-                        btnCards.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${inactiveClass}`;
-                        btnList.className = `w-9 h-9 flex items-center justify-center rounded-lg transition-all ${activeClass}`;
-                        container.className = "flex flex-col space-y-3";
+                        container.className = "flex flex-col space-y-2"; // قائمة مضغوطة
                         this.state.itemsPerPage = 6;
                     }
                     
@@ -3373,69 +3582,93 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
 
                 // --- HTML TEMPLATES ---
-
                 getCardHTML: function(trip) {
                     const date = new Date(trip.startTime).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
-                    // حساب السرعة كرقم
                     const speedVal = parseFloat(App.Utils.calculateSpeed(trip.actualPath));
                     const speedDisplay = isNaN(speedVal) ? 0 : speedVal;
                     
-                    // جلب إعدادات التصميم بناءً على الحالة والسرعة
+                    // حساب نسبة السرعة لشريط التقدم (بحد أقصى 120 كم/س للتصميم)
+                    const speedPercent = Math.min((speedDisplay / 120) * 100, 100);
+                    
                     const status = this.getStatusConfig(trip, speedDisplay);
                     
+                    // استخراج لون الحالة لاستخدامه في الحدود والظلال (تجريد اسم اللون من كلاس Tailwind)
+                    // مثال: text-emerald-400 -> emerald
+                    const colorName = status.colorClass.split('-')[1] || 'indigo'; 
+
                     return `
-                    <div class="fleet-card group relative bg-slate-900/40 backdrop-blur-xl rounded-[2rem] p-6 border border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${status.borderHover} cursor-pointer overflow-hidden" onclick="App.navigate('tracking-detail', '${trip.driverId}')">
+                    <div class="fleet-card group relative bg-[#1e293b]/70 backdrop-blur-xl rounded-[1.5rem] border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-${colorName}-500/20 cursor-pointer overflow-hidden isolate" onclick="App.navigate('tracking-detail', '${trip.driverId}')">
                         
-                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent blur-[50px] rounded-full group-hover:blur-[60px] transition-all"></div>
-                        
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-6">
-                                <div class="flex items-center gap-4">
-                                    <div class="relative">
-                                        <div class="w-14 h-14 rounded-2xl bg-slate-800 p-0.5 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                            <img src="${trip.driverPhoto}" class="w-full h-full rounded-[10px] object-cover filter grayscale group-hover:grayscale-0 transition-all duration-300">
-                                        </div>
-                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-slate-900 rounded-full flex items-center justify-center border border-white/10">
-                                            <div class="w-2.5 h-2.5 rounded-full ${status.dot}"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-white font-bold text-lg group-hover:text-cyan-300 transition-colors">${trip.driverName}</h4>
-                                        <div class="flex items-center gap-1 text-xs text-slate-400 font-mono mt-0.5">
-                                            <i class="ph ph-hash"></i> ${trip.id.substring(0,6)}
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="absolute -right-12 -top-12 w-40 h-40 bg-${colorName}-500/20 blur-[60px] rounded-full group-hover:bg-${colorName}-500/30 transition-all duration-700 -z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-                                <div class="flex flex-col items-end gap-1">
-                                    <span class="px-3 py-1.5 rounded-xl text-[10px] font-bold border flex items-center gap-2 ${status.bgClass} ${status.colorClass} shadow-lg ${status.glow}">
-                                        <i class="ph ${status.icon} text-sm"></i>
-                                        ${status.text}
-                                    </span>
-                                </div>
+                        <div class="flex items-center justify-between p-5 pb-0 relative z-20">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/5 text-slate-400 border border-white/10 group-hover:border-${colorName}-500/30 transition-colors">
+                                    #TRP-${String(trip.id || trip.driverId).substring(0, 4).toUpperCase()}
+                                </span>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/20 rounded-2xl p-3 border border-white/5 group-hover:border-cyan-500/20 transition-colors">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <i class="ph ph-speedometer text-cyan-400"></i>
-                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">السرعة</span>
-                                    </div>
-                                    <div class="text-xl font-bold text-white font-mono flex items-baseline gap-1">
-                                        ${speedDisplay} <span class="text-[10px] font-sans text-slate-500">km/h</span>
-                                    </div>
-                                </div>
-                                <div class="bg-black/20 rounded-2xl p-3 border border-white/5 group-hover:border-purple-500/20 transition-colors">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <i class="ph ph-clock text-purple-400"></i>
-                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">البدء</span>
-                                    </div>
-                                    <div class="text-lg font-bold text-white font-mono">
-                                        ${date}
-                                    </div>
-                                </div>
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-${colorName}-500/10 border border-${colorName}-500/20 shadow-[0_0_10px_rgba(0,0,0,0.2)]">
+                                <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-${colorName}-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-${colorName}-500"></span>
+                                </span>
+                                <span class="text-[10px] font-bold text-${colorName}-400">${status.text}</span>
                             </div>
                         </div>
+
+                        <div class="p-5 flex items-center gap-4 relative z-20">
+                            <div class="relative shrink-0">
+                                <div class="w-14 h-14 rounded-2xl p-[2px] bg-gradient-to-br from-white/10 to-white/5 group-hover:from-${colorName}-400 group-hover:to-${colorName}-600 transition-all duration-500 shadow-lg">
+                                    <img src="${trip.driverPhoto}" class="w-full h-full rounded-[14px] object-cover bg-slate-800">
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-1 border border-slate-700">
+                                    <i class="ph-fill ph-steering-wheel text-xs text-slate-300"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-white font-bold text-base truncate leading-tight group-hover:text-${colorName}-300 transition-colors">${trip.driverName}</h4>
+                                <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-400">
+                                    <i class="ph ph-bus text-${colorName}-400"></i>
+                                    <span>حافلة مدرسية</span>
+                                </div>
+                            </div>
+                            
+                            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-500 group-hover:bg-${colorName}-500 group-hover:text-white transition-all transform group-hover:rotate-45 duration-300">
+                                <i class="ph-bold ph-arrow-up-left"></i> </div>
+                        </div>
+
+                        <div class="mx-5 mb-5 grid grid-cols-2 gap-3 relative z-20">
+                            
+                            <div class="bg-[#0f172a]/40 rounded-2xl p-3 border border-white/5 group-hover:border-white/10 transition-colors relative overflow-hidden">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="text-[10px] text-slate-500 font-medium">السرعة الحالية</span>
+                                    <i class="ph-fill ph-speedometer text-slate-600 group-hover:text-${colorName}-400 transition-colors"></i>
+                                </div>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-xl font-bold text-white font-mono tracking-tight">${speedDisplay}</span>
+                                    <span class="text-[10px] text-slate-500 font-bold">km/h</span>
+                                </div>
+                                <div class="w-full h-1 bg-slate-700/50 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-${colorName}-500 transition-all duration-1000 ease-out" style="width: ${speedPercent}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#0f172a]/40 rounded-2xl p-3 border border-white/5 group-hover:border-white/10 transition-colors">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="text-[10px] text-slate-500 font-medium">وقت الانطلاق</span>
+                                    <i class="ph-fill ph-clock text-slate-600 group-hover:text-amber-400 transition-colors"></i>
+                                </div>
+                                <div class="flex items-baseline gap-1 mt-1">
+                                    <span class="text-lg font-bold text-white font-mono tracking-tight">${date}</span>
+                                    <span class="text-[10px] text-slate-500">م</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-${colorName}-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
                     </div>`;
                 },
 
@@ -3917,6 +4150,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     else this.initHomeMap();
                 }, 800);
             },
+            
             toggleAdminMenu: function() {
                 const menu = document.getElementById('admin-menu');
                 const arrow = document.getElementById('admin-menu-arrow');
@@ -3935,97 +4169,198 @@ document.addEventListener("DOMContentLoaded", () => {
             },
 
 navigate: function(viewId) {
-    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-    const navItem = document.getElementById(`nav-${viewId}`);
-    if(navItem) navItem.classList.add('active');
+    // 1. Update Sidebar Active State
+    document.querySelectorAll('.sidebar-item').forEach(el => {
+        el.classList.remove('nav-item-active', 'bg-white/5');
+        // Reset icon color
+        const icon = el.querySelector('i');
+        if(icon) gsap.to(icon, {color: '#94a3b8', scale: 1, duration: 0.3});
+    });
 
-    // Hide all views
+    const navItem = document.getElementById(`nav-${viewId}`);
+    if(navItem) {
+        navItem.classList.add('nav-item-active');
+        const icon = navItem.querySelector('i');
+        // Animate active icon
+        if(icon) gsap.to(icon, {color: '#818cf8', scale: 1.2, duration: 0.4, ease: "back.out(1.7)"});
+    }
+
+    // 2. Hide all views
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
     
+    // 3. Show target view with Animation
     const targetId = viewId === 'tracking-detail' ? 'view-tracking-detail' : `view-${viewId}`;
     const target = document.getElementById(targetId);
     
-    target.classList.remove('hidden');
-    gsap.fromTo(target, {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: 0.4});
+    if (target) {
+        target.classList.remove('hidden');
+        
+        // Staggered Animation for children if it's a grid view
+        if(viewId === 'home' || viewId === 'tracking' || viewId === 'drivers') {
+            gsap.fromTo(target.children, 
+                {opacity: 0, y: 20}, 
+                {opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power2.out", clearProps: "all"}
+            );
+        } else {
+            // Simple fade for maps/details
+            gsap.fromTo(target, 
+                {opacity: 0, scale: 0.98}, 
+                {opacity: 1, scale: 1, duration: 0.4, ease: "power2.out"}
+            );
+        }
+    }
 
+    // 4. Update Header Title
     const titles = { 
         'home': 'لوحة المعلومات', 
         'map': 'الخريطة الكاملة', 
         'drivers': 'إدارة السائقين', 
         'students': 'إدارة الطلاب', 
         'tracking': 'تتبع الرحلات', 
-        'tracking-detail': 'مراقبة الرحلة' ,
-        'settings': 'إعدادات الخرائط'
+        'tracking-detail': 'غرفة العمليات',
+        'settings': 'الإعدادات'
     };
-    document.getElementById('page-title').textContent = titles[viewId] || 'النظام';
+    const titleEl = document.getElementById('page-title');
+    if(titleEl) {
+        // Text Switch Animation
+        gsap.to(titleEl, {
+            opacity: 0, 
+            y: -10, 
+            duration: 0.2, 
+            onComplete: () => {
+                titleEl.textContent = titles[viewId] || 'النظام';
+                gsap.to(titleEl, {opacity: 1, y: 0, duration: 0.3});
+            }
+        });
+    }
 
-    if (viewId !== 'tracking-detail') {
-        App.Replay.stop();
-    }
-    if (viewId === 'settings') {
-        App.Settings.initUI();
-    }
-    
-    // --- التصحيح هنا: استخدام MapHandler.resizeMap ---
-    if (viewId === 'map') {
-        setTimeout(() => {
-            if (!this.state.map) this.initMap();
-            else App.MapHandler.resizeMap(this.state.map);
-        }, 100);
-    }
-    if (viewId === 'home' && this.state.homeMap) {
-        setTimeout(() => App.MapHandler.resizeMap(this.state.homeMap), 100);
-    }
-    if (viewId === 'tracking-detail' && this.state.trackingMap) {
-            setTimeout(() => App.MapHandler.resizeMap(this.state.trackingMap), 100);
-    } else if (viewId === 'tracking') {
-            this.updateTrackingListUI();
-    } else if (viewId === 'drivers') {
-            this.updateDriversUI();
-    }
+    // ... (باقي المنطق الخاص بإيقاف الـ Replay وتحديث الخرائط كما هو) ...
+    if (viewId !== 'tracking-detail') App.Replay.stop();
+    if (viewId === 'map') setTimeout(() => { if (!App.state.map) App.initMap(); else App.MapHandler.resizeMap(App.state.map); }, 100);
+    if (viewId === 'home' && App.state.homeMap) setTimeout(() => App.MapHandler.resizeMap(App.state.homeMap), 100);
+    if (viewId === 'tracking-detail' && App.state.trackingMap) setTimeout(() => App.MapHandler.resizeMap(App.state.trackingMap), 100);
+    if (viewId === 'tracking') App.updateTrackingListUI();
+    if (viewId === 'drivers') App.updateDriversUI();
 },
+setupFilterListeners: function() {
+    const buttons = document.querySelectorAll('#tracking-filters .filter-btn');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.currentTarget;
+            
+            // منع إعادة الضغط على الزر النشط
+            if (target.classList.contains('active')) return;
 
-            // --- DATA & REALTIME ---
+            // 1. إعادة ضبط الجميع (Reset All)
+            buttons.forEach(b => {
+                b.classList.remove('active', 'text-white', 'shadow-[0_0_20px_rgba(99,102,241,0.4)]', 'shadow-[0_0_20px_rgba(16,185,129,0.4)]');
+                b.classList.add('text-slate-400', 'hover:bg-white/5');
+                
+                // إخفاء الطبقة الملونة
+                const layer = b.querySelector('.bg-layer');
+                if (layer) {
+                    layer.classList.remove('opacity-100');
+                    layer.classList.add('opacity-0');
+                }
+            });
+
+            // 2. تفعيل الزر المختار (Activate Target)
+            target.classList.remove('text-slate-400', 'hover:bg-white/5');
+            target.classList.add('active', 'text-white');
+            
+            // إظهار الطبقة الملونة
+            const targetLayer = target.querySelector('.bg-layer');
+            if (targetLayer) {
+                targetLayer.classList.remove('opacity-0');
+                targetLayer.classList.add('opacity-100');
+            }
+
+            // إضافة الظل (Glow) حسب النوع
+            const filterType = target.dataset.filter;
+            if (filterType === 'all') {
+                target.classList.add('shadow-[0_0_20px_rgba(99,102,241,0.4)]');
+            } else if (filterType === 'active') {
+                target.classList.add('shadow-[0_0_20px_rgba(16,185,129,0.4)]');
+            }
+
+            // تأثير نبض بسيط عند الضغط (اختياري)
+            if (window.gsap) {
+                gsap.fromTo(target, { scale: 0.95 }, { scale: 1, duration: 0.3, ease: "back.out(2)" });
+            }
+
+            // 3. تنفيذ الفلترة
+            this.updateTrackingListUI();
+        });
+    });
+},
 setupRealtimeListeners: function() {
-    // الاستماع لتغييرات السائقين
+    // ---------------------------------------------------------
+    // 1. تهيئة مستمعات الواجهة (للبحث والفلترة)
+    // ---------------------------------------------------------
+    // هذا السطر هو الأهم لربط أزرار (الكل/نشط/متوقف) ومربع البحث بالكود
+    if (typeof this.setupTrackingListeners === 'function') {
+        this.setupTrackingListeners();
+    }
+this.setupFilterListeners();
+    // ---------------------------------------------------------
+    // 2. الاستماع لتغييرات بيانات السائقين (Realtime Database)
+    // ---------------------------------------------------------
     db.ref('drivers').on('value', (snapshot) => {
-        // تخزين البيانات في متغير لاستخدامه لاحقاً
+        // تخزين البيانات في الحالة (State)
         const driversData = snapshot.val() || {};
-        
         this.state.drivers = driversData;
         
+        // تحديث الإحصائيات العلوية
         this.updateStats();
+        
+        // تحديث جدول إدارة السائقين (صفحة السائقين)
         this.updateDriversUI();
+        
+        // تحديث العلامات على الخريطة الكاملة
         this.updateMapMarkers();
+        
+        // تحديث الخريطة المصغرة في الصفحة الرئيسية
         this.updateHomeMapMarkers();
         
-        if (!document.getElementById('view-tracking').classList.contains('hidden')) {
+        // تحديث قائمة التتبع (الصفحة التي قمنا بتعديلها)
+        // نتحقق أولاً مما إذا كانت الصفحة مفتوحة لتوفير الموارد
+        const trackingView = document.getElementById('view-tracking');
+        if (trackingView && !trackingView.classList.contains('hidden')) {
+            // الدالة المعدلة ستقرأ تلقائياً الفلتر النشط ونص البحث وتعيد الرسم
             this.updateTrackingListUI();
         }
+
+        // تحديث صفحة التفاصيل إذا كان المستخدم يتابع سائقاً محدداً الآن
         if(this.state.currentTrackingDriverId) {
             this.updateTrackingDetailMap(this.state.currentTrackingDriverId);
         }
 
-        // تحديث قائمة الرحلات الجديدة (FleetFeed)
+        // تحديث قائمة الرحلات الجانبية (FleetFeed) في الصفحة الرئيسية
         if(this.FleetFeed) {
             this.FleetFeed.refreshData();
         }
 
-        // 👇👇👇 تشغيل المراقبة والتنبيهات (TripMonitor) 👇👇👇
-        // التعديل هنا: مررنا driversData بدلاً من data
+        // تشغيل نظام المراقبة والتنبيهات الذكية
         if (this.TripMonitor) {
             this.TripMonitor.scan(driversData);
         }
     });
 
-    // الاستماع لتغييرات الطلاب
+    // ---------------------------------------------------------
+    // 3. الاستماع لتغييرات بيانات الطلاب
+    // ---------------------------------------------------------
     db.ref('students').on('value', (snapshot) => {
         this.state.students = snapshot.val() || {};
+        
+        // تحديث الإحصائيات (عدد الطلاب، توزيع البنين والبنات)
         this.updateStats();
+        
+        // تحديث جدول الطلاب
         this.updateStudentsUI();
     });
 },
-            // --- DRIVER LOCATION SELECTION ---
+// --- DRIVER LOCATION SELECTION ---
 initDriverLocationMap: function() {
     if(this.state.driverLocationMap) return;
 
@@ -4099,147 +4434,275 @@ initDriverLocationMap: function() {
                 });
             },
 
-            // --- TRACKING LOGIC ---
-            updateTrackingListUI: function() {
-                const list = document.getElementById('tracking-list');
-                if (!list) return; // حماية إضافية في حال لم يتم تحميل الصفحة
-                
-                list.innerHTML = '';
-                const searchInput = document.getElementById('tracking-search');
-                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-                
-                // التغيير هنا: نستخدم entries لجلب الـ ID من المفتاح (Key) لضمان وجوده
-                Object.entries(this.state.drivers || {}).forEach(([driverId, driverData]) => {
-                    
-                    // دمج الـ ID مع بيانات السائق لضمان وجوده
-                    const driver = { ...driverData, id: driverId };
-                    const profile = driver.profile || { name: 'غير معروف' };
-                    
-                    // حماية: إذا كان الاسم غير موجود
-                    const driverName = profile.name || 'بدون اسم';
-                    
-                    // 1. منطق التصفية (Filter Logic)
-                    // التأكد من أن القيم موجودة قبل البحث فيها
-                    const searchMatch = driverName.toLowerCase().includes(searchTerm) || 
-                                        String(driver.id).includes(searchTerm);
-                                        
-                    if (searchTerm && !searchMatch) return;
+// --- دالة تحديث قائمة التتبع (المصححة) ---
+updateTrackingListUI: function() {
+    const list = document.getElementById('tracking-list');
+    if (!list) return;
 
-                    // 2. منطق الحسابات (Calculation Logic)
-                    let currentSpeed = 0;
-                    let lastUpdate = 'غير متوفر';
-                    let isActive = false;
+    // 1. جلب حالة البحث والفلتر
+    const searchInput = document.getElementById('tracking-search');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    const activeFilterBtn = document.querySelector('#tracking-filters .filter-btn.active');
+    const filterMode = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
 
-                    if(driver.trips) {
-                        const tripKeys = Object.keys(driver.trips);
-                        if (tripKeys.length > 0) {
-                            const lastTrip = driver.trips[tripKeys[tripKeys.length - 1]];
-                            if(lastTrip && lastTrip.actualPath) {
-                                currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
-                                const pathKeys = Object.keys(lastTrip.actualPath);
-                                if (pathKeys.length > 0) {
-                                    const lastPoint = lastTrip.actualPath[pathKeys[pathKeys.length - 1]];
-                                    if (lastPoint && lastPoint.ts) {
-                                        lastUpdate = new Date(lastPoint.ts).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
-                                        isActive = (Date.now() - lastPoint.ts) < 5 * 60 * 1000;
-                                    }
-                                }
+    const driversObj = this.state.drivers || {};
+    const driverEntries = Object.entries(driversObj);
+    
+    const validCardIds = new Set();
+    let hasResults = false;
+
+    // --- دالة توليد HTML الداخلي للكارت (تم التحديث لإضافة المدرسة والإحداثيات) ---
+    const getInnerHtml = (driver, isActive, currentSpeed, lastUpdate, theme, glowColor, statusText, displayId, driverPhoto, schoolName, destinationStr) => {
+        return `
+            <div class="absolute inset-0 bg-gradient-to-b from-${theme}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="absolute -right-16 -top-16 w-48 h-48 bg-${theme}-500/10 blur-[80px] rounded-full group-hover:bg-${theme}-500/20 transition-all duration-700"></div>
+            
+            <i class="ph-duotone ph-steering-wheel absolute top-4 left-4 text-6xl text-white/5 group-hover:text-${theme}-500/10 group-hover:rotate-45 transition-all duration-700 animate-float"></i>
+            
+            <div class="relative p-6 pb-2 flex items-start gap-4 z-10">
+                <div class="relative shrink-0">
+                    <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-white/10 to-transparent border border-white/10 group-hover:border-${theme}-400/50 transition-all shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+                        <img src="${driverPhoto}" class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                    <div class="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center">
+                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-${theme}-400 opacity-75"></span>
+                         <span class="relative inline-flex h-4 w-4 rounded-full bg-${theme}-500 border-2 border-[#1e293b]"></span>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-0 pt-1">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-white truncate group-hover:text-${theme}-300 transition-colors">${driver.profile.name || 'بدون اسم'}</h3>
+                        <span class="px-2 py-1 rounded-lg text-[10px] font-mono font-bold bg-black/40 text-slate-400 border border-white/5 group-hover:border-${theme}-500/30 group-hover:text-${theme}-400 transition-all">#${displayId}</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-${theme}-500/10 text-${theme}-400 border border-${theme}-500/20 flex items-center gap-1.5 shadow-[0_0_10px_${glowColor}]">
+                            <i class="ph-fill ph-${isActive ? 'broadcast' : 'prohibit'}"></i>
+                            ${statusText}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-2 grid grid-cols-2 gap-3 relative z-10">
+                <div class="bg-[#0f172a]/40 rounded-2xl p-2 pr-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-speedometer text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 font-medium">السرعة</p>
+                        <p class="text-sm font-bold text-white font-mono leading-none mt-0.5">${currentSpeed} <span class="text-[9px] text-slate-400">km/h</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-[#0f172a]/40 rounded-2xl p-2 pr-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-clock text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 font-medium">التحديث</p>
+                        <p class="text-sm font-bold text-white font-mono leading-none mt-0.5">${lastUpdate}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 pb-2 pt-1 grid grid-cols-1 gap-2 relative z-10">
+                
+                <div class="bg-[#0f172a]/60 rounded-2xl p-3 flex items-center gap-3 border border-white/5 group-hover:border-purple-500/30 transition-all relative overflow-hidden">
+                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-purple-500/50"></div>
+                    
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shrink-0">
+                        <i class="ph-fill ph-student text-xl"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] text-slate-500 font-medium flex justify-between">
+                            <span>المدرسة التابع لها</span>
+                            <i class="ph-bold ph-buildings text-purple-500/50"></i>
+                        </p>
+                        <p class="text-sm font-bold text-white truncate leading-tight mt-0.5">${schoolName}</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#0f172a]/40 rounded-2xl p-3 flex items-center gap-3 border border-white/5 group-hover:bg-[#0f172a]/60 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 shrink-0">
+                        <i class="ph-fill ph-map-pin-line text-lg animate-pulse"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] text-slate-500 font-medium">إحداثيات الوجهة الحالية</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <p class="text-xs font-bold text-white font-mono tracking-wider truncate dir-ltr text-right">${destinationStr}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 mt-2 border-t border-white/5 bg-gradient-to-t from-black/20 to-transparent relative z-10">
+                <button id="btn-${driver.id}" class="w-full group/btn relative flex items-center justify-center gap-2 py-3 rounded-xl bg-${theme}-600 hover:bg-${theme}-500 text-white font-bold text-xs overflow-hidden transition-all shadow-lg shadow-${theme}-900/20">
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[100%] group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
+                    <i class="ph-bold ph-crosshair-simple text-lg group-hover/btn:animate-spin"></i>
+                    <span class="relative">فتح مركز التتبع</span>
+                </button>
+            </div>
+            
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-${theme}-500 to-transparent opacity-50"></div>
+        `;
+    };
+
+    // 2. معالجة البيانات
+    if (driverEntries.length === 0) {
+        list.innerHTML = this.getEmptyStateHTML('لا توجد بيانات للسائقين حالياً');
+        return;
+    }
+
+    driverEntries.forEach(([driverId, driverData]) => {
+        const driver = { ...driverData, id: driverId };
+        const profile = driver.profile || { name: 'غير معروف' };
+        const driverName = profile.name || 'بدون اسم';
+        
+        // --- استخراج البيانات الجديدة (المدرسة والوجهة) ---
+        // استخدام بيانات افتراضية إذا لم تكن موجودة في الداتابيز
+        const schoolName = profile.school || 'مدرسة المستقبل الدولية'; 
+        
+        // حساب الإحداثيات والوجهة
+        let currentSpeed = 0;
+        let lastUpdate = 'غير متوفر';
+        let isActive = false;
+        let destinationStr = '--.----, --.----'; // القيمة الافتراضية
+
+        if(driver.trips) {
+            const tripKeys = Object.keys(driver.trips);
+            if (tripKeys.length > 0) {
+                const lastTrip = driver.trips[tripKeys[tripKeys.length - 1]];
+                
+                // محاولة استخراج الوجهة من بيانات الرحلة الأخيرة
+                if (lastTrip && lastTrip.destination) {
+                    // إذا كان هناك كائن وجهة مخزن
+                    destinationStr = `${Number(lastTrip.destination.lat).toFixed(4)}, ${Number(lastTrip.destination.lng).toFixed(4)}`;
+                } else if (lastTrip && lastTrip.actualPath) {
+                    // أو نستخدم آخر نقطة وصل لها كوجهة حالية
+                    const pathKeys = Object.keys(lastTrip.actualPath);
+                    if (pathKeys.length > 0) {
+                        const lastPoint = lastTrip.actualPath[pathKeys[pathKeys.length - 1]];
+                        if (lastPoint) {
+                            if (lastPoint.ts) {
+                                lastUpdate = new Date(lastPoint.ts).toLocaleTimeString('ar', {hour: '2-digit', minute:'2-digit'});
+                                isActive = (Date.now() - lastPoint.ts) < 5 * 60 * 1000;
                             }
+                            // تحديث الوجهة بآخر نقطة معروفة كإحداثيات
+                            // destinationStr = `${Number(lastPoint.lat).toFixed(4)}, ${Number(lastPoint.lng).toFixed(4)}`;
                         }
                     }
+                    currentSpeed = App.Utils.calculateSpeed(lastTrip.actualPath);
+                }
+            }
+        }
 
-                    // 3. إعداد متغيرات التصميم
-                    const glowClass = isActive 
-                        ? 'shadow-[0_0_20px_rgba(16,185,129,0.15)] border-emerald-500/30' 
-                        : 'border-white/5';
-                    
-                    const statusColor = isActive ? 'emerald' : 'slate';
-                    const statusText = isActive ? 'متصل الآن' : 'غير نشط';
-                    
-                    // إصلاح الخطأ: التأكد من وجود ID وقصه بأمان
-                    // إذا كان الـ ID غير موجود نضع نص افتراضي
-                    const displayId = driver.id ? String(driver.id).substring(0, 8) : '---';
-                    const driverInitial = driverName.charAt(0);
+        // الفلترة
+        if (filterMode === 'active' && !isActive) return;
+        if (filterMode === 'stopped' && isActive) return;
 
-                    // 4. إنشاء البطاقة
-                    const card = document.createElement('div');
-                    card.className = `group relative bg-[#0f172a]/60 backdrop-blur-xl rounded-3xl border ${glowClass} p-1 overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-[#0f172a]/80`;
-                    
-                    card.innerHTML = `
-                        <div class="h-28 w-full bg-slate-800/50 rounded-2xl relative overflow-hidden group-hover:opacity-90 transition">
-                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#4b5563 1px, transparent 1px); background-size: 10px 10px;"></div>
-                            
-                            ${isActive ? 
-                                `<div class="absolute inset-0 bg-emerald-900/10 flex items-center justify-center">
-                                    <div class="flex items-center gap-2 text-emerald-400 text-[10px] font-mono bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        GPS SIGNAL LIVE
-                                    </div>
-                                </div>` 
-                                : 
-                                `<div class="absolute inset-0 flex items-center justify-center text-slate-600/50">
-                                    <i class="ph ph-map-pin-slash text-4xl"></i>
-                                </div>`
-                            }
-                        </div>
+        const searchMatch = driverName.toLowerCase().includes(searchTerm) || 
+                            String(driver.id).includes(searchTerm);
+        if (searchTerm && !searchMatch) return;
 
-                        <div class="p-5 relative">
-                            <div class="absolute -top-10 right-5">
-                                <div class="w-14 h-14 rounded-2xl bg-[#0f172a] p-1 border border-white/10 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                                    <div class="w-full h-full rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-lg font-bold text-white shadow-inner">
-                                        ${driverInitial}
-                                    </div>
-                                </div>
-                            </div>
+        hasResults = true;
+        const cardDomId = `tracking-card-${driverId}`;
+        validCardIds.add(cardDomId);
 
-                            <div class="mt-4">
-                                <h4 class="text-lg font-bold text-white leading-tight mb-1">${driverName}</h4>
-                                <p class="text-[10px] text-slate-400 font-mono tracking-wider opacity-70">ID: ${displayId}</p>
-                            </div>
+        // متغيرات التصميم
+        const theme = isActive ? 'emerald' : 'slate';
+        const glowColor = isActive ? 'rgba(16,185,129,0.4)' : 'rgba(148,163,184,0.1)';
+        const statusText = isActive ? 'متصل الآن' : 'غير متصل';
+        const displayId = driver.id ? String(driver.id).substring(0, 6).toUpperCase() : '---';
+        const driverPhoto = driver.photo || `https://ui-avatars.com/api/?name=${driverName}&background=random&color=fff`;
 
-                            <div class="mt-6 grid grid-cols-2 gap-2">
-                                <button id="btn-${driver.id}" class="col-span-2 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold transition-all shadow-lg shadow-blue-900/20 group-hover:shadow-blue-500/30 flex items-center justify-center gap-2 border border-white/10">
-                                    <i class="ph ph-crosshair-simple text-base"></i>
-                                    مركز القيادة والتتبع
-                                </button>
-                                
-                                <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col justify-center items-center gap-1 group-hover:bg-white/10 transition">
-                                    <span class="text-[10px] text-slate-400">الحالة</span>
-                                    <span class="text-xs font-bold text-${statusColor}-400 flex items-center gap-1">
-                                        ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>' : ''}
-                                        ${statusText}
-                                    </span>
-                                </div>
-                                
-                                <div class="p-2 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col justify-center items-center gap-1 group-hover:bg-white/10 transition">
-                                    <span class="text-[10px] text-slate-400">السرعة الحالية</span>
-                                    <span class="text-xs font-mono font-bold text-indigo-300">${currentSpeed} <span class="text-[9px] text-slate-500">km/h</span></span>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3 text-center border-t border-white/5 pt-2">
-                                <p class="text-[10px] text-slate-500">آخر إشارة: <span class="text-slate-300 font-mono">${lastUpdate}</span></p>
-                            </div>
-                        </div>
-                    `;
+        // التحديث الذكي
+        let cardWrapper = document.getElementById(cardDomId);
+        
+        // تمرير البيانات الجديدة لدالة HTML
+        const newInnerHTML = getInnerHtml(
+            driver, isActive, currentSpeed, lastUpdate, theme, glowColor, statusText, displayId, driverPhoto, 
+            schoolName, destinationStr
+        );
 
-                    const btn = card.querySelector(`#btn-${driver.id}`);
-                    if(btn) {
-                        btn.onclick = (e) => {
-                            e.stopPropagation();
-                            // التأكد من أن الدالة موجودة قبل استدعائها
-                            if (typeof this.openTrackingDetail === 'function') {
-                                this.openTrackingDetail(driver.id);
-                            } else {
-                                console.error('openTrackingDetail function is missing');
-                            }
-                        };
-                    }
-                    
-                    list.appendChild(card);
-                });
-            },
+        if (cardWrapper) {
+            if (cardWrapper.innerHTML !== newInnerHTML) {
+                cardWrapper.innerHTML = newInnerHTML;
+                const btn = cardWrapper.querySelector(`#btn-${driver.id}`);
+                if(btn) btn.onclick = (e) => { e.stopPropagation(); App.openTrackingDetail(driver.id); };
+            }
+            // تحديث الإطار الأخضر
+            const baseClasses = `group relative w-full bg-[#1e293b]/60 backdrop-blur-2xl rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl`;
+            const activeClasses = `border border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]`;
+            const inactiveClasses = `border border-white/5 hover:border-slate-500/30`;
+            cardWrapper.firstElementChild.className = isActive ? `${baseClasses} ${activeClasses}` : `${baseClasses} ${inactiveClasses}`;
 
+        } else {
+            cardWrapper = document.createElement('div');
+            cardWrapper.id = cardDomId;
+            cardWrapper.className = `tracking-card-item opacity-0 transform translate-y-8`;
+            const borderClass = isActive ? 'border border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]' : 'border border-white/5 hover:border-slate-500/30';
+            
+            cardWrapper.innerHTML = `
+                <div class="group relative w-full bg-[#1e293b]/60 backdrop-blur-2xl rounded-[2rem] ${borderClass} overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                    ${newInnerHTML}
+                </div>
+            `;
+            const btn = cardWrapper.querySelector(`#btn-${driver.id}`);
+            if(btn) btn.onclick = (e) => { e.stopPropagation(); App.openTrackingDetail(driver.id); };
+
+            list.appendChild(cardWrapper);
+            if (window.gsap) gsap.to(cardWrapper, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", clearProps: "transform" });
+        }
+    });
+
+    // 3. التنظيف
+    Array.from(list.children).forEach(child => {
+        if (child.id === 'tracking-empty-state') return;
+        if (!child.id || !child.id.startsWith('tracking-card-') || !validCardIds.has(child.id)) {
+            child.remove();
+        }
+    });
+
+    // 4. حالة الفراغ
+    const emptyStateId = 'tracking-empty-state';
+    let emptyState = document.getElementById(emptyStateId);
+    
+    if (!hasResults) {
+        if (!emptyState) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.id = emptyStateId;
+            emptyDiv.className = 'col-span-full';
+            emptyDiv.innerHTML = this.getEmptyStateHTML('لا توجد نتائج مطابقة للبحث أو الفلتر');
+            list.appendChild(emptyDiv);
+        }
+    } else {
+        if (emptyState) emptyState.remove();
+    }
+},
+// دالة HTML لحالة الفراغ
+getEmptyStateHTML: function(message) {
+    return `
+        <div class="flex flex-col items-center justify-center h-64 text-slate-500 glass-panel rounded-[2rem] border border-white/5 animate-pulse-slow">
+            <div class="w-24 h-24 bg-gradient-to-br from-slate-800 to-slate-900 rounded-full flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+                <i class="ph-duotone ph-magnifying-glass text-4xl opacity-50 text-indigo-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">عذراً، لم نعثر على شيء</h3>
+            <p class="text-sm font-medium opacity-60">${message}</p>
+        </div>`;
+},
+// دالة مساعدة للشكل الفارغ
+getEmptyStateHTML: function(message) {
+    return `
+        <div class="col-span-full flex flex-col items-center justify-center h-64 text-slate-500 glass-panel rounded-3xl border border-white/5 animate-pulse">
+            <div class="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
+                <i class="ph-duotone ph-magnifying-glass text-4xl opacity-50"></i>
+            </div>
+            <p class="text-sm font-bold opacity-70">${message}</p>
+        </div>`;
+},
             openTrackingDetail: function(driverId) {
                 this.state.currentTrackingDriverId = driverId;
                 this.navigate('tracking-detail');
