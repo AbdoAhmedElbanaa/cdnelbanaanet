@@ -438,6 +438,67 @@
     0% { transform: scale(0.5); opacity: 1; }
     100% { transform: scale(2.5); opacity: 0; }
 }
+/* Hero Section Custom Animations */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 8s infinite ease-in-out;
+}
+
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0) rotate(12deg); }
+    50% { transform: translateY(-20px) rotate(15deg); }
+}
+
+.animate-float-slow {
+    animation: float-slow 10s infinite ease-in-out;
+}
+
+@keyframes scan-down {
+    0% { top: -10%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 110%; opacity: 0; }
+}
+
+.animate-scan-down {
+    animation: scan-down 2s infinite linear;
+}
+
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+    animation: shimmer 1.5s infinite;
+}
+
+.glass-hero {
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Perspective for Text 3D feel */
+.perspective-container {
+    perspective: 1000px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+    #auth-hero {
+        background-image: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+    }
+    .hero-content {
+        display: none; /* Hide heavy text on mobile */
+    }
+    #auth-card {
+        background: rgba(15, 23, 42, 0.85); /* Darker on mobile for readability */
+    }
+}
     </style>
 </head>
 <body class="text-slate-200">
@@ -446,44 +507,150 @@
     <div id="app" class="relative min-h-screen flex overflow-hidden">
         
         <!-- Toast Container -->
-<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2"></div>
-
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a] transition-opacity duration-500">
-            <div class="flex flex-col items-center">
-                <div class="loader mb-4"></div>
-                <h2 class="text-xl font-bold animate-pulse">جاري تحميل النظام...</h2>
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2"></div>
+        <!-- Loader Screen -->
+            <div id="app-loader" class="fixed inset-0 z-[100] bg-[#0f172a] flex flex-col items-center justify-center transition-opacity duration-500">
+            <div class="relative w-24 h-24 mb-8">
+                <div class="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping"></div>
+                <div class="absolute inset-0 bg-indigo-500/10 rounded-full blur-xl"></div>
+                <div class="relative w-full h-full bg-[#1e1b4b] rounded-full border border-indigo-500/30 flex items-center justify-center shadow-2xl">
+                    <i class="ph-fill ph-bus text-4xl text-indigo-400 animate-pulse"></i>
+                </div>
+            </div>
+            
+            <h2 class="text-xl font-bold text-white mb-2 tracking-wide">النقل المدرسي الذكي</h2>
+            <div class="flex items-center gap-2 text-indigo-300 text-sm font-mono bg-indigo-900/20 px-4 py-1.5 rounded-full border border-indigo-500/20">
+                <i class="ph ph-circle-notch animate-spin"></i>
+                <span id="loader-text">جاري استعادة الجلسة...</span>
             </div>
         </div>
-
         <!-- Auth Screen -->
-        <div id="auth-screen" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-            <div class="glass-panel p-8 rounded-2xl w-full max-w-md relative z-10 auth-box">
-                <div class="text-center mb-8">
-                    <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
-                        <i class="ph ph-bus text-3xl text-indigo-400"></i>
+        <section id="auth-hero" class="relative w-full min-h-screen overflow-hidden bg-slate-900 flex items-center justify-center lg:justify-between px-4 lg:px-20 relative z-50">
+    
+    <div class="absolute inset-0 z-0 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a]"></div>
+        
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse-slow" style="animation-delay: 2s"></div>
+        
+        <div class="absolute inset-0 opacity-20" 
+             style="background-image: linear-gradient(#6366f1 1px, transparent 1px), linear-gradient(90deg, #6366f1 1px, transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle at center, black 40%, transparent 80%);">
+        </div>
+    </div>
+
+    <div class="hidden lg:flex flex-col justify-center w-1/2 h-full relative z-10 pr-10 text-white perspective-container">
+        
+        <div class="absolute -top-20 -right-20 text-[15rem] text-white/5 rotate-12 animate-float-slow pointer-events-none">
+            <i class="ph-fill ph-bus"></i>
+        </div>
+
+        <div class="hero-content space-y-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-sm font-medium backdrop-blur-md w-fit opacity-0 translate-y-5 hero-anim">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                <span>الإصدار Enterprise V2.0</span>
+            </div>
+
+            <h1 class="text-5xl xl:text-7xl font-bold leading-tight opacity-0 translate-y-5 hero-anim">
+                <span class="block text-transparent bg-clip-text bg-gradient-to-l from-white to-slate-400">منصة إدارة</span>
+                <span class="block text-transparent bg-clip-text bg-gradient-to-l from-indigo-400 to-purple-400">النقل المدرسي الذكي</span>
+            </h1>
+
+            <p class="text-lg text-slate-400 max-w-xl leading-relaxed opacity-0 translate-y-5 hero-anim">
+                نظام متكامل يربط المدرسة، السائقين، وأولياء الأمور في بيئة رقمية آمنة. تتبع مباشر للحافلات، إدارة ذكية للمسارات، وإشعارات فورية لضمان سلامة الطلاب.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 max-w-lg mt-8 opacity-0 translate-y-5 hero-anim">
+                <div class="glass-panel p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all group cursor-default">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform"><i class="ph ph-shield-check text-xl"></i></div>
+                        <span class="text-slate-300 font-bold">أمان عالي</span>
                     </div>
-                    <h1 class="text-2xl font-bold text-white mb-2">منصة إدارة النقل المدرسي</h1>
-                    <p class="text-slate-400 text-sm">تسجيل دخول المشرفين</p>
+                    <p class="text-xs text-slate-500">مراقبة السرعة والسلوك</p>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all group cursor-default">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-lg bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform"><i class="ph ph-map-trifold text-xl"></i></div>
+                        <span class="text-slate-300 font-bold">تتبع لحظي</span>
+                    </div>
+                    <p class="text-xs text-slate-500">تحديث GPS كل ثانية</p>
+                </div>
+            </div>
+            
+            <div class="pt-6 border-t border-white/10 opacity-0 translate-y-5 hero-anim">
+                <p class="text-xs text-slate-500 mb-3 uppercase tracking-widest">يدعم تقنيات</p>
+                <div class="flex gap-4 text-slate-400 text-2xl">
+                    <i class="ph-fill ph-google-logo hover:text-white transition-colors" title="Google Maps"></i>
+                    <i class="ph-bold ph-globe hover:text-white transition-colors" title="TomTom"></i>
+                    <i class="ph-fill ph-cloud hover:text-white transition-colors" title="Cloud"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/2 flex items-center justify-center lg:justify-end relative z-20">
+        
+        <div id="auth-card" class="glass-hero w-full max-w-[420px] p-8 rounded-[2rem] border border-white/10 shadow-2xl backdrop-blur-xl bg-[#0f172a]/60 relative overflow-hidden transform opacity-0 translate-y-10 hover:shadow-indigo-500/10 transition-shadow duration-500">
+            
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/30 blur-[60px] rounded-full pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/30 blur-[60px] rounded-full pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <div class="text-center mb-8 logo-anim">
+                    <div class="relative w-20 h-20 mx-auto mb-4 group cursor-pointer">
+                        <div class="absolute inset-0 bg-indigo-600 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+                        <div class="relative w-full h-full bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl flex items-center justify-center border border-indigo-500/30 shadow-inner overflow-hidden">
+                            <i class="ph-fill ph-bus text-4xl text-indigo-400 bus-icon group-hover:scale-110 transition-transform duration-300"></i>
+                            <div class="absolute top-0 w-full h-[2px] bg-indigo-400/50 shadow-[0_0_10px_#818cf8] animate-scan-down opacity-0 group-hover:opacity-100"></div>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">تسجيل الدخول</h2>
+                    <p class="text-slate-400 text-sm mt-1">لوحة تحكم المدراء والمشرفين</p>
                 </div>
                 
                 <form id="login-form" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-400 mb-1">البريد الإلكتروني</label>
-                        <input type="email" id="email" class="glass-input w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500" placeholder="admin@school.com" required>
+                    <div class="form-group opacity-0 translate-y-4">
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5 mr-1">البريد الإلكتروني</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="ph ph-envelope-simple text-slate-500 group-focus-within:text-indigo-400 transition-colors"></i>
+                            </div>
+                            <input type="email" id="email" 
+                                class="w-full pr-10 pl-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all duration-300 text-sm font-medium" 
+                                placeholder="admin@school.com" required>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-400 mb-1">كلمة المرور</label>
-                        <input type="password" id="password" class="glass-input w-full px-4 py-3 rounded-xl" placeholder="••••••••" required>
+
+                    <div class="form-group opacity-0 translate-y-4">
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5 mr-1">كلمة المرور</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="ph ph-lock-key text-slate-500 group-focus-within:text-indigo-400 transition-colors"></i>
+                            </div>
+                            <input type="password" id="password" 
+                                class="w-full pr-10 pl-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all duration-300 text-sm font-medium tracking-widest" 
+                                placeholder="••••••••" required>
+                        </div>
+                        <div class="flex justify-end mt-2">
+                            <a href="#" class="text-[10px] text-slate-500 hover:text-indigo-400 transition-colors">نسيت كلمة المرور؟</a>
+                        </div>
                     </div>
-                    <button type="submit" class="glass-btn w-full py-3 rounded-xl font-bold text-white shadow-lg hover:shadow-indigo-500/30">
-                        دخول للنظام
+
+                    <button type="submit" id="submit-btn" 
+                            class="form-group opacity-0 translate-y-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            دخول آمن <i class="ph-bold ph-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                        </span>
+                        <div class="absolute inset-0 -translate-x-full group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent z-0"></div>
                     </button>
-                    <p id="login-error" class="text-red-400 text-sm text-center hidden"></p>
+
+                    <p id="login-error" class="text-red-400 text-xs text-center hidden mt-3 bg-red-500/10 p-2 rounded-lg border border-red-500/20 flex items-center justify-center gap-2">
+                        <i class="ph-fill ph-warning-circle"></i> <span>خطأ في البيانات</span>
+                    </p>
                 </form>
             </div>
         </div>
+    </div>
+</section>
 
         <!-- Main Dashboard Layout -->
         <div id="dashboard-layout" class="flex w-full hidden opacity-0">
@@ -1818,7 +1985,72 @@
         const auth = firebase.auth();
         const db = firebase.database();
         const appId = firebaseConfig.appId || 'default';
+// --- Hero Section Animations ---
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // 1. تسلسل ظهور العناصر (Timeline)
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
+    // ظهور بطاقة الدخول
+    tl.to("#auth-card", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        delay: 0.2
+    })
+    // ظهور نصوص الـ Hero (فقط في الديسكتوب)
+    .to(".hero-anim", {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.15 // تتابع زمني بين كل سطر
+    }, "-=0.5")
+    // ظهور عناصر النموذج داخل البطاقة
+    .to(".form-group", {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.1
+    }, "-=1.0");
+
+    // 2. تفاعل الخلفية مع الماوس (Parallax Effect)
+    const heroSection = document.getElementById('auth-hero');
+    if(heroSection && window.innerWidth > 1024) {
+        heroSection.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+            // تحريك الأيقونة الكبيرة في الخلفية
+            gsap.to('.animate-float-slow', {
+                x: x * 2,
+                y: y * 2,
+                duration: 1,
+                ease: "power1.out"
+            });
+            
+            // تحريك النصوص بشكل خفيف عكسي
+            gsap.to('.hero-content', {
+                x: -x,
+                y: -y,
+                duration: 1.5,
+                ease: "power1.out"
+            });
+        });
+    }
+
+    // 3. تفاعل عند الكتابة في حقل الايميل
+    const emailInput = document.getElementById('email');
+    const busIcon = document.querySelector('.bus-icon');
+    
+    if(emailInput && busIcon) {
+        emailInput.addEventListener('focus', () => {
+            gsap.to(busIcon, { scale: 1.2, color: "#818cf8", duration: 0.3 });
+        });
+        emailInput.addEventListener('blur', () => {
+            gsap.to(busIcon, { scale: 1, color: "#6366f1", duration: 0.3 });
+        });
+    }
+});
         // --- 2. STATE MANAGEMENT & UTILS ---
         const App = {
             state: {
@@ -3419,28 +3651,43 @@
                 }
             },
 
-            // --- INIT ---
+// --- INIT ---
             init: function() {
-                // GSAP Animations Setup
-                gsap.to("#loading-screen", { opacity: 0, delay: 1, duration: 0.5, onComplete: () => {
-                    document.getElementById('loading-screen').classList.add('hidden');
-                }});
+                const loaderText = document.getElementById('loader-text');
 
                 // Auth Listener
                 auth.onAuthStateChanged(user => {
                     if (user) {
+                        // حالة: المستخدم مسجل دخول مسبقاً
+                        if(loaderText) loaderText.textContent = "أهلاً بك، جاري تحضير النظام...";
                         this.state.user = user; 
-                        this.checkAdminRole(user);
+                        
+                        // نستخدم promise لانتظار التحقق قبل إخفاء اللودر
+                        this.checkAdminRole(user).then(() => {
+                            this.transitionToApp(true); // true = دخول تلقائي
+                        });
                     } else {
-                        this.showAuth();
+                        // حالة: لا يوجد مستخدم
+                        if(loaderText) loaderText.textContent = "جاري تحويلك لتسجيل الدخول...";
+                        setTimeout(() => {
+                            this.showAuth(true); // true = أول مرة
+                        }, 800);
                     }
                 });
-                    this.Settings.load();
-                    App.FleetFeed.init();
+
+                this.Settings.load();
+                // تأكد من وجود FleetFeed قبل استدعائه
+                if(App.FleetFeed) App.FleetFeed.init();
+
                 // Event Listeners
-                document.getElementById('login-form').addEventListener('submit', this.handleLogin.bind(this));
-                document.getElementById('driver-form').addEventListener('submit', this.handleSaveDriver.bind(this));
-                document.getElementById('student-form').addEventListener('submit', this.handleSaveStudent.bind(this));
+                const loginForm = document.getElementById('login-form');
+                if(loginForm) loginForm.addEventListener('submit', this.handleLogin.bind(this));
+                
+                const driverForm = document.getElementById('driver-form');
+                if(driverForm) driverForm.addEventListener('submit', this.handleSaveDriver.bind(this));
+                
+                const studentForm = document.getElementById('student-form');
+                if(studentForm) studentForm.addEventListener('submit', this.handleSaveStudent.bind(this));
                 
                 const destSearch = document.getElementById('destination-search');
                 if (destSearch) destSearch.addEventListener('input', this.handleLocationSearch.bind(this));
@@ -3463,72 +3710,153 @@
                 }
             },
 
+            // دالة مساعدة جديدة لضمان الانتقال النظيف وإخفاء الشاشات المتداخلة
+            transitionToApp: function(isInitialLoad) {
+                const loader = document.getElementById('app-loader');
+                const authScreen = document.getElementById('auth-hero');
+                const dashboard = document.getElementById('dashboard-layout');
+
+                // 1. إخفاء شاشة الدخول تماماً
+                if(authScreen) {
+                    authScreen.classList.add('hidden');
+                    authScreen.style.display = 'none'; // ضمان إضافي لعدم الحجز في DOM
+                }
+
+                // 2. تجهيز الداشبورد (لكنه مخفي بالشفافية أولاً)
+                if(dashboard) {
+                    dashboard.classList.remove('hidden');
+                    dashboard.style.display = 'flex';
+                }
+
+                // 3. التعامل مع اللودر
+                if(isInitialLoad && loader) {
+                    gsap.to(loader, {
+                        opacity: 0,
+                        duration: 0.8,
+                        onComplete: () => {
+                            loader.classList.add('hidden');
+                            this.showDashboard(); // إظهار الداشبورد الآن
+                        }
+                    });
+                } else {
+                    this.showDashboard();
+                }
+            },
+
             // --- AUTH LOGIC ---
             handleLogin: async function(e) {
                 e.preventDefault();
+                
+                const btn = document.getElementById('submit-btn');
+                const originalContent = btn.innerHTML;
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const errorEl = document.getElementById('login-error');
                 
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                } catch (error) {
-                    errorEl.textContent = "خطأ في البريد أو كلمة المرور";
-                    errorEl.classList.remove('hidden');
-                }
-            },
+                // 1. UI Loading State
+                errorEl.classList.add('hidden');
+                btn.disabled = true;
+                btn.innerHTML = '<div class="flex items-center justify-center gap-2"><i class="ph ph-spinner animate-spin text-xl"></i> <span>جاري التحقق من البيانات...</span></div>';
+                btn.classList.add('opacity-90', 'cursor-not-allowed');
 
-            checkAdminRole: function(user) {
-                // 1. أولاً: التحقق مما إذا كان مدير مدرسة
-                const schoolAdminRef = db.ref(`school_admins/${user.uid}`);
-                
-                schoolAdminRef.once('value').then(snapshot => {
-                    if (snapshot.exists()) {
-                        // -- المستخدم مدير مدرسة --
-                        this.state.user = user;
-                        this.state.role = 'school_admin';
+                // 2. Simulate Verification Delay (1.5 ثانية)
+                setTimeout(async () => {
+                    try {
+                        await auth.signInWithEmailAndPassword(email, password);
                         
-                        const adminData = snapshot.val();
-                        const popupEmail = document.getElementById('popup-admin-email');
-                        const adminName = document.getElementById('sidebar-admin-name');
-                        
-                        if(popupEmail) popupEmail.textContent = adminData.email || user.email;
-                        if(adminName) adminName.textContent = adminData.name || 'مدير المدرسة';
-                        
-                        this.showDashboard();
-                    } else {
-                        // 2. ثانياً: إذا لم يكن مدير مدرسة، تحقق مما إذا كان سوبر أدمن
-                        const superAdminRef = db.ref(`super_admins/${user.uid}`);
-                        
-                        superAdminRef.once('value').then(superSnap => {
-                            if (superSnap.exists()) {
-                                // -- المستخدم سوبر أدمن --
-                                this.state.user = user;
-                                this.state.role = 'super_admin';
-                                
-                                const adminData = superSnap.val();
-                                const popupEmail = document.getElementById('popup-admin-email');
-                                const adminName = document.getElementById('sidebar-admin-name');
-                                
-                                if(popupEmail) popupEmail.textContent = adminData.email || user.email;
-                                if(adminName) adminName.textContent = adminData.name || 'Super Admin';
-                                // تمييز السوبر أدمن بلون مختلف (اختياري)
-                                if(adminName) adminName.classList.add('text-yellow-400'); 
+                        // 3. Success Feedback
+                        btn.innerHTML = '<div class="flex items-center justify-center gap-2"><i class="ph-fill ph-check-circle text-xl"></i> <span>تم الدخول بنجاح</span></div>';
+                        btn.classList.remove('from-indigo-600', 'to-purple-600');
+                        btn.classList.add('bg-emerald-500', 'hover:bg-emerald-600', 'shadow-emerald-500/30');
 
-                                this.showDashboard();
-                            } else {
-                                // 3. المستخدم ليس مديراً ولا سوبر أدمن
-                                console.error("Access Denied: User ID not found in admin lists.");
-                                alert("عذراً، هذا الحساب لا يملك صلاحيات الدخول.");
-                                auth.signOut();
-                                this.showAuth();
+                        // 4. Transition Animation (الأنيميشن والإخفاء)
+                        const authHero = document.getElementById('auth-hero');
+                        
+                        gsap.to(authHero, {
+                            opacity: 0,
+                            y: -100,
+                            scale: 0.95,
+                            filter: "blur(10px)",
+                            duration: 0.8,
+                            ease: "power3.inOut",
+                            onComplete: () => {
+                                // 5. إخفاء شاشة الدخول تماماً لمنع التداخل
+                                authHero.classList.add('hidden');
+                                authHero.style.display = 'none'; 
+                                
+                                // الانتقال للنظام
+                                this.transitionToApp(false);
                             }
                         });
+
+                    } catch (error) {
+                        // Error Handling
+                        console.error(error);
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                        btn.classList.remove('opacity-90', 'cursor-not-allowed', 'bg-emerald-500');
+                        
+                        errorEl.innerHTML = `<i class="ph-fill ph-warning-circle"></i> بيانات الدخول غير صحيحة`;
+                        errorEl.classList.remove('hidden');
+                        
+                        gsap.fromTo("#auth-card", 
+                            { x: -10 }, 
+                            { x: 10, duration: 0.1, repeat: 3, yoyo: true, ease: "power1.inOut" }
+                        );
                     }
-                }).catch(err => {
-                    console.error("Database Error:", err);
-                    alert("خطأ في الاتصال بقاعدة البيانات");
+                }, 1500);
+            },
+
+            // تعديل الدالة لترجع Promise لضبط التزامن
+            checkAdminRole: function(user) {
+                return new Promise((resolve, reject) => {
+                    const schoolAdminRef = db.ref(`school_admins/${user.uid}`);
+                    
+                    schoolAdminRef.once('value').then(snapshot => {
+                        if (snapshot.exists()) {
+                            this.state.user = user;
+                            this.state.role = 'school_admin';
+                            
+                            const adminData = snapshot.val();
+                            this.updateAdminInfo(user, adminData);
+                            resolve(); // تم التحقق بنجاح
+                        } else {
+                            const superAdminRef = db.ref(`super_admins/${user.uid}`);
+                            superAdminRef.once('value').then(superSnap => {
+                                if (superSnap.exists()) {
+                                    this.state.user = user;
+                                    this.state.role = 'super_admin';
+                                    
+                                    const adminData = superSnap.val();
+                                    this.updateAdminInfo(user, adminData);
+                                    
+                                    // تمييز السوبر أدمن
+                                    const adminName = document.getElementById('sidebar-admin-name');
+                                    if(adminName) adminName.classList.add('text-yellow-400'); 
+                                    
+                                    resolve(); // تم التحقق بنجاح
+                                } else {
+                                    alert("عذراً، هذا الحساب لا يملك صلاحيات الدخول.");
+                                    auth.signOut();
+                                    this.showAuth();
+                                    reject(); // فشل التحقق
+                                }
+                            });
+                        }
+                    }).catch(err => {
+                        console.error("Database Error:", err);
+                        alert("خطأ في الاتصال بقاعدة البيانات");
+                        reject(err);
+                    });
                 });
+            },
+
+            // دالة مساعدة لتحديث بيانات الأدمن في الواجهة
+            updateAdminInfo: function(user, data) {
+                const popupEmail = document.getElementById('popup-admin-email');
+                const adminName = document.getElementById('sidebar-admin-name');
+                if(popupEmail) popupEmail.textContent = data.email || user.email;
+                if(adminName) adminName.textContent = data.name || (this.state.role === 'super_admin' ? 'Super Admin' : 'مدير المدرسة');
             },
 
             logout: function() {
@@ -3536,29 +3864,59 @@
             },
 
             // --- UI NAVIGATION ---
-            showAuth: function() {
-                const authScreen = document.getElementById('auth-screen');
+            showAuth: function(isInitialLoad = false) {
+                const loader = document.getElementById('app-loader');
+                const authScreen = document.getElementById('auth-hero');
                 const dashboardLayout = document.getElementById('dashboard-layout');
 
-                if (authScreen) authScreen.classList.remove('hidden');
-                if (dashboardLayout) dashboardLayout.classList.add('hidden');
-                gsap.from(".auth-box", {y: 50, opacity: 0, duration: 0.8, ease: "back.out(1.7)"});
+                // إخفاء الداشبورد
+                if (dashboardLayout) {
+                    dashboardLayout.classList.add('hidden');
+                    dashboardLayout.style.display = 'none';
+                }
+
+                // إظهار شاشة الدخول
+                if (authScreen) {
+                    authScreen.classList.remove('hidden');
+                    authScreen.style.display = 'flex'; // أو flex حسب التنسيق
+                    
+                    // إعادة ضبط الخصائص للأنيميشن
+                    gsap.set(authScreen, {y: 0, opacity: 1, filter: 'blur(0px)', scale: 1});
+                    gsap.from(".auth-box", {y: 50, opacity: 0, duration: 0.8, ease: "back.out(1.7)"});
+                }
+
+                // إخفاء اللودر إذا كان موجوداً
+                if(isInitialLoad && loader) {
+                    gsap.to(loader, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => loader.classList.add('hidden')
+                    });
+                }
             },
 
             showDashboard: function() {
-                const authScreen = document.getElementById('auth-screen');
                 const dashboardLayout = document.getElementById('dashboard-layout');
-
-                if (authScreen) authScreen.classList.add('hidden');
-                if (dashboardLayout) dashboardLayout.classList.remove('hidden');
-                gsap.to(dashboardLayout, {opacity: 1, duration: 0.5});
+                
+                // ملاحظة: تم التعامل مع authScreen hidden في transitionToApp
+                
+                if (dashboardLayout) {
+                    dashboardLayout.classList.remove('hidden');
+                    gsap.fromTo(dashboardLayout, 
+                        { opacity: 0, y: 20 }, 
+                        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+                    );
+                }
 
                 this.setupRealtimeListeners();
                 this.navigate('home');
                 
-                setTimeout(() => this.initHomeMap(), 1000);
+                // تأخير بسيط لضمان رسم الخريطة
+                setTimeout(() => {
+                    if(this.state.homeMap) App.MapHandler.resizeMap(this.state.homeMap);
+                    else this.initHomeMap();
+                }, 800);
             },
-
             toggleAdminMenu: function() {
                 const menu = document.getElementById('admin-menu');
                 const arrow = document.getElementById('admin-menu-arrow');
