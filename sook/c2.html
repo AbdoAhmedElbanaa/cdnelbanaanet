@@ -140,7 +140,28 @@
 #loadingView { z-index: 9990 !important; }  /* تحت السبلاش مباشرة */
 #loginView { z-index: 50 !important; }
 #homeView, #mapView { z-index: 10 !important; }
-
+#mapView {
+    /* 1. تثبيت العنصر بملء الشاشة تماماً */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    
+    /* استخدام dvh لضمان تغطية الشاشة حتى مع وجود شريط العنوان في الموبايل */
+    height: 100dvh; 
+    
+    /* 2. منع ظهور أي محتوى خارج الحدود */
+    overflow: hidden;
+    
+    /* 3. خاصية سحرية تمنع "المطاطية" أو السحب للأسفل في الموبايل */
+    overscroll-behavior: none;
+    
+    /* 4. تمنع المتصفح من معالجة حركات اللمس (مثل التمرير) */
+    /* هذا يترك التحكم باللمس لتطبيقك فقط (للخريطة والـ Drag Drop) */
+    touch-action: none;
+    
+    z-index: 1; /* تأكد من ترتيب الطبقات */
+}
         /* --- Glassmorphism & UI Components --- */
         .glass-card {
             background: rgba(30, 41, 59, 0.7); /* Slate 800/70 */
@@ -333,7 +354,7 @@
 
         #toolsMenu {
             transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: top left;
+            transform-origin: bottom left;
         }
         .tool-item {
             display: flex;
@@ -807,7 +828,58 @@
     justify-content: center;
 }
 
+/* تنسيقات المعالج (Wizard) */
+.step-dot {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #1e293b; border: 2px solid #334155;
+    display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; z-index: 10; transition: all 0.3s;
+}
+.step-dot.active {
+    background: #10b981; border-color: #10b981; color: white;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+}
+.step-dot.completed {
+    background: #065f46; border-color: #10b981; color: #34d399;
+}
 
+.wizard-step { transition: all 0.4s ease-in-out; width: 100%; }
+.active-step { display: block; animation: fadeIn 0.4s; }
+.hidden-step-right { display: none; transform: translateX(50px); opacity: 0; }
+.hidden-step-left { display: none; transform: translateX(-50px); opacity: 0; }
+
+.continent-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 15px; cursor: pointer; text-align: center;
+    transition: all 0.2s;
+}
+.continent-card:hover, .continent-card.selected {
+    background: rgba(16, 185, 129, 0.2); border-color: #10b981; transform: translateY(-2px);
+}
+
+.country-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; cursor: pointer; transition: all 0.2s;
+    border: 1px solid transparent;
+}
+.country-item:hover, .country-item.selected {
+    background: rgba(16, 185, 129, 0.1); border-color: #10b981;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+
+/* تنسيق الكبسولة الزجاجية */
+.glass-pill {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+}
 
     </style>
 </head>
@@ -1300,8 +1372,8 @@
 </div>
 
     <!-- ================= VIEW 5: MAP VIEW ================= -->
-    <div id="mapView" class="view-section view-hidden">
-        <div id="map"></div>
+<div id="mapView" class="view-section view-hidden relative bg-gray-900">
+    <div id="map" class="w-full h-full z-0"></div>
         
         <!-- Top Floating Controls -->
         <div class="absolute top-0 left-0 right-0 z-30 pointer-events-none p-4 pt-safe flex flex-col gap-3">
@@ -1320,10 +1392,6 @@
                             <i class="fas fa-chart-pie text-purple-300"></i>
                         </div>
                     </div>
-                    <!-- Tools Toggle -->
-                    <div onclick="toggleToolsMenu()" id="toolsBtn" class="hidden glass-pill w-11 h-11 rounded-full flex items-center justify-center text-gray-300 active:scale-95 transition border border-white/10 bg-slate-800/80 shadow-lg">
-                        <i class="fas fa-layer-group text-blue-400"></i>
-                    </div>
                 </div>
             </div>
             
@@ -1336,81 +1404,7 @@
             </div>
         </div>
 
-        <!-- TomTom Tools Menu -->
-        <div id="toolsMenu" class="glass-card w-64 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 opacity-0 scale-95 origin-top-left pointer-events-none absolute top-[80px] left-4 z-40">
-            <div class="p-3 bg-white/5 border-b border-white/10">
-                <h4 class="text-sm font-bold text-gray-300">أدوات الخرائط الذكية</h4>
-            </div>
-            
-            <div class="tool-item" onclick="toggleTomTomLayer('trafficFlow')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-road text-orange-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">حركة المرور</span>
-                        <span class="text-[10px] text-gray-400 block">Traffic Flow</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-trafficFlow"></div>
-            </div>
 
-            <div class="tool-item" onclick="toggleTomTomLayer('trafficIncidents')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-car-crash text-red-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">الحوادث</span>
-                        <span class="text-[10px] text-gray-400 block">Incidents</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-trafficIncidents"></div>
-            </div>
-
-            <div class="tool-item" onclick="toggleTomTomLayer('evStations')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-charging-station text-green-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">محطات شحن</span>
-                        <span class="text-[10px] text-gray-400 block">EV Stations</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-evStations"></div>
-            </div>
-
-            <div class="tool-item" onclick="toggleTomTomLayer('pois')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-gas-pump text-blue-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">محطات وقود</span>
-                        <span class="text-[10px] text-gray-400 block">Gas Stations</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-pois"></div>
-            </div>
-            
-             <div class="tool-item" onclick="toggleTomTomLayer('snapRoads')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-magnet text-purple-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">تصحيح المسار</span>
-                        <span class="text-[10px] text-gray-400 block">Snap to Roads</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-snapRoads"></div>
-            </div>
-
-            <div class="tool-item" onclick="downloadCurrentMapArea()">
-                <div class="flex items-center">
-                    <div class="tool-icon">
-                        <i class="fas fa-download text-cyan-400"></i>
-                    </div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">تحميل المنطقة</span>
-                        <span class="text-[10px] text-gray-400 block">Offline Save</span>
-                    </div>
-                </div>
-                <div id="dlStatus" class="text-[10px] text-emerald-400 font-bold hidden">تم ✅</div>
-            </div>
-
-        </div>
 
         <!-- Analytics Details Overlay (Review Mode) -->
         <div id="analyticsOverlay" class="absolute top-24 left-4 right-4 z-50 hidden" data-aos="zoom-in">
@@ -1460,17 +1454,106 @@
         </div>
 
         <!-- Controls -->
-        <div class="absolute right-4 bottom-[calc(85vh-160px+20px)] z-30 flex flex-col gap-4 pointer-events-auto">
-            <!-- Compass Button -->
-            <button onclick="resetBearing()" id="compassBtn" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
-                <i class="fas fa-compass" id="compassIcon"></i>
-            </button>
-            
-            <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
-                <i class="fas fa-crosshairs"></i>
-            </button>
+<div class="absolute right-4 bottom-[calc(85vh-160px+20px)] z-30 flex flex-col gap-4 pointer-events-auto items-end">
+    
+    <button onclick="resetBearing()" id="compassBtn" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
+        <i class="fas fa-compass" id="compassIcon"></i>
+    </button>
+
+    <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
+        <i class="fas fa-crosshairs"></i>
+    </button>
+
+<div class="relative flex flex-col items-end">
+    
+    <div onclick="toggleToolsMenu()" id="toolsBtn" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-gray-300 active:scale-95 transition border border-white/10 bg-slate-800/80 shadow-lg cursor-pointer hover:bg-slate-700 hover:text-white relative z-50">
+        <i class="fas fa-layer-group text-blue-400 text-xl"></i>
+    </div>
+
+    <div id="toolsMenu" class="absolute top-14 right-0 w-64 glass-card rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 opacity-0 scale-95 -translate-y-5 pointer-events-none origin-top-right z-40 invisible">
+        
+        <div class="p-3 bg-white/5 border-b border-white/10 flex justify-between items-center">
+            <h4 class="text-sm font-bold text-gray-300">أدوات الخرائط الذكية</h4>
+            <button onclick="toggleToolsMenu()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
         </div>
         
+        <div class="max-h-[300px] overflow-y-auto custom-scrollbar p-1">
+            
+            <div class="tool-item" onclick="toggleTomTomLayer('trafficFlow')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-road text-orange-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">حركة المرور</span>
+                        <span class="text-[10px] text-gray-400 block">Traffic Flow</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-trafficFlow"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('trafficIncidents')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-car-crash text-red-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">الحوادث</span>
+                        <span class="text-[10px] text-gray-400 block">Incidents</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-trafficIncidents"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('evStations')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-charging-station text-green-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">محطات شحن</span>
+                        <span class="text-[10px] text-gray-400 block">EV Stations</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-evStations"></div>
+            </div>
+
+            <div class="tool-item" onclick="toggleTomTomLayer('pois')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-gas-pump text-blue-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">محطات وقود</span>
+                        <span class="text-[10px] text-gray-400 block">Gas Stations</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-pois"></div>
+            </div>
+            
+            <div class="tool-item" onclick="toggleTomTomLayer('snapRoads')">
+                <div class="flex items-center">
+                    <div class="tool-icon"><i class="fas fa-magnet text-purple-400"></i></div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">تصحيح المسار</span>
+                        <span class="text-[10px] text-gray-400 block">Snap to Roads</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" id="toggle-snapRoads"></div>
+            </div>
+
+            <div class="tool-item border-t border-white/5 mt-1 pt-2" onclick="openWizard()">
+                <div class="flex items-center">
+                    <div class="tool-icon">
+                        <i class="fas fa-globe-americas text-cyan-400"></i>
+                    </div>
+                    <div class="mr-3">
+                        <span class="text-sm font-semibold block">تحميل الخرائط</span>
+                        <span class="text-[10px] text-gray-400 block">Offline Countries</span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-left text-xs text-gray-600"></i>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+        <!-- Loading Overlay -->
         <div id="loadingRoute" class="hidden absolute inset-0 bg-black/60 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
             <div class="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
             <span class="font-bold text-lg animate-pulse">جاري تحميل المسار الذكي...</span>
@@ -1680,6 +1763,105 @@
         </div>
     </div>
 
+    <!-- Mini Download Indicator -->
+<div id="miniDownloadIndicator" onclick="openWizard()" 
+     class="fixed left-4 bottom-[240px] z-[8000] hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1">
+    
+    <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500 animate-pulse"></div>
+    
+    <div class="relative flex items-center gap-3 px-4 py-3 bg-[#0f172a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl min-w-[160px]">
+        
+        <div class="relative w-9 h-9 flex items-center justify-center bg-slate-800 rounded-full border border-white/5 shadow-inner">
+            <svg class="w-full h-full p-1 text-emerald-400 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                <path class="opacity-100" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <i class="fas fa-arrow-down text-[8px] text-white absolute"></i>
+        </div>
+
+        <div class="flex flex-col flex-1">
+            <div class="flex justify-between items-center w-full">
+                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider">تحميل...</span>
+                <span id="miniProgressText" class="text-xs font-mono font-bold text-emerald-400">0%</span>
+            </div>
+            <div class="w-full h-1 bg-slate-700 rounded-full mt-1 overflow-hidden">
+                <div id="miniProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <i class="fas fa-expand-alt text-gray-500 text-xs group-hover:text-white transition"></i>
+    </div>
+</div>
+
+    <!-- Offline Maps Wizard Modal -->
+    <div id="offlineWizardModal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/90 backdrop-blur-md transition-opacity duration-300 opacity-0">
+        <div class="glass-modal w-full max-w-lg rounded-[2rem] overflow-hidden transform scale-95 transition-all duration-300 relative border border-white/10 bg-[#0f172a] shadow-2xl">
+            
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                <h2 class="text-2xl font-bold text-white relative z-10">تحميل الخرائط</h2>
+                <p class="text-emerald-100 text-xs relative z-10 mt-1">تنزيل خرائط الدول للاستخدام بدون إنترنت</p>
+                <button onclick="closeWizard()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-black/20 text-white hover:bg-black/30 transition flex items-center justify-center z-20"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="flex justify-between items-center px-10 py-6 relative">
+                <div class="absolute top-1/2 left-10 right-10 h-1 bg-gray-700 -z-0"></div>
+                <div class="absolute top-1/2 left-10 h-1 bg-emerald-500 -z-0 transition-all duration-500" id="progressBar" style="width: 0%"></div>
+                
+                <div class="step-dot active" data-step="1"><i class="fas fa-globe"></i></div>
+                <div class="step-dot" data-step="2"><i class="fas fa-flag"></i></div>
+                <div class="step-dot" data-step="3"><i class="fas fa-download"></i></div>
+            </div>
+
+            <div class="p-6 min-h-[300px] relative">
+                
+                <div id="step1" class="wizard-step active-step">
+                    <h3 class="text-lg font-bold text-white mb-4 text-center">اختر القارة</h3>
+                    <div class="grid grid-cols-2 gap-3" id="continentsGrid"></div>
+                </div>
+
+                <div id="step2" class="wizard-step hidden-step-right">
+                    <h3 class="text-lg font-bold text-white mb-4 text-center">اختر الدولة</h3>
+                    <div class="relative mb-4">
+                        <input type="text" id="countrySearch" placeholder="بحث عن دولة..." class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white text-right focus:outline-none focus:border-emerald-500 transition">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar" id="countriesList"></div>
+                </div>
+
+                <div id="step3" class="wizard-step hidden-step-right text-center">
+                    <div class="mb-6">
+                        <div class="w-24 h-24 mx-auto rounded-full border-4 border-slate-700 flex items-center justify-center relative">
+                            <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                                <circle cx="48" cy="48" r="44" stroke="currentColor" stroke-width="4" fill="transparent" class="text-slate-700" />
+                                <circle id="dlCircle" cx="48" cy="48" r="44" stroke="currentColor" stroke-width="4" fill="transparent" class="text-emerald-500 transition-all duration-300" stroke-dasharray="276" stroke-dashoffset="276" />
+                            </svg>
+                            <i class="fas fa-cloud-download-alt text-3xl text-emerald-400 animate-bounce"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2" id="downloadingTitle">جاري التحضير...</h3>
+                    <p class="text-gray-400 text-sm mb-6" id="downloadingStatus">يتم حساب المربعات المطلوبة</p>
+                    <div class="bg-slate-800 rounded-xl p-4 border border-white/5 text-right">
+                        <div class="flex justify-between text-xs text-gray-400 mb-2">
+                            <span>المساحة المستهلكة</span>
+                            <span id="storageUsed">0 MB</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>قاعدة البيانات</span>
+                            <span id="targetDBName" class="font-mono text-emerald-400">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-white/5 flex justify-between items-center bg-slate-900/50">
+                <button onclick="prevStep()" id="prevBtn" class="px-6 py-2 rounded-xl text-gray-400 hover:text-white transition disabled:opacity-0" disabled>سابق</button>
+                <button onclick="nextStep()" id="nextBtn" class="px-8 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>التالي</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- AOS INIT ---
         AOS.init({ once: true, offset: 50, duration: 800 });
@@ -1774,72 +1956,7 @@
             evStations: L.layerGroup(),
             pois: L.layerGroup()
         };
-        /* =========================================
-        1. محرك التخزين الأوفلاين (Map Offline Engine)
-        ========================================= */
-        const DB_NAME = 'SookMapCache';
-        const STORE_NAME = 'tiles';
 
-        function openMapDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 1);
-                request.onupgradeneeded = (ev) => {
-                    const db = ev.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
-                };
-                request.onsuccess = (ev) => resolve(ev.target.result);
-                request.onerror = (ev) => reject(ev.target.error);
-            });
-        }
-
-        L.TileLayer.Offline = L.TileLayer.extend({
-            createTile: function (coords, done) {
-                const tile = document.createElement('img');
-                L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
-                L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
-                if (this.options.crossOrigin) tile.crossOrigin = ''; 
-                tile.alt = '';
-                tile.setAttribute('role', 'presentation');
-                const url = this.getTileUrl(coords);
-                const key = `${this.options.providerId}_${coords.z}_${coords.x}_${coords.y}`;
-                this._loadTile(tile, url, key);
-                return tile;
-            },
-            _loadTile: async function (tile, url, key) {
-                try {
-                    const db = await openMapDB();
-                    const tx = db.transaction(STORE_NAME, 'readonly');
-                    const request = tx.objectStore(STORE_NAME).get(key);
-                    request.onsuccess = (e) => {
-                        const blob = e.target.result;
-                        if (blob) {
-                            const objectURL = URL.createObjectURL(blob);
-                            tile.src = objectURL;
-                            tile.onload = () => URL.revokeObjectURL(objectURL);
-                        } else {
-                            this._fetchAndSaveTile(tile, url, key, db);
-                        }
-                    };
-                    request.onerror = () => { tile.src = url; };
-                } catch (err) { tile.src = url; }
-            },
-            _fetchAndSaveTile: function(tile, url, key, db) {
-                tile.src = url;
-                if (navigator.onLine) {
-                    fetch(url, { mode: 'cors' }).then(res => {
-                        if (!res.ok) throw new Error;
-                        return res.blob();
-                    }).then(blob => {
-                        const tx = db.transaction(STORE_NAME, 'readwrite');
-                        tx.objectStore(STORE_NAME).put(blob, key);
-                    }).catch(e => {});
-                }
-            }
-        });
-
-        L.tileLayer.offline = function (url, options) {
-            return new L.TileLayer.Offline(url, options);
-        };
         // Navigation State
         let currentView = 'loginView';
 
@@ -3091,7 +3208,8 @@ function initMap() {
     }
 
     // إضافة الطبقة الأوفلاين
-    L.tileLayer.offline(activeUrl, activeOptions).addTo(map);
+    window.offlineLayer = L.tileLayer.offline(activeUrl, activeOptions);
+    window.offlineLayer.addTo(map);
 
     // إضافة بقية الطبقات
     if (typeof tomTomLayers !== 'undefined') {
@@ -3327,46 +3445,51 @@ function initMap() {
                 });
         }
 
-        // --- TOMTOM TOOLS LOGIC ---
-        function toggleToolsMenu() {
-            if (toolsMenu.classList.contains('pointer-events-none')) {
-                toolsMenu.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
-                toolsMenu.classList.add('opacity-100', 'scale-100');
-            } else {
-                toolsMenu.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
-                toolsMenu.classList.remove('opacity-100', 'scale-100');
-            }
-        }
-        /* =========================================
-        3. دالة زر التحميل اليدوي
-        ========================================= */
-        async function downloadCurrentMapArea() {
-            if (!map) return;
-            
-            showToast('جاري حفظ المنطقة الحالية...', 'info');
-            
-            // خدعة بسيطة: تغيير الزوم قليلاً لإجبار المتصفح على طلب الصور وتخزينها
-            const originalCenter = map.getCenter();
-            const originalZoom = map.getZoom();
-            
-            // إظهار علامة "تم"
-            const statusEl = document.getElementById('dlStatus');
-            if(statusEl) statusEl.classList.remove('hidden');
+/* =========================================
+   Tools Menu Toggle Logic (Vertical Animation)
+   ========================================= */
+let isToolsMenuOpen = false;
 
-            // محاكاة تحميل سريع للمستويات القريبة
-            let z = originalZoom;
-            map.setZoom(z + 1);
-            
-            setTimeout(() => {
-                map.setZoom(z); // العودة للوضع الطبيعي
-                map.panBy([10, 10]); // تحريك بسيط جداً
-                setTimeout(() => {
-                    map.panBy([-10, -10]); // العودة
-                    showToast('تم حفظ المنطقة في الذاكرة ✅', 'success');
-                    if(statusEl) setTimeout(() => statusEl.classList.add('hidden'), 3000);
-                }, 500);
-            }, 1000);
-        }
+function toggleToolsMenu() {
+    const menu = document.getElementById('toolsMenu');
+    const btn = document.getElementById('toolsBtn');
+    
+    isToolsMenuOpen = !isToolsMenuOpen;
+    
+    if (isToolsMenuOpen) {
+        // فتح القائمة: تظهر وتنزلق لمكانها الطبيعي (translate-y-0)
+        menu.classList.remove('invisible', 'opacity-0', 'scale-95', '-translate-y-5', 'pointer-events-none');
+        menu.classList.add('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+        
+        // تفعيل ستايل الزر
+        btn.classList.add('bg-slate-600', 'border-blue-400');
+        btn.querySelector('i').classList.add('text-white');
+    } else {
+        // إغلاق القائمة: تختفي وترتفع قليلاً للأعلى (-translate-y-5)
+        menu.classList.add('opacity-0', 'scale-95', '-translate-y-5', 'pointer-events-none');
+        menu.classList.remove('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+        
+        setTimeout(() => {
+            if(!isToolsMenuOpen) menu.classList.add('invisible');
+        }, 300);
+        
+        // إعادة ستايل الزر
+        btn.classList.remove('bg-slate-600', 'border-blue-400');
+        btn.querySelector('i').classList.remove('text-white');
+    }
+}
+
+// إغلاق القائمة عند النقر خارجها
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('toolsMenu');
+    const btn = document.getElementById('toolsBtn');
+    
+    // تأكد أن العناصر موجودة لتجنب الأخطاء
+    if (menu && btn && isToolsMenuOpen && !menu.contains(event.target) && !btn.contains(event.target)) {
+        toggleToolsMenu();
+    }
+});
+
         function toggleTomTomLayer(type) {
             activeLayers[type] = !activeLayers[type];
             const toggleEl = document.getElementById(`toggle-${type}`);
@@ -5627,6 +5750,501 @@ function onTripConnectionRestored() {
 
     // بدء المزامنة
     checkForPendingSync();
+}
+
+
+/* =========================================
+   نظام الخرائط الأوفلاين الشامل
+   (Sharding + Wizard + Background Download)
+   ========================================= */
+
+// 1. البيانات والإعدادات
+const WORLD_DATA = {
+    "AF": { name: "أفريقيا", icon: "fa-globe-africa" },
+    "AS": { name: "آسيا", icon: "fa-globe-asia" },
+    "EU": { name: "أوروبا", icon: "fa-globe-europe" },
+    "NA": { name: "أمريكا الشمالية", icon: "fa-globe-americas" }
+};
+
+const COUNTRIES_DATA = [
+    { code: "EG", name: "مصر", continent: "AF", bounds: [22.0, 24.6, 31.8, 36.9] },
+    { code: "SA", name: "السعودية", continent: "AS", bounds: [16.3, 34.5, 32.2, 55.7] },
+    { code: "AE", name: "الإمارات", continent: "AS", bounds: [22.6, 51.5, 26.1, 56.5] },
+    { code: "KW", name: "الكويت", continent: "AS", bounds: [28.5, 46.5, 30.1, 48.5] },
+    { code: "QA", name: "قطر", continent: "AS", bounds: [24.4, 50.7, 26.2, 51.7] },
+    { code: "BH", name: "البحرين", continent: "AS", bounds: [25.5, 50.3, 26.4, 50.9] },
+    { code: "OM", name: "عمان", continent: "AS", bounds: [16.6, 52.0, 26.4, 59.9] },
+    { code: "JO", name: "الأردن", continent: "AS", bounds: [29.1, 34.9, 33.4, 39.4] },
+    { code: "MA", name: "المغرب", continent: "AF", bounds: [21.0, -17.0, 36.0, -1.0] },
+    { code: "DZ", name: "الجزائر", continent: "AF", bounds: [18.9, -8.7, 37.1, 12.0] },
+    { code: "TR", name: "تركيا", continent: "EU", bounds: [35.8, 25.6, 42.1, 44.8] },
+    { code: "US", name: "الولايات المتحدة (شرق)", continent: "NA", bounds: [24.3, -125.0, 49.3, -66.9] }
+];
+
+const STORE_NAME = 'tiles';
+
+// تهيئة التخزين الدائم
+async function initStorageSystem() {
+    if (navigator.storage && navigator.storage.persist) {
+        await navigator.storage.persist();
+    }
+}
+document.addEventListener('DOMContentLoaded', initStorageSystem);
+
+// 2. إدارة قواعد البيانات (Sharding)
+const ShardManager = {
+    getShards: (countryCode) => {
+        const key = `sook_shards_${countryCode}`;
+        return JSON.parse(localStorage.getItem(key) || `["SookMap_${countryCode}_0"]`);
+    },
+    
+    addShard: (countryCode) => {
+        const shards = ShardManager.getShards(countryCode);
+        const nextIndex = shards.length;
+        const newShard = `SookMap_${countryCode}_${nextIndex}`;
+        shards.push(newShard);
+        localStorage.setItem(`sook_shards_${countryCode}`, JSON.stringify(shards));
+        ShardManager.updateGlobalActiveDBs(newShard);
+        return newShard;
+    },
+
+    getCurrentShard: (countryCode) => {
+        const shards = ShardManager.getShards(countryCode);
+        return shards[shards.length - 1];
+    },
+
+    updateGlobalActiveDBs: (newDB) => {
+        let list = JSON.parse(localStorage.getItem('sook_downloaded_dbs') || '[]');
+        if (!list.includes(newDB)) {
+            list.push(newDB);
+            localStorage.setItem('sook_downloaded_dbs', JSON.stringify(list));
+        }
+    }
+};
+
+function openMapDB(dbName) {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = (ev) => {
+            const db = ev.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+        };
+        request.onsuccess = (ev) => resolve(ev.target.result);
+        request.onerror = (ev) => reject(ev.target.error);
+    });
+}
+
+// 3. طبقة Leaflet المعدلة (Mult-DB Support)
+L.TileLayer.Offline = L.TileLayer.extend({
+    initialize: function (url, options) {
+        L.TileLayer.prototype.initialize.call(this, url, options);
+        this.activeDBs = JSON.parse(localStorage.getItem('sook_downloaded_dbs') || '[]');
+    },
+
+    createTile: function (coords, done) {
+        const tile = document.createElement('img');
+        L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+        L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+        if (this.options.crossOrigin) tile.crossOrigin = '';
+        tile.alt = '';
+        tile.setAttribute('role', 'presentation');
+        
+        const url = this.getTileUrl(coords);
+        const key = `${this.options.providerId}_${coords.z}_${coords.x}_${coords.y}`;
+        
+        this._tryLoadFromAllShards(tile, url, key);
+        return tile;
+    },
+
+    _tryLoadFromAllShards: async function(tile, url, key) {
+        let found = false;
+        this.activeDBs = JSON.parse(localStorage.getItem('sook_downloaded_dbs') || '[]');
+
+        // البحث العكسي (الأحدث للأقدم)
+        for (let i = this.activeDBs.length - 1; i >= 0; i--) {
+            try {
+                const blob = await this._getTileFromDB(this.activeDBs[i], key);
+                if (blob) {
+                    const objectURL = URL.createObjectURL(blob);
+                    tile.src = objectURL;
+                    tile.onload = () => URL.revokeObjectURL(objectURL);
+                    found = true;
+                    break;
+                }
+            } catch (e) { }
+        }
+
+        if (!found) tile.src = url;
+    },
+
+    _getTileFromDB: async function(dbName, key) {
+        const db = await openMapDB(dbName);
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const request = tx.objectStore(STORE_NAME).get(key);
+            request.onsuccess = (e) => e.target.result ? resolve(e.target.result) : reject();
+            request.onerror = () => reject();
+        });
+    }
+});
+
+L.tileLayer.offline = function (url, options) {
+    return new L.TileLayer.Offline(url, options);
+};
+
+// 4. مدير التحميل في الخلفية (Background Manager)
+const DownloadManager = {
+    isActive: false,
+    controller: null,
+    country: null,
+    dbName: '',
+    stats: { total: 0, completed: 0, errors: 0, bytes: 0 },
+    
+    reset: function() {
+        this.isActive = false;
+        this.controller = null;
+        this.country = null;
+        this.stats = { total: 0, completed: 0, errors: 0, bytes: 0 };
+        updateMiniIndicator();
+    }
+};
+
+let currentStep = 1;
+let selectedContinent = null;
+let selectedCountry = null;
+
+// دوال الواجهة (Wizard)
+function openWizard() {
+    const modal = document.getElementById('offlineWizardModal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    const content = modal.querySelector('.glass-modal');
+    content.classList.remove('scale-95');
+    content.classList.add('scale-100');
+
+    if (DownloadManager.isActive) {
+        currentStep = 3;
+        selectedCountry = DownloadManager.country;
+        
+        document.getElementById('targetDBName').innerText = DownloadManager.dbName;
+        document.getElementById('downloadingTitle').innerText = `تحميل خريطة ${selectedCountry.name}`;
+        
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.innerText = "تصغير (خلفية)";
+        nextBtn.onclick = closeWizard;
+        nextBtn.disabled = false;
+        document.getElementById('prevBtn').innerText = "إلغاء التحميل";
+        document.getElementById('prevBtn').disabled = false;
+
+        updateDownloadUI(true);
+    } else {
+        currentStep = 1;
+        selectedContinent = null;
+        selectedCountry = null;
+        renderContinents();
+    }
+    updateStepUI();
+}
+
+function closeWizard() {
+    const modal = document.getElementById('offlineWizardModal');
+    const content = modal.querySelector('.glass-modal');
+    content.classList.remove('scale-100');
+    content.classList.add('scale-95');
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+
+    if (DownloadManager.isActive) {
+        showToast('يستمر التحميل في الخلفية ⬇️', 'info');
+        updateMiniIndicator();
+    }
+}
+
+function nextStep() {
+    if (currentStep < 3) {
+        if(currentStep === 1 && !selectedContinent) return;
+        if(currentStep === 2 && !selectedCountry) return;
+        
+        currentStep++;
+        updateStepUI();
+        if (currentStep === 2) renderCountries();
+        if (currentStep === 3) startCountryDownload();
+    } else if (currentStep === 3) {
+        closeWizard();
+    }
+}
+
+function prevStep() {
+    if (currentStep === 3 && DownloadManager.isActive) {
+        if(confirm("إلغاء التحميل الحالي؟")) {
+            DownloadManager.controller.abort();
+            DownloadManager.reset();
+            currentStep = 1;
+            updateStepUI();
+            showToast('تم الإلغاء', 'warning');
+        }
+    } else if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+    }
+}
+
+function updateStepUI() {
+    document.querySelectorAll('.wizard-step').forEach((el, idx) => {
+        const stepNum = idx + 1;
+        el.className = `wizard-step ${stepNum === currentStep ? 'active-step' : (stepNum < currentStep ? 'hidden-step-left' : 'hidden-step-right')}`;
+    });
+
+    document.querySelectorAll('.step-dot').forEach(dot => {
+        const s = parseInt(dot.dataset.step);
+        dot.classList.toggle('active', s <= currentStep);
+        dot.classList.toggle('completed', s < currentStep);
+    });
+
+    document.getElementById('progressBar').style.width = `${((currentStep - 1) / 2) * 100}%`;
+
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    
+    prevBtn.disabled = currentStep === 1;
+    prevBtn.classList.toggle('opacity-0', currentStep === 1);
+    
+    if (currentStep === 1) nextBtn.disabled = !selectedContinent;
+    if (currentStep === 2) nextBtn.disabled = !selectedCountry;
+    if (currentStep === 3) {
+        nextBtn.innerText = "تصغير";
+        nextBtn.disabled = true;
+    } else {
+        nextBtn.innerText = "التالي";
+        nextBtn.onclick = nextStep;
+        prevBtn.innerText = "سابق";
+    }
+}
+
+function renderContinents() {
+    const grid = document.getElementById('continentsGrid');
+    grid.innerHTML = '';
+    Object.keys(WORLD_DATA).forEach(key => {
+        const item = document.createElement('div');
+        item.className = `continent-card ${selectedContinent === key ? 'selected' : ''}`;
+        item.onclick = () => {
+            selectedContinent = key;
+            renderContinents();
+            document.getElementById('nextBtn').disabled = false;
+        };
+        item.innerHTML = `<i class="fas ${WORLD_DATA[key].icon} text-3xl mb-2 text-emerald-400"></i><h4 class="font-bold text-gray-200">${WORLD_DATA[key].name}</h4>`;
+        grid.appendChild(item);
+    });
+}
+
+function renderCountries() {
+    const list = document.getElementById('countriesList');
+    const searchVal = document.getElementById('countrySearch').value.toLowerCase();
+    list.innerHTML = '';
+    
+    const filtered = COUNTRIES_DATA.filter(c => c.continent === selectedContinent && c.name.toLowerCase().includes(searchVal));
+
+    filtered.forEach(country => {
+        const item = document.createElement('div');
+        item.className = `country-item ${selectedCountry && selectedCountry.code === country.code ? 'selected' : ''}`;
+        item.onclick = () => {
+            selectedCountry = country;
+            renderCountries();
+            document.getElementById('nextBtn').disabled = false;
+        };
+        item.innerHTML = `<span class="font-bold text-gray-200">${country.name}</span><span class="text-xs bg-slate-700 px-2 py-1 rounded text-gray-400">${country.code}</span>`;
+        list.appendChild(item);
+    });
+}
+document.getElementById('countrySearch').addEventListener('input', renderCountries);
+
+// 5. منطق التحميل (Core Logic)
+async function startCountryDownload() {
+    if (!selectedCountry) return;
+    if (DownloadManager.isActive && DownloadManager.country.code !== selectedCountry.code) return;
+
+    DownloadManager.isActive = true;
+    DownloadManager.controller = new AbortController();
+    DownloadManager.country = selectedCountry;
+    DownloadManager.stats = { completed: 0, total: 0, errors: 0, bytes: 0 };
+    
+    const signal = DownloadManager.controller.signal;
+    let currentDBName = ShardManager.getCurrentShard(selectedCountry.code);
+    DownloadManager.dbName = currentDBName;
+    ShardManager.updateGlobalActiveDBs(currentDBName);
+
+    // تحديث الواجهة
+    document.getElementById('targetDBName').innerText = currentDBName;
+    document.getElementById('downloadingTitle').innerText = `تحميل خريطة ${selectedCountry.name}`;
+    document.getElementById('downloadingStatus').innerText = "جاري التحضير...";
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.innerText = "تصغير (خلفية)";
+    nextBtn.onclick = closeWizard;
+    nextBtn.disabled = false;
+    document.getElementById('prevBtn').innerText = "إلغاء التحميل";
+
+    try {
+        const bounds = L.latLngBounds([selectedCountry.bounds[0], selectedCountry.bounds[1]], [selectedCountry.bounds[2], selectedCountry.bounds[3]]);
+        const isSmallCountry = (bounds.getNorth() - bounds.getSouth()) < 2;
+        const minZ = 6;
+        const maxZ = isSmallCountry ? 14 : 11;
+        
+        const tilesQueue = generateTilesList(bounds, minZ, maxZ);
+        DownloadManager.stats.total = tilesQueue.length;
+        document.getElementById('downloadingStatus').innerText = `بدء تحميل ${tilesQueue.length} ملف...`;
+
+        let db = await openMapDB(currentDBName);
+        const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+        for (let i = 0; i < tilesQueue.length; i++) {
+            if (signal.aborted) throw new Error("Aborted");
+            const tileItem = tilesQueue[i];
+
+            try {
+                // Check if exists
+                const txCheck = db.transaction(STORE_NAME, 'readonly');
+                const exists = await new Promise(r => {
+                    const req = txCheck.objectStore(STORE_NAME).get(tileItem.key);
+                    req.onsuccess = () => r(req.result ? true : false);
+                    req.onerror = () => r(false);
+                });
+
+                if (!exists) {
+                    const res = await fetch(tileItem.url, { signal, mode: 'cors' });
+                    if (!res.ok) throw new Error(res.status);
+                    const blob = await res.blob();
+                    
+                    try {
+                        const tx = db.transaction(STORE_NAME, 'readwrite');
+                        tx.objectStore(STORE_NAME).put(blob, tileItem.key);
+                        await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+                    } catch (err) {
+                        if (err.name === 'QuotaExceededError' || err.code === 22) {
+                            console.warn("DB Full, Sharding...");
+                            currentDBName = ShardManager.addShard(selectedCountry.code);
+                            DownloadManager.dbName = currentDBName;
+                            db.close();
+                            db = await openMapDB(currentDBName);
+                            const tx2 = db.transaction(STORE_NAME, 'readwrite');
+                            tx2.objectStore(STORE_NAME).put(blob, tileItem.key);
+                            await new Promise((res, rej) => { tx2.oncomplete = res; tx2.onerror = rej; });
+                        }
+                    }
+                    DownloadManager.stats.bytes += blob.size;
+                    await wait(100); 
+                }
+                DownloadManager.stats.completed++;
+            } catch (e) {
+                if (e.message === "Aborted") throw e;
+                DownloadManager.stats.errors++;
+            }
+
+            if (i % 5 === 0 || i === tilesQueue.length - 1) {
+                updateDownloadUI();
+                updateMiniIndicator();
+            }
+        }
+
+        finishDownload(true);
+
+    } catch (e) {
+        if (e.message !== "Aborted") {
+            console.error(e);
+            document.getElementById('downloadingStatus').innerText = "حدث خطأ";
+            finishDownload(false);
+        }
+    }
+}
+
+function generateTilesList(bounds, minZ, maxZ) {
+    const queue = [];
+    const subdomains = ['a', 'b', 'c', 'd'];
+    const long2tile = (lon, zoom) => (Math.floor((lon + 180) / 360 * Math.pow(2, zoom)));
+    const lat2tile = (lat, zoom) => (Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)));
+
+    for (let z = minZ; z <= maxZ; z++) {
+        const top = lat2tile(bounds.getNorth(), z);
+        const left = long2tile(bounds.getWest(), z);
+        const bottom = lat2tile(bounds.getSouth(), z);
+        const right = long2tile(bounds.getEast(), z);
+        const maxIndex = Math.pow(2, z) - 1;
+
+        for (let x = left; x <= right; x++) {
+            for (let y = top; y <= bottom; y++) {
+                const validX = ((x % (maxIndex + 1)) + (maxIndex + 1)) % (maxIndex + 1);
+                if (y < 0 || y > maxIndex) continue;
+
+                const s = subdomains[(validX + y) % subdomains.length];
+                let url = '';
+                if (API_KEYS.tomtom) {
+                    url = `https://${s}.api.tomtom.com/map/1/tile/basic/night/${z}/${validX}/${y}.png?key=${API_KEYS.tomtom}`;
+                } else {
+                    url = `https://${s}.basemaps.cartocdn.com/dark_all/${z}/${validX}/${y}.png`;
+                }
+                const key = `${API_KEYS.tomtom ? 'tomtom' : 'carto'}_${z}/${validX}/${y}`;
+                queue.push({ url, key });
+            }
+        }
+    }
+    return queue;
+}
+
+function updateDownloadUI(force = false) {
+    const { completed, total, bytes } = DownloadManager.stats;
+    const percent = total > 0 ? (completed / total) * 100 : 0;
+    
+    // --- تحديث المؤشر المصغر (الجزء الجديد) ---
+    // 1. تحديث النص
+    const miniText = document.getElementById('miniProgressText');
+    if (miniText) miniText.innerText = `${Math.round(percent)}%`;
+
+    // 2. تحديث شريط التقدم الصغير (الإضافة الجديدة)
+    const miniBar = document.getElementById('miniProgressBar');
+    if (miniBar) miniBar.style.width = `${percent}%`;
+    // ---------------------------------------------
+
+    // تحديث النافذة الكبيرة (كما هي)
+    const modal = document.getElementById('offlineWizardModal');
+    if (force || !modal.classList.contains('hidden')) {
+        const circleOffset = 276 - ((completed / total) * 276);
+        const circle = document.getElementById('dlCircle');
+        if(circle) circle.style.strokeDashoffset = circleOffset;
+        
+        const status = document.getElementById('downloadingStatus');
+        if(status) status.innerText = `${completed} / ${total} (${Math.round(percent)}%)`;
+        
+        const storage = document.getElementById('storageUsed');
+        if(storage) storage.innerText = (bytes / (1024*1024)).toFixed(2) + " MB";
+        
+        const dbLabel = document.getElementById('targetDBName');
+        if(dbLabel) dbLabel.innerText = DownloadManager.dbName;
+    }
+}
+
+function updateMiniIndicator() {
+    const indicator = document.getElementById('miniDownloadIndicator');
+    const modal = document.getElementById('offlineWizardModal');
+    if (DownloadManager.isActive && modal.classList.contains('hidden')) {
+        indicator.classList.remove('hidden');
+        indicator.classList.add('flex');
+    } else {
+        indicator.classList.add('hidden');
+        indicator.classList.remove('flex');
+    }
+}
+
+function finishDownload(success) {
+    DownloadManager.isActive = false;
+    updateMiniIndicator();
+    if (success) {
+        document.getElementById('downloadingTitle').innerText = "اكتمل التحميل!";
+        document.getElementById('dlCircle').style.strokeDashoffset = 0;
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.innerText = "إغلاق";
+        nextBtn.onclick = () => { closeWizard(); DownloadManager.reset(); };
+        nextBtn.disabled = false;
+        showToast('تم التحميل بنجاح ✅', 'success');
+    }
 }
 
     </script>
