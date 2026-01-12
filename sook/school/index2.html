@@ -2926,8 +2926,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!currentPoint) return;
 
                     // 1. تحديث النصوص
-                    const speedEl = document.getElementById('track-speed');
-                    if (speedEl) speedEl.textContent = Math.round(currentPoint.s || 0);
+                    const currentSpeedVal = Math.round(currentPoint.s || 0);
+                    App.Utils.animateDashboardSpeed(currentSpeedVal);
 
                     const lngLat = [currentPoint.lng, currentPoint.lat];
 
@@ -4786,7 +4786,7 @@ updateTrackingDetailMap: function(driverId) {
     }
 
     const speed = App.Utils.calculateSpeed(currentTrip.actualPath);
-    document.getElementById('track-speed').textContent = speed;
+    App.Utils.animateDashboardSpeed(speed);
     App.startTripTimer(currentTrip.startTime, currentTrip.status);
 
     // --- Path Calculations ---
@@ -5012,15 +5012,24 @@ updateStudentMarkers: function(events) {
             },
 
             startTripTimer: function(startTime, status) {
-                if (this.tripTimerInterval) clearInterval(this.tripTimerInterval);
-                const durationEl = document.getElementById('track-duration');
+                // 1. تنظيف أي مؤقت أو أنيميشن سابق لمنع التداخل
+                if (this.tripTimerFrame) cancelAnimationFrame(this.tripTimerFrame);
                 
+                const durationEl = document.getElementById('track-duration');
+                if (!durationEl) return;
+
+                // إيقاف أي تأثيرات GSAP قديمة على هذا العنصر
+                if (window.gsap) gsap.killTweensOf(durationEl);
+
+                // 2. حالة التوقف أو عدم وجود وقت بداية
                 if (status === 'completed' || !startTime) {
                     durationEl.textContent = '00:00:00';
+                    durationEl.style.opacity = 1; // إعادة الشفافية للوضع الطبيعي
                     return;
                 }
 
-                this.tripTimerInterval = setInterval(() => {
+                // 3. دالة التحديث الذكية (تعمل مع معدل تحديث الشاشة)
+                const updateTimer = () => {
                     const now = Date.now();
                     const diff = now - startTime;
                     
@@ -5028,9 +5037,31 @@ updateStudentMarkers: function(events) {
                     const minutes = Math.floor((diff % 3600000) / 60000);
                     const seconds = Math.floor((diff % 60000) / 1000);
                     
-                    durationEl.textContent = 
+                    const timeString = 
                         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }, 1000);
+                    
+                    // تحسين الأداء: تحديث النص في الـ DOM فقط إذا تغيرت الثواني فعلياً
+                    if (durationEl.textContent !== timeString) {
+                        durationEl.textContent = timeString;
+                    }
+
+                    // طلب الإطار القادم
+                    this.tripTimerFrame = requestAnimationFrame(updateTimer);
+                };
+
+                // بدء العداد
+                updateTimer();
+
+                // 4. إضافة لمسة جمالية (تأثير "نبض" خفيف يدل على أن العداد حي)
+                if (window.gsap) {
+                    gsap.to(durationEl, {
+                        opacity: 0.7,      // يقلل الشفافية قليلاً
+                        duration: 1.5,     // ببطء خلال ثانية ونصف
+                        yoyo: true,        // يعود للوضع الطبيعي
+                        repeat: -1,        // يكرر للأبد
+                        ease: "sine.inOut" // حركة ناعمة جداً تشبه التنفس
+                    });
+                }
             },
 
             renderTripHistory: function(driverId) {
@@ -6271,7 +6302,44 @@ Toast: {
                     if (speed > 200) return 0; 
                     
                     return Math.round(speed);
-                }
+                },
+                animateDashboardSpeed: function(targetSpeed) {
+                    const el = document.getElementById('track-speed');
+                    if (!el) return;
+
+                    // قراءة السرعة الحالية المعروضة (أو 0 إذا كانت فارغة)
+                    const currentSpeed = parseFloat(el.innerText) || 0;
+                    
+                    // إذا لم يكن هناك تغيير، لا تفعل شيئاً
+                    if (currentSpeed === targetSpeed) return;
+
+                    // كائن مؤقت للأنيميشن
+                    const proxy = { val: currentSpeed };
+
+                    // تحديد لون العداد بناءً على السرعة (أبيض -> برتقالي -> أحمر)
+                    let targetColor = '#ffffff'; // أبيض (طبيعي)
+                    if (targetSpeed > 80) targetColor = '#f59e0b'; // برتقالي (تحذير)
+                    if (targetSpeed > 120) targetColor = '#ef4444'; // أحمر (خطر)
+
+                    // GSAP Magic: تحريك القيمة واللون
+                    gsap.to(proxy, {
+                        val: targetSpeed,
+                        duration: 1.5, // مدة الحركة (تجعل الإبرة تبدو ثقيلة وواقعية)
+                        ease: "power3.out", // تبدأ سريعاً وتتباطأ في النهاية (فيزياء حقيقية)
+                        snap: { val: 1 }, // التأكد من عرض أرقام صحيحة فقط (بدون كسور)
+                        onUpdate: function() {
+                            // تحديث النص في كل فريم
+                            el.innerText = Math.round(this.targets()[0].val);
+                        }
+                    });
+
+                    // أنيميشن منفصلة للون لتعطي تأثيراً جميلاً
+                    gsap.to(el, {
+                        color: targetColor,
+                        duration: 0.5,
+                        textShadow: targetSpeed > 100 ? "0 0 20px rgba(239, 68, 68, 0.6)" : "0 0 10px rgba(59, 130, 246, 0.5)"
+                    });
+                },
             }
         };
 
