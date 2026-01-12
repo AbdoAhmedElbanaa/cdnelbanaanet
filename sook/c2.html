@@ -2644,12 +2644,36 @@ btn.innerHTML = `
                         myStudents.push(data);
                     });
                 }
-                gsap.to('#studentsCountDisplay', { 
+                
+                /* =========================================================
+                تأثير "النبض المطاطي" لعداد الطلاب (Elastic Pop)
+                ========================================================= */
+                const studentEl = document.getElementById('studentsCountDisplay');
+
+                // 1. حركة العداد (تغيير الأرقام بنمط مختلف)
+                gsap.to(studentEl, { 
                     innerText: myStudents.length, 
-                    duration: 1.5, 
+                    duration: 2, 
                     snap: { innerText: 1 }, 
-                    ease: "power2.out" 
+                    ease: "circ.out" // حركة تبدأ سريعة جداً وتهدأ فجأة (مختلفة عن power2)
                 });
+
+                // 2. حركة بصرية (تكبير، تلوين، وارتداد)
+                gsap.fromTo(studentEl, 
+                    { 
+                        scale: 1.5,  // يبدأ كبيراً
+                        color: "#34d399", // لون أخضر فاتح (Emerald-400)
+                        textShadow: "0 0 20px rgba(52, 211, 153, 0.6)" // توهج
+                    }, 
+                    { 
+                        scale: 1, // يعود لحجمه الطبيعي
+                        color: "#ffffff", // يعود للأبيض
+                        textShadow: "none", // يختفي التوهج
+                        duration: 1.2, 
+                        ease: "elastic.out(1, 0.4)" // الارتداد المطاطي المميز
+                    }
+                );
+                
                 renderStudentAvatars();
             });
         }
@@ -4127,13 +4151,12 @@ toggleTracking = async function() {
                         const dist = getDistanceInMeters(lastPos, {lat, lng});
                         
                         // التعديل: تفعيل الترميم فقط إذا كنا متصلين بالانترنت (!isOfflineMode)
-                        // لأن الترميم يتطلب جلب بيانات من سيرفرات الخرائط
                         if (dist > GAP_THRESHOLD && !isOfflineMode) {
                             console.log(`Gap detected: ${dist.toFixed(0)} meters. Restoring path...`);
                             await processPathGap(lastPos, {lat, lng}, speedKmh);
                             totalDist += dist * 1.2; 
                         } else {
-                            // الوضع الطبيعي أو وضع الأوفلاين (رسم خط مباشر)
+                            // الوضع الطبيعي أو وضع الأوفلاين
                             pathLine.addLatLng(latLng);
                             totalDist += dist;
                         }
@@ -4142,20 +4165,26 @@ toggleTracking = async function() {
                         pathLine.addLatLng(latLng);
                     }
 
-                    // تحديث الواجهة
-                    const distEl = document.getElementById('distanceDisplay');
-                    const speedEl = document.getElementById('speedDisplay');
+                    // =========================================================
+                    // 🚀 تحديث الواجهة باستخدام GSAP Smooth Counter
+                    // =========================================================
+                    
+                    // 1. تحديث المسافة (Smooth Distance) - نمرر true لأنها تحتوي كسور
+                    animateCounter('distanceDisplay', totalDist / 1000, true);
 
-                    if(distEl) distEl.innerText = (totalDist/1000).toFixed(2) + " كم";
+                    // التحقق من تجاوز حد المسافة (المنطق كما هو)
                     checkDistanceLimit(totalDist);
+
+                    // 2. تحديث السرعة (Smooth Speedometer) - نمرر false لأنه رقم صحيح
+                    animateCounter('speedDisplay', speedKmh, false);
+
+                    // 3. تحديث لون السرعة بسلاسة (تأثير إضافي)
+                    animateSpeedColor(speedKmh);
+
+                    // =========================================================
+
                     
-                    if(speedEl) {
-                        speedEl.innerText = speedKmh;
-                        speedEl.style.color = speedKmh > 100 ? '#ef4444' : (speedKmh > 80 ? '#f59e0b' : 'white');
-                    }
-                    
-                    // --- التعديل الجوهري: استبدال كود Firebase المباشر باستدعاء الدالة الموحدة ---
-                    // هذه الدالة ستقرر الحفظ محلياً أو سحابياً بناءً على الحالة
+                    // استدعاء الدالة الموحدة للحفظ
                     handleLocationUpdate(lat, lng, speedKmh, trafficStatus);
 
                     // تحديث lastPos للنقطة القادمة
@@ -4272,6 +4301,66 @@ toggleTracking = async function() {
         }
                 
         // --- UTILS ---
+
+/* =========================================================
+   GSAP SMOOTH COUNTER UTILITY
+   دالة لتحريك الأرقام بسلاسة بدلاً من القفز المباشر
+   ========================================================= */
+function animateCounter(elementId, endValue, isFloat = false) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    // الحصول على القيمة الحالية، إذا كانت غير رقمية نعتبرها 0
+    let startValue = parseFloat(element.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+
+    // إذا كانت القيمة الجديدة هي نفسها القديمة، لا تفعل شيئاً
+    if (startValue === endValue) return;
+
+    // إعداد كائن مؤقت للتحريك
+    let counter = { val: startValue };
+
+    gsap.to(counter, {
+        val: endValue,
+        duration: 0.8, // مدة الانتقال (سريعة لتبدو واقعية)
+        ease: "power2.out", // حركة تبدأ سريعة وتبطئ في النهاية
+        onUpdate: function() {
+            // تحديث النص في كل فريم
+            if (isFloat) {
+                // للمسافات: رقم عشري واحد (مثلاً 5.2)
+                element.innerText = counter.val.toFixed(1); 
+            } else {
+                // للسرعة والطلاب: رقم صحيح (مثلاً 60)
+                element.innerText = Math.round(counter.val);
+            }
+        }
+    });
+}
+
+// دالة إضافية لتغيير لون السرعة بسلاسة أيضاً
+function animateSpeedColor(speed) {
+    const speedEl = document.getElementById('speedDisplay');
+    if (!speedEl) return;
+    
+    // تحديد اللون المستهدف
+    let targetColor = '#ffffff'; // أبيض (طبيعي)
+    let shadowColor = 'rgba(255,255,255,0)';
+
+    if (speed > 100) {
+        targetColor = '#ef4444'; // أحمر (خطر)
+        shadowColor = 'rgba(239, 68, 68, 0.5)';
+    } else if (speed > 80) {
+        targetColor = '#f59e0b'; // برتقالي (تحذير)
+        shadowColor = 'rgba(245, 158, 11, 0.5)';
+    }
+
+    // تحريك اللون
+    gsap.to(speedEl, {
+        color: targetColor,
+        textShadow: `0 0 20px ${shadowColor}`,
+        duration: 0.5
+    });
+}
+
 /* =========================================================
    GSAP LOGIN ANIMATIONS ENGINE (FANCY VERSION)
    ========================================================= */
