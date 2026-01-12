@@ -1,1841 +1,451 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html data-theme='light' dir='rtl' lang='ar' class="overflow-x-hidden">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sook | منصة السائقين</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    
-    <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Leaflet Libraries -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, child, push, update, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyBaEfEewAxIFqhfW2oQH7qGqGBeqVISnmc",
-          authDomain: "smarttrans-34bec.firebaseapp.com",
-          databaseURL: "https://smarttrans-34bec-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "smarttrans-34bec",
-          storageBucket: "smarttrans-34bec.firebasestorage.app",
-          messagingSenderId: "611309810028",
-          appId: "1:611309810028:web:e817a023fc50b42959c349",
-          measurementId: "G-60987892BP"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app); 
-
-        window.db = db;
-        window.auth = auth;
-        
-        window.rtdbRef = ref;
-        window.rtdbSet = set;
-        window.rtdbGet = get;
-        window.rtdbChild = child;
-        window.rtdbPush = push;
-        window.rtdbUpdate = update;
-        window.rtdbOnValue = onValue;
-        window.rtdbQuery = query;
-        window.rtdbOrderByChild = orderByChild;
-        window.rtdbEqualTo = equalTo;
-        
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signOut = signOut;
-        window.onAuthStateChanged = onAuthStateChanged;
-
-        console.log("Firebase Initialized");
-    </script>
-
-    <style>
-        :root {
-            --glass-bg: rgba(15, 23, 42, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #0f172a;
-            color: white;
-            overflow: hidden;
-            height: 100vh;
-            height: 100dvh;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .view-section {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            background: #0f172a;
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease;
-            z-index: 10;
-        }
-        
-        .view-hidden {
-            transform: translateX(100%);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .view-active {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 20;
-        }
-
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-sheet {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border-top: 1px solid var(--glass-border);
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
-            touch-action: none;
-        }
-
-        .glass-pill {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .glass-modal {
-            background: rgba(20, 25, 40, 0.95);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Toast Container & Animation */
-        #toastContainer {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 90%;
-            max-width: 400px;
-            pointer-events: none;
-        }
-
-        .toast-item {
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-
-        .toast-item.hide {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        /* Security Alert Specifics */
-        .security-lock-overlay {
-            background: rgba(127, 29, 29, 0.95); /* Deep Red */
-            backdrop-filter: blur(40px);
-        }
-
-        /* TomTom Tools Menu */
-        #toolsMenu {
-            transition: opacity 0.2s, transform 0.2s;
-            transform-origin: bottom right;
-        }
-        .tool-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .tool-item:last-child { border-bottom: none; }
-        .tool-item:hover { background: rgba(255,255,255,0.05); }
-        .tool-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-        }
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-        .tool-item.active .toggle-switch { background: #10b981; }
-        .tool-item.active .toggle-switch::after { left: 22px; }
-
-        @keyframes toastSlideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            background: #1a1a1a;
-            z-index: 0;
-        }
-
-        .pulse-ring {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(16, 185, 129, 0.4);
-            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        @keyframes pulse-ring {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
-        }
-        
-        .leaflet-marker-icon.custom-div-icon { transition: transform 0.3s linear; }
-        .leaflet-control-container .leaflet-routing-container { display: none; }
-        .leaflet-control-attribution { display: none; }
-
-        .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Timeline Marker Styles */
-        .timeline-marker {
-            position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background-color: #10b981;
-            border: 2px solid white;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 25; /* Above Slider Track */
-            transition: transform 0.2s, background-color 0.2s;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-        .timeline-marker:hover {
-            transform: translate(-50%, -50%) scale(1.5);
-            background-color: #34d399;
-        }
-        .timeline-tooltip {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 10px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .timeline-marker:hover .timeline-tooltip {
-            opacity: 1;
-        }
-
-        /* Student Boarding Pin Style */
-        .student-pin {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .student-pin-frame {
-            width: 40px;
-            height: 40px;
-            border-radius: 50% 50% 50% 0;
-            background: white;
-            border: 3px solid #10b981; /* Emerald */
-            transform: rotate(-45deg);
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .student-pin-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: rotate(45deg); /* Counter rotate image */
-            border-radius: 50%;
-        }
-
-        /* Improved Student Card */
-        .student-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s;
-        }
-        .student-card:active { transform: scale(0.98); }
-        
-        /* Boarding Button */
-        .board-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            transition: all 0.2s;
-        }
-        .board-btn:active { transform: scale(0.95); }
-        .board-btn:disabled {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body class="w-screen h-screen overflow-hidden bg-slate-900 text-white">
-
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
-
-    <!-- Security Alert Overlay -->
-    <div id="securityOverlay" class="fixed inset-0 z-[9999] security-lock-overlay hidden flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(220,38,38,0.6)] animate-bounce">
-            <i class="fas fa-user-lock text-5xl text-white"></i>
-        </div>
-        <h2 class="text-3xl font-bold mb-4">تم قفل الحساب أمنياً</h2>
-        <p class="text-gray-200 mb-8 leading-relaxed max-w-sm">
-            تم اكتشاف محاولة دخول من جهاز غير مصرح به. هذا الحساب مرتبط بجهاز آخر.
-            <br><br>
-            <span class="text-sm bg-black/30 px-3 py-1 rounded">رمز الحماية: SEC-DEVICE-MISMATCH</span>
-        </p>
-        <button onclick="window.location.reload()" class="bg-white text-red-700 font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition shadow-xl">
-            العودة لتسجيل الدخول
-        </button>
-    </div>
-
-    <!-- ================= VIEW 1: LOGIN ================= -->
-    <div id="loginView" class="view-section view-active flex flex-col justify-center items-center p-6 bg-[url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
-        
-        <div class="relative z-10 w-full max-w-md">
-            <div class="text-center mb-10">
-                <div class="w-20 h-20 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md shadow-lg shadow-emerald-500/20">
-                    <i class="fas fa-bus text-4xl text-emerald-400"></i>
-                </div>
-                <h1 class="text-3xl font-bold mb-2">منصة Sook للسائقين</h1>
-                <p class="text-gray-400">نظام محمي برقم التعريف الموحد</p>
-            </div>
-
-            <div class="glass-card p-8 rounded-3xl space-y-6">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">البريد الإلكتروني</label>
-                    <div class="relative">
-                        <i class="fas fa-envelope absolute right-4 top-4 text-gray-500"></i>
-                        <input type="email" id="loginEmail" class="w-full bg-black/20 border border-white/10 rounded-xl py-3.5 pr-10 pl-4 focus:outline-none focus:border-emerald-500 transition text-right" placeholder="driver@sook.com">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">كلمة المرور</label>
-                    <div class="relative">
-                        <i class="fas fa-lock absolute right-4 top-4 text-gray-500"></i>
-                        <input type="password" id="loginPass" class="w-full bg-black/20 border border-white/10 rounded-xl py-3.5 pr-10 pl-4 focus:outline-none focus:border-emerald-500 transition text-right" placeholder="••••••">
-                    </div>
-                </div>
-                
-                <button onclick="handleLogin()" id="loginBtn" class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 font-bold text-lg shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition">
-                    تسجيل الدخول الآمن
-                </button>
-
-                <div class="text-center mt-4">
-                    <button onclick="seedDriver()" class="text-xs text-emerald-500 hover:text-emerald-400 underline">إنشاء حساب جديد (تجربة الحماية)</button>
-                </div>
-            </div>
-            
-            <p class="text-center text-xs text-gray-500 mt-8">جميع الحقوق محفوظة © 2024 Sook Platform</p>
-        </div>
-    </div>
-
-    <!-- ================= VIEW 2: HOME ================= -->
-    <div id="homeView" class="view-section view-hidden pt-safe pb-safe px-4">
-         <!-- Header -->
-        <header class="flex justify-between items-center py-6">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold shadow-lg">
-                    <img src="https://i.pravatar.cc/150?img=11" alt="Driver" class="w-full h-full rounded-full object-cover border-2 border-white/20">
-                </div>
-                <div>
-                    <h2 class="font-bold text-lg" id="driverNameDisplay">جاري التحميل...</h2>
-                    <p class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">● متاح للعمل</p>
-                </div>
-            </div>
-            <button onclick="logout()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-red-400 hover:bg-red-500/10 transition">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </header>
-
-        <!-- School & Shift Info -->
-        <div class="glass-card p-5 rounded-2xl mb-6 border-l-4 border-l-blue-500 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -translate-x-10 -translate-y-10"></div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-gray-400 text-xs mb-1">المدرسة التابعة لها</p>
-                        <h3 class="font-bold text-xl" id="schoolNameDisplay">--</h3>
-                    </div>
-                    <div class="bg-blue-500/20 p-2 rounded-lg text-blue-400">
-                        <i class="fas fa-school text-xl"></i>
-                    </div>
-                </div>
-                <div class="flex gap-4 border-t border-white/10 pt-4">
-                    <div>
-                        <p class="text-gray-400 text-[10px]">الوردية الصباحية</p>
-                        <p class="font-bold font-mono text-sm" id="shiftDisplay">--</p>
-                    </div>
-                    <div class="w-px bg-white/10 h-8"></div>
-                    <div>
-                        <p class="text-gray-400 text-[10px]">الطلاب</p>
-                        <p class="font-bold text-sm" id="studentsCountDisplay">-- طالب</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Start Trip Action -->
-        <div class="mb-8">
-            <h3 class="font-bold text-lg mb-3">مهام اليوم</h3>
-            <button onclick="startDailyTrip()" class="w-full h-24 rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 relative overflow-hidden group shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                <div class="relative z-10 flex items-center justify-between px-6 h-full">
-                    <div class="text-right">
-                        <span class="bg-white/20 text-white text-[10px] px-2 py-1 rounded mb-1 inline-block">الآن</span>
-                        <h4 class="text-2xl font-bold">بدء الرحلة اليومية</h4>
-                        <p class="text-emerald-100 text-sm">توصيل الطلاب للمدرسة</p>
-                    </div>
-                    <div class="w-14 h-14 bg-white text-emerald-600 rounded-full flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition">
-                        <i class="fas fa-play pl-1"></i>
-                    </div>
-                </div>
-            </button>
-        </div>
-
-        <!-- Calendar / History -->
-        <div>
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-lg">سجل الرحلات السابق</h3>
-                <div class="text-xs text-gray-400 bg-white/5 px-3 py-1 rounded-full">تحديث مباشر</div>
-            </div>
-            
-            <div class="grid gap-3" id="calendarGrid">
-                <div class="text-center text-gray-500 py-4">جاري تحميل السجل...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= VIEW 3: MAP VIEW ================= -->
-    <div id="mapView" class="view-section view-hidden">
-        <div id="map"></div>
-        <!-- Floating Header -->
-        <div class="absolute top-0 left-0 right-0 z-30 pointer-events-none p-4 pt-safe flex flex-col gap-3">
-            <div class="flex justify-between items-start pointer-events-auto">
-                <button onclick="returnToHome()" class="glass-pill w-11 h-11 rounded-full flex items-center justify-center text-white active:scale-95 transition shadow-lg bg-slate-800 border-white/20">
-                    <i class="fas fa-arrow-right text-lg"></i>
-                </button>
-                <div class="flex gap-2">
-                    <div id="historyModeBadge" class="hidden glass-pill px-4 py-2 rounded-full flex items-center gap-2 bg-purple-500/20 border-purple-500/30 backdrop-blur-md">
-                        <i class="fas fa-history text-purple-400"></i>
-                        <span class="text-xs font-bold text-purple-200">مراجعة</span>
-                        <span id="historyDateDisplay" class="text-[10px] text-gray-300 mr-1"></span>
-                    </div>
-                    <div onclick="toggleToolsMenu()" id="toolsBtn" class="hidden glass-pill w-10 h-10 rounded-full flex items-center justify-center text-gray-300 active:scale-95 transition border border-white/10 bg-slate-800/80">
-                        <i class="fas fa-layer-group text-blue-400"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="routeInfo" class="hidden glass-pill px-4 py-3 rounded-2xl flex items-center gap-3 w-fit border-l-4 border-l-emerald-500 bg-slate-800/90 pointer-events-auto">
-                <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400"><i class="fas fa-route"></i></div>
-                <div><p class="text-xs text-gray-400">الوقت</p><p class="font-bold text-lg leading-none" id="routeTime">--</p></div>
-                <div class="h-8 w-px bg-white/10 mx-1"></div>
-                <div><p class="text-xs text-gray-400">المسافة</p><p class="font-bold text-lg leading-none" id="routeSummary">--</p></div>
-            </div>
-        </div>
-
-        <!-- TomTom Tools Menu -->
-        <div id="toolsMenu" class="glass-card w-64 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 opacity-0 scale-95 origin-top-right pointer-events-none absolute top-[70px] left-4 z-40">
-            <div class="p-3 bg-white/5 border-b border-white/10">
-                <h4 class="text-sm font-bold text-gray-300">أدوات TomTom API</h4>
-            </div>
-            
-            <!-- Traffic Flow -->
-            <div class="tool-item" onclick="toggleTomTomLayer('trafficFlow')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-road text-orange-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">حركة المرور</span>
-                        <span class="text-[10px] text-gray-400 block">Traffic Flow API</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-trafficFlow"></div>
-            </div>
-
-            <!-- Traffic Incidents -->
-            <div class="tool-item" onclick="toggleTomTomLayer('trafficIncidents')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-car-crash text-red-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">الحوادث</span>
-                        <span class="text-[10px] text-gray-400 block">Incidents API</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-trafficIncidents"></div>
-            </div>
-
-            <!-- EV Charging -->
-            <div class="tool-item" onclick="toggleTomTomLayer('evStations')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-charging-station text-green-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">محطات شحن</span>
-                        <span class="text-[10px] text-gray-400 block">EV & Search API</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-evStations"></div>
-            </div>
-
-            <!-- POIs (Gas/Rest) -->
-            <div class="tool-item" onclick="toggleTomTomLayer('pois')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-gas-pump text-blue-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">محطات وقود</span>
-                        <span class="text-[10px] text-gray-400 block">Search API</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-pois"></div>
-            </div>
-            
-             <!-- Snap To Roads (Visual Toggle) -->
-             <div class="tool-item" onclick="toggleTomTomLayer('snapRoads')">
-                <div class="flex items-center">
-                    <div class="tool-icon"><i class="fas fa-magnet text-purple-400"></i></div>
-                    <div class="mr-3">
-                        <span class="text-sm font-semibold block">تصحيح المسار</span>
-                        <span class="text-[10px] text-gray-400 block">Snap to Roads API</span>
-                    </div>
-                </div>
-                <div class="toggle-switch" id="toggle-snapRoads"></div>
-            </div>
-
-        </div>
-
-        <!-- Controls -->
-        <div class="absolute right-4 bottom-[calc(85vh-160px+20px)] z-30 flex flex-col gap-4 pointer-events-auto">
-            <button onclick="locateUser(true)" class="glass-pill w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg active:scale-90 transition bg-slate-800/90 border border-slate-600">
-                <i class="fas fa-crosshairs"></i>
-            </button>
-        </div>
-        <div id="loadingRoute" class="hidden absolute inset-0 bg-black/60 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
-            <div class="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-            <span class="font-bold text-lg animate-pulse">جاري تحميل المسار...</span>
-        </div>
-
-        <!-- Bottom Panel -->
-        <div id="tripPanel" class="absolute bottom-0 left-0 right-0 z-40 glass-sheet rounded-t-[30px] transition-transform duration-300 ease-out transform translate-y-[calc(85vh-180px)] h-[85vh]">
-            <div id="dragHandle" class="w-full h-8 flex items-center justify-center cursor-grab active:cursor-grabbing pt-2">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full"></div>
-            </div>
-            <div class="h-full overflow-y-auto hide-scrollbar px-6 pb-24">
-                <div class="mb-8">
-                    <div class="flex items-end justify-between mb-6">
-                        <div>
-                            <p class="text-gray-400 text-xs font-medium mb-1 tracking-wider uppercase">السرعة</p>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-5xl font-black text-white tracking-tighter" id="speedDisplay">0</span>
-                                <span class="text-sm font-semibold text-gray-400">كم/س</span>
-                            </div>
-                        </div>
-                        <div class="text-left bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                            <p class="text-gray-400 text-[10px] mb-0.5">المسافة</p>
-                            <p class="text-xl font-bold text-emerald-400 font-mono" id="distanceDisplay">0.0 <span class="text-xs text-gray-500">كم</span></p>
-                        </div>
-                    </div>
-
-                    <div id="liveControls" class="grid grid-cols-1">
-                        <button id="actionBtn" onclick="toggleTracking()" class="h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 text-white font-bold text-lg shadow-lg active:scale-[0.98] transition flex items-center justify-center gap-3">
-                            <i class="fas fa-play"></i><span>بدء التحرك الفعلي</span>
-                        </button>
-                    </div>
-
-                    <!-- NEW REVIEW TIMELINE CONTROLS -->
-                    <div id="reviewControls" class="hidden mb-6 animate-fade-in">
-                        <div class="glass-card p-5 rounded-2xl border border-purple-500/20 relative overflow-hidden group">
-                            <!-- Glow Effect -->
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                            
-                            <!-- Header: Time & Info -->
-                            <div class="flex justify-between items-end mb-4 relative z-10">
-                                <div>
-                                    <p class="text-purple-300 text-xs font-mono mb-1">وقت الرحلة</p>
-                                    <h3 class="text-3xl font-black font-mono tracking-wider" id="timelineCurrent">00:00</h3>
-                                </div>
-                                <div class="text-left">
-                                     <div class="flex items-center gap-2 text-xs text-gray-400 mb-1">
-                                        <span id="timelineStart">00:00</span>
-                                        <span class="w-8 h-[1px] bg-gray-600"></span>
-                                        <span id="timelineEnd">00:00</span>
-                                     </div>
-                                     <div class="flex items-center gap-1 justify-end">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span class="text-[10px] text-emerald-400 font-bold">تسجيل مباشر</span>
-                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Slider Container -->
-                            <div class="relative w-full h-8 flex items-center">
-                                <!-- Track Background -->
-                                <div class="absolute inset-x-0 h-2 bg-slate-800 rounded-full overflow-hidden">
-                                    <div id="timelineProgress" class="h-full bg-gradient-to-r from-purple-600 to-pink-500 w-0 transition-all duration-75"></div>
-                                </div>
-                                
-                                <!-- Markers Container -->
-                                <div id="timelineMarkers" class="absolute inset-x-0 h-2 pointer-events-none z-10 top-1/2 transform -translate-y-1/2"></div>
-
-                                <!-- Actual Input -->
-                                <input type="range" id="timelineSlider" min="0" max="100" value="0" 
-                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                                
-                                <!-- Custom Thumb (Visual) -->
-                                <div id="customThumb" class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-4 border-purple-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.6)] pointer-events-none z-10 transition-transform duration-75 ease-out flex items-center justify-center">
-                                     <div class="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                                </div>
-                            </div>
-                            
-                            <p class="text-[10px] text-center text-gray-500 mt-3 font-mono">اسحب الشريط لمراجعة مسار الرحلة</p>
-                        </div>
-                    </div>
-
-                    <button id="closeReviewBtn" onclick="returnToHome()" class="hidden w-full h-14 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-lg active:scale-[0.98] transition flex items-center justify-center gap-2 mt-3">
-                        <i class="fas fa-arrow-right"></i>
-                        <span>العودة للرئيسية</span>
-                    </button>
-                </div>
-                
-                <div id="expandedContent" class="content-fade opacity-50 space-y-6">
-                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <h3 class="font-bold text-lg mb-4 flex justify-between items-center">
-                            <span>قائمة الطلاب</span>
-                            <span class="text-xs bg-white/10 px-2 py-1 rounded" id="studentCountBadge">0</span>
-                        </h3>
-                        <div class="space-y-3" id="studentsListContainer">
-                            <div class="text-center text-gray-500 py-4">جاري تحميل الطلاب...</div>
-                        </div>
-                    </div>
-                    <div class="h-20"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Student Detail Modal -->
-    <div id="studentModal" class="fixed inset-0 z-[250] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-modal w-full max-w-sm rounded-[2.5rem] overflow-hidden transform scale-95 transition-all duration-300 relative" id="studentModalContent">
-            <button onclick="closeStudentModal()" class="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/20 text-white flex items-center justify-center z-10 hover:bg-black/40 transition">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="h-32 bg-gradient-to-br from-emerald-500 to-blue-600 relative">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-            </div>
-            <div class="px-6 pb-8 -mt-16 flex flex-col items-center">
-                <div class="w-28 h-28 rounded-full border-4 border-slate-900 shadow-2xl overflow-hidden mb-4 bg-slate-800">
-                    <img id="studentPhoto" src="" alt="Student" class="w-full h-full object-cover">
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-1" id="studentName">اسم الطالب</h3>
-                <span class="px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold mb-6 border border-white/5" id="studentGrade">الصف</span>
-                <div class="w-full space-y-4">
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
-                            <i class="fas fa-id-card"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-gray-400">رقم البطاقة</p>
-                            <p class="font-mono font-bold text-sm" id="studentBadge">----</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-[10px] text-gray-400">هاتف ولي الأمر</p>
-                            <p class="font-mono font-bold text-sm dir-ltr text-right" id="studentParentPhone">----</p>
-                        </div>
-                        <a href="#" id="callParentBtn" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg active:scale-90 transition">
-                            <i class="fas fa-phone-alt text-xs"></i>
-                        </a>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
-                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-gray-400">العنوان</p>
-                            <p class="text-sm" id="studentAddress">----</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Generic Modal -->
-    <div id="customModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-modal w-full max-w-xs rounded-[2rem] p-6 transform scale-95 transition-all duration-300" id="modalContent">
-            <div class="flex flex-col items-center text-center">
-                <div id="modalIcon" class="mb-5 text-5xl drop-shadow-xl filter"></div>
-                <h3 id="modalTitle" class="text-xl font-bold text-white mb-2"></h3>
-                <p id="modalMessage" class="text-gray-300 text-sm leading-relaxed mb-8 px-2"></p>
-                <div id="modalInputContainer" class="w-full mb-4 hidden">
-                    <input type="text" id="modalInput" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-center text-white focus:outline-none focus:border-emerald-500" placeholder="">
-                </div>
-                <div id="modalActions" class="flex w-full gap-3"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- DEVICE FINGERPRINTING LOGIC ---
-        function getDeviceFingerprint() {
-            let deviceId = localStorage.getItem('sook_trusted_device_id');
-            if (!deviceId) {
-                deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                localStorage.setItem('sook_trusted_device_id', deviceId);
-            }
-            return deviceId;
-        }
-
-        // --- GLOBAL VARIABLES ---
-        const API_KEYS = { google: "", tomtom: "lYWa4mjQDIZqRVen5BpX2sHtblrAmTcu" }; // Add TomTom Key here
-        let map, userMarker, pathLine, originalPathLine, reviewPathLine;
-        let trafficLayerGroup = null;
-        let routingControl = null;
-        let watchId = null;
-        let isTracking = false;
-        let isSimulating = false;
-        let currentReviewTrip = null;
-        let wakeLock = null;
-        let currentDriverId = null;
-        let currentTripKey = null; 
-        let boardingMarkers = []; 
-        let currentPos = { lat: 0, lng: 0 };
-        
-        let driverData = {}; 
-        let myStudents = []; 
-        let currentTripStudents = [];
-
-        // TomTom Layer State
-        let activeLayers = {
-            trafficFlow: false,
-            trafficIncidents: false,
-            evStations: false,
-            pois: false,
-            snapRoads: false
-        };
-        let tomTomLayers = {
-            trafficFlow: null,
-            trafficIncidents: null,
-            evStations: L.layerGroup(),
-            pois: L.layerGroup()
-        };
-
-        // Navigation State
-        let currentView = 'loginView';
-
-        // --- DOM ELEMENTS ---
-        const views = {
-            login: document.getElementById('loginView'),
-            home: document.getElementById('homeView'),
-            map: document.getElementById('mapView')
-        };
-        const historyView = document.getElementById('historyView');
-        const loadingRoute = document.getElementById('loadingRoute');
-        const historyModeBadge = document.getElementById('historyModeBadge');
-        // tripTimeline removed - logic moved to reviewControls
-        const reviewControls = document.getElementById('reviewControls');
-        const routeInfo = document.getElementById('routeInfo');
-        const routeSummary = document.getElementById('routeSummary');
-        const routeTime = document.getElementById('routeTime');
-        const speedDisplay = document.getElementById('speedDisplay');
-        const distanceDisplay = document.getElementById('distanceDisplay');
-        const actionBtn = document.getElementById('actionBtn');
-        const historyDateDisplay = document.getElementById('historyDateDisplay');
-        const timelineStart = document.getElementById('timelineStart');
-        const timelineEnd = document.getElementById('timelineEnd');
-        const timelineCurrent = document.getElementById('timelineCurrent');
-        const timelineSlider = document.getElementById('timelineSlider');
-        const timelineMarkers = document.getElementById('timelineMarkers');
-        const timelineProgress = document.getElementById('timelineProgress');
-        const customThumb = document.getElementById('customThumb');
-        const calendarGrid = document.getElementById('calendarGrid');
-        const studentsListContainer = document.getElementById('studentsListContainer');
-        const studentCountBadge = document.getElementById('studentCountBadge');
-        const closeReviewBtn = document.getElementById('closeReviewBtn');
-        const liveControls = document.getElementById('liveControls');
-        const securityOverlay = document.getElementById('securityOverlay');
-        const toolsMenu = document.getElementById('toolsMenu');
-        const toolsBtn = document.getElementById('toolsBtn');
-
-        // Student Modal Elements
-        const studentModal = document.getElementById('studentModal');
-        const studentModalContent = document.getElementById('studentModalContent');
-        const studentPhoto = document.getElementById('studentPhoto');
-        const studentName = document.getElementById('studentName');
-        const studentGrade = document.getElementById('studentGrade');
-        const studentBadge = document.getElementById('studentBadge');
-        const studentParentPhone = document.getElementById('studentParentPhone');
-        const studentAddress = document.getElementById('studentAddress');
-        const callParentBtn = document.getElementById('callParentBtn');
-        const toastContainer = document.getElementById('toastContainer');
-
-        // Bottom Sheet Drag Logic variables
-        const panel = document.getElementById('tripPanel');
-        const dragHandle = document.getElementById('dragHandle');
-        const expandedContent = document.getElementById('expandedContent');
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if(window.auth) {
-                    window.onAuthStateChanged(window.auth, (user) => {
-                        if (user) {
-                            handleAutoLogin(user.uid);
-                        } else {
-                            showView('login');
-                        }
-                    });
-                }
-            }, 500);
-
-            // Setup Timeline Listener
-            timelineSlider.addEventListener('input', handleTimelineInput);
-        });
-
-        // --- TIMELINE LOGIC ---
-        function handleTimelineInput() {
-            if(!currentReviewTrip || !currentReviewTrip.optimizedPath) return;
-            
-            const index = parseInt(timelineSlider.value);
-            const max = parseInt(timelineSlider.max);
-            const point = currentReviewTrip.optimizedPath[index];
-            
-            // Update Visual Progress & Thumb
-            const percent = (index / max) * 100;
-            timelineProgress.style.width = `${percent}%`;
-            customThumb.style.right = `${percent}%`;
-            
-            if(point) {
-                // Update Marker Position
-                const latLng = [point.lat, point.lng];
-                if(userMarker) userMarker.setLatLng(latLng);
-                map.panTo(latLng, {animate: false}); 
-                
-                // Update Time Display
-                if(point.ts) {
-                    const timeStr = new Date(point.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                    timelineCurrent.innerText = timeStr;
-                }
-            }
-        }
-
-        // --- TOAST SYSTEM ---
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast-item';
-            
-            let icon = '';
-            let colorClass = 'text-blue-400';
-            
-            if (type === 'success') {
-                icon = '<i class="fas fa-check-circle"></i>';
-                colorClass = 'text-emerald-400';
-            } else if (type === 'error') {
-                icon = '<i class="fas fa-exclamation-circle"></i>';
-                colorClass = 'text-red-400';
-            } else {
-                icon = '<i class="fas fa-info-circle"></i>';
-            }
-
-            toast.innerHTML = `
-                <div class="${colorClass} text-lg">${icon}</div>
-                <div class="text-sm font-semibold">${message}</div>
-            `;
-
-            toastContainer.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
-
-        // --- SHIFT LOGIC ---
-        function checkShiftTime() {
-            if (!driverData || !driverData.shift) return true; 
-
-            const now = new Date();
-            const currentTimeStr = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'});
-            
-            const parts = driverData.shift.split('-');
-            if (parts.length !== 2) return true;
-
-            const startStr = parts[0].trim();
-            const endStr = parts[1].trim();
-
-            const parseTime = (str) => {
-                const [h, m] = str.split(':').map(Number);
-                return h * 60 + m;
-            };
-
-            const currentMinutes = parseTime(currentTimeStr);
-            const startMinutes = parseTime(startStr);
-            const endMinutes = parseTime(endStr);
-
-            if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-                return true;
-            }
-            return false;
-        }
-
-        // --- VIEW MANAGEMENT ---
-        function showView(viewName) {
-            Object.values(views).forEach(el => {
-                if(el) {
-                    el.classList.add('view-hidden');
-                    el.classList.remove('view-active');
-                }
-            });
-            if(views[viewName]) {
-                views[viewName].classList.remove('view-hidden');
-                views[viewName].classList.add('view-active');
-                currentView = viewName;
-
-                if(viewName === 'map' && !map) {
-                    setTimeout(initMap, 300);
-                } else if (viewName === 'map') {
-                    setTimeout(() => {
-                        if (map) map.invalidateSize();
-                    }, 300);
-                }
-            }
-        }
-
-        // --- FIREBASE AUTH & SECURITY ---
-        async function handleLogin() {
-            const emailInput = document.getElementById('loginEmail');
-            const passInput = document.getElementById('loginPass');
-            const email = emailInput.value.trim();
-            const password = passInput.value.trim();
-
-            if(!email || !password) {
-                showToast('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error');
-                return;
-            }
-
-            const loginBtn = document.getElementById('loginBtn');
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
-            loginBtn.disabled = true;
-
-            try {
-                const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
-                const user = userCredential.user;
-                checkDriverProfile(user.uid, true);
-            } catch (error) {
-                console.error("Login Error:", error);
-                let msg = 'تعذر تسجيل الدخول. تأكد من البيانات.';
-                showToast(msg, 'error');
-                loginBtn.innerHTML = 'تسجيل الدخول';
-                loginBtn.disabled = false;
-            }
-        }
-
-        async function seedDriver() {
-            const email = prompt("أدخل بريد إلكتروني جديد:");
-            const password = prompt("أدخل كلمة مرور (6 أحرف على الأقل):");
-            if(!email || !password) return;
-            
-            try {
-                const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
-                const user = userCredential.user;
-                const currentDeviceId = getDeviceFingerprint();
-                const driverRef = window.rtdbRef(window.db, 'drivers/' + user.uid + '/profile');
-                await window.rtdbSet(driverRef, {
-                    id: user.uid,
-                    name: 'سائق جديد',
-                    email: email,
-                    school: 'مدرسة Sook للتجربة',
-                    shift: '07:00 - 13:00',
-                    createdAt: new Date().toISOString(),
-                    registeredDeviceId: currentDeviceId 
-                });
-                alert("تم إنشاء الحساب بنجاح! سيتم الدخول تلقائياً.");
-            } catch(e) {
-                alert("حدث خطأ أثناء الإنشاء: " + e.message);
-            }
-        }
-
-        async function checkDriverProfile(uid, isManualLogin = false) {
-            try {
-                const dbRef = window.rtdbRef(window.db);
-                const snapshot = await window.rtdbGet(window.rtdbChild(dbRef, `drivers/${uid}/profile`));
-
-                if (snapshot.exists()) {
-                    driverData = snapshot.val();
-                    const currentDeviceId = getDeviceFingerprint();
-                    const registeredId = driverData.registeredDeviceId;
-
-                    if (!registeredId) {
-                        const profileRef = window.rtdbRef(window.db, `drivers/${uid}/profile`);
-                        await window.rtdbUpdate(profileRef, { registeredDeviceId: currentDeviceId });
-                        loginSuccess(uid);
-                    } else if (registeredId === currentDeviceId) {
-                        loginSuccess(uid);
-                    } else {
-                        window.signOut(window.auth);
-                        securityOverlay.classList.remove('hidden'); 
-                        document.getElementById('loginBtn').innerHTML = 'تسجيل الدخول';
-                        document.getElementById('loginBtn').disabled = false;
-                    }
-                } else {
-                    showToast('لم يتم العثور على ملف السائق.', 'error');
-                    window.signOut(window.auth);
-                    document.getElementById('loginBtn').innerHTML = 'تسجيل الدخول';
-                    document.getElementById('loginBtn').disabled = false;
-                }
-            } catch (e) {
-                console.error("Profile Fetch Error", e);
-                showToast('فشل في جلب البيانات', 'error');
-            }
-        }
-
-        function loginSuccess(id) {
-            currentDriverId = id;
-            document.getElementById('driverNameDisplay').innerText = driverData.name || 'سائق';
-            document.getElementById('schoolNameDisplay').innerText = driverData.school || 'غير محدد';
-            document.getElementById('shiftDisplay').innerText = driverData.shift || '--';
-            fetchStudents(id);
-            listenToHistory(id);
-            showToast('تم تسجيل الدخول بنجاح', 'success');
-            setTimeout(() => showView('home'), 500);
-        }
-
-        function handleAutoLogin(id) {
-            checkDriverProfile(id); 
-        }
-
-        function logout() {
-            window.signOut(window.auth).then(() => {
-                currentDriverId = null;
-                driverData = {};
-                showView('login');
-                const btn = document.getElementById('loginBtn');
-                if(btn) {
-                    btn.innerHTML = 'تسجيل الدخول';
-                    btn.disabled = false;
-                }
-            });
-        }
-
-        // --- FETCH & HISTORY & STUDENTS ---
-        function fetchStudents(driverId) {
-            const studentsRef = window.rtdbRef(window.db, 'students');
-            const q = window.rtdbQuery(studentsRef, window.rtdbOrderByChild('driverId'), window.rtdbEqualTo(driverId));
-            
-            window.rtdbOnValue(q, (snapshot) => {
-                myStudents = [];
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const data = childSnapshot.val();
-                        data.id = childSnapshot.key;
-                        data.status = 'pending';
-                        myStudents.push(data);
-                    });
-                }
-                document.getElementById('studentsCountDisplay').innerText = `${myStudents.length} طالب`;
-            });
-        }
-
-        function listenToHistory(driverId) {
-            const tripsRef = window.rtdbRef(window.db, 'drivers/' + driverId + '/trips');
-            const recentTripsQuery = window.rtdbQuery(tripsRef, window.rtdbOrderByChild('startTime'));
-
-            window.rtdbOnValue(recentTripsQuery, (snapshot) => {
-                calendarGrid.innerHTML = '';
-                if(!snapshot.exists()) {
-                    calendarGrid.innerHTML = '<div class="text-center text-gray-500 py-4">لا توجد رحلات سابقة</div>';
-                    return;
-                }
-                const trips = [];
-                snapshot.forEach((childSnapshot) => {
-                    trips.push(childSnapshot.val());
-                });
-                trips.reverse(); 
-                trips.forEach((trip) => {
-                    if(trip.status === 'completed') { 
-                        renderTripCard(trip);
-                    }
-                });
-            });
-        }
-
-        function renderTripCard(trip) {
-            const dateObj = new Date(trip.startTime);
-            const dayName = dateObj.toLocaleDateString('ar-SA', {weekday: 'long'});
-            const distance = trip.totalDistance ? trip.totalDistance.toFixed(2) : "0.0";
-            const card = document.createElement('div');
-            card.className = 'glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition';
-            card.onclick = () => reviewTrip(trip);
-            card.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-lg bg-white/5 flex flex-col items-center justify-center border border-white/10">
-                        <span class="text-xs text-gray-400">${dateObj.getDate()}</span>
-                        <span class="text-xs font-bold">${dateObj.toLocaleDateString('ar-SA', {month:'short'})}</span>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm">${dayName}</h4>
-                        <p class="text-xs text-emerald-400">تم التوصيل <i class="fas fa-check-circle"></i></p>
-                    </div>
-                </div>
-                <div class="text-left">
-                    <p class="text-sm font-bold font-mono">${distance} km</p>
-                    <i class="fas fa-chevron-left text-xs text-gray-500"></i>
-                </div>
-            `;
-            calendarGrid.appendChild(card);
-        }
-
-        // --- STUDENTS & BOARDING RENDER LOGIC ---
-        function renderStudentsList(isReviewMode = false, events = []) {
-            studentsListContainer.innerHTML = '';
-            let listToRender = isReviewMode ? JSON.parse(JSON.stringify(myStudents)) : currentTripStudents;
-            if(listToRender.length === 0) studentsListContainer.innerHTML = '<div class="text-center text-gray-500 py-2">لا يوجد طلاب</div>';
-            if (isReviewMode) {
-                listToRender = listToRender.map(student => {
-                    const event = events.find(e => e.studentId === student.id);
-                    return { ...student, status: event ? 'boarded' : 'pending', boardTime: event ? event.ts : null };
-                });
-            }
-            studentCountBadge.innerText = listToRender.length;
-            
-            // Check trip status for button state
-            const isTripActive = isTracking;
-
-            listToRender.forEach(student => {
-                const item = document.createElement('div');
-                item.className = 'student-card cursor-pointer'; // Use new student-card class
-                
-                item.onclick = (e) => { 
-                    if(e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
-                         showStudentDetails(student); 
-                    }
-                };
-                
-                let actionArea = '';
-                if (student.status === 'boarded') {
-                    const timeStr = student.boardTime ? new Date(student.boardTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
-                    actionArea = `<div class="text-right"><span class="text-emerald-400 text-xs font-bold block"><i class="fas fa-check-circle"></i> تم الركوب</span><span class="text-gray-400 text-[10px]">${timeStr}</span></div>`;
-                } else if (!isReviewMode) {
-                    // Logic for "Start Trip First"
-                    if(isTripActive) {
-                         actionArea = `<button onclick="promptBoarding('${student.id}')" class="board-btn">تسجيل ركوب</button>`;
-                    } else {
-                         actionArea = `<button disabled class="board-btn opacity-50 cursor-not-allowed" title="يجب بدء الرحلة أولاً">انتظار البدء</button>`;
-                    }
-                } else {
-                    actionArea = `<span class="text-gray-500 text-xs">لم يركب</span>`;
-                }
-                item.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden border border-white/10"><img src="${student.photo || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover"></div><div><span class="font-semibold text-sm block">${student.name}</span><span class="text-[10px] text-gray-400">${student.grade}</span></div></div>${actionArea}`;
-                studentsListContainer.appendChild(item);
-            });
-        }
-        
-        window.promptBoarding = function(studentId) {
-            const student = currentTripStudents.find(s => s.id === studentId);
-            if(!student) return;
-            
-            // Optimised "Fast" UX: Focus input immediately
-            showInputModal('تأكيد الركوب', `أدخل رقم البطاقة للطالب: ${student.name}`, '1234...', (value) => {
-                if(value === student.badgeId) {
-                    // Optimistic update happens inside markStudentBoarded
-                    markStudentBoarded(studentId);
-                } else {
-                    showToast('رقم البطاقة غير صحيح!', 'error');
-                }
-            });
-            // Auto focus input
-            setTimeout(() => {
-                const input = document.getElementById('modalInput');
-                if(input) input.focus();
-            }, 100);
-        };
-        
-        function markStudentBoarded(studentId) {
-            const studentIndex = currentTripStudents.findIndex(s => s.id === studentId);
-            if(studentIndex > -1) {
-                // OPTIMISTIC UI UPDATE: Update local state immediately
-                currentTripStudents[studentIndex].status = 'boarded';
-                currentTripStudents[studentIndex].boardTime = Date.now();
-                // Re-render list immediately to show green check
-                renderStudentsList(false);
-            }
-            
-            // Send to Firebase in background
-            if(currentTripKey && navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const eventData = { type: 'boarding', studentId: studentId, ts: Date.now(), lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    const eventsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/events');
-                    window.rtdbPush(eventsRef, eventData).then(() => {
-                         // Success confirmed
-                    }).catch(err => {
-                         console.error("Boarding sync failed", err);
-                         // Ideally revert UI here if failed, but for simplicity we keep optimistic state
-                    });
-                });
-            }
-        }
-        
-        function showStudentDetails(student) {
-            studentName.innerText = student.name; studentGrade.innerText = student.grade; studentBadge.innerText = student.badgeId; studentParentPhone.innerText = student.parentPhone; studentAddress.innerText = student.address; studentPhoto.src = student.photo || 'https://via.placeholder.com/150'; callParentBtn.href = `tel:${student.parentPhone}`;
-            studentModal.classList.remove('hidden');
-            setTimeout(() => { studentModal.classList.remove('opacity-0'); studentModalContent.classList.remove('scale-95'); studentModalContent.classList.add('scale-100'); }, 10);
-        }
-        window.closeStudentModal = function() {
-            studentModal.classList.add('opacity-0'); studentModalContent.classList.remove('scale-100'); studentModalContent.classList.add('scale-95'); setTimeout(() => { studentModal.classList.add('hidden'); }, 300);
-        };
-
-        // --- MAP & ROUTING ---
-        function initMap() {
-            if(map) return;
-            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([24.7136, 46.6753], 13);
-            
-            // Base Layer check
-            if (API_KEYS.tomtom) {
-                 L.tileLayer(`https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {maxZoom: 22, subdomains: 'abcd'}).addTo(map);
-            } else {
-                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, subdomains: 'abcd' }).addTo(map);
-            }
-            
-            // Add layers to the group map for toggling
-            tomTomLayers.evStations.addTo(map);
-            tomTomLayers.pois.addTo(map);
-            // Traffic layers are tiles, handled differently
-
-            const carIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: `<div class="relative w-full h-full"><div class="pulse-ring"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-blue-500 rounded-full border-2 border-white p-1 shadow-lg"><i class="fas fa-location-arrow text-white text-sm transform -rotate-45 block"></i></div></div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
-            userMarker = L.marker([0, 0], {icon: carIcon});
-            pathLine = L.polyline([], { color: '#10b981', weight: 6, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
-            
-            map.on('click', function(e) {
-                if(!historyView.classList.contains('hidden') || currentReviewTrip) return;
-                if(isSimulating) { showToast('يرجى إيقاف المحاكاة لتغيير الوجهة', 'error'); return; }
-                calculateRoute(e.latlng.lat, e.latlng.lng);
-            });
-        }
-        
-        async function calculateRoute(destLat, destLng) {
-            if (currentPos.lat === 0) { showToast('جاري تحديد موقعك...', 'info'); locateUser(); return; }
-            loadingRoute.classList.remove('hidden');
-            
-            // If TomTom API key is present, use TomTom Routing API
-            if (API_KEYS.tomtom) {
-                try {
-                    const url = `https://api.tomtom.com/routing/1/calculateRoute/${currentPos.lat},${currentPos.lng}:${destLat},${destLng}/json?key=${API_KEYS.tomtom}&traffic=true&travelMode=car`;
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    
-                    if(data.routes && data.routes.length > 0) {
-                        const route = data.routes[0];
-                        const points = route.legs[0].points.map(p => [p.latitude, p.longitude]);
-                        
-                        // Clear old routing controls if any (from OSRM)
-                        if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-                        
-                        // Clear previous custom route line
-                        if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
-                        
-                        // Draw new line
-                        window.currentRouteLayer = L.polyline(points, {
-                            color: '#3b82f6', 
-                            weight: 6, 
-                            opacity: 0.8
-                        }).addTo(map);
-                        
-                        map.fitBounds(window.currentRouteLayer.getBounds(), {padding: [50, 50]});
-
-                        // Update Info
-                        const summary = route.summary;
-                        const distKm = (summary.lengthInMeters / 1000).toFixed(1);
-                        const timeMin = Math.round(summary.travelTimeInSeconds / 60);
-                        
-                        routeInfo.classList.remove('hidden');
-                        routeInfo.classList.add('flex');
-                        routeSummary.innerText = `${distKm} كم`;
-                        routeTime.innerText = `${timeMin} د`;
-                        loadingRoute.classList.add('hidden');
-                        
-                        // Populate selectedRouteCoordinates for simulation
-                        selectedRouteCoordinates = points.map(p => ({lat: p[0], lng: p[1]}));
-                    } else {
-                        throw new Error("No route found");
-                    }
-                } catch(e) {
-                    console.error("TomTom Routing Error", e);
-                    // Fallback to OSRM if TomTom fails
-                    useOSRM(destLat, destLng);
-                }
-            } else {
-                // Fallback to OSRM if no key
-                useOSRM(destLat, destLng);
-            }
-        }
-        
-        function useOSRM(destLat, destLng) {
-            if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-            if (window.currentRouteLayer) map.removeLayer(window.currentRouteLayer);
-            
-            routingControl = L.Routing.control({
-                waypoints: [L.latLng(currentPos.lat, currentPos.lng), L.latLng(destLat, destLng)],
-                router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-                lineOptions: { styles: [{color: '#3b82f6', opacity: 0.6, weight: 6}], extendToWaypoints: false, missingRouteTolerance: 10 },
-                showAlternatives: false,
-                createMarker: function(i, wp, nWps) {
-                    if (i === nWps - 1) return L.marker(wp.latLng, { icon: L.divIcon({ className: 'dest-icon', html: '<div class="text-emerald-500 text-4xl drop-shadow-2xl filter"><i class="fas fa-school"></i></div>', iconSize: [40, 40], iconAnchor: [20, 40] }) });
-                    return null;
-                },
-                addWaypoints: false, fitSelectedRoutes: true, show: false
-            }).addTo(map);
-            
-            routingControl.on('routesfound', function(e) {
-                loadingRoute.classList.add('hidden');
-                const bestRoute = e.routes[0];
-                routeInfo.classList.remove('hidden');
-                routeInfo.classList.add('flex');
-                routeSummary.innerText = `${(bestRoute.summary.totalDistance / 1000).toFixed(1)} كم`;
-                routeTime.innerText = `${Math.round(bestRoute.summary.totalTime / 60)} د`;
-                
-                // Populate for simulation
-                selectedRouteCoordinates = bestRoute.coordinates;
-            });
-            
-            routingControl.on('routingerror', function() {
-                loadingRoute.classList.add('hidden');
-                showToast("تعذر الوصول لهذا الموقع.", 'error');
-            });
-        }
-
-        // --- TOMTOM TOOLS LOGIC ---
-        function toggleToolsMenu() {
-            if (toolsMenu.classList.contains('pointer-events-none')) {
-                // Show
-                toolsMenu.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
-                toolsMenu.classList.add('opacity-100', 'scale-100');
-            } else {
-                // Hide
-                toolsMenu.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
-                toolsMenu.classList.remove('opacity-100', 'scale-100');
-            }
-        }
-
-        function toggleTomTomLayer(type) {
-            activeLayers[type] = !activeLayers[type];
-            const toggleEl = document.getElementById(`toggle-${type}`);
-            const itemEl = toggleEl.parentElement;
-            
-            if (activeLayers[type]) {
-                itemEl.classList.add('active');
-            } else {
-                itemEl.classList.remove('active');
-            }
-
-            if (!API_KEYS.tomtom) {
-                showToast('عذراً، يجب إضافة مفتاح TomTom API لتفعيل هذه الميزة', 'error');
-                // Revert visual state
-                activeLayers[type] = false;
-                itemEl.classList.remove('active');
-                return;
-            }
-
-            if (type === 'trafficFlow') {
-                if (activeLayers[type]) {
-                    if (!tomTomLayers.trafficFlow) {
-                         tomTomLayers.trafficFlow = L.tileLayer(`https://{s}.api.tomtom.com/traffic/map/4/tile/flow/relative/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {
-                            subdomains: 'abcd', opacity: 0.8, zIndex: 10
-                        });
-                    }
-                    tomTomLayers.trafficFlow.addTo(map);
-                } else {
-                    if (tomTomLayers.trafficFlow) map.removeLayer(tomTomLayers.trafficFlow);
-                }
-            }
-            
-            else if (type === 'trafficIncidents') {
-                if (activeLayers[type]) {
-                    if (!tomTomLayers.trafficIncidents) {
-                        tomTomLayers.trafficIncidents = L.tileLayer(`https://{s}.api.tomtom.com/traffic/map/4/tile/incidents/s3/{z}/{x}/{y}.png?key=${API_KEYS.tomtom}`, {
-                            subdomains: 'abcd', opacity: 1, zIndex: 11
-                        });
-                    }
-                    tomTomLayers.trafficIncidents.addTo(map);
-                } else {
-                    if (tomTomLayers.trafficIncidents) map.removeLayer(tomTomLayers.trafficIncidents);
-                }
-            }
-
-            else if (type === 'evStations' || type === 'pois') {
-                const query = type === 'evStations' ? 'electric vehicle station' : 'gas station';
-                const layer = type === 'evStations' ? tomTomLayers.evStations : tomTomLayers.pois;
-                
-                if (activeLayers[type]) {
-                    if (currentPos.lat !== 0) {
-                        fetchTomTomPOIs(query, layer, type === 'evStations' ? 'green' : 'blue');
-                    } else {
-                         showToast('يجب تحديد الموقع أولاً', 'error');
-                    }
-                } else {
-                    layer.clearLayers();
-                }
-            }
-        }
-
-        async function fetchTomTomPOIs(queryStr, layerGroup, color) {
-            const lat = currentPos.lat;
-            const lon = currentPos.lng;
-            // Search radius 5km
-            const url = `https://api.tomtom.com/search/2/search/${queryStr}.json?key=${API_KEYS.tomtom}&lat=${lat}&lon=${lon}&radius=5000&limit=20`;
-            
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                layerGroup.clearLayers();
-                
-                if (data.results) {
-                    data.results.forEach(result => {
-                        const marker = L.circleMarker([result.position.lat, result.position.lon], {
-                            radius: 8,
-                            fillColor: color === 'green' ? '#10b981' : '#3b82f6',
-                            color: '#fff',
-                            weight: 2,
-                            opacity: 1,
-                            fillOpacity: 0.8
-                        });
-                        
-                        marker.bindPopup(`<b>${result.poi.name}</b><br>${result.address.freeformAddress}`);
-                        layerGroup.addLayer(marker);
-                    });
-                    showToast(`تم العثور على ${data.results.length} موقع`, 'success');
-                }
-            } catch (err) {
-                console.error(err);
-                showToast('فشل في جلب البيانات', 'error');
-            }
-        }
-
-        // --- START DAILY TRIP ---
-        function startDailyTrip() {
-            if (!navigator.geolocation) { showToast('GPS غير مدعوم', 'error'); return; }
-            const isShiftValid = checkShiftTime();
-            if (!isShiftValid) { showToast('انتهت فترة العمل لهذا اليوم. يرجى الانتظار للغد.', 'error'); return; }
-            showView('map');
-            loadingRoute.classList.remove('hidden');
-            historyModeBadge.classList.add('hidden');
-            // tripTimeline was removed
-            
-            // Show Live Controls
-            document.getElementById('liveControls').classList.remove('hidden');
-            reviewControls.classList.add('hidden'); // Hide review controls
-            document.getElementById('closeReviewBtn').classList.add('hidden');
-            
-            // Tools Button
-            document.getElementById('toolsBtn').classList.remove('hidden');
-
-            currentTripStudents = JSON.parse(JSON.stringify(myStudents));
-            renderStudentsList(false);
-
-            navigator.geolocation.getCurrentPosition(pos => {
-                if (!map) initMap();
-                if (!map) { console.error("Map not initialized"); return; }
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const currentLatLng = L.latLng(lat, lng);
-                
-                // Update global pos
-                currentPos = {lat, lng};
-                
-                if(!map.hasLayer(userMarker)) userMarker.addTo(map);
-                userMarker.setLatLng(currentLatLng);
-                map.setView(currentLatLng, 15);
-                const destLatLng = L.latLng(29.939433605939247, 30.941213714457312);
-                
-                // Use new unified calculateRoute instead of explicit OSRM here
-                // This ensures TomTom is used if key is present for the initial route
-                calculateRoute(destLatLng.lat, destLatLng.lng);
-
-            }, err => { showToast('تعذر تحديد موقعك الحالي', 'error'); returnToHome(); });
-        }
-
-        // --- REVIEW HISTORY ---
-        function reviewTrip(trip) {
-            currentReviewTrip = trip;
-            showView('map');
-            if (!map) { initMap(); if (!map) return; }
-            setTimeout(() => { if(map) map.invalidateSize(); }, 100);
-
-            if(pathLine && map.hasLayer(pathLine)) map.removeLayer(pathLine);
-            if(routingControl) map.removeControl(routingControl);
-            if(window.currentRouteLayer) map.removeLayer(window.currentRouteLayer); // Remove TomTom route line
-            if(originalPathLine && map.hasLayer(originalPathLine)) map.removeLayer(originalPathLine);
-            if(reviewPathLine && map.hasLayer(reviewPathLine)) map.removeLayer(reviewPathLine);
-            
-            boardingMarkers.forEach(m => map.removeLayer(m));
-            boardingMarkers = [];
-            
-            // Clear Timeline Markers
-            timelineMarkers.innerHTML = '';
-            
-            // Toggle Controls: Hide Start, Show Return & Review Timeline
-            document.getElementById('liveControls').classList.add('hidden');
-            reviewControls.classList.remove('hidden');
-            document.getElementById('closeReviewBtn').classList.remove('hidden');
-            
-            // Hide Tools in Review Mode? Maybe keep them to see context
-            // Let's keep them visible
-
-            routeInfo.classList.add('hidden');
-            historyModeBadge.classList.remove('hidden');
-            historyModeBadge.classList.add('flex');
-            historyDateDisplay.innerText = new Date(trip.startTime).toLocaleDateString('ar-SA');
-            // tripTimeline removed - using reviewControls
-            
-            let events = [];
-            if(trip.events) {
-                events = Object.values(trip.events);
-                events.forEach(ev => {
-                    if(ev.type === 'boarding') {
-                        const student = myStudents.find(s => s.id === ev.studentId);
-                        const imgSrc = student ? (student.photo || 'https://via.placeholder.com/50') : 'https://via.placeholder.com/50';
-                        const marker = L.marker([ev.lat, ev.lng], {
-                            icon: L.divIcon({ className: 'student-pin', html: `<div class="student-pin-frame"><img src="${imgSrc}" class="student-pin-img"></div>`, iconSize: [40, 40], iconAnchor: [20, 40] })
-                        }).addTo(map);
-                        boardingMarkers.push(marker);
-                    }
-                });
-            }
-            renderStudentsList(true, events);
-            
-            let pathPoints = [];
-            if(trip.actualPath) pathPoints = Object.values(trip.actualPath).sort((a,b) => a.ts - b.ts);
-            
-            if(pathPoints.length > 0) {
-                const latLngs = pathPoints.map(p => [p.lat, p.lng]);
-                reviewPathLine = L.polyline(latLngs, { color: '#a855f7', weight: 5, opacity: 1 }).addTo(map);
-                map.fitBounds(reviewPathLine.getBounds(), {padding: [50, 50]});
-                
-                currentReviewTrip.optimizedPath = pathPoints;
-                currentReviewTrip.startTime = trip.startTime;
-                currentReviewTrip.endTime = trip.endTime;
-                currentReviewTrip.events = events; 
-                
-                // Reset Slider Visuals
-                timelineSlider.max = pathPoints.length - 1;
-                timelineSlider.value = 0;
-                timelineProgress.style.width = '0%';
-                customThumb.style.right = '0%';
-                
-                if(!map.hasLayer(userMarker)) userMarker.addTo(map);
-                userMarker.setLatLng(latLngs[0]);
-                
-                const startD = new Date(trip.startTime);
-                const endD = new Date(trip.endTime);
-                timelineStart.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                timelineEnd.innerText = endD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                timelineCurrent.innerText = startD.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}); // Set initial current time
-
-                // Generate Timeline Markers for Events
-                events.forEach(ev => {
-                    if(ev.type === 'boarding' && ev.ts) {
-                        // Find closest point index in path
-                        let closestIndex = 0;
-                        let minDiff = Infinity;
-                        
-                        pathPoints.forEach((p, idx) => {
-                            const diff = Math.abs(p.ts - ev.ts);
-                            if(diff < minDiff) {
-                                minDiff = diff;
-                                closestIndex = idx;
-                            }
-                        });
-
-                        const percent = (closestIndex / (pathPoints.length - 1)) * 100;
-                        const studentName = myStudents.find(s => s.id === ev.studentId)?.name || 'طالب';
-                        const timeStr = new Date(ev.ts).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-
-                        const dot = document.createElement('div');
-                        dot.className = 'timeline-marker';
-                        dot.style.left = `${percent}%`;
-                        dot.innerHTML = `<div class="timeline-tooltip">${studentName} (${timeStr})</div>`;
-                        
-                        dot.onclick = (e) => {
-                            e.stopPropagation();
-                            timelineSlider.value = closestIndex;
-                            handleTimelineInput(); // Update map and time
-                        };
-                        
-                        timelineMarkers.appendChild(dot);
-                    }
-                });
-            }
-        }
-
-        function returnToHome() {
-            if(isTracking) stopTracking(false);
-            boardingMarkers.forEach(m => map.removeLayer(m));
-            boardingMarkers = [];
-            if(reviewPathLine && map.hasLayer(reviewPathLine)) map.removeLayer(reviewPathLine);
-            if(window.currentRouteLayer && map.hasLayer(window.currentRouteLayer)) map.removeLayer(window.currentRouteLayer);
-            if(pathLine && !map.hasLayer(pathLine)) pathLine.addTo(map);
-            
-            // Hide Review Controls, Show Live
-            document.getElementById('liveControls').classList.remove('hidden');
-            reviewControls.classList.add('hidden');
-            document.getElementById('closeReviewBtn').classList.add('hidden');
-            
-            document.getElementById('historyModeBadge').classList.add('hidden');
-            document.getElementById('historyModeBadge').classList.remove('flex');
-            // tripTimeline removed
-            currentReviewTrip = null;
-            showView('home');
-        }
-
-        // --- TRACKING LOGIC ---
-        async function toggleTracking() {
-            const btnSpan = actionBtn ? actionBtn.querySelector('span') : null;
-            const btnIcon = actionBtn ? actionBtn.querySelector('i') : null;
-            if (!isTracking) {
-                if (!navigator.geolocation) return;
-                isTracking = true;
-                
-                // Re-render list to enable buttons
-                renderStudentsList(false);
-
-                try {
-                    const tripsRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips');
-                    const newTripRef = window.rtdbPush(tripsRef);
-                    currentTripKey = newTripRef.key;
-                    await window.rtdbSet(newTripRef, { startTime: Date.now(), status: 'active', totalDistance: 0 });
-                } catch(e) { console.error("Error creating trip", e); }
-                if(btnSpan) btnSpan.innerText = "إنهاء الرحلة";
-                if(btnIcon) btnIcon.className = "fas fa-stop-circle animate-pulse";
-                if(actionBtn) { actionBtn.classList.replace('from-emerald-500', 'from-red-500'); actionBtn.classList.replace('to-emerald-600', 'to-red-600'); }
-                pathLine.setLatLngs([]);
-                let lastPos = null;
-                let totalDist = 0;
-                watchId = navigator.geolocation.watchPosition(
-                    pos => {
-                        const lat = pos.coords.latitude;
-                        const lng = pos.coords.longitude;
-                        const latLng = [lat, lng];
-                        currentPos = {lat, lng}; // Update global current pos
-                        userMarker.setLatLng(latLng);
-                        map.panTo(latLng, {animate: true});
-                        pathLine.addLatLng(latLng);
-                        if(lastPos) {
-                            totalDist += L.latLng(lastPos).distanceTo(latLng);
-                            distanceDisplay.innerText = (totalDist/1000).toFixed(2) + " كم";
-                        }
-                        lastPos = latLng;
-                        speedDisplay.innerText = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(0) : 0;
-                        if(currentTripKey) {
-                            const pathRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey + '/actualPath');
-                            const pointRef = window.rtdbPush(pathRef);
-                            window.rtdbSet(pointRef, { lat: lat, lng: lng, ts: Date.now() });
-                            const tripMetaRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
-                            window.rtdbUpdate(tripMetaRef, { totalDistance: totalDist / 1000 });
-                        }
+<meta charset='UTF-8'/>
+<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
+<title>SmartTrans - منصة إدارة النقل المدرسي الذكية</title>
+
+<!-- الخطوط -->
+<link href='https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700&display=swap' rel='stylesheet'/>
+<link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap' rel='stylesheet'/>
+
+<!-- TailwindCSS -->
+<script src='https://cdn.tailwindcss.com'></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    primary: {
+                        50: '#eff6ff',
+                        100: '#dbeafe',
+                        500: '#3b82f6',
+                        600: '#2563eb',
+                        700: '#1d4ed8',
+                        900: '#1e3a8a',
                     },
-                    err => console.error(err),
-                    { enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                stopTracking(true);
+                    glass: {
+                        100: 'rgba(255, 255, 255, 0.05)',
+                        border: 'rgba(255, 255, 255, 0.15)',
+                    },
+                },
+                animation: {
+                    'float-slow': 'float 5s ease-in-out infinite',
+                    'float-medium': 'float 3s ease-in-out infinite',
+                    'float-fast': 'float 2s ease-in-out infinite',
+                    'float-delayed': 'float 5s ease-in-out infinite 1s',
+                    'float-random': 'floatRandom 8s ease-in-out infinite',
+                    'shine': 'shine 1.5s infinite',
+                    'pulse-glow': 'pulseGlow 2s infinite',
+                    'spin-slow': 'spin 8s linear infinite',
+                    'pop-icons': 'popIcons 0.4s ease-out forwards',
+                    'dash': 'dash 20s linear infinite',
+                    'modal-in': 'modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    'modal-out': 'modalOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                },
+                keyframes: {
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0)' },
+                        '50%': { transform: 'translateY(-15px)' }
+                    },
+                    floatRandom: {
+                        '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                        '33%': { transform: 'translate(10px, -10px) rotate(5deg)' },
+                        '66%': { transform: 'translate(-10px, 10px) rotate(-5deg)' }
+                    },
+                    shine: {
+                        '0%': { transform: 'translateX(-100%)' },
+                        '100%': { transform: 'translateX(100%)' }
+                    },
+                    pulseGlow: {
+                        '0%, 100%': { boxShadow: '0 0 15px rgba(59, 130, 246, 0.3)' },
+                        '50%': { boxShadow: '0 0 30px rgba(59, 130, 246, 0.6)' }
+                    },
+                    popIcons: {
+                        '0%': { opacity: '0', transform: 'translate(0, 0) scale(0)' },
+                        '100%': { opacity: '1', transform: 'translate(var(--tx), var(--ty)) scale(1)' }
+                    },
+                    dash: {
+                        '0%': { strokeDashoffset: '1000' },
+                        '100%': { strokeDashoffset: '0' }
+                    },
+                    modalIn: {
+                        '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+                        '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
+                    },
+                    modalOut: {
+                        '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        '100%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' }
+                    }
+                }
             }
         }
+    }
+</script>
 
-        function stopTracking(resetUI) {
-            isTracking = false;
-            if(watchId) navigator.geolocation.clearWatch(watchId);
-            if(currentTripKey) {
-                const tripRef = window.rtdbRef(window.db, 'drivers/' + currentDriverId + '/trips/' + currentTripKey);
-                window.rtdbUpdate(tripRef, { status: 'completed', endTime: Date.now() });
-                currentTripKey = null;
-            }
-            if(resetUI && actionBtn) {
-                const btnSpan = actionBtn.querySelector('span');
-                const btnIcon = actionBtn.querySelector('i');
-                if(btnSpan) btnSpan.innerText = "بدء التحرك الفعلي";
-                if(btnIcon) btnIcon.className = "fas fa-play";
-                actionBtn.classList.replace('from-red-500', 'from-emerald-500');
-                actionBtn.classList.replace('to-red-600', 'to-emerald-600');
-                showToast('أحسنت، تم إنهاء الرحلة وتسجيلها بنجاح', 'success');
-                setTimeout(returnToHome, 1000);
-            }
-        }
+<!-- أيقونات Lucide -->
+<script src='https://unpkg.com/lucide@latest'></script>
 
-        // --- UTILS ---
-        function showInputModal(title, msg, placeholder, callback) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMessage').innerText = msg;
-            document.getElementById('modalIcon').innerHTML = '<i class="fas fa-id-badge text-blue-400"></i>';
-            const inputContainer = document.getElementById('modalInputContainer');
-            const input = document.getElementById('modalInput');
-            inputContainer.classList.remove('hidden');
-            input.value = '';
-            input.placeholder = placeholder;
-            const actions = document.getElementById('modalActions');
-            actions.innerHTML = '';
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'flex-1 py-3 rounded-xl bg-white/10 text-gray-400 hover:bg-white/20 transition';
-            cancelBtn.innerText = 'إلغاء';
-            cancelBtn.onclick = () => { modal.classList.add('hidden'); modal.classList.remove('opacity-100'); };
-            const okBtn = document.createElement('button');
-            okBtn.className = 'flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-lg transition';
-            okBtn.innerText = 'تأكيد';
-            okBtn.onclick = () => { modal.classList.add('hidden'); modal.classList.remove('opacity-100'); if(callback) callback(input.value); };
-            actions.appendChild(cancelBtn); actions.appendChild(okBtn);
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10);
-            setTimeout(() => input.focus(), 300); // Auto-focus input
-        }
+<!-- مكتبة AOS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-        function showModal(title, msg, type, callback) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMessage').innerText = msg;
-            document.getElementById('modalInputContainer').classList.add('hidden');
-            let icon = type === 'error' ? '<i class="fas fa-times-circle text-red-500"></i>' : type === 'success' ? '<i class="fas fa-check-circle text-emerald-500"></i>' : '<i class="fas fa-info-circle text-blue-500"></i>';
-            document.getElementById('modalIcon').innerHTML = icon;
-            const actions = document.getElementById('modalActions');
-            actions.innerHTML = '';
-            const btn = document.createElement('button');
-            btn.className = 'w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 transition font-bold';
-            btn.innerText = 'حسناً';
-            btn.onclick = () => { modal.classList.add('hidden'); modal.classList.remove('opacity-100'); if(callback) callback(); };
-            actions.appendChild(btn);
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10);
-        }
+<!-- مكتبة SwiperJS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* =========================================
+   1. VARIABLES & THEME CONFIGURATION
+   ========================================= */
+:root {
+    --bg-body: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    --bg-glass-hover: rgba(255, 255, 255, 0.9);
+    --border-glass: rgba(255, 255, 255, 0.5);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-        function locateUser(recenter) {
-            if(!map) return;
-            navigator.geolocation.getCurrentPosition(pos => {
-                const ll = [pos.coords.latitude, pos.coords.longitude];
-                if(recenter) map.setView(ll, 16);
-            });
-        }
-        
-        // Drag Logic & Bottom Sheet (Keep existing)
-        let startY = 0; let isDragging = false; let isExpanded = false;
-        dragHandle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; panel.style.transition = 'none'; });
-        dragHandle.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); });
-        dragHandle.addEventListener('touchend', (e) => { isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.changedTouches[0].clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
-        dragHandle.addEventListener('mousedown', (e) => { startY = e.clientY; isDragging = true; panel.style.transition = 'none'; });
-        window.addEventListener('mouseup', (e) => { if(!isDragging) return; isDragging = false; panel.style.transition = 'transform 0.3s ease-out'; const dist = startY - e.clientY; if (dist > 50) expandPanel(); else if (dist < -50) collapsePanel(); else { if(isExpanded) expandPanel(); else collapsePanel(); } });
-        function expandPanel() { panel.style.transform = 'translateY(0)'; isExpanded = true; expandedContent.style.opacity = '1'; }
-        function collapsePanel() { panel.style.transform = 'translateY(calc(85vh - 180px))'; isExpanded = false; expandedContent.style.opacity = '0.5'; panel.querySelector('.overflow-y-auto').scrollTop = 0; }
-    </script>
+[data-theme='dark'] {
+    --bg-body: #020617;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --bg-glass: rgba(15, 23, 42, 0.6);
+    --bg-glass-hover: rgba(30, 41, 59, 0.8);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    /* تحسين عرض الخطوط */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* تحسين شريط التمرير */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.6); }
+
+/* Lenis Scroll Fixes */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+/* =========================================
+   2. UI COMPONENTS (Glass, Cards, Buttons)
+   ========================================= */
+
+/* Background Elements - استخدام will-change */
+.bg-blobs { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    z-index: -1; overflow: hidden; pointer-events: none; 
+}
+.blob { 
+    position: absolute; filter: blur(80px); opacity: 0.5; 
+    will-change: transform; /* تحسين الأداء */
+    animation: float 8s infinite alternate; 
+}
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent); }
+.blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent); animation-delay: -4s; }
+
+/* Decorative Shapes - إزالة التعقيد */
+.shape-circle, .shape-dots {
+    position: absolute; z-index: 0; pointer-events: none;
+}
+.shape-circle { border-radius: 50%; border: 2px solid rgba(59, 130, 246, 0.1); }
+.shape-dots {
+    width: 100px; height: 100px;
+    background-image: radial-gradient(rgba(59, 130, 246, 0.2) 2px, transparent 2px);
+    background-size: 10px 10px;
+}
+
+/* Glass Effect Optimization */
+.glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    border-radius: 1.5rem;
+    /* إزالة transition هنا لتجنب إعادة حساب الفلتر باستمرار */
+}
+
+.glass-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(16px);
+    /* استخدام translate3d لتفعيل GPU */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+}
+
+.glass-card:hover {
+    transform: translateY(-8px) scale(1.02); /* سيتم معالجته عبر GPU */
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.25);
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.4s ease;
+    pointer-events: none; /* تحسين الأداء */
+}
+.glass-card:hover::before { left: 100%; }
+
+/* Buttons */
+.btn-gradient {
+    background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    position: relative; overflow: hidden; z-index: 1;
+    transition: transform 0.3s ease;
+}
+.btn-gradient::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    z-index: -1; transition: opacity 0.3s ease; opacity: 0;
+}
+.btn-gradient:hover::before { opacity: 1; }
+.btn-gradient:active { transform: scale(0.95); }
+
+/* Navigation */
+.nav-link-item { position: relative; }
+.nav-link-item::after {
+    content: ''; position: absolute; bottom: -4px; right: 50%; width: 0; height: 2px;
+    background: #3b82f6; transition: width 0.3s ease, transform 0.3s ease;
+    transform: translateX(50%); border-radius: 2px;
+}
+.nav-link-item:hover::after { width: 80%; }
+/* =========================================
+   3. 3D ELEMENTS (Phone, Laptop, Hero)
+   ========================================= */
+
+/* Hero 3D Card */
+.hero-perspective {
+    perspective: 2000px;
+    transform-style: preserve-3d;
+}
+
+.hero-img-card {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    will-change: transform;
+}
+
+.hero-img-card:hover {
+    transform: translateZ(40px) scale(1.05); /* إزالة rotateY لمنع التشويش */
+    box-shadow: 0 40px 70px -15px rgba(59, 130, 246, 0.5);
+    z-index: 50;
+}
+
+/* Phone Styles */
+#phone-frame {
+    box-shadow: 
+        0 0 0 2px #334155,
+        0 0 0 5px #1e293b,
+        0 20px 50px -10px rgba(0,0,0,0.5);
+    backface-visibility: hidden; /* مهم للأداء */
+    transform: translateZ(0); /* تفعيل GPU */
+}
+
+.phone-slide { display: flex; flex-direction: column; }
+.perspective-1000 { perspective: 1000px; }
+
+/* Laptop Styles */
+.perspective-1500 { perspective: 1500px; }
+.preserve-3d { transform-style: preserve-3d; }
+
+#laptop-mockup {
+    transform: rotateX(15deg);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.5s ease;
+    will-change: transform;
+}
+.group:hover #laptop-mockup { transform: rotateX(0deg) scale(1.02); }
+
+/* Timeline Elements */
+.timeline-line {
+    position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, transparent, #3b82f6, #8b5cf6, transparent);
+    transform: translateX(-50%);
+}
+.timeline-node {
+    position: absolute; left: 50%; top: 2rem;
+    transform: translateX(-50%); width: 20px; height: 20px;
+    background: #3b82f6; border-radius: 50%;
+    border: 4px solid var(--bg-body);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    z-index: 10; transition: background-color 0.3s, box-shadow 0.3s;
+}
+.group:hover .timeline-node { background-color: #8b5cf6; box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.3); }
+
+/* Modal */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    will-change: opacity;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+/* =========================================
+   4. ANIMATIONS & KEYFRAMES
+   ========================================= */
+
+/* حركة الطفو (Floating) */
+@keyframes float { 
+    0% { transform: translate(0, 0); } 
+    100% { transform: translate(20px, 20px); } 
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+.floating-icon { 
+    animation: floatIcon 6s ease-in-out infinite; 
+    will-change: transform;
+}
+
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
+.animate-float-slow { animation: floatSlow 6s ease-in-out infinite; }
+
+@keyframes floatMedium {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(-5deg); }
+}
+.animate-float-medium { animation: floatMedium 4s ease-in-out infinite; }
+
+/* حركة المحاكاة (Simulation) */
+@keyframes driveAcross { 
+    0% { transform: translateX(-10%); } 
+    40% { transform: translateX(50%); } 
+    60% { transform: translateX(50%); } 
+    100% { transform: translateX(110%); } 
+}
+/* ملاحظة: استخدمت translateX بدلاً من left لتحسين الأداء */
+.group:hover .sim-car-move { animation: driveAcross 3s linear infinite; }
+
+@keyframes notifyPop { 
+    0% { opacity: 0; transform: translateY(10px) scale(0.9); } 
+    10% { opacity: 1; transform: translateY(0) scale(1); } 
+    90% { opacity: 1; transform: translateY(0) scale(1); } 
+    100% { opacity: 0; transform: translateY(-10px); } 
+}
+.group:hover .sim-notify-pop { animation: notifyPop 4s ease-in-out infinite; }
+
+@keyframes gaugeMove { 
+    0% { transform: rotate(-45deg); } 
+    50% { transform: rotate(45deg); } 
+    100% { transform: rotate(-45deg); } 
+}
+.group:hover .sim-gauge-needle { animation: gaugeMove 2s ease-in-out infinite alternate; }
+
+@keyframes timelinePlay { 
+    0% { width: 0%; } 
+    100% { width: 100%; } 
+}
+.group:hover .sim-timeline-progress { animation: timelinePlay 3s linear infinite; }
+
+@keyframes thumbMove { 
+    0% { left: 0%; } 
+    100% { left: 100%; } 
+}
+.group:hover .sim-timeline-thumb { animation: thumbMove 3s linear infinite; }
+
+/* حركة الخط المتقطع */
+@keyframes dash {
+    to { stroke-dashoffset: -1000; }
+}
+.animate-dash-line {
+    stroke-dasharray: 5;
+    animation: dash 20s linear infinite;
+    will-change: stroke-dashoffset;
+}
+
+/* حركة ظهور الأيقونات الطائرة */
+@keyframes pop-icons {
+    to { opacity: 1; transform: translate(var(--tx), var(--ty)); }
+}
+.fly-icon { position: absolute; opacity: 0; transition: all 0.3s ease; pointer-events: none; }
+.group:hover .fly-icon-1 { animation: pop-icons 0.5s 0.05s forwards; --tx: -35px; --ty: -35px; }
+.group:hover .fly-icon-2 { animation: pop-icons 0.5s 0.1s forwards; --tx: 35px; --ty: -45px; }
+.group:hover .fly-icon-3 { animation: pop-icons 0.5s 0.15s forwards; --tx: 45px; --ty: 25px; }
+/* تأثيرات النصوص والخلفيات */
+.bg-300\% { background-size: 300% 300%; }
+@keyframes gradientAnim {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.animate-gradient { animation: gradientAnim 6s ease infinite; }
+
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+.animate-shimmer { animation: shimmer 2s infinite; }
+
+/* تأثير الوهج على الحدود */
+.border-glow {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1), inset 0 0 10px rgba(59, 130, 246, 0.05);
+}
+
+/* المنظور للعناصر ثلاثية الأبعاد */
+.perspective-2000 { perspective: 2000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+
+/* أنيميشن الطفو العشوائي */
+@keyframes floatRandom {
+    0% { transform: translate(0, 0); }
+    33% { transform: translate(10px, -10px); }
+    66% { transform: translate(-5px, 5px); }
+    100% { transform: translate(0, 0); }
+}
+.animate-float-random { animation: floatRandom 8s ease-in-out infinite; }
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spinSlow 20s linear infinite; }
+</style>
+</head>
+<body class="selection:bg-blue-500 selection:text-white antialiased overflow-x-hidden">
+
+      <div id="app_root"></div>
+
+    <!-- السكريبتات -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- مكتبة Lenis للتمرير السلس -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script src="app.js"></script>
 </body>
 </html>
