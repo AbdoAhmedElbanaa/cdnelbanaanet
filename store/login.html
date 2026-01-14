@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Join - Ultimate Luxury Store</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Inter', 'Tajawal', sans-serif; 
+            background-color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Header (Same as Index) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Login Container (Sliding Logic) */
+        .container-form {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 650px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .form-box {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* Active States for Sliding */
+        .container-form.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+            opacity: 0; /* Fade out logic if needed, but slide covers it */
+        }
+
+        .container-form.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        @keyframes show {
+            0%, 49.99% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+        }
+
+        /* Overlay (The Moving Image Part) */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+            border-radius: 0 0 0 0; /* Adjusted dynamically */
+        }
+
+        .container-form.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .overlay {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #ffffff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .container-form.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .container-form.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .container-form.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        /* Custom Inputs & Effects */
+        .glow-input {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .glow-input:focus {
+            background: #fff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .social-btn {
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+            border-color: #3b82f6;
+        }
+
+        /* Floating Icons */
+        .float-icon {
+            position: absolute;
+            color: rgba(59, 130, 246, 0.1);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Mobile Responsiveness Override */
+        @media (max-width: 768px) {
+            .container-form { min-height: 800px; flex-direction: column; }
+            .form-box { width: 100%; position: relative; height: auto; min-height: 400px; }
+            .sign-in-container, .sign-up-container { width: 100%; left: 0; opacity: 1; z-index: 5; }
+            .overlay-container { display: none; } /* Hide sliding overlay on mobile, show simple toggle */
+            .sign-up-container { display: none; }
+            .container-form.right-panel-active .sign-in-container { display: none; }
+            .container-form.right-panel-active .sign-up-container { display: block; transform: none; animation: fadeIn 0.5s; }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#0f172a',
+                        accent: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col relative selection:bg-blue-500 selection:text-white" x-data="{ isSignUp: false }">
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/20 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-400/20 rounded-full blur-[100px]" style="animation: pulse 4s infinite reverse;"></div>
+        <svg class="float-icon w-24 h-24 top-20 left-10"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="float-icon w-32 h-32 bottom-40 right-20"><path fill="currentColor" d="M12 18.5l-2.5-4.2h5zM12 2l2.5 4.2h-5z"/></svg>
+        <svg class="float-icon w-16 h-16 top-1/2 left-1/4"><path fill="currentColor" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4"/></svg>
+    </div>
+
+    <header class="glass-panel sticky top-0 z-50 px-6 py-4 mb-4 md:mb-12">
+        <div class="container mx-auto max-w-[1350px] flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <span class="font-extrabold text-lg">B</span>
+                </div>
+                <h1 class="font-bold text-xl text-slate-800">Brandoz</h1>
+            </a>
+            
+            <nav class="hidden md:flex gap-6 font-medium text-slate-600 text-sm">
+                <a href="index.html" class="hover:text-primary transition">Home</a>
+                <a href="#" class="hover:text-primary transition">Shop</a>
+                <a href="#" class="hover:text-primary transition">Categories</a>
+            </nav>
+
+            <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-primary transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Back to Store
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 pb-20">
+        
+        <div class="container-form" :class="isSignUp ? 'right-panel-active' : ''" data-aos="zoom-in">
+            
+            <div class="form-box sign-up-container p-8 md:p-12 flex flex-col justify-center h-full bg-white/40">
+                <form class="flex flex-col h-full justify-center" @submit.prevent>
+                    <h2 class="text-3xl font-black text-slate-800 mb-2">Create Account</h2>
+                    <p class="text-sm text-slate-500 mb-6">Join us for exclusive luxury deals.</p>
+                    
+                    <div class="flex justify-center gap-4 mb-6">
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                        </button>
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5">
+                        </button>
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/512317/github-142.svg" class="w-5 h-5">
+                        </button>
+                    </div>
+
+                    <span class="text-xs text-slate-400 font-bold uppercase text-center mb-4">Or use your email</span>
+
+                    <div class="space-y-4 w-full">
+                        <div class="relative group">
+                            <input type="text" placeholder="Full Name" class="glow-input w-full px-5 py-3 rounded-xl outline-none text-sm font-medium">
+                            <svg class="w-4 h-4 text-slate-400 absolute right-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                        <div class="relative group">
+                            <input type="email" placeholder="Email Address" class="glow-input w-full px-5 py-3 rounded-xl outline-none text-sm font-medium">
+                            <svg class="w-4 h-4 text-slate-400 absolute right-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="relative group">
+                            <input type="password" placeholder="Password" class="glow-input w-full px-5 py-3 rounded-xl outline-none text-sm font-medium">
+                            <svg class="w-4 h-4 text-slate-400 absolute right-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                    </div>
+
+                    <button @click="btnAnimate($event)" class="mt-8 w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.02] transition-all relative overflow-hidden group">
+                        <span class="relative z-10">Sign Up</span>
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <span class="particle absolute w-1 h-1 bg-white rounded-full opacity-0"></span>
+                    </button>
+                    
+                    <p class="md:hidden text-center mt-6 text-sm text-slate-500">Already have an account? <button @click="isSignUp = false" class="text-primary font-bold">Sign In</button></p>
+                </form>
+            </div>
+
+            <div class="form-box sign-in-container p-8 md:p-12 flex flex-col justify-center h-full bg-white/40">
+                <form class="flex flex-col h-full justify-center" @submit.prevent>
+                    <h2 class="text-3xl font-black text-slate-800 mb-2">Welcome Back</h2>
+                    <p class="text-sm text-slate-500 mb-6">Enter your details to access your account.</p>
+
+                    <div class="flex justify-center gap-4 mb-6">
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                        </button>
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5">
+                        </button>
+                        <button class="social-btn w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                            <img src="https://www.svgrepo.com/show/512317/github-142.svg" class="w-5 h-5">
+                        </button>
+                    </div>
+
+                    <span class="text-xs text-slate-400 font-bold uppercase text-center mb-4">Or sign in with</span>
+
+                    <div class="space-y-4 w-full">
+                        <div class="relative group">
+                            <input type="email" placeholder="Email Address" class="glow-input w-full px-5 py-3 rounded-xl outline-none text-sm font-medium">
+                            <svg class="w-4 h-4 text-slate-400 absolute right-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="relative group">
+                            <input type="password" placeholder="Password" class="glow-input w-full px-5 py-3 rounded-xl outline-none text-sm font-medium">
+                            <svg class="w-4 h-4 text-slate-400 absolute right-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                    </div>
+
+                    <a href="#" class="text-xs text-right text-slate-500 font-bold mt-2 hover:text-primary transition">Forgot Password?</a>
+
+                    <button @click="btnAnimate($event)" class="mt-8 w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold shadow-lg shadow-slate-900/20 hover:shadow-slate-900/40 hover:scale-[1.02] transition-all relative overflow-hidden group">
+                        <span class="relative z-10">Sign In</span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine"></div>
+                    </button>
+
+                    <p class="md:hidden text-center mt-6 text-sm text-slate-500">Don't have an account? <button @click="isSignUp = true" class="text-primary font-bold">Sign Up</button></p>
+                </form>
+            </div>
+
+            <div class="overlay-container hidden md:block">
+                <div class="overlay">
+                    
+                    <div class="overlay-panel overlay-left bg-[url('https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center">
+                        <div class="absolute inset-0 bg-indigo-900/80 backdrop-blur-[2px]"></div>
+                        <div class="relative z-10 text-white px-8">
+                            <h2 class="text-4xl font-black mb-4">Welcome Back!</h2>
+                            <p class="text-sm text-indigo-100 mb-8 leading-relaxed">
+                                To keep connected with us please login with your personal info.
+                            </p>
+                            <button @click="isSignUp = false" class="px-8 py-3 border-2 border-white rounded-xl font-bold hover:bg-white hover:text-indigo-900 transition-all transform hover:scale-105">
+                                Sign In
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overlay-panel overlay-right bg-[url('https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center">
+                        <div class="absolute inset-0 bg-blue-900/80 backdrop-blur-[2px]"></div>
+                        <div class="relative z-10 text-white px-8">
+                            <h2 class="text-4xl font-black mb-4">Hello, Friend!</h2>
+                            <p class="text-sm text-blue-100 mb-8 leading-relaxed">
+                                Enter your personal details and start your journey with us.
+                            </p>
+                            <button @click="isSignUp = true" class="px-8 py-3 border-2 border-white rounded-xl font-bold hover:bg-white hover:text-blue-900 transition-all transform hover:scale-105">
+                                Sign Up
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // Init AOS
+        AOS.init({ duration: 800, once: true });
+
+        // Floating Icons Animation (GSAP)
+        gsap.to(".float-icon", {
+            y: "random(-50, 50)",
+            x: "random(-30, 30)",
+            rotation: "random(-180, 180)",
+            duration: "random(10, 20)",
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            stagger: 2
+        });
+
+        // Anime.js Button Effect
+        function btnAnimate(e) {
+            const btn = e.currentTarget;
+            
+            // Simple shake effect on click
+            anime({
+                targets: btn,
+                translateX: [0, -5, 5, -5, 5, 0],
+                duration: 500,
+                easing: 'easeInOutSine'
+            });
+
+            // If it's a sign up, maybe show some particles (Simulated)
+            // Ideally you would create DOM elements for particles here
+        }
+
+        // Add Shine Animation for buttons
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        shine: 'shine 1.5s infinite',
+                    },
+                    keyframes: {
+                        shine: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

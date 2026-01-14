@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Ultimate Luxury Store</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Inter', 'Tajawal', sans-serif; 
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Shipping Card Selection Animation */
+        .shipping-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .shipping-card.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.15);
+        }
+        .shipping-card:hover:not(.active) {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        /* Checkmark Animation */
+        .check-circle {
+            transform: scale(0);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .shipping-card.active .check-circle {
+            transform: scale(1);
+        }
+
+        .coupon-float-icon {
+            position: absolute;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+            color: white;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#0f172a',
+                        accent: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="antialiased text-slate-700 min-h-screen flex flex-col">
+
+    <header class="glass-panel sticky top-0 z-50 px-6 py-4 mb-8">
+        <div class="container mx-auto max-w-[1350px] flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <span class="font-extrabold text-lg">B</span>
+                </div>
+                <h1 class="font-bold text-xl text-slate-800">Brandoz <span class="text-xs text-slate-400 font-normal ml-1">| Cart</span></h1>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-4 text-sm font-bold">
+                <div class="flex items-center gap-2 text-primary">
+                    <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">1</span>
+                    <span>Cart</span>
+                </div>
+                <div class="w-12 h-0.5 bg-slate-200"></div>
+                <div class="flex items-center gap-2 text-slate-400">
+                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">2</span>
+                    <span>Checkout</span>
+                </div>
+                <div class="w-12 h-0.5 bg-slate-200"></div>
+                <div class="flex items-center gap-2 text-slate-400">
+                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">3</span>
+                    <span>Done</span>
+                </div>
+            </div>
+
+            <a href="#" class="text-sm font-bold text-slate-500 hover:text-primary transition">Need Help?</a>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto max-w-[1350px] px-4 md:px-6 pb-20" x-data="cartLogic()">
+        
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800 mb-8" data-aos="fade-down">
+            Shopping <span class="text-gradient">Bag</span> <span class="text-lg font-medium text-slate-400 ml-2" x-text="'(' + items.length + ' Items)'"></span>
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
+
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div class="space-y-6">
+                     <div class="hidden md:grid grid-cols-12 gap-4 text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-200 ml-2">
+                        <div class="col-span-6">Product</div>
+                        <div class="col-span-2 text-center">Quantity</div>
+                        <div class="col-span-2 text-center">Price</div>
+                        <div class="col-span-2 text-center">Total</div>
+                    </div>
+
+                    <template x-for="(item, index) in items" :key="item.id">
+                        <div class="glass-panel p-4 rounded-3xl hover:border-blue-200 transition-all duration-300 group relative overflow-hidden" data-aos="fade-up" :data-aos-delay="index * 100">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                                <div class="col-span-6 flex items-center gap-5">
+                                    <div class="relative w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100">
+                                        <img :src="item.image" class="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500">
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide" x-text="item.category"></span>
+                                        <h3 class="text-lg font-bold text-slate-800 leading-tight mb-1 group-hover:text-primary transition-colors cursor-pointer" x-text="item.name"></h3>
+                                        <div class="flex items-center gap-3 mt-2 text-xs">
+                                            <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md text-slate-600">
+                                                <span class="w-2 h-2 rounded-full" :style="`background-color: ${item.colorCode}`"></span>
+                                                <span x-text="item.color"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-span-6 md:col-span-2 flex justify-center">
+                                    <div class="flex items-center bg-white border border-slate-200 rounded-xl shadow-sm h-10">
+                                        <button @click="updateQty(item.id, -1)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-50 rounded-l-xl transition">-</button>
+                                        <input type="text" class="w-10 text-center text-sm font-bold text-slate-800 outline-none" :value="item.qty" readonly>
+                                        <button @click="updateQty(item.id, 1)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-50 rounded-r-xl transition">+</button>
+                                    </div>
+                                </div>
+                                <div class="hidden md:block col-span-2 text-center">
+                                    <span class="text-sm font-bold text-slate-500" x-text="'$' + item.price"></span>
+                                </div>
+                                <div class="col-span-6 md:col-span-2 flex items-center justify-between md:justify-center gap-4">
+                                    <span class="text-lg font-black text-slate-800" x-text="'$' + (item.price * item.qty).toFixed(2)"></span>
+                                    <button @click="removeItem(item.id)" class="w-9 h-9 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl" data-aos="fade-up">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
+                        <h3 class="font-bold text-xl text-slate-800">Choose Delivery Method</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <div class="shipping-card p-4 rounded-2xl bg-white border border-slate-100 relative" 
+                             :class="shippingMethod === 'standard' ? 'active' : ''"
+                             @click="setShipping('standard', 0.00)">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-slate-800">Standard Delivery</h4>
+                            <p class="text-xs text-slate-400 mb-3">5 - 7 Days</p>
+                            <span class="text-sm font-bold text-green-500">Free</span>
+                        </div>
+
+                        <div class="shipping-card p-4 rounded-2xl bg-white border border-slate-100 relative"
+                             :class="shippingMethod === 'express' ? 'active' : ''"
+                             @click="setShipping('express', 15.00)">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-slate-800">Express Delivery</h4>
+                            <p class="text-xs text-slate-400 mb-3">1 - 2 Days</p>
+                            <span class="text-sm font-bold text-slate-800">$15.00</span>
+                        </div>
+
+                        <div class="shipping-card p-4 rounded-2xl bg-white border border-slate-100 relative"
+                             :class="shippingMethod === 'sameday' ? 'active' : ''"
+                             @click="setShipping('sameday', 25.00)">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-slate-800">Same Day Delivery</h4>
+                            <p class="text-xs text-slate-400 mb-3">Today (Order before 2pm)</p>
+                            <span class="text-sm font-bold text-slate-800">$25.00</span>
+                        </div>
+
+                         <div class="shipping-card p-4 rounded-2xl bg-white border border-slate-100 relative"
+                             :class="shippingMethod === 'pickup' ? 'active' : ''"
+                             @click="setShipping('pickup', 0.00)">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-slate-800">Store Pickup</h4>
+                            <p class="text-xs text-slate-400 mb-3">Ready in 2 Hours</p>
+                            <span class="text-sm font-bold text-green-500">Free</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="index.html" class="flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-slate-200 font-bold text-slate-600 hover:border-slate-800 hover:text-slate-800 transition-all group">
+                        <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 space-y-6 relative" data-aos="fade-left">
+                
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-blue-600 p-6 text-white shadow-2xl shadow-blue-500/20 group">
+                    <div class="coupon-float-icon top-2 right-2 w-12 h-12"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg></div>
+                    <div class="coupon-float-icon bottom-4 left-4 w-16 h-16 opacity-10"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg></div>
+
+                    <h3 class="relative z-10 text-lg font-bold mb-1">Have a Coupon?</h3>
+                    <p class="relative z-10 text-blue-100 text-xs mb-4">Add your code for instant discount.</p>
+                    
+                    <div class="relative z-10 flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" x-model="couponCode" placeholder="Promo Code" class="w-full pl-4 pr-3 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-blue-200 outline-none focus:bg-white/30 transition backdrop-blur-sm">
+                        </div>
+                        <button @click="applyCoupon()" class="px-4 py-2 bg-white text-indigo-600 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg">Apply</button>
+                    </div>
+                    
+                    <div x-show="discount > 0" x-transition class="relative z-10 mt-3 flex items-center gap-2 text-xs font-bold text-green-300 bg-green-900/30 p-2 rounded-lg backdrop-blur">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Code Applied Successfully!
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl">
+                    <h3 class="font-black text-xl text-slate-800 mb-6">Order Summary</h3>
+                    
+                    <div class="space-y-4 mb-6 border-b border-slate-200 pb-6">
+                        <div class="flex justify-between items-center text-sm font-medium text-slate-500">
+                            <span>Subtotal</span>
+                            <span class="text-slate-800" x-text="'$' + subtotal.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm font-medium text-slate-500">
+                            <span>Shipping</span>
+                            <span class="text-slate-800" x-text="shippingCost === 0 ? 'Free' : '$' + shippingCost.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm font-medium text-slate-500">
+                            <span>Tax (5%)</span>
+                            <span class="text-slate-800" x-text="'$' + tax.toFixed(2)"></span>
+                        </div>
+                        <div x-show="discount > 0" class="flex justify-between items-center text-sm font-bold text-green-500">
+                            <span>Discount</span>
+                            <span x-text="'-$' + discount.toFixed(2)"></span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-8">
+                        <span class="text-slate-600 font-bold">Total</span>
+                        <div class="text-right">
+                            <span class="block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" x-text="'$' + total.toFixed(2)"></span>
+                            <span class="text-xs text-slate-400">Including VAT</span>
+                        </div>
+                    </div>
+
+                    <button class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 hover:bg-primary hover:shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group">
+                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine"></span>
+                        Checkout Now
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="glass-panel p-3 rounded-2xl flex flex-col items-center text-center gap-2 hover:border-blue-300 transition group cursor-default">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase leading-tight">Fast<br>Delivery</span>
+                    </div>
+                    
+                    <div class="glass-panel p-3 rounded-2xl flex flex-col items-center text-center gap-2 hover:border-green-300 transition group cursor-default">
+                        <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase leading-tight">Secure<br>Payment</span>
+                    </div>
+
+                    <div class="glass-panel p-3 rounded-2xl flex flex-col items-center text-center gap-2 hover:border-purple-300 transition group cursor-default">
+                        <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase leading-tight">7 Days<br>Return</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        function cartLogic() {
+            return {
+                items: [
+                    { 
+                        id: 1, 
+                        name: 'Sony WH-1000XM5', 
+                        price: 348.00, 
+                        qty: 1, 
+                        image: 'https://sell77.doobagency.com/storage/app/public/product/thumbnail/2025-01-07-677d50113ada3.webp',
+                        category: 'Audio',
+                        color: 'Black',
+                        colorCode: '#1e293b'
+                    },
+                    { 
+                        id: 2, 
+                        name: 'Apple Watch Series 9', 
+                        price: 399.00, 
+                        qty: 2, 
+                        image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=200',
+                        category: 'Wearables',
+                        color: 'Red',
+                        colorCode: '#ef4444'
+                    }
+                ],
+                couponCode: '',
+                discount: 0,
+                shippingMethod: 'express', // الافتراضي
+                shippingCost: 15.00,
+                
+                get subtotal() {
+                    return this.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                },
+                
+                get tax() {
+                    return this.subtotal * 0.05;
+                },
+
+                get total() {
+                    return (this.subtotal + this.shippingCost + this.tax) - this.discount;
+                },
+
+                updateQty(id, change) {
+                    const item = this.items.find(i => i.id === id);
+                    if (item && item.qty + change > 0) item.qty += change;
+                },
+
+                removeItem(id) {
+                    this.items = this.items.filter(i => i.id !== id);
+                },
+
+                setShipping(method, cost) {
+                    this.shippingMethod = method;
+                    this.shippingCost = cost;
+                },
+
+                applyCoupon() {
+                    if (this.couponCode.toLowerCase() === 'wow50') {
+                        this.discount = 50;
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            colors: ['#3b82f6', '#8b5cf6', '#ffffff']
+                        });
+                    } else {
+                        alert('Invalid Coupon! Try "WOW50"');
+                        this.discount = 0;
+                    }
+                }
+            }
+        }
+
+        // Coupon Icons Floating Animation
+        gsap.to(".coupon-float-icon", {
+            y: "random(-10, 10)",
+            x: "random(-10, 10)",
+            rotation: "random(-15, 15)",
+            duration: "random(2, 4)",
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.5
+        });
+
+        // Button Shine Effect
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        shine: 'shine 1.5s infinite',
+                    },
+                    keyframes: {
+                        shine: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
