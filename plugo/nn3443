@@ -1056,9 +1056,9 @@
         <div class="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
     </div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+    <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 z-10">
         
-        <div class="relative text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+        <div class="relative text-center max-w-7xl mx-auto mb-16" data-aos="fade-up">
             
             <div class="absolute -top-10 -left-10 md:left-0 hidden md:block animate-float text-blue-500/20 dark:text-blue-400/20">
                 <i data-lucide="code-2" size="64"></i>
@@ -1088,7 +1088,7 @@
             </p>
         </div>
 
-        <div class="relative min-h-[500px]">
+        <div class="relative min-h-[300px]">
             
             <div id="auth-overlay" class="relative z-30 flex flex-col items-center justify-center py-10 transition-all duration-500">
                 
@@ -2393,6 +2393,13 @@ const TOOLS_CONFIG = [
     desc: 'إنشاء أزرار وتنبيهات احترافية', 
     icon: 'pen-tool', // تأكد أن مكتبة Lucide تعمل
     render: renderArticleTools 
+    },
+    { 
+    id: 'custom-tools', 
+    name: 'المظهر والاتصال', 
+    desc: 'تخصيص الألوان وصفحة اتصل بنا', 
+    icon: 'palette', 
+    render: renderContactTools 
 }
 ];
 
@@ -2461,7 +2468,7 @@ function renderToolboxUI() {
 
     // 3. الهيكل العام
     return `
-    <div class="flex flex-col lg:flex-row gap-6 h-full min-h-[700px]">
+    <div class="flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
         
         <div class="w-full lg:w-1/4 flex flex-col gap-3">
             <div class="p-6 rounded-[2rem] bg-white/40 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 backdrop-blur-xl h-full flex flex-col shadow-sm">
@@ -2815,6 +2822,120 @@ function renderArticleTools() {
     `;
 }
 
+function renderContactTools() {
+    // تشغيل التحديث الأولي (في حال كان هناك قيمة قديمة)
+    setTimeout(() => {
+        updateContactGen();
+    }, 100);
+
+    return `
+    <div class="animate-fade-up h-full flex flex-col gap-8 overflow-y-auto custom-scrollbar pr-2">
+        
+        <div class="relative w-full rounded-3xl overflow-hidden bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 p-8 text-white shadow-xl shadow-fuchsia-500/20 group">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 group-hover:translate-x-0 transition-transform duration-1000"></div>
+            <div class="absolute bottom-0 left-0 w-40 h-40 bg-purple-900/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/3"></div>
+            
+            <div class="relative z-10 flex justify-between items-center">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-xs font-bold text-white mb-3 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+                        <span>أدوات أساسية</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-2">تخصيص المظهر والاتصال 🎨</h2>
+                    <p class="text-fuchsia-100 text-lg max-w-lg">تحكم في هوية موقعك البصرية وأنشئ قناة تواصل احترافية مع زوارك في ثوانٍ.</p>
+                </div>
+                <div class="hidden md:flex w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 items-center justify-center shadow-2xl transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
+                    <i data-lucide="mail" size="40" class="text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group hover:border-violet-400 transition-colors">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="paint-bucket" size="24"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">تغيير ألوان وخطوط الموقع</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 leading-relaxed">
+                        يمكنك تغيير اللون الرئيسي (الأزرق) وألوان الوضع الليلي والخطوط دون الحاجة لتعديل الأكواد يدوياً.
+                    </p>
+                    
+                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700/50">
+                        <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700 dark:text-slate-300 font-medium">
+                            <li>اذهب إلى لوحة تحكم بلوجر > <span class="font-bold text-violet-600">المظهر (Theme)</span>.</li>
+                            <li>اضغط على زر <span class="font-bold text-violet-600">تخصيص (Customize)</span>.</li>
+                            <li>اختر <span class="font-bold text-violet-600">"متقدم" (Advanced)</span> من القائمة الجانبية.</li>
+                            <li>غيّر الألوان والخطوط وستظهر النتائج فوراً!</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-fuchsia-500"></div>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <span class="p-2 bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 rounded-lg"><i data-lucide="contact" size="20"></i></span>
+                <h3 class="text-xl font-black text-slate-800 dark:text-white">مولد صفحة "اتصل بنا"</h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">
+                        هذه الأداة تنشئ كود صفحة اتصل بنا متكاملة، تعمل بتقنية AJAX (بدون إعادة تحميل)، ومربوطة ببريدك تلقائياً.
+                    </p>
+                    
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 mb-1.5 block uppercase">بريدك الإلكتروني (لاستقبال الرسائل)</label>
+                        <div class="relative">
+                            <input id="userEmail" type="email" placeholder="name@example.com" oninput="updateContactGen()" 
+                                   class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-4 pr-12 py-3 text-sm font-bold focus:border-fuchsia-500 outline-none transition dark:text-white" dir="ltr">
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <i data-lucide="at-sign" size="18"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 rounded-xl p-4 flex gap-3">
+                        <i data-lucide="alert-triangle" class="text-amber-500 shrink-0" size="20"></i>
+                        <div class="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                            <strong class="block mb-1 font-bold">خطوة تفعيل مهمة جداً:</strong>
+                            بعد نشر الصفحة، أرسل رسالة تجريبية لنفسك. ستصلك رسالة تفعيل على إيميلك من (FormSubmit)، اضغط <b>Activate</b> ليعمل النموذج.
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <h4 class="font-bold text-slate-700 dark:text-slate-200 text-xs mb-2 flex items-center gap-1"><i data-lucide="help-circle" size="12"></i> أين أضع الكود؟</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+                            <li>أنشئ <b>صفحة جديدة</b> بعنوان "اتصل بنا".</li>
+                            <li>من الخيارات (يسار): اختر <b>عدم السماح بالتعليقات</b>.</li>
+                            <li>حول المحرر إلى وضع <b>عرض HTML</b>.</li>
+                            <li>الصق الكود واضغط نشر.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full bg-slate-100 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden">
+                    <div class="p-3 bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700 flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">الكود الناتج</span>
+                        <button onclick="copyCode('finalCodeOutput', this)" class="bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+                            <i data-lucide="copy" size="12"></i> نسخ الكود
+                        </button>
+                    </div>
+                    <div class="relative flex-grow overflow-hidden">
+                        <pre class="w-full h-full p-4 text-[10px] font-mono text-slate-600 dark:text-slate-400 overflow-auto custom-scrollbar" dir="ltr"><code id="finalCodeOutput"></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="h-10"></div>
+    </div>
+    `;
+}
+
 // ==========================================
 // 4. المنطق الداخلي لمولد الأكواد (Code Generator Logic)
 // ==========================================
@@ -2935,23 +3056,27 @@ function setBtnStyle(colorClass, btnElement) {
 
 // 2. تحديث مولد الأزرار
 function updateBtnGen() {
-    const text = document.getElementById('btnText').value;
+    // التحقق من وجود العنصر أولاً لتجنب الخطأ
+    const textInput = document.getElementById('btnText');
+    if (!textInput) return; // إذا لم يكن العنصر موجوداً، توقف فوراً
+
+    const text = textInput.value;
     const url = document.getElementById('btnUrl').value;
     const colorClass = document.getElementById('btnColorClass').value;
     const preview = document.getElementById('btnPreview');
     const codeOutput = document.getElementById('btnCode');
 
-    // Update Preview (Using Tailwind Classes directly for preview)
-    preview.className = `px-8 py-3 rounded-lg text-white font-bold shadow-lg transition-transform hover:scale-105 ${colorClass}`;
-    preview.innerText = text;
-    preview.href = url;
+    if (preview) {
+        preview.className = `px-8 py-3 rounded-lg text-white font-bold shadow-lg transition-transform hover:scale-105 ${colorClass}`;
+        preview.innerText = text;
+        preview.href = url;
+    }
 
-    // Generate Code (Shortcode style or Class style)
-    // هنا قمت بإنشاء كود HTML بسيط ونظيف
-    const generatedCode = `&lt;a href="${url}" class="custom-btn ${colorClass.replace('bg-', '')}" target="_blank"&gt;${text}&lt;/a&gt;`;
-    codeOutput.innerHTML = generatedCode;
+    if (codeOutput) {
+        const generatedCode = `&lt;a href="${url}" class="custom-btn ${colorClass.replace('bg-', '')}" target="_blank"&gt;${text}&lt;/a&gt;`;
+        codeOutput.innerHTML = generatedCode;
+    }
 }
-
 // 3. تحديث مولد التنبيهات
 function updateAlertGen() {
     const type = document.getElementById('alertType').value;
@@ -3036,9 +3161,88 @@ function copyCode(elementId, btn) {
         btn.innerText = 'فشل!';
     });
 }
+
 // ==========================================
-// 5. التحديث الرئيسي (Main Switcher Function)
+// منطق مولد صفحة الاتصال
 // ==========================================
+function updateContactGen() {
+    const email = document.getElementById('userEmail').value.trim();
+    const output = document.getElementById('finalCodeOutput');
+    
+    if (!email) {
+        output.innerText = "";
+        return;
+    }
+
+    // CSS Part (Minified for cleaner output)
+    const cssCode = `<style>
+.contact-wrapper{max-width:700px;margin:40px auto;padding:30px;background:var(--bg-card, #fff);border:1px solid var(--border-color, #eee);border-radius:16px;box-shadow:0 10px 30px -10px rgba(0,0,0,0.05)}
+.contact-head h2{text-align:center;font-size:24px;margin-bottom:10px;color:var(--text-primary)}
+.contact-head p{text-align:center;font-size:15px;color:var(--text-secondary);margin-bottom:30px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-weight:700;margin-bottom:8px;font-size:14px}
+.form-input{width:100%;padding:12px 15px;border:1px solid var(--border-color, #ddd);border-radius:10px;background:var(--bg-input, #f9f9f9);color:var(--text-primary);transition:0.3s}
+.form-input:focus{border-color:#3b82f6;outline:none;box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+.form-btn{width:100%;background:#3b82f6;color:#fff;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;transition:0.3s}
+.form-btn:hover{background:#2563eb;transform:translateY(-2px)}
+.form-btn:disabled{background:#ccc;cursor:not-allowed}
+.success-msg{text-align:center;padding:30px;background:#ecfdf5;color:#065f46;border-radius:12px;border:1px dashed #10b981;display:none}
+</style>`;
+
+    // HTML Part
+    const htmlCode = `
+<div class="contact-wrapper" id="contact-wrapper">
+  <div id="success-msg" class="success-msg">
+    <h3 style="font-size:20px;margin-bottom:10px">✅ تم الإرسال بنجاح!</h3>
+    <p>شكراً لتواصلك معنا، سنرد عليك في أقرب وقت.</p>
+  </div>
+
+  <form action="https://formsubmit.co/${email}" id="contact-form" method="POST">
+    <div class="contact-head">
+      <h2>تواصل معنا</h2>
+      <p>املأ النموذج أدناه وسنقوم بالرد عليك قريباً.</p>
+    </div>
+    
+    <div class="form-group">
+      <label>الاسم بالكامل</label>
+      <input class="form-input" name="name" placeholder="اسمك الكريم" required type="text"/>
+    </div>
+    
+    <div class="form-group">
+      <label>البريد الإلكتروني</label>
+      <input class="form-input" name="email" placeholder="example@mail.com" required type="email"/>
+    </div>
+    
+    <div class="form-group">
+      <label>عنوان الرسالة</label>
+      <input class="form-input" name="subject" placeholder="بخصوص..." required type="text"/>
+    </div>
+    
+    <div class="form-group">
+      <label>تفاصيل الرسالة</label>
+      <textarea class="form-input" name="message" placeholder="اكتب رسالتك هنا..." required rows="5"></textarea>
+    </div>
+
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_subject" value="رسالة جديدة من الموقع!">
+
+    <button class="form-btn" id="submit-btn" type="submit">إرسال الرسالة 🚀</button>
+  </form>
+</div>`;
+
+    // JS Part
+    const jsCode = `<script>
+const form=document.getElementById("contact-form"),wrapper=document.getElementById("contact-wrapper"),successMsg=document.getElementById("success-msg"),btn=document.getElementById("submit-btn");
+form.addEventListener("submit",e=>{e.preventDefault();btn.innerText="جاري الإرسال...";btn.disabled=!0;
+fetch(form.action,{method:"POST",body:new FormData(form)})
+.then(e=>{if(e.ok){form.style.display="none";successMsg.style.display="block"}else{throw new Error()}})
+.catch(e=>{alert("حدث خطأ! تأكد من تفعيل بريدك.");btn.innerText="إعادة المحاولة";btn.disabled=!1})});
+<\/script>`;
+
+    output.innerText = cssCode + "\n" + htmlCode + "\n" + jsCode;
+}
+
 // ==========================================
 // 6. تحديث دالة الحالة الرئيسية (Updated Logic)
 // ==========================================
