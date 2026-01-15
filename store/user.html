@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=3.0">
     <title>My Dashboard - Ultimate Luxury Store</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/4.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Inter', 'Tajawal', sans-serif; 
+
+        body {
+            font-family: 'Inter', 'Tajawal', sans-serif;
             background-color: #f1f5f9;
             overflow-x: hidden;
         }
 
         /* Glassmorphism */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
         }
 
         /* Sidebar Link Active State */
@@ -34,11 +38,13 @@
             position: relative;
             overflow: hidden;
         }
+
         .nav-link.active {
             background: linear-gradient(to right, #eff6ff, #f0fdf4);
             color: #3b82f6;
             border-right: 3px solid #3b82f6;
         }
+
         .nav-link:hover:not(.active) {
             background: #f8fafc;
             transform: translateX(5px);
@@ -53,9 +59,18 @@
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
 
         /* Order Status Line */
         .status-line {
@@ -65,12 +80,92 @@
             border-radius: 10px;
             overflow: hidden;
         }
+
         .status-progress {
             height: 100%;
             background: linear-gradient(to right, #3b82f6, #8b5cf6);
             border-radius: 10px;
             width: 0%;
             transition: width 1.5s ease-in-out;
+        }
+
+        /* Credit Card Styles */
+        .credit-card {
+            width: 100%;
+            height: 220px;
+            border-radius: 20px;
+            color: white;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .card-visa {
+            background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);
+        }
+
+        .card-mastercard {
+            background: linear-gradient(135deg, #FF4B2B 0%, #FF416C 100%);
+        }
+
+        .card-amex {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .card-chip {
+            width: 50px;
+            height: 35px;
+            background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Swiper Customization */
+        .swiper {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 380px;
+            /* height: 220px; */
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+        }
+
+        /* Fade Transition for Tabs */
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .fade-enter-start,
+        .fade-leave-end {
+            opacity: 0;
+            transform: translateY(10px);
         }
     </style>
     <script>
@@ -87,23 +182,39 @@
         }
     </script>
 </head>
+
 <body class="antialiased text-slate-700 min-h-screen flex flex-col relative">
 
     <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3"></div>
-        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/40 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3"></div>
-        
-        <svg class="dash-float-icon w-32 h-32 top-20 left-10 text-blue-500"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-        <svg class="dash-float-icon w-24 h-24 bottom-40 right-20 text-purple-500"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <div
+            class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/40 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3">
+        </div>
+
+        <svg class="dash-float-icon w-32 h-32 top-20 left-10 text-blue-500">
+            <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+        </svg>
+        <svg class="dash-float-icon w-24 h-24 bottom-40 right-20 text-purple-500">
+            <path fill="currentColor"
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+        </svg>
+        <svg class="dash-float-icon w-16 h-16 top-1/2 left-20 text-yellow-500">
+            <path fill="currentColor"
+                d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z" />
+        </svg>
     </div>
 
     <header class="glass-panel sticky top-0 z-50 px-6 py-4 mb-8">
         <div class="container mx-auto max-w-[1350px] flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2 group">
-                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
                     <span class="font-extrabold text-lg">B</span>
                 </div>
-                <h1 class="font-bold text-xl text-slate-800">Brandoz <span class="text-xs text-slate-400 font-normal ml-1">| Dashboard</span></h1>
+                <h1 class="font-bold text-xl text-slate-800">Brandoz <span
+                        class="text-xs text-slate-400 font-normal ml-1">| Dashboard</span></h1>
             </a>
             <div class="flex items-center gap-4">
                 <div class="hidden md:flex items-center gap-2 text-right">
@@ -111,10 +222,15 @@
                         <p class="text-sm font-bold text-slate-800">John Doe</p>
                         <p class="text-[10px] text-slate-500 uppercase tracking-wider">Premium Member</p>
                     </div>
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" class="w-10 h-10 rounded-full border-2 border-white shadow-md">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop"
+                        class="w-10 h-10 rounded-full border-2 border-white shadow-md">
                 </div>
-                <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-primary transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <a href="index.html"
+                    class="text-sm font-bold text-slate-500 hover:text-primary transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                     Logout
                 </a>
             </div>
@@ -122,185 +238,648 @@
     </header>
 
     <main class="container mx-auto max-w-[1350px] px-4 md:px-6 pb-20" x-data="{ currentTab: 'overview' }">
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
+            <!-- Sidebar -->
             <aside class="lg:col-span-3 space-y-6" data-aos="fade-right">
                 <div class="glass-panel rounded-2xl overflow-hidden p-4">
                     <nav class="space-y-1">
-                        <a href="#" @click.prevent="currentTab = 'overview'" :class="currentTab === 'overview' ? 'active' : ''" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        <a href="#" @click.prevent="currentTab = 'overview'"
+                            :class="currentTab === 'overview' ? 'active' : ''"
+                            class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
                             Overview
                         </a>
-                        <a href="#" @click.prevent="currentTab = 'orders'" :class="currentTab === 'orders' ? 'active' : ''" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        <a href="#" @click.prevent="currentTab = 'orders'"
+                            :class="currentTab === 'orders' ? 'active' : ''"
+                            class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
                             My Orders
-                            <span class="ml-auto bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full">2 Active</span>
+                            <span
+                                class="ml-auto bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full">2
+                                Active</span>
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        <a href="#" @click.prevent="currentTab = 'wallet'"
+                            :class="currentTab === 'wallet' ? 'active' : ''"
+                            class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
                             Wallet & Cards
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            Addresses
-                        </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        <a href="#" @click.prevent="currentTab = 'wishlist'"
+                            :class="currentTab === 'wishlist' ? 'active' : ''"
+                            class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
                             Wishlist
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <a href="#" @click.prevent="currentTab = 'settings'"
+                            :class="currentTab === 'settings' ? 'active' : ''"
+                            class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
                             Settings
                         </a>
                     </nav>
                 </div>
 
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white shadow-lg">
+                <div
+                    class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white shadow-lg">
                     <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full bg-white/10 blur-xl"></div>
                     <h4 class="font-bold text-lg mb-1 relative z-10">Get 20% OFF</h4>
                     <p class="text-xs text-indigo-100 mb-4 relative z-10">On your next order with code</p>
-                    <div class="bg-white/20 backdrop-blur rounded-lg border border-white/30 p-2 text-center font-mono font-bold tracking-widest relative z-10">
+                    <div
+                        class="bg-white/20 backdrop-blur rounded-lg border border-white/30 p-2 text-center font-mono font-bold tracking-widest relative z-10">
                         WELCOME20
                     </div>
                 </div>
             </aside>
 
             <div class="lg:col-span-9 space-y-8" data-aos="fade-left">
-                
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">Hello, John! 👋</h2>
-                        <p class="text-slate-500">Here's what's happening with your account today.</p>
+
+                <!-- OVERVIEW TAB -->
+                <div x-show="currentTab === 'overview'" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800">Hello, John! 👋</h2>
+                            <p class="text-slate-500">Here's what's happening with your account today.</p>
+                        </div>
+                        <button
+                            class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:bg-primary transition text-sm">
+                            Go Shopping
+                        </button>
                     </div>
-                    <button class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:bg-primary transition text-sm">
-                        Go Shopping
-                    </button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div
+                            class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-blue-300 transition">
+                            <div
+                                class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-bold uppercase">Total Spend</p>
+                                <h3 class="text-2xl font-black text-slate-800 counter" data-target="2450">$0</h3>
+                            </div>
+                        </div>
+
+                        <div
+                            class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-purple-300 transition">
+                            <div
+                                class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-bold uppercase">Total Orders</p>
+                                <h3 class="text-2xl font-black text-slate-800 counter" data-target="34">0</h3>
+                            </div>
+                        </div>
+
+                        <div
+                            class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-yellow-300 transition">
+                            <div
+                                class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 font-bold uppercase">Points</p>
+                                <h3 class="text-2xl font-black text-slate-800 counter" data-target="850">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-3xl mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg text-slate-800">Track Order <span
+                                    class="text-primary">#ORD-3920</span></h3>
+                            <span
+                                class="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full">Shipped</span>
+                        </div>
+
+                        <div class="relative py-4 px-2">
+                            <div class="status-line mb-8">
+                                <div class="status-progress" style="width: 75%;"></div>
+                            </div>
+
+                            <div class="flex justify-between relative -mt-12">
+                                <div class="text-center group">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-800">Confirmed</p>
+                                    <p class="text-[10px] text-slate-400">Jan 12</p>
+                                </div>
+
+                                <div class="text-center group">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-800">Processing</p>
+                                    <p class="text-[10px] text-slate-400">Jan 13</p>
+                                </div>
+
+                                <div class="text-center group">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10 animate-pulse">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs font-bold text-primary">Shipped</p>
+                                    <p class="text-[10px] text-slate-400">Jan 14</p>
+                                </div>
+
+                                <div class="text-center group opacity-50">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center border-4 border-white shadow mx-auto mb-2 relative z-10">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-800">Delivered</p>
+                                    <p class="text-[10px] text-slate-400">Pending</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-3xl overflow-hidden">
+                        <h3 class="font-bold text-lg text-slate-800 mb-6">Recent Orders</h3>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-xs text-slate-400 uppercase border-b border-slate-200">
+                                        <th class="py-3 font-bold">Order ID</th>
+                                        <th class="py-3 font-bold">Date</th>
+                                        <th class="py-3 font-bold">Status</th>
+                                        <th class="py-3 font-bold">Total</th>
+                                        <th class="py-3 font-bold text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-slate-600">
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+                                        <td class="py-4 font-bold text-slate-800">#ORD-3920</td>
+                                        <td class="py-4">Jan 12, 2026</td>
+                                        <td class="py-4"><span
+                                                class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">Shipped</span>
+                                        </td>
+                                        <td class="py-4 font-bold">$348.00</td>
+                                        <td class="py-4 text-right">
+                                            <button
+                                                class="text-primary hover:text-blue-700 font-bold text-xs underline">View
+                                                Details</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+                                        <td class="py-4 font-bold text-slate-800">#ORD-3918</td>
+                                        <td class="py-4">Dec 28, 2025</td>
+                                        <td class="py-4"><span
+                                                class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">Delivered</span>
+                                        </td>
+                                        <td class="py-4 font-bold">$125.50</td>
+                                        <td class="py-4 text-right">
+                                            <button
+                                                class="text-primary hover:text-blue-700 font-bold text-xs underline">View
+                                                Details</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50/50 transition">
+                                        <td class="py-4 font-bold text-slate-800">#ORD-3890</td>
+                                        <td class="py-4">Dec 15, 2025</td>
+                                        <td class="py-4"><span
+                                                class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">Delivered</span>
+                                        </td>
+                                        <td class="py-4 font-bold">$59.00</td>
+                                        <td class="py-4 text-right">
+                                            <button
+                                                class="text-primary hover:text-blue-700 font-bold text-xs underline">View
+                                                Details</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-blue-300 transition">
-                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-400 font-bold uppercase">Total Spend</p>
-                            <h3 class="text-2xl font-black text-slate-800 counter" data-target="2450">$0</h3>
-                        </div>
-                    </div>
+                <!-- MY ORDERS TAB -->
+                <div x-show="currentTab === 'orders'" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                        My Orders
+                        <span
+                            class="text-sm font-normal text-slate-500 bg-white px-2 py-1 rounded-lg border">History</span>
+                    </h2>
 
-                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-purple-300 transition">
-                        <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <div class="space-y-4">
+                        <!-- Active Order Item -->
+                        <div
+                            class="glass-panel p-5 rounded-2xl group hover:shadow-xl transition-all duration-300 border-l-4 border-blue-500">
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-lg">
+                                        📦
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">Order #ORD-3920</h4>
+                                        <p class="text-xs text-slate-400">Placed on Jan 12, 2026</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">In
+                                        Transit</span>
+                                    <p class="font-black text-lg text-slate-800">$348.00</p>
+                                </div>
+                            </div>
+                            <hr class="border-slate-100 mb-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex -space-x-3">
+                                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=50"
+                                        class="w-10 h-10 rounded-full border-2 border-white" alt="Product">
+                                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=50"
+                                        class="w-10 h-10 rounded-full border-2 border-white" alt="Product">
+                                    <div
+                                        class="w-10 h-10 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-xs text-slate-500 font-bold">
+                                        +1</div>
+                                </div>
+                                <button
+                                    class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-primary transition">Track
+                                    Order</button>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-400 font-bold uppercase">Total Orders</p>
-                            <h3 class="text-2xl font-black text-slate-800 counter" data-target="34">0</h3>
-                        </div>
-                    </div>
 
-                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-yellow-300 transition">
-                        <div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:scale-110 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-400 font-bold uppercase">Points</p>
-                            <h3 class="text-2xl font-black text-slate-800 counter" data-target="850">0</h3>
+                        <!-- Delivered Order Item -->
+                        <div
+                            class="glass-panel p-5 rounded-2xl group hover:shadow-xl transition-all duration-300 border-l-4 border-green-500">
+                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-lg">
+                                        ✅
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">Order #ORD-3890</h4>
+                                        <p class="text-xs text-slate-400">Placed on Dec 15, 2025</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span
+                                        class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold">Delivered</span>
+                                    <p class="font-black text-lg text-slate-800">$59.00</p>
+                                </div>
+                            </div>
+                            <hr class="border-slate-100 mb-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex -space-x-3">
+                                    <img src="https://images.unsplash.com/photo-1618354691438-2542e39f2686?auto=format&fit=crop&q=80&w=50"
+                                        class="w-10 h-10 rounded-full border-2 border-white" alt="Product">
+                                </div>
+                                <div class="flex gap-2">
+                                    <button
+                                        class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition">Invoice</button>
+                                    <button
+                                        class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-primary transition">Re-order</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-3xl" data-aos="fade-up" data-aos-delay="100">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg text-slate-800">Track Order <span class="text-primary">#ORD-3920</span></h3>
-                        <span class="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full">Shipped</span>
+                <!-- WALLET TAB -->
+                <div x-show="currentTab === 'wallet'" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6">Payment Methods</h2>
+
+                    <div class="w-full mb-10 overflow-hidden">
+                        <!-- Swiper -->
+                        <div class="swiper mySwiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="credit-card card-visa">
+                                        <div class="flex justify-between items-start mb-8">
+                                            <div class="card-chip"></div>
+                                            <span class="font-bold text-lg italic tracking-wider">VISA</span>
+                                        </div>
+                                        <div class="font-mono text-2xl tracking-widest mb-4">**** **** **** 4920</div>
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Card Holder</div>
+                                                <div class="font-bold tracking-wide">JOHN DOE</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Expires</div>
+                                                <div class="font-bold tracking-wide">12/28</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="credit-card card-mastercard">
+                                        <div class="flex justify-between items-start mb-8">
+                                            <div class="card-chip"></div>
+                                            <div class="flex flex-col items-center">
+                                                <div class="w-8 h-8 rounded-full bg-red-500 opacity-80 -mb-4"></div>
+                                                <div class="w-8 h-8 rounded-full bg-yellow-500 opacity-80"></div>
+                                            </div>
+                                        </div>
+                                        <div class="font-mono text-2xl tracking-widest mb-4">**** **** **** 8854</div>
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Card Holder</div>
+                                                <div class="font-bold tracking-wide">JOHN DOE</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Expires</div>
+                                                <div class="font-bold tracking-wide">09/27</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="credit-card card-amex">
+                                        <div class="flex justify-between items-start mb-8">
+                                            <div class="card-chip"></div>
+                                            <span class="font-bold text-lg tracking-wider">AMEX</span>
+                                        </div>
+                                        <div class="font-mono text-2xl tracking-widest mb-4">**** ****** 12009</div>
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Card Holder</div>
+                                                <div class="font-bold tracking-wide">JOHN DOE</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] uppercase opacity-70 mb-1">Expires</div>
+                                                <div class="font-bold tracking-wide">11/29</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
                     </div>
 
-                    <div class="relative py-4 px-2">
-                        <div class="status-line mb-8">
-                            <div class="status-progress" style="width: 75%;"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-panel p-6 rounded-2xl">
+                            <h3 class="font-bold text-slate-800 mb-4">Payment Statistics</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">Monthly Spend Balance</span>
+                                    <span class="font-bold text-slate-800">$1,200.00 / $5,000.00</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div class="bg-primary h-2.5 rounded-full" style="width: 24%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="glass-panel p-6 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">Add New Card</h4>
+                                    <p class="text-xs text-slate-500">Supports Visa, MC, Amex</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WISHLIST TAB -->
+                <div x-show="currentTab === 'wishlist'" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6">My Wishlist <span
+                            class="text-slate-400 text-base font-normal">(4 Items)</span></h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Product Item -->
+                        <div
+                            class="glass-panel p-4 rounded-2xl flex items-center gap-4 group hover:-translate-y-1 transition duration-300">
+                            <div class="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=200"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 mb-1">Minimalist Watch</h4>
+                                <p class="text-xs text-slate-500 mb-2">Accessories</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-black text-lg text-primary">$120.00</span>
+                                    <button
+                                        class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="flex justify-between relative -mt-12">
-                            <div class="text-center group">
-                                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </div>
-                                <p class="text-xs font-bold text-slate-800">Confirmed</p>
-                                <p class="text-[10px] text-slate-400">Jan 12</p>
+                        <div
+                            class="glass-panel p-4 rounded-2xl flex items-center gap-4 group hover:-translate-y-1 transition duration-300">
+                            <div class="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=200"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                             </div>
-                            
-                            <div class="text-center group">
-                                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 mb-1">Nike Air Max</h4>
+                                <p class="text-xs text-slate-500 mb-2">Shoes</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-black text-lg text-primary">$180.00</span>
+                                    <button
+                                        class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <p class="text-xs font-bold text-slate-800">Processing</p>
-                                <p class="text-[10px] text-slate-400">Jan 13</p>
                             </div>
+                        </div>
 
-                            <div class="text-center group">
-                                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-2 relative z-10 animate-pulse">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                </div>
-                                <p class="text-xs font-bold text-primary">Shipped</p>
-                                <p class="text-[10px] text-slate-400">Jan 14</p>
+                        <div
+                            class="glass-panel p-4 rounded-2xl flex items-center gap-4 group hover:-translate-y-1 transition duration-300">
+                            <div class="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=200"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                             </div>
-
-                            <div class="text-center group opacity-50">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center border-4 border-white shadow mx-auto mb-2 relative z-10">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 mb-1">Headphones Pro</h4>
+                                <p class="text-xs text-slate-500 mb-2">Electronics</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-black text-lg text-primary">$250.00</span>
+                                    <button
+                                        class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <p class="text-xs font-bold text-slate-800">Delivered</p>
-                                <p class="text-[10px] text-slate-400">Pending</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-3xl overflow-hidden" data-aos="fade-up" data-aos-delay="200">
-                    <h3 class="font-bold text-lg text-slate-800 mb-6">Recent Orders</h3>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="text-xs text-slate-400 uppercase border-b border-slate-200">
-                                    <th class="py-3 font-bold">Order ID</th>
-                                    <th class="py-3 font-bold">Date</th>
-                                    <th class="py-3 font-bold">Status</th>
-                                    <th class="py-3 font-bold">Total</th>
-                                    <th class="py-3 font-bold text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm text-slate-600">
-                                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-                                    <td class="py-4 font-bold text-slate-800">#ORD-3920</td>
-                                    <td class="py-4">Jan 12, 2026</td>
-                                    <td class="py-4"><span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">Shipped</span></td>
-                                    <td class="py-4 font-bold">$348.00</td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-primary hover:text-blue-700 font-bold text-xs underline">View Details</button>
-                                    </td>
-                                </tr>
-                                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-                                    <td class="py-4 font-bold text-slate-800">#ORD-3918</td>
-                                    <td class="py-4">Dec 28, 2025</td>
-                                    <td class="py-4"><span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">Delivered</span></td>
-                                    <td class="py-4 font-bold">$125.50</td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-primary hover:text-blue-700 font-bold text-xs underline">View Details</button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/50 transition">
-                                    <td class="py-4 font-bold text-slate-800">#ORD-3890</td>
-                                    <td class="py-4">Dec 15, 2025</td>
-                                    <td class="py-4"><span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">Delivered</span></td>
-                                    <td class="py-4 font-bold">$59.00</td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-primary hover:text-blue-700 font-bold text-xs underline">View Details</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- SETTINGS TAB -->
+                <div x-show="currentTab === 'settings'" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4"
+                    x-transition:enter-end="opacity-100 translate-y-0">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6">Account Settings</h2>
+
+                    <div class="glass-panel p-8 rounded-3xl mb-8">
+                        <h3 class="font-bold text-slate-800 mb-6 border-b pb-2">Profile Details</h3>
+
+                        <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+                            <div class="relative group">
+                                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150&auto=format&fit=crop"
+                                    class="w-24 h-24 rounded-full border-4 border-white shadow-lg">
+                                <button
+                                    class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">First
+                                        Name</label>
+                                    <input type="text" value="John"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 outline-none focus:border-primary transition font-medium">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Last
+                                        Name</label>
+                                    <input type="text" value="Doe"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 outline-none focus:border-primary transition font-medium">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email
+                                        Address</label>
+                                    <input type="email" value="john.doe@example.com"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 outline-none focus:border-primary transition font-medium">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-slate-800 mb-6 border-b pb-2 pt-4">Security</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Current
+                                    Password</label>
+                                <input type="password" value="********"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 outline-none focus:border-primary transition font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">New
+                                    Password</label>
+                                <input type="password" placeholder="Min 8 characters"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 outline-none focus:border-primary transition font-medium">
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-slate-800 mb-6 border-b pb-2 pt-4">Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="font-bold text-slate-700">Order Updates</h5>
+                                    <p class="text-xs text-slate-500">Receive SMS or Email when order status changes</p>
+                                </div>
+                                <div
+                                    class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="toggle1" checked
+                                        class="peer absolute block w-6 h-6 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer" />
+                                    <label for="toggle1"
+                                        class="block overflow-hidden h-6 rounded-full bg-slate-200 cursor-pointer peer-checked:bg-green-500 transition-colors duration-300"></label>
+                                    <span
+                                        class="absolute right-0 top-0 w-6 h-6 rounded-full bg-white shadow transform transition-transform duration-300 peer-checked:-translate-x-full"></span>
+                                    <!-- Simple toggle visualization fix -->
+                                    <div
+                                        class="w-11 h-6 bg-slate-200 peer-checked:bg-primary rounded-full relative transition-colors cursor-pointer">
+                                        <div
+                                            class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform peer-checked:translate-x-5 shadow-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="font-bold text-slate-700">Promotions</h5>
+                                    <p class="text-xs text-slate-500">Receive deals and coupons</p>
+                                </div>
+                                <div
+                                    class="w-11 h-6 bg-slate-200 rounded-full relative transition-colors cursor-pointer hover:bg-slate-300">
+                                    <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t flex justify-end gap-3">
+                            <button
+                                class="px-6 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-50 transition">Cancel</button>
+                            <button
+                                class="px-6 py-2.5 rounded-xl bg-slate-900 text-white font-bold shadow-lg hover:bg-primary transition hover:shadow-primary/50">Save
+                                Changes</button>
+                        </div>
                     </div>
                 </div>
 
@@ -310,9 +889,21 @@
     </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <script>
         AOS.init({ duration: 800, once: true });
+
+        // Initialize Swiper
+        var swiper = new Swiper(".mySwiper", {
+            effect: "cards",
+            grabCursor: true,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+        });
 
         // Animated Counters
         const counters = document.querySelectorAll('.counter');
@@ -323,14 +914,14 @@
                 const increment = target / 50; // Speed
 
                 if (count < target) {
-                    if(counter.innerText.includes('$')) {
+                    if (counter.innerText.includes('$')) {
                         counter.innerText = '$' + Math.ceil(count + increment);
                     } else {
                         counter.innerText = Math.ceil(count + increment);
                     }
                     setTimeout(updateCount, 20);
                 } else {
-                    if(counter.getAttribute('data-target').includes('.')) return; // Handle decimals if needed
+                    if (counter.getAttribute('data-target').includes('.')) return; // Handle decimals if needed
                     counter.innerText = counter.getAttribute('data-target') > 100 ? '$' + target : target;
                 }
             };
@@ -350,4 +941,5 @@
         });
     </script>
 </body>
+
 </html>
