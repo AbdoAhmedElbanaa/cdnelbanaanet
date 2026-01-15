@@ -93,79 +93,845 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 
+<!-- ملفات CSS و JS الخاصة بالقالب -->
 <style>
-   :root{--primary-color:#3b82f6;--secondary-color:#64748b;--bg-body:#f8fafc;--bg-glass:rgba(255,255,255,0.75);--bg-glass-hover:rgba(255,255,255,0.9);--border-glass:rgba(255,255,255,0.5);--shadow-glass:0 10px 40px -10px rgba(0,0,0,0.08);--text-primary:#0f172a;--text-secondary:#475569;--accent-glow:rgba(59,130,246,0.2);--radius-xl:2rem;--sidebar-bg:rgba(255,255,255,0.6)}[data-theme='dark']{--bg-body:#020617;--bg-glass:rgba(15,23,42,0.7);--bg-glass-hover:rgba(30,41,59,0.8);--border-glass:rgba(255,255,255,0.1);--shadow-glass:0 10px 40px -10px rgba(0,0,0,0.6);--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--accent-glow:rgba(59,130,246,0.3);--sidebar-bg:rgba(15,23,42,0.6)}html{scroll-behavior:smooth}body{font-family:'Tajawal',sans-serif;background-color:var(--bg-body);color:var(--text-primary);margin:0;padding:0;overflow-x:hidden;transition:background-color .5s cubic-bezier(0.4,0,0.2,1),color .5s ease;position:relative;line-height:1.6}h1,h2,h3,h4,h5,h6{color:var(--text-primary)!important;letter-spacing:-0.025em;line-height:1.3}p,span,li,div{color:inherit}.bg-blobs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;overflow:hidden;pointer-events:none}.blob{position:absolute;filter:blur(120px);opacity:.45;animation:float 15s infinite alternate ease-in-out;mix-blend-mode:screen}[data-theme='dark'] .blob{mix-blend-mode:normal;opacity:.25}.blob-1{top:-10%;left:-5%;width:60vw;height:60vw;background:radial-gradient(circle,var(--accent-glow),transparent);animation:float 10s infinite alternate}.blob-2{bottom:-10%;right:-5%;width:60vw;height:60vw;background:radial-gradient(circle,rgba(168,85,247,0.2),transparent);animation:float 12s infinite alternate-reverse}@keyframes float{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,60px) scale(1.1)}}.glass{background:var(--bg-glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--border-glass);box-shadow:var(--shadow-glass),inset 0 1px 0 0 rgba(255,255,255,0.1);border-radius:1.5rem;transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s ease}.glass-hover{transition:all .4s cubic-bezier(0.4,0,0.2,1)}.glass-hover:hover{background:var(--bg-glass-hover);transform:translateY(-5px) scale(1.01);box-shadow:0 25px 50px -12px rgba(0,0,0,0.15),0 0 15px var(--accent-glow);border-color:rgba(255,255,255,0.6)}.glass-card{background:var(--bg-glass);border:1px solid var(--border-glass);box-shadow:var(--shadow-glass)}.header-main{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.85);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-bottom:1px solid var(--border-glass);transition:all .4s ease}[data-theme='dark'] .header-main{background:rgba(2,6,23,0.8)}.nav-link{color:var(--text-secondary);font-weight:600;padding:.75rem 1.5rem;border-radius:1rem;transition:all .3s ease;cursor:pointer;display:inline-block;text-decoration:none;position:relative;overflow:hidden}.nav-link:hover,.nav-link.active{color:var(--primary-color);background:rgba(59,130,246,0.1);font-weight:700}.nav-link::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--primary-color);transition:width .3s ease;border-radius:2px}.nav-link:hover::after,.nav-link.active::after{width:70%}.view-section{display:none;animation:fadeIn .6s cubic-bezier(0.22,1,0.36,1) forwards;min-height:calc(100vh - 96px)}.view-section.active-view{display:block}@keyframes fadeIn{from{opacity:0;transform:translateY(20px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}.explainer-btn{width:100%;text-align:right;transition:all .4s cubic-bezier(0.4,0,0.2,1);border:1px solid transparent;cursor:pointer;color:var(--text-secondary)}.explainer-btn.active{background:linear-gradient(90deg,rgba(59,130,246,0.08),transparent);border-right:4px solid var(--primary-color);color:var(--primary-color);transform:translateX(-8px)}.explainer-content-item{display:none;opacity:0;transform:translateY(15px);transition:all .5s ease-out;width:100%;height:100%}.explainer-content-item.active{display:block;opacity:1;transform:translateY(0)}#scrollTopBtn{position:fixed;bottom:40px;right:40px;z-index:99;border:none;outline:none;background:linear-gradient(135deg,var(--primary-color),#4f46e5);color:#fff;cursor:pointer;padding:18px;border-radius:50%;box-shadow:0 12px 35px rgba(79,70,229,0.4);transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);opacity:0;visibility:hidden;transform:translateY(30px);backdrop-filter:blur(4px)}#scrollTopBtn.show{opacity:1;visibility:visible;transform:translateY(0)}#scrollTopBtn:hover{transform:translateY(-8px) rotate(360deg);box-shadow:0 20px 45px rgba(79,70,229,0.6)}.modal-overlay,.version-modal-overlay,.payment-modal-overlay{position:fixed;inset:0;background:rgba(2, 6, 23, 0.212);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:1000;display:flex;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:all .4s ease}.modal-overlay.open,.version-modal-overlay.open,.payment-modal-overlay.open{opacity:1;visibility:visible;display:flex}.modal-content,.version-modal-content{background:var(--bg-body);padding:3rem;border-radius:2.5rem;max-width:600px;width:90%;position:relative;transform:scale(0.9) translateY(20px);transition:all .4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 50px 100px -20px rgba(0,0,0,0.7);border:1px solid var(--border-glass);color:var(--text-primary);background:linear-gradient(to bottom right,var(--bg-body),rgba(255,255,255,0.03))}.modal-overlay.open .modal-content,.version-modal-overlay.open .version-modal-content{transform:scale(1) translateY(0)}.modal-content.glass{background:var(--bg-glass);backdrop-filter:blur(24px) saturate(180%)}#toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:15px;pointer-events:none}.toast-card{pointer-events:auto;background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border-glass);box-shadow:0 25px 50px -12px rgba(0,0,0,0.15),0 0 25px rgba(255,255,255,0.3);backdrop-filter:blur(25px) saturate(200%);-webkit-backdrop-filter:blur(25px) saturate(200%);padding:18px 28px;border-radius:1.75rem;display:flex;align-items:center;gap:18px;min-width:320px;animation:toastIn .5s cubic-bezier(0.34,1.56,0.64,1) forwards;transform-origin:top center}[data-theme='dark'] .toast-card{background:rgba(15,23,42,0.9);border-color:rgba(255,255,255,0.1);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5)}.toast-card.success{border-right:5px solid #10b981}.toast-card.error{border-right:5px solid #ef4444}.toast-card.loading{border-right:5px solid #3b82f6}@keyframes toastIn{from{opacity:0;transform:translateY(-40px) scale(0.9);filter:blur(12px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}.ui-toggle-btn{background:rgba(0,0,0,0.05);border:1px solid var(--border-glass);padding:.6rem;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s ease}.ui-toggle-btn:hover{background:rgba(0,0,0,0.1);transform:rotate(15deg)}[data-theme='dark'] .ui-toggle-btn{background:rgba(255,255,255,0.1)}[data-theme='dark'] .ui-toggle-btn:hover{background:rgba(255,255,255,0.2)}.mobile-menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);z-index:999;opacity:0;pointer-events:none;transition:opacity .4s}.mobile-menu-overlay.active{opacity:1;pointer-events:auto}.mobile-drawer{position:fixed;top:0;right:-340px;width:320px;height:100%;background:var(--bg-glass);backdrop-filter:blur(35px) saturate(180%);-webkit-backdrop-filter:blur(35px) saturate(180%);border-left:1px solid var(--border-glass);z-index:1000;transition:right .5s cubic-bezier(0.16,1,0.3,1);padding:3rem;display:flex;flex-direction:column;box-shadow:-30px 0 60px rgba(0,0,0,0.3)}.mobile-drawer.active{right:0}html[dir="ltr"] .mobile-drawer{right:auto;left:-340px;border-left:none;border-right:1px solid var(--border-glass)}html[dir="ltr"] .mobile-drawer.active{left:0}.swiper{width:100%;padding-top:80px;padding-bottom:80px}.swiper-slide{background-position:center;background-size:cover;width:700px;height:420px;border-radius:2.5rem;overflow:hidden;filter:blur(6px) opacity(.6) grayscale(30%);transform:scale(0.85);transition:all .7s cubic-bezier(0.4,0,0.2,1);box-shadow:0 15px 40px rgba(0,0,0,0.15);border:1px solid var(--border-glass)}@media (max-width:768px){.swiper-slide{width:320px;height:220px}}.swiper-slide-active{filter:blur(0) opacity(1) grayscale(0%);transform:scale(1);z-index:10;box-shadow:0 40px 80px -20px rgba(59,130,246,0.4);border-color:rgba(59,130,246,0.4)}.swiper-pagination-bullet{background:var(--primary-color)!important;width:12px;height:12px;transition:all .3s}.swiper-pagination-bullet-active{width:36px;border-radius:6px}.payment-option-card{cursor:pointer;transition:all .3s cubic-bezier(0.4,0,0.2,1);border:1px solid var(--border-glass);position:relative;overflow:hidden}.payment-option-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,0.1),transparent);opacity:0;transition:opacity .3s}.payment-option-card:hover,.payment-option-card.selected{border-color:var(--primary-color);background:rgba(59,130,246,0.05);transform:translateY(-5px);box-shadow:0 20px 40px -10px rgba(59,130,246,0.2)}.payment-option-card:hover::before{opacity:1}.docs-sidebar-link{display:flex;align-items:center;gap:14px;padding:14px 20px;border-radius:14px;color:var(--text-secondary);transition:all .3s;border:1px solid transparent;font-weight:600;cursor:pointer}.docs-sidebar-link:hover,.docs-sidebar-link.active{background:rgba(59,130,246,0.1);color:var(--primary-color);border-color:rgba(59,130,246,0.2)}.docs-content-pane{display:none;animation:fadeIn .4s ease-out}.docs-content-pane.active{display:block}.btn-premium{position:relative;overflow:hidden;transition:all .3s ease}.btn-premium::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.1),transparent);transform:rotate(45deg);transition:.5s}.btn-premium:hover::after{left:120%}.heatmap-cell{width:12px;height:12px;border-radius:3px;background-color:rgba(226,232,240,0.2)}.heatmap-cell.level-1{background-color:#bbdefb}.heatmap-cell.level-2{background-color:#64b5f6}.heatmap-cell.level-3{background-color:#1e88e5}.heatmap-cell.level-4{background-color:#0d47a1}[data-theme='dark'] .heatmap-cell{background-color:rgba(255,255,255,0.05)}[data-theme='dark'] .heatmap-cell.level-1{background-color:#0d47a1}[data-theme='dark'] .heatmap-cell.level-2{background-color:#1565c0}[data-theme='dark'] .heatmap-cell.level-3{background-color:#42a5f5}[data-theme='dark'] .heatmap-cell.level-4{background-color:#90caf9}.plugo-container{background:var(--bg-glass);border-radius:3rem;border:1px solid var(--border-glass);box-shadow:0 40px 80px -20px rgba(0,0,0,0.08);backdrop-filter:blur(30px);min-height:750px;overflow:hidden;display:flex;flex-direction:column;transition:all .5s cubic-bezier(0.4,0,0.2,1)}.plugo-sidebar{background:var(--sidebar-bg);border-left:1px solid var(--border-glass);border-right:1px solid var(--border-glass);backdrop-filter:blur(15px)}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(100,116,139,0.2);border-radius:20px}.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.dev-theme-toggle{position:fixed;bottom:30px;left:30px;z-index:9999;background:var(--bg-glass);border:1px solid var(--border-glass);padding:12px;border-radius:50%;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,0.1);transition:all .3s ease}.driver-popover{background:var(--bg-glass)!important;backdrop-filter:blur(20px)!important;border:1px solid var(--border-glass)!important;border-radius:2rem!important;padding:25px!important;box-shadow:0 25px 50px -12px rgba(0,0,0,0.2)!important;color:var(--text-primary)!important;font-family:'Tajawal',sans-serif!important;max-width:320px!important}.t-glass-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);box-shadow:0 4px 30px rgba(0,0,0,0.1)}.t-glass-card:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);transform:translateY(-5px)}.swiper-pagination-custom-bullet{background:#94a3b8;opacity:.5}.swiper-pagination-bullet-active.swiper-pagination-custom-bullet-active{background:#3b82f6;opacity:1;width:20px;border-radius:5px;transition:width .3s}.testimonialsSwiper .swiper-slide{height:auto;display:flex;transition:all .5s ease;opacity:.4;filter:blur(3px);transform:scale(0.9)}.testimonialsSwiper .swiper-slide>div{width:100%}.testimonialsSwiper .swiper-slide-active{opacity:1;filter:blur(0);transform:scale(1);z-index:10}@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.animate-spin-slow{animation:spin-slow 3s linear infinite}.theme-transition, .theme-transition *, .theme-transition *::before, .theme-transition *::after { transition: all 0.65s cubic-bezier(0.4, 0, 0.2, 1) !important; transition-delay: 0s !important; }  .rotate-icon { animation: icon-spin 0.5s ease-in-out; } @keyframes icon-spin { 0% { transform: rotate(0deg) scale(1); opacity: 1; } 50% { transform: rotate(180deg) scale(0.5); opacity: 0.5; } 100% { transform: rotate(360deg) scale(1); opacity: 1; } }
-   /* --- Premium Floating Animations --- */ /* النمط الأول: حركة رأسية بطيئة مع دوران خفيف */ @keyframes float-1 { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.8; } 50% { transform: translateY(-25px) rotate(3deg); opacity: 0.4; } } /* النمط الثاني: حركة مائلة مع تغيير الحجم قليلاً */ @keyframes float-2 { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; } 50% { transform: translate(-10px, -20px) scale(1.05); opacity: 0.9; } } /* النمط الثالث: حركة عكسية بطيئة جداً */ @keyframes float-3 { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; } 50% { transform: translateY(20px) rotate(-3deg); opacity: 0.3; } } .animate-float-1 { animation: float-1 8s ease-in-out infinite; } .animate-float-2 { animation: float-2 10s ease-in-out infinite; } .animate-float-3 { animation: float-3 12s ease-in-out infinite; } /* تحسين الأداء لعدم تقطيع الحركة */ .parallax-element { will-change: transform, opacity; }/* --- Scroll Down Mouse Animation --- */ @keyframes scroll-wheel { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(15px); opacity: 0; } } .animate-scroll-wheel { animation: scroll-wheel 2s ease-in-out infinite; }
-   
-   /* --- Device Frames Styling --- */
+/* ==========================================================================
+   1. متغيرات النظام والثيم (VARIABLES & THEME TOKENS)
+   ========================================================================== */
+:root {
+    /* --- لوحة الألوان الأساسية (Color Palette) --- */
+    --primary-color: #3b82f6;
+    --secondary-color: #64748b;
+    --bg-body: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-glow: rgba(59, 130, 246, 0.2);
 
-/* 1. Desktop Mode */
-.frame-desktop {
-    width: 1200px;
-    height: 750px;
-    border-radius: 12px;
-    border: 12px solid #1e293b; /* Slate-800 */
+    /* --- ألوان نظام الزجاج (Glass System Colors) --- */
+    --bg-glass-light: rgba(255, 255, 255, 0.6);
+    --bg-glass-medium: rgba(255, 255, 255, 0.75);
+    --bg-glass-heavy: rgba(255, 255, 255, 0.85);
+    --bg-glass-hover: rgba(255, 255, 255, 0.9);
+    --sidebar-bg: rgba(255, 255, 255, 0.6);
+
+    /* --- الحدود والظلال (Borders & Shadows) --- */
+    --border-glass: rgba(255, 255, 255, 0.5);
+    --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+
+    /* --- نظام الضبابية الموحد (Unified Blur System) --- */
+    /* توحيد القيم هام جداً لمنع التقطيع (Lag) أثناء السكرول */
+    --blur-xs: blur(5px);   /* للخلفيات البسيطة */
+    --blur-sm: blur(10px);  /* للعناصر الصغيرة */
+    --blur-md: blur(16px);  /* للكروت المتوسطة */
+    --blur-lg: blur(24px);  /* للعناصر العائمة */
+    --blur-xl: blur(35px);  /* للهيدر والقوائم */
+
+    /* --- الأبعاد والزوايا (Dimensions & Radius) --- */
+    --radius-xl: 2rem;
+    --radius-lg: 1.5rem;
+    --radius-md: 1rem;
 }
 
-/* 2. Tablet Mode (iPad) */
-.frame-tablet {
-    width: 768px;
-    height: 1024px;
-    border-radius: 24px;
-    border: 16px solid #0f172a; /* Slate-900 */
+/* --- تخصيص الوضع الليلي (Dark Mode Overrides) --- */
+[data-theme='dark'] {
+    --bg-body: #020617;
+    --bg-glass-light: rgba(15, 23, 42, 0.6);
+    --bg-glass-medium: rgba(15, 23, 42, 0.7);
+    --bg-glass-heavy: rgba(2, 6, 23, 0.8);
+    --bg-glass-hover: rgba(30, 41, 59, 0.8);
+    --sidebar-bg: rgba(15, 23, 42, 0.6);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --shadow-glass: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --accent-glow: rgba(59, 130, 246, 0.3);
 }
 
-/* 3. iPhone Mode */
-.frame-iphone {
-    width: 390px;
-    height: 844px;
-    border-radius: 48px;
-    border: 12px solid #000;
-    box-shadow: 0 0 0 2px #334155; /* Outer rim */
+/* ==========================================================================
+   2. الإعدادات الأساسية وتحسين السكرول (BASE & SCROLL OPTIMIZATION)
+   ========================================================================== */
+* {
+    box-sizing: border-box;
 }
 
-/* 4. Android Mode */
-.frame-android {
-    width: 412px;
-    height: 915px;
-    border-radius: 32px;
-    border: 8px solid #1e293b;
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* زر التفعيل في البار العلوي */
-.device-btn.active {
-    background-color: #3b82f6; /* Blue-500 */
-    color: white;
-}
-/* --- Floating Icons Animation --- */
-@keyframes float-rotate {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
-    50% { transform: translateY(-20px) rotate(10deg); opacity: 0.4; }
-    100% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* منع السكرول الأفقي */
+    line-height: 1.6;
+    
+    /* تحسين الأداء لتقليل التقطيع عند تغيير الألوان */
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
+    
+    /* تحسين عرض النصوص */
+    text-rendering: optimizeLegibility;
 }
 
-.animate-float-icon {
-    animation: float-rotate 8s infinite ease-in-out;
+/* --- تنسيق العناوين (Typography) --- */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+    letter-spacing: -0.025em;
+    line-height: 1.3;
 }
 
-/* --- Floating Animation Keyframes --- */
-@keyframes float-rotate {
-    0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(10deg); }
-    100% { transform: translateY(0) rotate(0deg); }
+p, span, li, div {
+    color: inherit;
 }
-.animate-float-rotate { animation: float-rotate 10s infinite ease-in-out; }
-.animate-float-slow { animation: float-rotate 15s infinite ease-in-out; }
-.animate-float-delayed { animation: float-rotate 12s infinite ease-in-out 2s; }
 
-/* --- Pro Card Styles --- */
+/* --- تخصيص شريط التمرير (Custom Scrollbar) --- */
+::-webkit-scrollbar {
+    width: 6px;
+}
 
-/* 1. تصميم الكارت الأساسي */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.2);
+    border-radius: 20px;
+}
+
+/* إخفاء السكرول بار (Utility Classes) */
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar,
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* سكرول بار للمحتوى الداخلي */
+.visual-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.visual-content::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.2);
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   3. الخلفيات المتحركة والأداء (BACKGROUNDS & PERFORMANCE)
+   ========================================================================== */
+.bg-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    
+    /* [هام] تفعيل تسريع كارت الشاشة (GPU) لمنع الـ Lag */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
+
+.blob {
+    position: absolute;
+    filter: blur(80px); /* تم تقليل البلور قليلاً لتحسين الأداء */
+    opacity: .45;
+    animation: float 15s infinite alternate ease-in-out;
+    mix-blend-mode: screen;
+    
+    /* تحسين الأداء للعناصر المتحركة */
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+[data-theme='dark'] .blob {
+    mix-blend-mode: normal;
+    opacity: .25;
+}
+
+.blob-1 {
+    top: -10%;
+    left: -5%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, var(--accent-glow), transparent);
+    animation: float 10s infinite alternate;
+}
+
+.blob-2 {
+    bottom: -10%;
+    right: -5%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent);
+    animation: float 12s infinite alternate-reverse;
+}
+
+/* ==========================================================================
+   4. أدوات الزجاج الموحدة (GLASS UTILITIES)
+   ========================================================================== */
+/* كلاس الزجاج الأساسي (Standard Glass) */
+.glass {
+    background: var(--bg-glass-medium);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    
+    /* انتقالات ناعمة */
+    transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .3s ease;
+    backface-visibility: hidden;
+}
+
+/* تأثير التفاعل عند مرور الماوس (Hover Effect) */
+.glass-hover {
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+    background: var(--bg-glass-hover);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 15px var(--accent-glow);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* كارت زجاجي بسيط (Simple Card) */
+.glass-card {
+    background: var(--bg-glass-medium);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+}
+
+/* كارت زجاجي شفاف جداً (Transparent Glass) */
+.t-glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.t-glass-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+/* ==========================================================================
+   5. تخطيط الصفحة والهيدر (LAYOUT & HEADER)
+   ========================================================================== */
+/* الهيدر الرئيسي (Main Header) */
+.header-main {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    
+    /* استخدام أثقل درجة بلور للهيدر */
+    background: var(--bg-glass-heavy);
+    backdrop-filter: var(--blur-xl) saturate(180%);
+    -webkit-backdrop-filter: var(--blur-xl) saturate(180%);
+    
+    border-bottom: 1px solid var(--border-glass);
+    transition: all .4s ease;
+    
+    /* تحسين الأداء عند التثبيت */
+    will-change: transform;
+    contain: layout paint;
+}
+
+[data-theme='dark'] .header-main {
+    background: rgba(2, 6, 23, 0.8);
+}
+
+/* روابط التنقل (Navigation Links) */
+.nav-link {
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: .75rem 1.5rem;
+    border-radius: 1rem;
+    transition: all .3s ease;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.1);
+    font-weight: 700;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: width .3s ease;
+    border-radius: 2px;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 70%;
+}
+
+/* صورة المستخدم في الهيدر */
+.user-header-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    object-fit: cover;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#header-client-btn:hover .user-header-avatar {
+    border-color: #fff;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+   6. القوائم الجانبية والموبايل (SIDEBARS & MOBILE DRAWER)
+   ========================================================================== */
+/* غطاء القائمة (Overlay) */
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: var(--blur-sm);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s;
+}
+
+.mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* القائمة الجانبية للموبايل (Drawer) */
+.mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: -340px;
+    width: 320px;
+    height: 100%;
+    background: var(--bg-glass-medium);
+    backdrop-filter: var(--blur-xl) saturate(180%);
+    -webkit-backdrop-filter: var(--blur-xl) saturate(180%);
+    border-left: 1px solid var(--border-glass);
+    z-index: 1000;
+    transition: right .5s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -30px 0 60px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-drawer.active {
+    right: 0;
+}
+
+/* دعم الاتجاه الأيسر (LTR Support) */
+html[dir="ltr"] .mobile-drawer {
+    right: auto;
+    left: -340px;
+    border-left: none;
+    border-right: 1px solid var(--border-glass);
+}
+
+html[dir="ltr"] .mobile-drawer.active {
+    left: 0;
+}
+
+/* روابط الشريط الجانبي للوثائق */
+.docs-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    color: var(--text-secondary);
+    transition: all .3s;
+    border: 1px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.docs-sidebar-link:hover,
+.docs-sidebar-link.active {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary-color);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* حاوية التطبيق الرئيسية (Main Container) */
+.plugo-container {
+    background: var(--bg-glass-medium);
+    border-radius: 3rem;
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08);
+    backdrop-filter: var(--blur-xl);
+    min-height: 750px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all .5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.plugo-sidebar {
+    background: var(--sidebar-bg);
+    border-left: 1px solid var(--border-glass);
+    border-right: 1px solid var(--border-glass);
+    backdrop-filter: var(--blur-md);
+}
+
+/* ==========================================================================
+   7. أقسام العرض والمحتوى (VIEW SECTIONS)
+   ========================================================================== */
+.view-section {
+    display: none;
+    animation: fadeIn .6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    min-height: calc(100vh - 96px);
+    
+    /* تحسين ظهور القسم */
+    will-change: opacity, transform;
+}
+
+.view-section.active-view {
+    display: block;
+}
+
+.docs-content-pane {
+    display: none;
+    animation: fadeIn .4s ease-out;
+}
+
+.docs-content-pane.active {
+    display: block;
+}
+
+/* ==========================================================================
+   8. العناصر التفاعلية والأزرار (INTERACTIVE ELEMENTS)
+   ========================================================================== */
+/* أزرار الشرح (Explainer Buttons) */
+.explainer-btn {
+    width: 100%;
+    text-align: right;
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.explainer-btn.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
+    border-right: 4px solid var(--primary-color);
+    color: var(--primary-color);
+    transform: translateX(-8px);
+}
+
+.explainer-content-item {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all .5s ease-out;
+    width: 100%;
+    height: 100%;
+}
+
+.explainer-content-item.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* زر الصعود للأعلى (Scroll Top Button) */
+#scrollTopBtn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    color: #fff;
+    cursor: pointer;
+    padding: 18px;
+    border-radius: 50%;
+    box-shadow: 0 12px 35px rgba(79, 70, 229, 0.4);
+    transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    backdrop-filter: var(--blur-xs);
+}
+
+#scrollTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#scrollTopBtn:hover {
+    transform: translateY(-8px) rotate(360deg);
+    box-shadow: 0 20px 45px rgba(79, 70, 229, 0.6);
+}
+
+/* زر تبديل الثيم (Theme Toggle) */
+.ui-toggle-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-glass);
+    padding: .6rem;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s ease;
+}
+
+.ui-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: rotate(15deg);
+}
+
+[data-theme='dark'] .ui-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .ui-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* زر الثيم العائم للمطورين */
+.dev-theme-toggle {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 9999;
+    background: var(--bg-glass-medium);
+    border: 1px solid var(--border-glass);
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all .3s ease;
+}
+
+/* زر بريميوم اللامع (Premium Button) */
+.btn-premium {
+    position: relative;
+    overflow: hidden;
+    transition: all .3s ease;
+}
+
+.btn-premium::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: .5s;
+}
+
+.btn-premium:hover::after {
+    left: 120%;
+}
+
+.btn-glow {
+    animation: pulse-ring 2s infinite;
+}
+
+/* ==========================================================================
+   9. النوافذ المنبثقة والتنبيهات (MODALS & TOASTS)
+   ========================================================================== */
+/* النوافذ المنبثقة (Modals) */
+.modal-overlay,
+.version-modal-overlay,
+.payment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.212);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all .4s ease;
+    
+    /* منع التقطيع عند الفتح */
+    will-change: opacity;
+}
+
+.modal-overlay.open,
+.version-modal-overlay.open,
+.payment-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+}
+
+.modal-content,
+.version-modal-content {
+    background: var(--bg-body);
+    padding: 3rem;
+    border-radius: 2.5rem;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.9) translateY(20px);
+    transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    background: linear-gradient(to bottom right, var(--bg-body), rgba(255, 255, 255, 0.03));
+}
+
+.modal-overlay.open .modal-content,
+.version-modal-overlay.open .version-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-content.glass {
+    background: var(--bg-glass-medium);
+    backdrop-filter: var(--blur-lg) saturate(180%);
+}
+
+/* التنبيهات (Toasts) */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: none;
+}
+
+.toast-card {
+    pointer-events: auto;
+    background: var(--bg-glass-medium);
+    color: var(--text-primary);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 25px rgba(255, 255, 255, 0.3);
+    backdrop-filter: var(--blur-lg) saturate(200%);
+    -webkit-backdrop-filter: var(--blur-lg) saturate(200%);
+    padding: 18px 28px;
+    border-radius: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 320px;
+    animation: toastIn .5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform-origin: top center;
+}
+
+[data-theme='dark'] .toast-card {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.toast-card.success {
+    border-right: 5px solid #10b981;
+}
+
+.toast-card.error {
+    border-right: 5px solid #ef4444;
+}
+
+.toast-card.loading {
+    border-right: 5px solid #3b82f6;
+}
+
+/* القوائم العائمة (Popovers) */
+.driver-popover {
+    background: var(--bg-glass-medium) !important;
+    backdrop-filter: var(--blur-lg) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: 2rem !important;
+    padding: 25px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Tajawal', sans-serif !important;
+    max-width: 320px !important;
+}
+
+/* ==========================================================================
+   10. المكونات المتقدمة (ADVANCED COMPONENTS)
+   ========================================================================== */
+/* --- السوايب (Swiper Slider) --- */
+.swiper {
+    width: 100%;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.swiper-slide {
+    background-position: center;
+    background-size: cover;
+    width: 700px;
+    height: 420px;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    filter: blur(6px) opacity(.6) grayscale(30%);
+    transform: scale(0.85);
+    transition: all .7s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-glass);
+    
+    /* منع إعادة الرسم المكلفة أثناء السكرول */
+    will-change: transform, filter;
+}
+
+@media (max-width:768px) {
+    .swiper-slide {
+        width: 320px;
+        height: 220px;
+    }
+}
+
+.swiper-slide-active {
+    filter: blur(0) opacity(1) grayscale(0%);
+    transform: scale(1);
+    z-index: 10;
+    box-shadow: 0 40px 80px -20px rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.swiper-pagination-bullet {
+    background: var(--primary-color) !important;
+    width: 12px;
+    height: 12px;
+    transition: all .3s;
+}
+
+.swiper-pagination-bullet-active {
+    width: 36px;
+    border-radius: 6px;
+}
+
+.swiper-pagination-custom-bullet {
+    background: #94a3b8;
+    opacity: .5;
+}
+
+.swiper-pagination-bullet-active.swiper-pagination-custom-bullet-active {
+    background: #3b82f6;
+    opacity: 1;
+    width: 20px;
+    border-radius: 5px;
+    transition: width .3s;
+}
+
+/* --- معرض التقييمات (Testimonials) --- */
+.testimonialsSwiper .swiper-slide {
+    height: auto;
+    display: flex;
+    transition: all .5s ease;
+    opacity: .4;
+    filter: var(--blur-xs);
+    transform: scale(0.9);
+}
+
+.testimonialsSwiper .swiper-slide>div {
+    width: 100%;
+}
+
+.testimonialsSwiper .swiper-slide-active {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    z-index: 10;
+}
+
+/* --- خيارات الدفع (Payment Options) --- */
+.payment-option-card {
+    cursor: pointer;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-glass);
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-option-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.payment-option-card:hover,
+.payment-option-card.selected {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+}
+
+.payment-option-card:hover::before {
+    opacity: 1;
+}
+
+/* --- الخريطة الحرارية (Heatmap) --- */
+.heatmap-cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background-color: rgba(226, 232, 240, 0.2);
+}
+
+.heatmap-cell.level-1 { background-color: #bbdefb; }
+.heatmap-cell.level-2 { background-color: #64b5f6; }
+.heatmap-cell.level-3 { background-color: #1e88e5; }
+.heatmap-cell.level-4 { background-color: #0d47a1; }
+
+[data-theme='dark'] .heatmap-cell { background-color: rgba(255, 255, 255, 0.05); }
+[data-theme='dark'] .heatmap-cell.level-1 { background-color: #0d47a1; }
+[data-theme='dark'] .heatmap-cell.level-2 { background-color: #1565c0; }
+[data-theme='dark'] .heatmap-cell.level-3 { background-color: #42a5f5; }
+[data-theme='dark'] .heatmap-cell.level-4 { background-color: #90caf9; }
+
+/* --- كروت البرو والمعرض (Pro Card & Gallery) --- */
 .pg-pro-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5); /* حدود فاتحة */
+    background: var(--bg-glass-light);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 24px;
     padding: 12px;
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
@@ -174,24 +940,21 @@
     overflow: hidden;
 }
 
-/* 2. الوضع الليلي للكارت */
 .dark .pg-pro-card {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--bg-glass-light);
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
 }
 
-/* 3. تأثير الهوفر (Border Glow) */
 .pg-pro-card:hover {
-    border-color: rgba(59, 130, 246, 0.5); /* أزرق عند التحويم */
+    border-color: rgba(59, 130, 246, 0.5);
     box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.15);
     transform: translateY(-5px);
 }
 
-/* 4. Swiper Slide Adjustment */
 #pg-gallery-section .swiper-slide {
     width: 85%;
-    max-width: 850px; /* عرض كبير ومريح */
+    max-width: 850px;
     height: auto;
     opacity: 0.4;
     filter: blur(3px) grayscale(50%);
@@ -206,160 +969,114 @@
     z-index: 10;
 }
 
-/* 5. Pagination Capsules */
 .pg-pagination-container {
-    position: absolute; bottom: 0; left: 0; width: 100%;
-    display: flex; justify-content: center; padding-bottom: 10px; z-index: 20;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+    z-index: 20;
 }
+
 #pg-gallery-section .swiper-pagination-bullet {
-    width: 8px; height: 8px; background: #94a3b8; opacity: 0.4;
-    border-radius: 20px; transition: all 0.4s ease; margin: 0 6px !important;
+    width: 8px;
+    height: 8px;
+    background: #94a3b8;
+    opacity: 0.4;
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    margin: 0 6px !important;
 }
+
 #pg-gallery-section .swiper-pagination-bullet-active {
-    width: 36px; background: #3b82f6; opacity: 1;
+    width: 36px;
+    background: #3b82f6;
+    opacity: 1;
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
 }
-/* أنيميشن الطفو للأيقونات الخلفية */ @keyframes float-slow { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } } @keyframes float-medium { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.05); } } @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } } .animate-float-1 { animation: float-slow 8s ease-in-out infinite; } .animate-float-2 { animation: float-medium 6s ease-in-out infinite; animation-delay: 1s; } .animate-float-3 { animation: float-slow 7s ease-in-out infinite; animation-delay: 2s; } .btn-glow { animation: pulse-ring 2s infinite; } /* إخفاء السكرول بار للمظهر الجمالي */ .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; } /* انتقالات ناعمة للمحتوى */ .explainer-content-item { display: none; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; } .explainer-content-item.active { display: block; opacity: 1; transform: translateY(0); }
-/* تنسيق صورة المستخدم في الهيدر */
-.user-header-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.5); /* حدود شفافة */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    object-fit: cover;
-    background-color: rgba(255,255,255,0.2);
+
+/* --- كروت الميزات (Feature Cards) --- */
+.feature-card {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* حركة بسيطة عند تمرير الماوس */
-#header-client-btn:hover .user-header-avatar {
-    border-color: #fff;
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-}
-/* أنيميشن عام */
-    @keyframes float-y {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .feature-card {
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .dark .feature-card {
-        background: rgba(15, 23, 42, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    /* تأثير الـ Spotlight */
-    .spotlight-overlay {
-        pointer-events: none;
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 0.3s;
-        background: radial-gradient(600px circle at var(--x) var(--y), rgba(59, 130, 246, 0.1), transparent 40%);
-        z-index: 10;
-        border-radius: inherit;
-    }
-
-    .feature-card:hover .spotlight-overlay {
-        opacity: 1;
-    }
-
-    /* زخارف الخلفية داخل البطاقات */
-    .card-decoration {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 40%;
-        background: linear-gradient(to top, rgba(59, 130, 246, 0.05), transparent);
-        z-index: 0;
-        pointer-events: none;
-    }
-    
-    .icon-box {
-        animation: float-y 6s ease-in-out infinite;
-    }
-        .widget-card {
-        backface-visibility: hidden;
-    }
-    
-    /* عند التحويم، نقوم بتفعيل بعض الحركات داخل الـ SVG إذا وجدت كلاسات معينة */
-    .widget-card:hover .animate-on-hover {
-        animation-play-state: running;
-    }
-    
-    /* تخصيص السكرول بار إذا كان المحتوى طويل */
-    .visual-content::-webkit-scrollbar {
-        width: 4px;
-    }
-    .visual-content::-webkit-scrollbar-thumb {
-        background: rgba(100, 116, 139, 0.2);
-        border-radius: 4px;
-    }
-    .perspective-2000 { perspective: 2000px; }
-    @keyframes float-simple {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-    .animate-float-slow { animation: float-simple 6s ease-in-out infinite; }
-    .animate-float-delayed { animation: float-simple 7s ease-in-out infinite 2s; }
-        /* تحسينات CSS للأنيميشن */
-    .perspective-1000 {
-        perspective: 1000px;
-    }
-/* تأثير الطفو المستمر للأيقونات */
-@keyframes float-icon {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
+.dark .feature-card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.flying-icon-wrapper {
+.spotlight-overlay {
+    pointer-events: none;
     position: absolute;
     inset: 0;
-    pointer-events: none;
-    z-index: 1; /* جعلها فوق الخلفية مباشرة */
-    overflow: hidden;
-}
-
-.flying-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5); /* تبدأ صغيرة وفي المنتصف */
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* حركة "نطاطة" جذابة */
+    transition: opacity 0.3s;
+    background: radial-gradient(600px circle at var(--x) var(--y), rgba(59, 130, 246, 0.1), transparent 40%);
+    z-index: 10;
+    border-radius: inherit;
 }
 
-/* عند تمرير الماوس على الكارد الأب (group) */
-.group:hover .flying-icon {
-    opacity: 1; /* تظهر */
-    /* التحرك سيتم تحديده في الجافاسكريبت لكل أيقونة */
+.feature-card:hover .spotlight-overlay {
+    opacity: 1;
 }
-/* --- Tool Generator Styles --- */
+
+.card-decoration {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(59, 130, 246, 0.05), transparent);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.icon-box {
+    animation: float-y 6s ease-in-out infinite;
+}
+
+.widget-card {
+    backface-visibility: hidden;
+}
+
+.widget-card:hover .animate-on-hover {
+    animation-play-state: running;
+}
+
+/* --- إطارات الأجهزة (Device Frames) --- */
+.frame-desktop { width: 1200px; height: 750px; border-radius: 12px; border: 12px solid #1e293b; }
+.frame-tablet { width: 768px; height: 1024px; border-radius: 24px; border: 16px solid #0f172a; }
+.frame-iphone { width: 390px; height: 844px; border-radius: 48px; border: 12px solid #000; box-shadow: 0 0 0 2px #334155; }
+.frame-android { width: 412px; height: 915px; border-radius: 32px; border: 8px solid #1e293b; }
+.device-btn.active { background-color: #3b82f6; color: white; }
+
+/* ==========================================================================
+   11. مولد الأدوات (TOOL GENERATOR STYLES)
+   ========================================================================== */
 .style-card {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
 }
+
 .style-card:hover {
     transform: translateY(-5px);
 }
+
 .style-card.selected {
     border-color: #3b82f6;
     background-color: rgba(59, 130, 246, 0.05);
     box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
 }
+
 .dark .style-card.selected {
     background-color: rgba(59, 130, 246, 0.1);
 }
 
-/* Mini Layout Visuals */
 .mini-layout {
     width: 100%;
     height: 80px;
@@ -372,27 +1089,26 @@
     overflow: hidden;
     margin-bottom: 12px;
 }
+
 .dark .mini-layout {
     background: #1e293b;
 }
 
-/* Abstract Shapes */
-.s-block { background: #cbd5e1; border-radius: 4px; } /* Gray */
-.s-accent { background: #3b82f6; border-radius: 4px; } /* Blue */
-.s-white { background: #ffffff; border-radius: 4px; } /* White */
+/* الأشكال المجردة داخل الـ Layout */
+.s-block { background: #cbd5e1; border-radius: 4px; }
+.s-accent { background: #3b82f6; border-radius: 4px; }
+.s-white { background: #ffffff; border-radius: 4px; }
 .dark .s-block { background: #334155; }
 .dark .s-white { background: #475569; }
 
-/* Code Block Styling */
+/* عرض الكود */
 .code-preview {
     font-family: 'Fira Code', monospace;
     direction: ltr;
     tab-size: 2;
 }
 
-
-
-/* تنسيقات القائمة الجانبية للأدوات */
+/* أزرار التنقل بين الأدوات */
 .tool-nav-btn {
     display: flex;
     align-items: center;
@@ -408,6 +1124,7 @@
 .tool-nav-btn:hover {
     background: rgba(255, 255, 255, 0.5);
 }
+
 .dark .tool-nav-btn:hover {
     background: rgba(30, 41, 59, 0.5);
 }
@@ -417,16 +1134,148 @@
     color: white;
     box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
 }
+
 .tool-nav-btn.active i {
     color: white;
 }
 
-/* تنسيق المنطقة اليمنى (المحتوى) */
 .tool-content-area {
     animation: fadeIn 0.4s ease-out;
 }
 
+/* ==========================================================================
+   12. الأنيميشن والحركة (ANIMATIONS & KEYFRAMES)
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 60px) scale(1.1); }
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(-40px) scale(0.9); filter: blur(12px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes icon-spin {
+    0% { transform: rotate(0deg) scale(1); opacity: 1; }
+    50% { transform: rotate(180deg) scale(0.5); opacity: 0.5; }
+    100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+
+@keyframes float-1 {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+    50% { transform: translateY(-25px) rotate(3deg); opacity: 0.4; }
+}
+
+@keyframes float-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+    50% { transform: translate(-10px, -20px) scale(1.05); opacity: 0.9; }
+}
+
+@keyframes float-3 {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+    50% { transform: translateY(20px) rotate(-3deg); opacity: 0.3; }
+}
+
+@keyframes scroll-wheel {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(15px); opacity: 0; }
+}
+
+@keyframes float-rotate {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+    50% { transform: translateY(-20px) rotate(10deg); opacity: 0.4; }
+    100% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+}
+
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+@keyframes float-medium {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.05); }
+}
+
+@keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes float-simple {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes float-icon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+/* --- كلاسات المساعدة للأنيميشن (Animation Utility Classes) --- */
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
+.rotate-icon { animation: icon-spin 0.5s ease-in-out; }
+.animate-float-1 { animation: float-1 8s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 10s ease-in-out infinite; }
+.animate-float-3 { animation: float-3 12s ease-in-out infinite; }
+.animate-scroll-wheel { animation: scroll-wheel 2s ease-in-out infinite; }
+.animate-float-icon { animation: float-rotate 8s infinite ease-in-out; }
+.animate-float-rotate { animation: float-rotate 10s infinite ease-in-out; }
+.animate-float-slow { animation: float-slow 15s infinite ease-in-out; }
+.animate-float-delayed { animation: float-rotate 12s infinite ease-in-out 2s; }
+
+/* تحسين الأداء للحركة */
+.parallax-element { will-change: transform, opacity; }
+.perspective-2000 { perspective: 2000px; }
+.perspective-1000 { perspective: 1000px; }
+
+/* --- الأيقونات الطائرة (Flying Icons) --- */
+.flying-icon-wrapper {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.flying-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.group:hover .flying-icon {
+    opacity: 1;
+}
+
+/* --- انتقالات الثيم (Theme Transitions) --- */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+    transition: all 0.65s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition-delay: 0s !important;
+}
 </style>
 </head>
 <body class="selection:bg-blue-500 selection:text-white antialiased">
@@ -687,7 +1536,7 @@
         </div>
     </div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="relative z-10 max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-blue-300 mb-8 hover:bg-white/10 transition-all cursor-default shadow-lg shadow-blue-900/20 group">
             <span class="relative flex h-3 w-3">
@@ -701,7 +1550,7 @@
             اصنع مستقبلك مع <br class="hidden md:block" />
             <span class="transparent-text bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 relative">
                 Plugo AI
-                <svg class="absolute w-full h-3 -bottom-1 left-0 text-blue-500 opacity-60" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7501 5.5 40.8003 6.72066 48.553 4.77266C72.9304 2.87158 90.1406 2.5 199 2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg class="absolute left-0 -bottom-1 w-full h-4 text-blue-500/60" viewBox="0 0 500 16" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" aria-hidden="true" > <path d=" M 2 10 C 40 6, 80 14, 120 9 S 200 6, 260 10 S 340 14, 400 8 S 460 6, 498 9 " stroke="currentColor" stroke-width="3" stroke-linecap="round" /> </svg>
             </span>
         </div>
 
@@ -1756,7 +2605,6 @@ function toggleLang() {
                         </div>`;
                     }
                 }).join('');
-                lucide.createIcons();
             }
 
             renderPaymentMethods() {
@@ -1779,7 +2627,6 @@ function toggleLang() {
                     </div>`;
                 }
                 this.paymentMethodsContainer.innerHTML = htmlContent;
-                lucide.createIcons();
             }
         }
 
@@ -1826,7 +2673,6 @@ function toggleLang() {
                         </div>
                     </div>
                 `;
-                lucide.createIcons();
             }
 
             renderHeader() {
@@ -1918,7 +2764,6 @@ function toggleLang() {
                         </div>
                     </div>
                 `;
-                lucide.createIcons();
             }
 
             async init() {
@@ -1959,7 +2804,6 @@ function toggleLang() {
                             btn.querySelector('i')?.classList.add('text-blue-500');
                         }
                     });
-                    lucide.createIcons();
                     container.style.opacity = '1';
                     container.style.transform = 'translateY(0)';
                 }, 200);
@@ -2203,7 +3047,6 @@ class VersionsManager {
             </article>`;
         }).join('');
         
-        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // 4. دالة فتح المودال
@@ -2277,7 +3120,6 @@ class VersionsManager {
         `;
 
         modal.classList.remove('hidden');
-        lucide.createIcons();
 
         setTimeout(() => {
             backdrop.classList.remove('opacity-0');
@@ -2509,7 +3351,6 @@ function switchTool(id) {
     
     // إعادة تفعيل السكربتات الخاصة بالأداة النشطة وتحديث الأيقونات
     setTimeout(() => {
-        lucide.createIcons();
         if (id === 'code-gen') updateGenCode(); // تفعيل منطق المولد فوراً
     }, 50);
 }
@@ -2588,8 +3429,7 @@ function renderCodeGenerator() {
                         <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
                         <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                     </div>
-                    <code id="codeOutput" class="text-blue-300 font-mono text-sm break-all leading-loose selection:bg-blue-500/30">
-                        </code>
+                    <code id="codeOutput" class="text-blue-300 font-mono text-sm break-all leading-loose selection:bg-blue-500/30" dir='ltr'></code>
                     <div id="minCountMsg" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-red-500/20 text-red-400 text-[10px] font-bold rounded-lg border border-red-500/30 flex items-center gap-2 whitespace-nowrap">
                         <i data-lucide="alert-circle" size="12"></i> <span>العدد قليل جداً لهذا التصميم</span>
                     </div>
@@ -3025,13 +3865,11 @@ function copyGenCode(btn) {
         btn.classList.add('bg-emerald-600', 'text-white');
         btn.classList.remove('bg-slate-900', 'dark:bg-blue-600');
         
-        lucide.createIcons();
 
         setTimeout(() => {
             btn.innerHTML = originalText;
             btn.classList.remove('bg-emerald-600', 'text-white');
             btn.classList.add('bg-slate-900', 'dark:bg-blue-600');
-            lucide.createIcons();
         }, 2000);
     });
 }
@@ -3148,13 +3986,11 @@ function copyCode(elementId, btn) {
         btn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
 
         // تحديث الأيقونات إذا كانت مكتبة Lucide مستخدمة
-        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         // إعادة الزر لحالته الأصلية بعد ثانيتين
         setTimeout(() => {
             btn.innerHTML = originalContent;
             btn.className = originalClass; // استعادة الكلاسات الأصلية
-            if (typeof lucide !== 'undefined') lucide.createIcons();
         }, 2000);
     }).catch(err => {
         console.error('فشل النسخ:', err);
@@ -3268,7 +4104,6 @@ function updateExplainerState(isLoggedIn) {
                 setTimeout(() => {
                     if(typeof updateGenCode === 'function') updateGenCode(); 
                     if(typeof updateBtnGen === 'function') updateBtnGen(); // في حال كانت الأداة النشطة هي أدوات المقال
-                    if(typeof lucide !== 'undefined') lucide.createIcons();
                 }, 100);
             }
 
@@ -3490,9 +4325,9 @@ function switchExplainer(targetId, btn) {
                 centeredSlides: true,
                 slidesPerView: "auto",
                 coverflowEffect: {
-                    rotate: 40,
+                    rotate: 20,
                     stretch: 0,
-                    depth: 200,
+                    depth: 80,
                     modifier: 1,
                     slideShadows: true,
                 },
@@ -3631,7 +4466,6 @@ window.addEventListener('load', () => {
                 `;
                 
                 container.appendChild(toast);
-                lucide.createIcons();
                 
                 const remove = () => { 
                     toast.style.opacity = '0'; 
@@ -3653,24 +4487,43 @@ window.addEventListener('load', () => {
             }
         };
 
-        function toggleTheme() {
+        window.toggleTheme = function() {
             const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            const newTheme = current === 'light' ? 'dark' : 'light';
             
-            html.setAttribute('data-theme', newTheme);
-            if (newTheme === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-            
-            localStorage.setItem('theme', newTheme);
-            lucide.createIcons();
-            if(typeof state !== 'undefined' && state.activeSection === 'overview' && state.view === 'dashboard' && window.renderApp) Actions.initAnalyticsCharts();
-        }
+            // 1. استخدام requestAnimationFrame لمنع تهنيج المتصفح أثناء إعادة تلوين الصفحة
+            requestAnimationFrame(() => {
+                const current = html.getAttribute('data-theme');
+                const newTheme = current === 'light' ? 'dark' : 'light';
+                
+                // تبديل الثيم
+                html.setAttribute('data-theme', newTheme);
+                if (newTheme === 'dark') {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+                
+                // حفظ الإعداد
+                localStorage.setItem('theme', newTheme);
 
-        lucide.createIcons();
+                // ============================================================
+                // هام جداً: قمنا بحذف lucide.createIcons() من هنا
+                // لأن الألوان تتغير تلقائياً بالـ CSS ولا داعي لإعادة الرسم
+                // مما يحل مشكلة التعليق تماماً.
+                // ============================================================
+
+                // تحديث الرسوم البيانية فقط (لأنها تحتاج إعادة رسم بالألوان الجديدة)
+                if(typeof state !== 'undefined' && state.activeSection === 'overview' && state.view === 'dashboard') {
+                    // نستخدم setTimeout بسيط لنعطي المتصفح نفساً
+                    setTimeout(() => {
+                        if (typeof Actions !== 'undefined' && Actions.initAnalyticsCharts) {
+                            Actions.initAnalyticsCharts();
+                        }
+                    }, 100);
+                }
+            });
+        };
+
 
 
         const SECRET_KEY = "AbdoABDOelbanaELBANAbassantBASSANT29920051102004";
@@ -3785,7 +4638,7 @@ window.addEventListener('load', () => {
                 };
                 state.update({ view: map[status] || 'dashboard' });
             },
-            setSection(sec) { state.update({ activeSection: sec }); if(sec === 'overview') setTimeout(() => { Actions.initAnalyticsCharts(); lucide.createIcons(); }, 100); },
+            setSection(sec) { state.update({ activeSection: sec }); if(sec === 'overview') setTimeout(() => { Actions.initAnalyticsCharts(); }, 100); },
             initAnalyticsCharts() {
     // التحقق من الوضع الحالي بدقة
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark');
@@ -3889,7 +4742,7 @@ window.addEventListener('load', () => {
                 const t = i18n[state.lang];
                 document.getElementById('modal-status-label').innerText = t.stInactive.t; document.getElementById('modal-license-label').innerText = t.usageRate; document.getElementById('modal-logout-btn').innerHTML = `<i data-lucide="log-out"></i> ${t.logout}`;
                 document.getElementById('modal-avatar-char').innerText = state.user?.name?.charAt(0).toUpperCase() || 'U'; document.getElementById('modal-user-name').innerText = state.user?.name || 'User'; document.getElementById('modal-user-email').innerText = Helpers.getUserEmail(); document.getElementById('modal-license-count').innerText = state.blogs.length + " / " + (state.user?.maxActivations || 0); document.getElementById('modal-status-badge').innerText = state.user?.status || 'Active';
-                m.classList.add('open'); lucide.createIcons();
+                m.classList.add('open');
             },
             closeProfileModal() { document.getElementById('profile-modal').classList.remove('open'); },
             download(link) { if(!link || link === "#") return Helpers.toast(state.lang === 'ar' ? "الرابط غير متاح" : "Link unavailable", "error"); state.pendingDownload = link; document.getElementById('download-terms-modal').classList.add('open'); },
@@ -4244,7 +5097,6 @@ window.addEventListener('load', () => {
             };
             
             app.innerHTML = (viewMap[state.view] || viewMap['inactive'])();
-            lucide.createIcons();
             if(state.view === 'dashboard' && state.activeSection === 'overview') setTimeout(Actions.initAnalyticsCharts, 50);
             anime({ targets: '#app > div', translateY: [30, 0], opacity: [0, 1], duration: 800, easing: 'easeOutCubic' });
         };
@@ -4295,7 +5147,6 @@ window.toggleTheme = function() {
     localStorage.setItem('theme', newTheme);
     
     // 4. تحديث الأيقونات
-    if(typeof lucide !== 'undefined') lucide.createIcons();
     
     // 5. إعادة رسم الرسوم البيانية (ApexCharts Fix)
     if(typeof state !== 'undefined' && state.activeSection === 'overview' && state.view === 'dashboard') {
@@ -4382,8 +5233,6 @@ window.toggleTheme = function() {
                 });
 
                 // تحديث الأيقونات
-                lucide.createIcons();
-
                 // تهيئة السلايدر الخاص بهذا القسم فقط
                 initUniqueSwiper();
 
@@ -4722,7 +5571,6 @@ async function fetchClientsData() {
         loader.classList.add('hidden');
         
         // تحديث الأيقونات
-        if(typeof lucide !== 'undefined') lucide.createIcons();
 
     } catch (error) {
         console.error('Fetch Error:', error);
@@ -4739,7 +5587,6 @@ async function fetchClientsData() {
                 <button onclick="clientsDataLoaded=false; fetchClientsData()" class="mt-4 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs font-bold hover:bg-slate-300 transition">إعادة المحاولة</button>
             </div>
         `;
-        if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 }/* */
 
@@ -4966,7 +5813,6 @@ async function initPgGallery() {
         startPgSwiper();
         
         // تفعيل الأيقونات
-        if(typeof lucide !== 'undefined') lucide.createIcons();
 
     } catch (error) {
         console.error('PgGallery Error:', error);
@@ -5002,22 +5848,6 @@ function startPgSwiper() {
         }
     });
 }
-        (function() {
-            var script = document.createElement("script");
-            script.src = "https://cdn.elbana.net/SmoothScroll.min.js";
-            script.onload = function() {
-                SmoothScroll({
-                    animationTime: 450, // مدة التمرير بالمللي ثانية
-                    stepSize: 90, // مقدار التمرير في كل مرة
-                    accelerationDelta: 50, // التسارع في الحركة
-                    accelerationMax: 3, // الحد الأقصى للتسارع
-                    touchpadSupport: true, // دعم التمرير في شاشات اللمس
-                    arrowScroll: 50,
-					frameRate: 150
-               });
-            };
-            document.documentElement.appendChild(script);
-        })();
 
 /**
  * دالة تحديث زر الهيدر بناءً على حالة تسجيل الدخول
@@ -5057,55 +5887,7 @@ function updateHeaderButtonUI() {
     }
 
     // إعادة تفعيل الأيقونات للعناصر الجديدة
-    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
-
-(function initGlobalMouseEffects() {
-    
-    const container = document.getElementById('global-mouse-container');
-    const spotlight = document.getElementById('global-spotlight');
-    const parallaxElements = document.querySelectorAll('.parallax-element');
-
-    if (container && spotlight) {
-        
-        // استماع للحركة على كامل الصفحة
-        document.addEventListener('mousemove', (e) => {
-            
-            const x = e.clientX;
-            const y = e.clientY;
-
-            // 1. تحديث تأثير الضوء (Spotlight)
-            spotlight.style.opacity = '1';
-            spotlight.style.setProperty('--x', `${x}px`);
-            spotlight.style.setProperty('--y', `${y}px`);
-
-            // تحديث لون الضوء ديناميكياً بناءً على الموقع (اختياري لجمالية أكثر)
-            // يغير اللون بين الأزرق والبنفسجي حسب العرض
-            const xPercent = x / window.innerWidth;
-            const hue = 200 + (xPercent * 60); 
-            spotlight.style.background = `radial-gradient(600px circle at var(--x) var(--y), hsla(${hue}, 80%, 60%, 0.15), transparent 40%)`;
-
-            // 2. تحديث العناصر العائمة (Parallax)
-            requestAnimationFrame(() => {
-                parallaxElements.forEach(el => {
-                    const speed = parseFloat(el.getAttribute('data-speed')) || 2;
-                    
-                    // الحركة عكس اتجاه الماوس لعمل عمق
-                    const xPos = (window.innerWidth - x * speed) / 100; 
-                    const yPos = (window.innerHeight - y * speed) / 100;
-                    
-                    el.style.transform = `translate(${xPos}px, ${yPos}px)`;
-                });
-            });
-        });
-
-        // إخفاء الضوء عند مغادرة النافذة
-        document.addEventListener('mouseleave', () => {
-            spotlight.style.opacity = '0';
-        });
-    }
-
-})();
 
 function handleSpotlight(e) {
         const card = e.currentTarget;
@@ -5213,12 +5995,68 @@ function handleSpotlight(e) {
                 grid.appendChild(card);
             });
 
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-
         } catch (error) {
             console.error('Error:', error);
         }
     }
-    </script>
+/**
+ * ==========================================
+ * Centralized Lucide Icon Handler (Auto-Run)
+ * ==========================================
+ */
+
+// 1. الدالة المركزية لتحديث الأيقونات
+// جعلناها window.refreshIcons لتتمكن من استدعائها يدوياً إذا لزم الأمر في حالات نادرة
+window.refreshIcons = function(container = document) {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({
+            root: container,
+            attrs: {
+                class: "lucide-icon" // كلاس موحد لتسهيل التنسيق بـ CSS
+            }
+        });
+    }
+};
+
+// 2. التشغيل عند تحميل الصفحة لأول مرة
+document.addEventListener('DOMContentLoaded', () => {
+    window.refreshIcons();
+});
+
+// 3. مراقب التغييرات الذكي (MutationObserver)
+// هذا الجزء هو "السحر" الذي يغنيك عن استدعاء الدالة 30 مرة
+const iconObserver = new MutationObserver((mutations) => {
+    let needsUpdate = false;
+
+    mutations.forEach((mutation) => {
+        // نتحقق فقط إذا تمت إضافة عناصر جديدة (Nodes Added)
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            // تحسين للأداء: نتحقق سريعاً هل العناصر المضافة هي عناصر HTML
+            // (نتجاهل النصوص الفارغة والتعليقات)
+            for (let i = 0; i < mutation.addedNodes.length; i++) {
+                const node = mutation.addedNodes[i];
+                if (node.nodeType === 1) { // 1 = Element
+                    needsUpdate = true;
+                    break; 
+                }
+            }
+        }
+    });
+
+    // إذا وجدنا عناصر جديدة، نقوم بتحديث الأيقونات
+    // نستخدم Debounce بسيط لمنع التكرار المفرط إذا تمت إضافة عناصر كثيرة بسرعة
+    if (needsUpdate) {
+        if (window.iconUpdateTimeout) clearTimeout(window.iconUpdateTimeout);
+        window.iconUpdateTimeout = setTimeout(() => {
+            window.refreshIcons(); 
+        }, 10); // تأخير بسيط جداً (10ms) لضمان الأداء
+    }
+});
+
+// بدء المراقبة على كامل الصفحة
+iconObserver.observe(document.body, {
+    childList: true,  // مراقبة إضافة/حذف العناصر
+    subtree: true     // مراقبة جميع العناصر المتداخلة (ليس فقط الأبناء المباشرين)
+});    </script>
 </body>
 </html>
