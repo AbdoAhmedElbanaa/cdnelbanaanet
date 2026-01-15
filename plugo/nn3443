@@ -4487,43 +4487,54 @@ window.addEventListener('load', () => {
             }
         };
 
-        window.toggleTheme = function() {
-            const html = document.documentElement;
-            
-            // 1. استخدام requestAnimationFrame لمنع تهنيج المتصفح أثناء إعادة تلوين الصفحة
-            requestAnimationFrame(() => {
-                const current = html.getAttribute('data-theme');
-                const newTheme = current === 'light' ? 'dark' : 'light';
-                
-                // تبديل الثيم
-                html.setAttribute('data-theme', newTheme);
-                if (newTheme === 'dark') {
-                    html.classList.add('dark');
-                } else {
-                    html.classList.remove('dark');
+window.toggleTheme = function() {
+    const html = document.documentElement;
+    
+    // استخدام requestAnimationFrame لأداء سلس
+    requestAnimationFrame(() => {
+        const current = html.getAttribute('data-theme');
+        const newTheme = current === 'light' ? 'dark' : 'light';
+        
+        // 1. تطبيق الوضع على العنصر الأساسي
+        html.setAttribute('data-theme', newTheme);
+        if (newTheme === 'dark') {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        
+        // 2. الحفظ في الذاكرة
+        localStorage.setItem('theme', newTheme);
+
+        // 3. تحديث الرسوم البيانية (Dashboard Charts)
+        if(typeof state !== 'undefined' && state.activeSection === 'overview' && state.view === 'dashboard') {
+            setTimeout(() => {
+                if (typeof Actions !== 'undefined' && Actions.initAnalyticsCharts) {
+                    Actions.initAnalyticsCharts();
                 }
-                
-                // حفظ الإعداد
-                localStorage.setItem('theme', newTheme);
+            }, 100);
+        }
 
-                // ============================================================
-                // هام جداً: قمنا بحذف lucide.createIcons() من هنا
-                // لأن الألوان تتغير تلقائياً بالـ CSS ولا داعي لإعادة الرسم
-                // مما يحل مشكلة التعليق تماماً.
-                // ============================================================
+        // 4. تحديث المعاينة الحية (Live Preview Iframe)
+        // إذا كان المودال مفتوحاً، نقوم بإعادة تحميل الـ iframe ليأخذ الثيم الجديد
+        const previewModal = document.getElementById('previewModal');
+        const previewFrame = document.getElementById('previewFrame');
+        if (previewModal && !previewModal.classList.contains('hidden') && previewFrame) {
+            // إضافة تأثير بسيط ليعرف المستخدم أن التحديث جارٍ
+            previewFrame.style.opacity = '0.5';
+            setTimeout(() => {
+                // إعادة تعيين الرابط لتحديث المحتوى
+                const currentSrc = previewFrame.src;
+                previewFrame.src = '';
+                previewFrame.src = currentSrc;
+                previewFrame.style.opacity = '1';
+            }, 200);
+        }
 
-                // تحديث الرسوم البيانية فقط (لأنها تحتاج إعادة رسم بالألوان الجديدة)
-                if(typeof state !== 'undefined' && state.activeSection === 'overview' && state.view === 'dashboard') {
-                    // نستخدم setTimeout بسيط لنعطي المتصفح نفساً
-                    setTimeout(() => {
-                        if (typeof Actions !== 'undefined' && Actions.initAnalyticsCharts) {
-                            Actions.initAnalyticsCharts();
-                        }
-                    }, 100);
-                }
-            });
-        };
-
+        // 5. إجبار أي مكتبات أخرى على استشعار التغيير (Dispatch Event)
+        window.dispatchEvent(new Event('themeChanged'));
+    });
+};
 
 
         const SECRET_KEY = "AbdoABDOelbanaELBANAbassantBASSANT29920051102004";
