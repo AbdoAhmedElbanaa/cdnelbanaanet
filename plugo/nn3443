@@ -1279,6 +1279,16 @@ html[dir="ltr"] .mobile-drawer.active {
 </style>
 </head>
 <body class="selection:bg-blue-500 selection:text-white antialiased">
+
+    
+
+    <!-- مكتبة AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(function renderPage() {
+
+  const html = `
 <div id="global-mouse-container" class="fixed inset-0 z-[1] overflow-hidden pointer-events-none">
     
     <div id="global-spotlight" class="absolute inset-0 opacity-0 transition-opacity duration-500" 
@@ -2327,12 +2337,12 @@ html[dir="ltr"] .mobile-drawer.active {
 
         </div>
     </div>
-</div>
-    <!-- مكتبة AOS JS -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</div>  `;
 
-    <script>
+  document.body.insertAdjacentHTML('afterbegin', html);
+
+})();
+
         // --- Data Source URLs ---
         const DOCS_API_URL = "https://raw.githubusercontent.com/PLugo-AI/home/refs/heads/main/assets/json/docs.json";
         const VERSIONS_API_URL = "https://raw.githubusercontent.com/AbdoAhmedElbanaa/cdnelbanaanet/refs/heads/main/plugo/vers.json";
@@ -6069,5 +6079,10 @@ iconObserver.observe(document.body, {
     childList: true,  // مراقبة إضافة/حذف العناصر
     subtree: true     // مراقبة جميع العناصر المتداخلة (ليس فقط الأبناء المباشرين)
 });    </script>
+
+
+
+
+
 </body>
 </html>
