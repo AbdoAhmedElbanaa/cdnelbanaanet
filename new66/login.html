@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MikroTik Luxury Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/all.min.css">
+    <!-- ✅ GSAP Library Added -->
+    <script src="./assets/gsap.min.js"></script>
+    <link rel="stylesheet" href="./assets/style.css" />
+
+</head>
+<body data-theme="light">
+
+    <div class="bg-anim-layer" id="bg-layer">
+        <!-- JS Rain -->
+    </div>
+
+    <header>
+        <!-- 🟢 STAGE 2: HEADER NETWORK IDENTITY (Right side in RTL) -->
+        <div class="header-net-identity" id="header-identity">
+            <div class="net-icon-box">
+                <!-- Original Logo Image with Fallback -->
+                <img src="assets/logo.png" alt="Logo" class="net-logo-small" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3670/3670157.png'">
+                <div class="net-pulse"></div>
+            </div>
+            <div class="net-info">
+                <div class="net-name">Trend Networks</div>
+                <div class="net-desc"><div class="net-dot"></div> <span>Internet Provider</span></div>
+            </div>
+        </div>
+
+        <!-- Left Controls (Clock + Theme Toggle) -->
+        <div class="header-controls-left">
+            <div class="clock-pill">
+                <i class="far fa-clock" style="color:var(--accent)"></i>
+                <span id="clock">00:00</span>
+            </div>
+            <div class="theme-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <main>
+        <!-- 🎬 STAGE 1: EXISTING INTRO STAGE (Kept exactly as is) -->
+        <div class="intro-stage" id="intro-container">
+            <div class="intro-particles-container" id="intro-particles"></div> 
+            
+            <div class="logo-wrapper">
+                <div class="logo-ring ring-1"></div>
+                <div class="logo-ring ring-2"></div>
+                <div class="logo-glow" id="anim-glow"></div>
+                <img src="assets/logo.png" alt="Logo" class="main-logo-img" id="anim-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3670/3670157.png'">
+            </div>
+            
+            <div class="text-content">
+                <div class="brand-name-container" id="txt-brand-container" dir="ltr"></div>
+                <div class="brand-slogan" id="txt-slogan">internet provider 🚀</div>
+            </div>
+        </div>
+
+        <!-- 🔥 STAGE 3: NEW MAIN CAFÉ HERO INTRO (Inserted Here) -->
+        <div class="cafe-hero-section" id="cafe-hero">
+            
+            <!-- Pulse Background System -->
+            <div class="cafe-bg-pulse-layer" id="cafe-pulse-layer">
+                <!-- SVGs injected via JS for cleaner HTML -->
+            </div>
+
+            <!-- Smoke Layer -->
+            <svg class="smoke-svg-layer" viewBox="0 0 200 300">
+                <defs>
+                    <filter id="smokeBlur">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+                    </filter>
+                    <radialGradient id="smokeGrad">
+                        <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0.4" />
+                        <stop offset="100%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
+                    </radialGradient>
+                </defs>
+                <g id="smoke-group" filter="url(#smokeBlur)"></g>
+            </svg>
+
+            <!-- Logo & Wifi Waves -->
+            <div class="cafe-logo-container">
+                <div class="wifi-wave-layer" id="wifi-waves">
+                    <!-- JS Injected Arcs -->
+                </div>
+                
+                <!-- SVG Shisha Logo will be injected here -->
+                
+                <!-- 🌌 GALAXY ORBIT CONTAINER (Moved Here) -->
+                <div id="hero-floating-icons"></div>
+            </div>
+
+            <!-- Text -->
+            <div class="cafe-hero-text">
+                <div class="cafe-3d-name">CAFÉ ROYALE</div>
+                <div class="cafe-hero-desc">Premium Shisha & Lounge</div>
+            </div>
+        </div>
+
+        <!-- 🔹 Main Login Card 🔹 -->
+        <div class="card-container" id="login-card-container">
+            <div class="login-panel" id="main-card">
+                
+                <div class="welcome-zone">
+                    <div class="avatar-wrapper">
+                        <div class="badge-icons-container" id="badge-particles"></div> 
+                        <div class="avatar-circle">
+                            <i class="fas fa-user-astronaut avatar-icon"></i>
+                        </div>
+                        <div class="avatar-pulse" id="avatar-pulse"></div>
+                        <div class="mini-badge mb-1"><i class="fas fa-star"></i></div>
+                        <div class="mini-badge mb-2"><i class="fas fa-check"></i></div>
+                    </div>
+                    
+                    <div class="welcome-title">
+                        <i class="fas fa-sparkles sparkle"></i> أهلاً بك يا بطل <i class="fas fa-sparkles sparkle"></i>
+                    </div>
+
+                    <div class="badge-viewport" id="badges-container">
+                        <!-- Badges cycled via JS -->
+                    </div>
+                </div>
+
+                <form action="$(link-login-only)" method="post" onsubmit="return validate()">
+                    <input type="hidden" name="dst" value="$(link-orig)" />
+                    <input type="hidden" name="popup" value="true" />
+                    <input type="hidden" name="password" value=""> 
+
+                    <div class="input-box">
+                        <i class="fas fa-ticket-alt input-icon"></i>
+                        <input type="tel" name="username" class="main-input" placeholder="رقم الكارت..." value="$(username)" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+
+                    <button type="submit" class="btn-action" id="login-btn">
+                        <div class="shine-effect"></div>
+                        <i class="fas fa-wifi btn-deco-icon left"></i>
+                        <span>تسجيل دخول</span>
+                        <i class="fas fa-bolt btn-deco-icon right"></i>
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </form>
+                <div id="mt-error" style="display:none">$(error)</div>
+            </div>
+        </div>
+
+        <!-- 🌀 Hub Section 🌀 -->
+        <div class="hub-section" id="hub-section">
+            <div class="hub-container" id="hub-container">
+                <div class="hub-grid">
+                    <div class="hub-btn hb-about" onclick="openModal('about')">
+                        <i class="fas fa-info-circle hub-icon"></i>
+                        <span class="hub-label">من نحن</span>
+                    </div>
+                    <div class="hub-btn hb-join" onclick="openModal('join')">
+                        <i class="fas fa-rocket hub-icon"></i>
+                        <span class="hub-label">انضم لنا</span>
+                    </div>
+                    <div class="hub-btn hb-menu" onclick="openModal('menu')">
+                        <i class="fas fa-th-large hub-icon"></i>
+                        <span class="hub-label">القائمة</span>
+                    </div>
+                </div>
+
+                <div class="hub-vis-shape shape-1"></div>
+                <div class="hub-vis-shape shape-2"></div>
+            </div>
+        </div>
+
+        <!-- 📞 Customer Service Footer (Redesigned) 📞 -->
+        <div class="cs-section" id="cs-section">
+            <div class="cs-contacts" id="cs-contacts">
+                <div class="cs-brand-side">
+                     <div class="cs-logo-bubble">
+                        <i class="fas fa-building"></i>
+                     </div>
+                     <div class="cs-text-group">
+                        <div class="cs-main-txt">تواصل مع الشركة</div>
+                        <div class="cs-sub-txt">Trend Networks لخدمات الإنترنت</div>
+                     </div>
+                </div>
+                <a href="tel:01500066652" class="cs-phone-btn">
+                    <span class="cs-phone-val">01500066652</span>
+                    <div class="cs-phone-label">دعم فني <i class="fas fa-headset"></i></div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- NEW TOAST STRUCTURE -->
+    <div id="toast"></div>
+
+    <!-- 🛑 STATIC MODAL OVERLAY (Controlled via display) -->
+    <div id="static-modal-overlay" class="modal-overlay" style="display: none;"></div>
+
+    <script>
+        const BRAND = "Trend Networks"; 
+        const JOIN_NUMBER = "01500066652"; 
+        
+        // --- Modal Templates ---
+        const modalTemplates = {
+            'about': `
+                <div class="modal-box">
+                    <button class="modal-close" type="button"><i class="fas fa-times"></i></button>
+                    <div class="modal-icon-header about-header"><i class="fas fa-building"></i></div>
+                    <h3 class="modal-title">من نحن</h3>
+                    <p class="modal-desc">نحن <strong style="color:var(--primary)">Trends Networks</strong>، المزود الرائد لخدمات الإنترنت فائق السرعة.</p>
+                    <div style="text-align:right; font-size:0.9rem; color:var(--text-muted); line-height:1.8;">
+                        <p><i class="fas fa-check-circle" style="color:var(--success); margin-left:5px;"></i> خبرة أكثر من 10 سنوات.</p>
+                        <p><i class="fas fa-check-circle" style="color:var(--success); margin-left:5px;"></i> دعم فني حقيقي 24 ساعة.</p>
+                    </div>
+                    <div class="about-social-grid">
+                        <a href="https://wa.me/201500066652" target="_blank" class="social-btn sb-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
+                        <a href="mailto:support@trendnet.com" class="social-btn sb-mail"><i class="fas fa-envelope"></i> ايميل</a>
+                    </div>
+                </div>
+            `,
+            'join': `
+                <div class="modal-box">
+                    <button class="modal-close" type="button"><i class="fas fa-times"></i></button>
+                    <div class="modal-icon-header join-header"><i class="fas fa-hand-shake"></i></div>
+                    <h3 class="modal-title">كن جزءاً من العائلة!</h3>
+                    <p class="modal-desc">انضم لفريقنا وابدأ مشوار نجاح جديد 💪
+الرقم موجود تحت  تواصل معانا في أي وقت..</p>
+                    <div class="number-display">
+                        <span style="font-size:0.8rem; color:var(--text-muted)">رقم الهاتف</span>
+                        <span class="the-number" id="join-number">01500066652</span>
+                    </div>
+                    <div class="join-actions">
+                        <button class="btn-modal btn-copy" onclick="copyNumber()"><i class="fas fa-copy"></i> نسخ الرقم</button>
+                        <button class="btn-modal btn-save" onclick="saveContact()"><i class="fas fa-user-plus"></i> تسجيل الرقم</button>
+                    </div>
+                </div>
+            `,
+            'menu': `
+                <div class="modal-box">
+                    <button class="modal-close" type="button"><i class="fas fa-times"></i></button>
+                    <div class="menu-viewport">
+                        <div class="menu-view active-view" id="menu-view-main">
+                            <div class="menu-header-area">
+                                <div class="modal-icon-header menu-header"><i class="fas fa-th-large"></i></div>
+                                <h3 class="modal-title">القائمة الرئيسية</h3>
+                            </div>
+                            <ul class="menu-list">
+                                <li class="menu-item" onclick="openSubMenu('speeds')"><span><i class="fas fa-tachometer-alt" style="margin-left:10px; color:var(--cyan)"></i>باقات السرعة</span><i class="fas fa-chevron-left"></i></li>
+                                <li class="menu-item" onclick="openSubMenu('prices')"><span><i class="fas fa-tags" style="margin-left:10px; color:var(--gold)"></i>الأسعار والعروض</span><i class="fas fa-chevron-left"></i></li>
+                                <li class="menu-item" onclick="openSubMenu('apps')"><span><i class="fas fa-mobile-alt" style="margin-left:10px; color:var(--success)"></i>تطبيقاتنا</span><i class="fas fa-chevron-left"></i></li>
+                                <li class="menu-item" onclick="openSubMenu('cafe-menu')"><span><i class="fas fa-coffee" style="margin-left:10px; color:var(--gold)"></i>مينو الكافية</span><i class="fas fa-chevron-left"></i></li>
+                                <li class="menu-item" onclick="openSubMenu('branches')"><span><i class="fas fa-map-marker-alt" style="margin-left:10px; color:var(--danger)"></i>فروعنا</span><i class="fas fa-chevron-left"></i></li>
+                            </ul>
+                        </div>
+                        <div class="menu-view" id="menu-view-speeds">
+                            <div class="back-btn-row" onclick="backToMain()"><i class="fas fa-arrow-right"></i> رجوع</div>
+                            <h3 class="modal-title">باقات السرعة</h3>
+                            <ul class="menu-list">
+                                <li class="menu-item"><span>🚀 باقة 5 ميجا</span> <small>للتصفح</small></li>
+                                <li class="menu-item"><span>⚡ باقة 10 ميجا</span> <small>للألعاب</small></li>
+                            </ul>
+                        </div>
+                        <div class="menu-view" id="menu-view-prices">
+                            <div class="back-btn-row" onclick="backToMain()"><i class="fas fa-arrow-right"></i> رجوع</div>
+                            <h3 class="modal-title">الأسعار</h3>
+                            <ul class="menu-list">
+                                <li class="menu-item"><span>50 جنيه</span> <small>5 ميجا</small></li>
+                            </ul>
+                        </div>
+                         <div class="menu-view" id="menu-view-apps">
+                            <div class="back-btn-row" onclick="backToMain()"><i class="fas fa-arrow-right"></i> رجوع</div>
+                            <h3 class="modal-title">التطبيقات</h3>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px">
+                                <div class="hub-btn" style="border-color:var(--primary)"><i class="fab fa-google-play hub-icon"></i><small>Android</small></div>
+                                <div class="hub-btn" style="border-color:var(--text-main)"><i class="fab fa-apple hub-icon"></i><small>iOS</small></div>
+                            </div>
+                        </div>
+                        <!-- ☕ NEW CAFE MENU VIEW -->
+                        <div class="menu-view" id="menu-view-cafe-menu">
+                            <div class="back-btn-row" onclick="backToMain()"><i class="fas fa-arrow-right"></i> رجوع</div>
+                            <h3 class="modal-title">قائمة الكافية</h3>
+                            <div class="cafe-menu-grid">
+                                <img src="assets/menu1.jpg" alt="Menu Page 1" class="menu-img" onerror="this.src='https://placehold.co/300x400?text=Menu+Page+1'">
+                                <img src="assets/menu2.jpg" alt="Menu Page 2" class="menu-img" onerror="this.src='https://placehold.co/300x400?text=Menu+Page+2'">
+                            </div>
+                        </div>
+                        <div class="menu-view" id="menu-view-branches">
+                            <div class="back-btn-row" onclick="backToMain()"><i class="fas fa-arrow-right"></i> رجوع</div>
+                            <h3 class="modal-title">فروعنا</h3>
+                            <div class="branch-list">
+                                <div class="branch-card"><div class="branch-img-box"><i class="fas fa-city"></i></div><div class="branch-info"><div class="branch-name">فرع القاهرة</div></div><div class="branch-action"><i class="fas fa-location-arrow"></i></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Clock & Error
+            setInterval(() => document.getElementById('clock').innerText=new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 1000);
+            handleError();
+            
+            if (typeof gsap === 'undefined') return;
+
+            // ① Background Rain
+            initBackgroundRain();
+
+            // ④ Floating Icons on Cards
+            initFloatingIconsOnCard('.login-panel', ['fa-lock', 'fa-shield-alt', 'fa-key']);
+            initFloatingIconsOnCard('.hub-container', ['fa-cube', 'fa-layer-group', 'fa-rocket']);
+            initFloatingIconsOnCard('.cs-contacts', ['fa-headset', 'fa-comments', 'fa-user-clock']);
+            
+            // ⑤ Button Pulse
+            startLoginButtonPulse();
+
+            // 🌟 Cinematic Intro Setup
+            initCinematicIntro();
+            
+            // 🔥 Setup New Café Hero (SVGs etc)
+            setupCafeHeroAssets();
+
+            // --- 🔧 Initial States for Animations ---
+            gsap.set([".card-container", ".hub-section", ".cs-section"], { autoAlpha: 0 }); 
+            gsap.set("#login-btn", { scale: 1 });
+            gsap.set("#header-identity", { autoAlpha: 0, x: -20 });
+            gsap.set("#cafe-hero", { autoAlpha: 0, height: 0, overflow: "hidden", margin: 0 }); // Hidden & Collapsed
+
+            // Master Timeline
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            // --- STAGE 1: EXISTING INTRO ---
+            tl.to("#bg-layer", { duration: 3, scale: 1.1, ease: "sine.inOut" }, 0)
+              // Rings Spin
+              .to(".logo-ring", { rotation: 360, duration: 20, repeat: -1, ease: "none" }, 0)
+              .fromTo(".logo-ring", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.5, stagger: 0.2 }, 0.1)
+              // Logo Boom
+              .fromTo("#anim-logo", 
+                  { scale: 0, rotation: -180 }, 
+                  { scale: 1, rotation: 0, duration: 1.5, ease: "elastic.out(1, 0.5)" }, 
+              0.3)
+              .to("#anim-glow", { duration: 1, opacity: 0.8, scale: 1.2, yoyo: true, repeat: 1 }, 0.5)
+              // Explosion
+              .add(() => { spawnIntroExplosion(); }, 0.5)
+              // Typing
+              .add(() => { animateBrandName(); }, 0.8)
+              // Slogan
+              .to(".brand-slogan", { duration: 1.2, opacity: 1, y: 0, ease: "power2.out" }, 2.0);
+
+            // --- 🟢 STAGE 2: TRANSITION TO HEADER (The "Ascension" Effect) ---
+            // Move Intro Up and Shrink
+            tl.to("#intro-container", { 
+                duration: 1.2, 
+                y: -100, /* Reduced travel distance */
+                scale: 0.4, 
+                opacity: 0, 
+                ease: "power3.inOut" 
+            }, 2.4);
+
+            // Animate Header Identity In (Matching the movement)
+            tl.fromTo("#header-identity", 
+                { y: 40, autoAlpha: 0 },
+                { y: 0, autoAlpha: 1, duration: 0.8, ease: "back.out(1.2)" }, 
+                "<0.5" // Start slightly after intro starts moving up
+            );
+
+            // Pulse effect on the new header element
+            tl.to(".net-pulse", { duration: 0.4, opacity: 1, scale: 1.2, yoyo: true, repeat: 3 }, ">-0.2");
+
+            // 🛑 Collapse the intro container space fully so Café Intro takes its place
+            tl.to("#intro-container", { 
+                height: 0, 
+                minHeight: 0,
+                marginBottom: 0, 
+                padding: 0,
+                duration: 0.8, 
+                ease: "power2.inOut" 
+            }, 2.6); 
+
+            // --- 🔥 STAGE 3: MAIN CAFÉ INTRO ---
+            // Expand Café Hero Container
+            tl.to("#cafe-hero", { 
+                height: "auto", 
+                margin: "0 auto 40px auto", /* Reduced margin */
+                duration: 0.8, 
+                ease: "power2.out" 
+            }, 3.0);
+
+            // Fade in Café Content
+            tl.to("#cafe-hero", { autoAlpha: 1, duration: 0.6 }, 3.2)
+              .fromTo(".cafe-svg-logo", { scale: 0, rotation: 10 }, { scale: 1, rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.6)" }, 3.2)
+              .fromTo(".wifi-real-active", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, stagger: 0.2, duration: 0.5 }, 3.4)
+              // 3D Text
+              .to(".cafe-3d-name", { duration: 1, opacity: 1, rotateX: 0, ease: "back.out(1.5)" }, 3.5)
+              .to(".cafe-hero-desc", { duration: 0.8, opacity: 1, y: 0, ease: "power2.out" }, 3.6)
+              // Trigger Smoke Loop
+              .add(() => { startSmokeAnimation(); startHeroBgPulse(); }, 3.5);
+
+            // --- REVEAL LOGIN CARD (Slightly delayed to let Cafe Intro breathe) ---
+            tl.to("#login-card-container", { duration: 1, y: 0, autoAlpha: 1, ease: "back.out(1.1)" }, 4.0)
+              .from(".login-panel", { y: 60, rotateX: 15 }, "<")
+              .from(".avatar-wrapper", { duration: 0.8, scale: 0, ease: "back.out(1.7)" }, ">0.2");
+
+            tl.to("#hub-section", { duration: 0.8, y: 0, autoAlpha: 1, ease: "power2.out" }, ">0.2")
+              .from(".hub-btn", { duration: 0.6, y: 20, opacity: 0, stagger: 0.1 }, "<0.1")
+              .to("#cs-section", { duration: 0.8, y: 0, autoAlpha: 1 }, ">0.2")
+              .from(".cs-item", { duration: 0.5, scale: 0.8, opacity: 0, stagger: 0.1 }, "<0.2");
+
+            // Start Loops
+            startBadgeCycleSystem();
+            startContinuousAnimations();
+            setupInteractions();
+        });
+
+        // --- ⚙️ NEW LOGIC FOR CAFÉ HERO ---
+
+        function setupCafeHeroAssets() {
+            // 1. Wifi Waves Generator (REAL Signal Bars)
+            const waveContainer = document.getElementById('wifi-waves');
+            waveContainer.innerHTML = ''; // Clear old arcs
+            
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // Create a Standard Wi-Fi Icon Structure (Dot + 3 Arcs)
+            // Using a single SVG for the wifi background to ensure alignment
+            const wifiSvg = document.createElementNS(svgNS, "svg");
+            wifiSvg.setAttribute("viewBox", "0 0 100 100");
+            wifiSvg.style.position = "absolute";
+            wifiSvg.style.width = "100%"; 
+            wifiSvg.style.height = "100%";
+            wifiSvg.style.opacity = "0.2"; // Subtle background effect
+            
+            // Dot
+            const dot = document.createElementNS(svgNS, "circle");
+            dot.setAttribute("cx", "50"); dot.setAttribute("cy", "80"); dot.setAttribute("r", "6");
+            dot.classList.add("wifi-real-active");
+            wifiSvg.appendChild(dot);
+
+            // Arc 1 (Small)
+            const arc1 = document.createElementNS(svgNS, "path");
+            arc1.setAttribute("d", "M35,65 Q50,55 65,65");
+            arc1.setAttribute("fill", "none"); arc1.setAttribute("stroke", "var(--accent)"); 
+            arc1.setAttribute("stroke-width", "6"); arc1.setAttribute("stroke-linecap", "round");
+            arc1.classList.add("wifi-real-active");
+            wifiSvg.appendChild(arc1);
+
+            // Arc 2 (Medium)
+            const arc2 = document.createElementNS(svgNS, "path");
+            arc2.setAttribute("d", "M20,50 Q50,30 80,50");
+            arc2.setAttribute("fill", "none"); arc2.setAttribute("stroke", "var(--accent)"); 
+            arc2.setAttribute("stroke-width", "6"); arc2.setAttribute("stroke-linecap", "round");
+            arc2.classList.add("wifi-real-active");
+            wifiSvg.appendChild(arc2);
+
+            // Arc 3 (Large)
+            const arc3 = document.createElementNS(svgNS, "path");
+            arc3.setAttribute("d", "M5,35 Q50,5 95,35");
+            arc3.setAttribute("fill", "none"); arc3.setAttribute("stroke", "var(--accent)"); 
+            arc3.setAttribute("stroke-width", "6"); arc3.setAttribute("stroke-linecap", "round");
+            arc3.classList.add("wifi-real-active");
+            wifiSvg.appendChild(arc3);
+
+            waveContainer.appendChild(wifiSvg);
+
+            // 2. Realistic Shisha Construction
+            const cafeContainer = document.querySelector('.cafe-logo-container');
+            // Remove old cup SVG if it exists (by class or just append new one)
+            const oldSvg = cafeContainer.querySelector('.cafe-svg-logo');
+            if(oldSvg) oldSvg.remove();
+
+            const shishaSvg = document.createElementNS(svgNS, "svg");
+            shishaSvg.setAttribute("viewBox", "0 0 100 200");
+            shishaSvg.classList.add("cafe-svg-logo");
+            
+            // Definitions for Gradients
+            const defs = document.createElementNS(svgNS, "defs");
+            shishaSvg.appendChild(defs);
+
+            // Glass Gradient (Flask)
+            const glassGrad = document.createElementNS(svgNS, "radialGradient");
+            glassGrad.setAttribute("id", "glassGrad");
+            glassGrad.setAttribute("cx", "50%"); glassGrad.setAttribute("cy", "50%"); glassGrad.setAttribute("r", "50%");
+            glassGrad.innerHTML = '<stop offset="0%" style="stop-color:rgba(255,255,255,0.1)" /><stop offset="80%" style="stop-color:rgba(200,200,255,0.3)" /><stop offset="100%" style="stop-color:rgba(255,255,255,0.5)" />';
+            defs.appendChild(glassGrad);
+
+            // Water Gradient
+            const waterGrad = document.createElementNS(svgNS, "linearGradient");
+            waterGrad.setAttribute("id", "waterGrad");
+            waterGrad.setAttribute("x1", "0%"); waterGrad.setAttribute("y1", "100%"); waterGrad.setAttribute("x2", "0%"); waterGrad.setAttribute("y2", "0%");
+            waterGrad.innerHTML = '<stop offset="0%" style="stop-color:#1e3a8a" /><stop offset="100%" style="stop-color:#3b82f6" />';
+            defs.appendChild(waterGrad);
+
+            // Gold/Brass Gradient
+            const goldGrad = document.createElementNS(svgNS, "linearGradient");
+            goldGrad.setAttribute("id", "goldGrad");
+            goldGrad.innerHTML = '<stop offset="0%" style="stop-color:#b45309" /><stop offset="50%" style="stop-color:#fbbf24" /><stop offset="100%" style="stop-color:#b45309" />';
+            defs.appendChild(goldGrad);
+
+            // -- Shisha Parts --
+            
+            // 1. Flask Base (Glass)
+            const flask = document.createElementNS(svgNS, "path");
+            flask.setAttribute("d", "M25,190 C10,190 10,140 25,130 L40,110 L60,110 L75,130 C90,140 90,190 75,190 Z");
+            flask.setAttribute("fill", "url(#glassGrad)");
+            flask.setAttribute("stroke", "rgba(255,255,255,0.4)");
+            flask.setAttribute("stroke-width", "1");
+            shishaSvg.appendChild(flask);
+
+            // Water inside
+            const water = document.createElementNS(svgNS, "path");
+            water.setAttribute("d", "M28,185 C15,185 15,150 28,145 L72,145 C85,150 85,185 72,185 Z");
+            water.setAttribute("fill", "url(#waterGrad)");
+            water.setAttribute("opacity", "0.6");
+            shishaSvg.appendChild(water);
+
+            // 2. Stem (Metal)
+            const stem = document.createElementNS(svgNS, "rect");
+            stem.setAttribute("x", "46"); stem.setAttribute("y", "50");
+            stem.setAttribute("width", "8"); stem.setAttribute("height", "60");
+            stem.setAttribute("fill", "url(#goldGrad)");
+            shishaSvg.appendChild(stem);
+
+            // Stem Decoration (Bulb)
+            const bulb = document.createElementNS(svgNS, "ellipse");
+            bulb.setAttribute("cx", "50"); bulb.setAttribute("cy", "80");
+            bulb.setAttribute("rx", "8"); bulb.setAttribute("ry", "12");
+            bulb.setAttribute("fill", "url(#goldGrad)");
+            shishaSvg.appendChild(bulb);
+
+            // 3. Tray
+            const tray = document.createElementNS(svgNS, "path");
+            tray.setAttribute("d", "M30,50 L70,50 L65,55 L35,55 Z");
+            tray.setAttribute("fill", "#d4af37");
+            shishaSvg.appendChild(tray);
+
+            // 4. Bowl (Head)
+            const bowl = document.createElementNS(svgNS, "path");
+            bowl.setAttribute("d", "M40,30 L60,30 L55,45 L45,45 Z");
+            bowl.setAttribute("fill", "#78350f"); // Clay color
+            shishaSvg.appendChild(bowl);
+
+            // 5. Hose
+            const hose = document.createElementNS(svgNS, "path");
+            hose.setAttribute("d", "M55,60 C80,60 90,90 90,120 C90,150 80,180 95,190");
+            hose.setAttribute("fill", "none");
+            hose.setAttribute("stroke", "#5b21b6"); // Purple hose
+            hose.setAttribute("stroke-width", "4");
+            hose.setAttribute("stroke-linecap", "round");
+            shishaSvg.appendChild(hose);
+
+            // Handle
+            const handle = document.createElementNS(svgNS, "rect");
+            handle.setAttribute("x", "88"); handle.setAttribute("y", "110");
+            handle.setAttribute("width", "6"); handle.setAttribute("height", "30");
+            handle.setAttribute("fill", "#1e293b");
+            shishaSvg.appendChild(handle);
+
+            cafeContainer.appendChild(shishaSvg);
+
+            // 3. Floating Hero Icons (FontAwesome) - Expanded for Galaxy Effect
+            const iconContainer = document.getElementById('hero-floating-icons');
+            // Clear existing if any re-run
+            iconContainer.innerHTML = '';
+            
+            const icons = ['fa-coffee', 'fa-fire', 'fa-leaf', 'fa-music', 'fa-star', 'fa-bolt', 'fa-cloud', 'fa-snowflake'];
+            icons.forEach((cls, index) => {
+                const i = document.createElement('i');
+                i.className = `fas ${cls} hero-float-icon`;
+                // Distribute angle evenly
+                i.dataset.angle = (index / icons.length) * (Math.PI * 2); 
+                iconContainer.appendChild(i);
+            });
+        }
+
+        function startSmokeAnimation() {
+            const smokeGroup = document.getElementById('smoke-group');
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // Generate smoke particles (Circles) dynamically
+            const particles = [];
+            for(let i=0; i<8; i++) {
+                const p = document.createElementNS(svgNS, "circle");
+                p.setAttribute("cx", "100"); // Center of smoke box
+                p.setAttribute("cy", "200"); // Adjusted start point for smaller size
+                p.setAttribute("r", gsap.utils.random(8, 15));
+                p.classList.add("smoke-particle");
+                smokeGroup.appendChild(p);
+                particles.push(p);
+            }
+
+            particles.forEach((smoke, i) => {
+                // Initial set
+                gsap.set(smoke, { 
+                    opacity: 0, 
+                    y: 0, // Relative to start
+                    scale: 0.5 
+                });
+
+                // Realistic Rise Animation
+                gsap.to(smoke, {
+                    duration: gsap.utils.random(4, 6),
+                    y: -180, // Reduced Rise up distance
+                    x: gsap.utils.random(-30, 30), // Drift left/right
+                    scale: gsap.utils.random(2, 3.5), // Expand
+                    opacity: 0, // Fade out
+                    ease: "power1.out",
+                    repeat: -1,
+                    delay: i * 0.7,
+                    onStart: function() {
+                        // Quick fade in
+                        gsap.to(smoke, { opacity: 0.5, duration: 1 });
+                    }
+                });
+            });
+
+            // Animate Wi-Fi Signal Bars (Real Effect)
+            const bars = document.querySelectorAll('.wifi-real-active');
+            if(bars.length > 0) {
+                // Pulse sequence: dot -> arc1 -> arc2 -> arc3
+                const signalTl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+                signalTl.fromTo(bars, 
+                    { opacity: 0.1 }, 
+                    { opacity: 1, duration: 0.3, stagger: 0.2, ease: "power1.out" }
+                )
+                .to(bars, { opacity: 0.1, duration: 0.3, stagger: 0.1, delay: 0.5 });
+            }
+        }
+
+        function startHeroBgPulse() {
+            const container = document.getElementById('cafe-pulse-layer');
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // Tech/Geo Circles instead of simple strokes
+            for(let i=0; i<3; i++) {
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("viewBox", "0 0 100 100");
+                svg.setAttribute("class", "pulse-shape");
+                // Reduced size from 350px to 250px
+                svg.style.width = "250px"; svg.style.height = "250px";
+                
+                const circle = document.createElementNS(svgNS, "circle");
+                circle.setAttribute("cx", "50"); circle.setAttribute("cy", "50"); circle.setAttribute("r", "45");
+                circle.setAttribute("stroke-dasharray", "10,5"); // Dashed line for tech look
+                svg.appendChild(circle);
+                container.appendChild(svg);
+
+                gsap.fromTo(svg, 
+                    { scale: 0.6, opacity: 0.4, rotation: 0 },
+                    { scale: 1.4, opacity: 0, rotation: 90, duration: 4, repeat: -1, delay: i * 1.5, ease: "power1.out" }
+                );
+            }
+
+            // Animate Hero Floating Icons - 🌌 GALAXY ORBIT SYSTEM 🌌
+            const icons = document.querySelectorAll('.hero-float-icon');
+            
+            icons.forEach((icon, i) => {
+                // Config for orbit
+                const radiusX = gsap.utils.random(90, 140); // Horizontal Radius
+                const radiusY = radiusX * 0.4; // Flattened for 3D perspective effect (Galaxy disk)
+                const startAngle = parseFloat(icon.dataset.angle) || 0;
+                const speed = gsap.utils.random(8, 15); // Duration for one orbit
+                const clockwise = i % 2 === 0 ? 1 : -1; // Some go opposite? No, galaxy usually one way. Let's vary speed mostly.
+                
+                // 1. Orbit Animation
+                // We use a proxy object to animate the 'angle' property
+                let orbitObj = { angle: startAngle };
+                
+                gsap.to(orbitObj, {
+                    angle: startAngle + (Math.PI * 2 * (clockwise ? 1 : 1)), // Full circle
+                    duration: speed,
+                    repeat: -1,
+                    ease: "none",
+                    onUpdate: () => {
+                        // Calculate position based on current angle
+                        const curAngle = orbitObj.angle;
+                        const x = Math.cos(curAngle) * radiusX;
+                        const y = Math.sin(curAngle) * radiusY;
+                        
+                        // Z-index sorting for 3D effect (objects in front vs back)
+                        const zScale = (Math.sin(curAngle) + 1) / 2; // 0 (back) to 1 (front)
+                        const scale = 0.8 + (zScale * 0.5); // Scale between 0.8 and 1.3
+                        const opacity = 0.5 + (zScale * 0.5); // Fade slightly at back
+                        const zIndex = Math.sin(curAngle) > 0 ? 20 : 5; // Behind or in front of logo
+
+                        gsap.set(icon, {
+                            x: x,
+                            y: y,
+                            scale: scale,
+                            opacity: opacity,
+                            zIndex: zIndex
+                        });
+                    }
+                });
+
+                // 2. Breathing/Floating Self-Animation (The "متنفسه" part)
+                gsap.to(icon, {
+                    rotation: gsap.utils.random(-20, 20),
+                    duration: gsap.utils.random(2, 4),
+                    yoyo: true,
+                    repeat: -1,
+                    ease: "sine.inOut"
+                });
+                
+                // Color pulse
+                gsap.to(icon, {
+                    color: i % 2 === 0 ? "var(--gold)" : "var(--primary)",
+                    duration: gsap.utils.random(3, 6),
+                    repeat: -1,
+                    yoyo: true
+                });
+            });
+        }
+
+
+        // --- ⚙️ Logic Functions (Original) ---
+
+        // 🌟 Cinematic Intro Functions
+        function initCinematicIntro() {
+            // Prepare Text for 3D Reveal
+            const brandContainer = document.getElementById('txt-brand-container');
+            brandContainer.innerHTML = '';
+            BRAND.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.className = 'brand-char';
+                span.innerText = char;
+                brandContainer.appendChild(span);
+            });
+            // Add Cursor
+            const cursor = document.createElement('span');
+            cursor.id = 'cursor'; cursor.innerText = '';
+            brandContainer.appendChild(cursor);
+        }
+
+        function animateBrandName() {
+            gsap.to(".brand-char", {
+                opacity: 1, rotateX: 0, y: 0,
+                duration: 0.8, stagger: 0.1,
+                ease: "back.out(1.7)",
+                onComplete: () => {
+                    // Remove cursor after typing
+                    setTimeout(() => { gsap.to("#cursor", { opacity: 0 }); }, 1000);
+                }
+            });
+        }
+
+        function spawnIntroExplosion() {
+            const container = document.getElementById('intro-particles');
+            const icons = ['fa-bolt', 'fa-star', 'fa-wifi', 'fa-rocket', 'fa-atom'];
+            
+            for(let i=0; i<12; i++) {
+                const icon = document.createElement('i');
+                icon.className = `fas ${icons[i % icons.length]} intro-particle`;
+                
+                // Random Start
+                gsap.set(icon, { x: 0, y: 0, scale: 0, opacity: 1 });
+                container.appendChild(icon);
+
+                // Calculate Explosion Trajectory
+                const angle = Math.random() * Math.PI * 2;
+                const distance = gsap.utils.random(60, 120); // Reduced distance
+                
+                gsap.to(icon, {
+                    x: Math.cos(angle) * distance,
+                    y: Math.sin(angle) * distance,
+                    scale: gsap.utils.random(0.5, 1.5),
+                    rotation: gsap.utils.random(0, 360),
+                    duration: gsap.utils.random(1, 2),
+                    ease: "power4.out",
+                    onComplete: () => {
+                        gsap.to(icon, { opacity: 0, duration: 0.5 });
+                    }
+                });
+            }
+        }
+
+        // ① Background Rain
+        function initBackgroundRain() {
+            const container = document.getElementById('bg-layer');
+            if(!container) return;
+            const icons = ['fa-wifi', 'fa-bolt', 'fa-network-wired', 'fa-signal'];
+            for(let i=0; i<15; i++) {
+                const icon = document.createElement('i');
+                icon.className = `fas ${icons[i % icons.length]} bg-rain-icon`;
+                gsap.set(icon, {
+                    left: gsap.utils.random(0, 100) + '%',
+                    top: gsap.utils.random(-100, -20) + '%',
+                    fontSize: gsap.utils.random(10, 25) + 'px',
+                    opacity: gsap.utils.random(0.05, 0.15)
+                });
+                container.appendChild(icon);
+                gsap.to(icon, {
+                    y: window.innerHeight + 100,
+                    duration: gsap.utils.random(6, 15),
+                    repeat: -1, ease: "none", delay: gsap.utils.random(0, 5)
+                });
+            }
+        }
+
+        // ④ Floating Icons Inside Cards
+        function initFloatingIconsOnCard(selector, iconsList) {
+            const el = document.querySelector(selector);
+            if(!el) return;
+            if(window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
+
+            for(let i=0; i<4; i++) {
+                const ic = document.createElement('i');
+                ic.className = `fas ${iconsList[i % iconsList.length]} card-float-icon`;
+                gsap.set(ic, {
+                    top: gsap.utils.random(10, 90) + '%',
+                    left: gsap.utils.random(5, 95) + '%',
+                    fontSize: gsap.utils.random(14, 28) + 'px',
+                    rotation: gsap.utils.random(-30, 30)
+                });
+                el.appendChild(ic);
+                gsap.to(ic, {
+                    y: gsap.utils.random(-15, 15),
+                    rotation: gsap.utils.random(-45, 45),
+                    duration: gsap.utils.random(3, 6),
+                    repeat: -1, yoyo: true, ease: "sine.inOut", delay: gsap.utils.random(0, 2)
+                });
+            }
+        }
+
+        // ② Improved Badge System
+        const badgeData = [
+            { class: 'bdg-speed', icon: 'fa-bolt', text: 'سرعة صاروخية', color: 'var(--cyan)', float: ['fa-wind', 'fa-tachometer-alt'] },
+            { class: 'bdg-secure', icon: 'fa-shield-alt', text: 'حماية كاملة', color: 'var(--purple)', float: ['fa-lock', 'fa-user-shield'] },
+            { class: 'bdg-game', icon: 'fa-gamepad', text: 'Ping منخفض', color: 'var(--gold)', float: ['fa-chess-knight', 'fa-trophy'] },
+            { class: 'bdg-user', icon: 'fa-users', text: 'اتصال مستقر', color: 'var(--success)', float: ['fa-check-double', 'fa-thumbs-up'] }
+        ];
+
+        function startBadgeCycleSystem() {
+            const container = document.getElementById('badges-container');
+            let idx = 0;
+            
+            function showNextBadge() {
+                container.innerHTML = '';
+                const data = badgeData[idx];
+                
+                const badge = document.createElement('div');
+                badge.className = `info-badge ${data.class}`;
+                badge.innerHTML = `<i class="fas ${data.icon} badge-icon"></i> <span>${data.text}</span>`;
+                container.appendChild(badge);
+
+                gsap.fromTo(badge, 
+                    { y: 30, opacity: 0, scale: 0.8 }, 
+                    { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.5)" }
+                );
+
+                spawnBadgeParticles(data.float, data.color);
+
+                setTimeout(() => {
+                    gsap.to(badge, { y: -30, opacity: 0, scale: 0.9, duration: 0.4, ease: "power2.in" });
+                }, 2500);
+
+                idx = (idx + 1) % badgeData.length;
+                setTimeout(showNextBadge, 3000);
+            }
+            showNextBadge();
+        }
+
+        function spawnBadgeParticles(icons, color) {
+            const pContainer = document.getElementById('badge-particles');
+            pContainer.innerHTML = ''; 
+            
+            for(let i=0; i<6; i++) {
+                const el = document.createElement('i');
+                el.className = `fas ${icons[i%icons.length]} mini-float-icon`;
+                el.style.color = color;
+                
+                gsap.set(el, { left: '50%', top: '50%', x: 0, y: 0, opacity: 0, scale: 0 });
+                pContainer.appendChild(el);
+
+                const angle = (i / 6) * Math.PI * 2;
+                const dist = 60; 
+                gsap.to(el, {
+                    x: Math.cos(angle) * dist,
+                    y: Math.sin(angle) * dist,
+                    opacity: 1, scale: 1,
+                    rotation: gsap.utils.random(-90, 90),
+                    duration: 0.6, ease: "power2.out",
+                    onComplete: () => {
+                        gsap.to(el, { y: "+=20", opacity: 0, duration: 0.8 });
+                    }
+                });
+            }
+        }
+
+        // ⑤ Button Pulse
+        function startLoginButtonPulse() {
+            const btn = document.getElementById('login-btn');
+            if(!btn) return;
+            gsap.to(btn, {
+                scale: 1.03, boxShadow: "0 0 25px rgba(22, 33, 249, 0.6)",
+                duration: 0.4, repeat: -1, yoyo: true, repeatDelay: 2, ease: "power1.inOut"
+            });
+        }
+
+        function startContinuousAnimations() {
+            gsap.to("#avatar-pulse", { scale: 1.6, opacity: 0, duration: 2, repeat: -1 });
+            gsap.to(".hub-vis-shape", { scale: 1.2, opacity: 0.3, duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+            gsap.to(".cs-float-badge", { y: -8, duration: 2.5, repeat: -1, yoyo: true, ease: "sine.inOut", stagger: 0.5 });
+            gsap.to(".login-panel", { y: "+=10", duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        }
+
+        function setupInteractions() {
+            const btn = document.querySelector('.btn-action');
+            if(btn) {
+                btn.addEventListener('mouseenter', () => { gsap.to(btn, { scale: 1.05, boxShadow: "0 0 35px var(--primary)", duration: 0.3, overwrite: 'auto' }); });
+                btn.addEventListener('mouseleave', () => { gsap.to(btn, { scale: 1, boxShadow: "0 10px 30px -5px rgba(234, 88, 12, 0.5)", duration: 0.3 }); startLoginButtonPulse(); });
+                btn.addEventListener('mousedown', () => gsap.to(btn, { scale: 0.95, duration: 0.1 }));
+                btn.addEventListener('mouseup', () => gsap.to(btn, { scale: 1.05, duration: 0.1 }));
+            }
+            document.querySelectorAll('.hub-btn, .cs-item').forEach(el => {
+                el.addEventListener('mouseenter', () => gsap.to(el, { y: -5, duration: 0.3 }));
+                el.addEventListener('mouseleave', () => gsap.to(el, { y: 0, duration: 0.3 }));
+            });
+        }
+
+        // ✅ FIXED MODAL LOGIC (Static Container)
+        const modalOverlay = document.getElementById('static-modal-overlay');
+
+        function openModal(type) {
+            if (!modalOverlay) return;
+            modalOverlay.innerHTML = modalTemplates[type] || '';
+            modalOverlay.style.display = 'flex';
+            
+            const closeBtn = modalOverlay.querySelector('.modal-close');
+            if(closeBtn) {
+                closeBtn.onclick = (e) => { e.stopPropagation(); closeCurrentModal(); };
+            }
+            modalOverlay.onclick = (e) => { if(e.target === modalOverlay) closeCurrentModal(); }
+            document.onkeydown = (e) => { if(e.key === 'Escape') closeCurrentModal(); }
+
+            gsap.killTweensOf(modalOverlay);
+            gsap.killTweensOf(".modal-box");
+            gsap.fromTo(modalOverlay, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+            gsap.fromTo(modalOverlay.querySelector('.modal-box'), 
+                { scale: 0.7, y: 100, opacity: 0 }, 
+                { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }
+            );
+            if(navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function closeCurrentModal() {
+            if (!modalOverlay || modalOverlay.style.display === 'none') return;
+            document.onkeydown = null;
+            modalOverlay.onclick = null;
+            const closeBtn = modalOverlay.querySelector('.modal-close');
+            if(closeBtn) closeBtn.onclick = null;
+
+            const box = modalOverlay.querySelector('.modal-box');
+            if(box) gsap.to(box, { scale: 0.8, opacity: 0, y: 50, duration: 0.25, ease: "power2.in" });
+
+            gsap.to(modalOverlay, { 
+                opacity: 0, duration: 0.25, delay: 0.1, 
+                onComplete: () => {
+                    modalOverlay.style.display = 'none'; 
+                    modalOverlay.innerHTML = ''; 
+                } 
+            });
+        }
+
+        // --- Menu & Helpers ---
+        function openSubMenu(id) {
+            const main = document.getElementById('menu-view-main');
+            if(main) { main.classList.remove('active-view'); main.classList.add('slide-out-left'); }
+            const sub = document.getElementById('menu-view-' + id);
+            if(sub) { setTimeout(() => sub.classList.add('active-view'), 50); }
+        }
+
+        function backToMain() {
+            document.querySelectorAll('.menu-view').forEach(el => { if(el.id !== 'menu-view-main') el.classList.remove('active-view'); });
+            const main = document.getElementById('menu-view-main');
+            if(main) { main.classList.remove('slide-out-left'); main.classList.add('active-view'); }
+        }
+
+        function copyNumber() {
+            const textArea = document.createElement("textarea"); textArea.value = JOIN_NUMBER; document.body.appendChild(textArea); textArea.select();
+            try { document.execCommand('copy'); showToast("تم نسخ الرقم بنجاح!"); } catch (err) { showToast("حدث خطأ"); }
+            document.body.removeChild(textArea);
+        }
+
+        function saveContact() {
+            const blob = new Blob([`BEGIN:VCARD\nVERSION:3.0\nFN:Trends Networks Support\nTEL;TYPE=CELL:${JOIN_NUMBER}\nEND:VCARD`], { type: 'text/vcard' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Meganet_Support.vcf';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("جاري الحفظ...");
+        }
+
+        function toggleTheme() {
+            const b = document.body; const btn = document.querySelector('.theme-btn i');
+            if(b.getAttribute('data-theme')==='dark'){ b.setAttribute('data-theme','light'); btn.className = 'fas fa-sun'; } 
+            else { b.setAttribute('data-theme','dark'); btn.className = 'fas fa-moon'; }
+        }
+
+        /* 🔥 REDESIGNED SHOW TOAST 🔥 */
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            
+            // Dynamic structure for premium look
+            t.innerHTML = `
+                <div class="toast-icon-box"><i class="fas fa-bell"></i></div>
+                <div class="toast-content">
+                    <span class="toast-msg">${m}</span>
+                </div>
+            `;
+            
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline();
+                
+                // Reset states
+                gsap.set(t, { y: 100, opacity: 0 });
+                
+                // Entrance with bounce
+                tl.to(t, { y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.7)" });
+                
+                // Icon Pulse Effect
+                tl.fromTo(".toast-icon-box", 
+                    { scale: 0.5, rotation: -45 }, 
+                    { scale: 1, rotation: 0, duration: 0.6, ease: "elastic.out(1, 0.5)" }, 
+                "-=0.4");
+
+                // Spawn Particles
+                spawnToastParticles(t);
+
+                // Exit after delay
+                tl.to(t, { y: 100, opacity: 0, duration: 0.4, ease: "power2.in", delay: 3 });
+            } 
+            
+            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+
+        function spawnToastParticles(container) {
+            const iconBox = container.querySelector('.toast-icon-box');
+            if(!iconBox) return;
+            
+            const colors = ['var(--gold)', 'var(--primary)', '#fff'];
+            
+            for(let i=0; i<12; i++) {
+                const p = document.createElement('div');
+                p.className = 'toast-particle';
+                p.style.backgroundColor = colors[i % colors.length];
+                
+                // Center on the icon box
+                gsap.set(p, { left: 34, top: 20, scale: 0 }); 
+                container.appendChild(p);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = gsap.utils.random(40, 70);
+                
+                gsap.to(p, {
+                    x: Math.cos(angle) * dist,
+                    y: Math.sin(angle) * dist,
+                    scale: gsap.utils.random(0.5, 1.2),
+                    opacity: 0,
+                    duration: gsap.utils.random(0.6, 1.2),
+                    ease: "power2.out",
+                    onComplete: () => p.remove()
+                });
+            }
+        }
+
+        function handleError() {
+            let e = document.getElementById('mt-error').innerText.trim();
+            if(e && e !== "$(error)") {
+                if(e.includes('invalid')) showToast("بيانات خطأ");
+                else if(e.includes('limit')) showToast("الرصيد انتهى");
+                else if(e.includes('user')) showToast("رقم الكارت خطأ");
+                else showToast("تأكد من الرقم");
+            }
+        }
+
+        function validate() {
+            if(!document.querySelector('input[name="username"]').value) { showToast("اكتب الكارت يا بطل!"); return false; }
+            return true;
+        }
+    </script>
+</body>
+</html>
