@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Modern Admin Dashboard</title>
+    
+    <!-- Original CSS Dependencies (Minimal retention for JS compatibility if needed) -->
+    <link rel="stylesheet" href="https://sell77.doobagency.com/public/assets/back-end/css/vendor.min.css">
+    <link rel="stylesheet" href="https://sell77.doobagency.com/public/assets/back-end/css/theme.minc619.css?v=1.0">
+    
+    <!-- Modern Stack -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            prefix: 'tw-',
+            important: true,
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#073B74',
+                        secondary: '#00C9DB',
+                        success: '#00C9A7',
+                        danger: '#ED4C78',
+                        warning: '#F5CA99',
+                        dark: '#1E2022',
+                        light: '#F8F9FA'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'glow': '0 0 20px rgba(7, 59, 116, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-10px) rotate(5deg); opacity: 0.2; }
+            100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+        }
+        .floating-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Glass Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 1rem;
+        }
+
+        /* Chart Canvas Size Fix */
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body class="tw-bg-slate-50 tw-font-sans tw-text-slate-800">
+
+    <!-- =========================
+         NEW SIDEBAR (Fixed Left)
+         ========================= -->
+    <aside class="tw-fixed tw-inset-y-0 tw-left-0 tw-z-50 tw-w-64 tw-bg-white tw-shadow-xl tw-transform tw-transition-transform tw-duration-300 lg:tw-translate-x-0 tw-hidden lg:tw-block border-r border-slate-100">
+        <!-- Logo Area -->
+        <div class="tw-h-20 tw-flex tw-items-center tw-justify-center tw-border-b tw-border-slate-100">
+            <img class="tw-h-10 tw-w-auto" src="https://sell77.doobagency.com/storage/app/public/company/2025-05-09-681e14c54e3cb.webp" alt="Logo">
+        </div>
+
+        <!-- Navigation -->
+        <nav class="tw-mt-6 tw-px-4 tw-space-y-2">
+            <!-- Dashboard (Active) -->
+            <a href="#" class="tw-flex tw-items-center tw-px-4 tw-py-3 tw-bg-primary/5 tw-text-primary tw-rounded-xl tw-font-medium tw-transition-colors">
+                <svg class="tw-w-5 tw-h-5 tw-mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+
+            <!-- Orders -->
+            <a href="#" class="tw-flex tw-items-center tw-px-4 tw-py-3 tw-text-slate-500 hover:tw-bg-slate-50 hover:tw-text-primary tw-rounded-xl tw-font-medium tw-transition-colors">
+                <svg class="tw-w-5 tw-h-5 tw-mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                All Orders
+                <span class="tw-ml-auto tw-bg-blue-100 tw-text-primary tw-text-xs tw-font-bold tw-px-2 tw-py-0.5 tw-rounded-full">10</span>
+            </a>
+
+            <!-- Products -->
+            <a href="#" class="tw-flex tw-items-center tw-px-4 tw-py-3 tw-text-slate-500 hover:tw-bg-slate-50 hover:tw-text-primary tw-rounded-xl tw-font-medium tw-transition-colors">
+                <svg class="tw-w-5 tw-h-5 tw-mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Products
+            </a>
+
+            <!-- Vendors -->
+            <a href="#" class="tw-flex tw-items-center tw-px-4 tw-py-3 tw-text-slate-500 hover:tw-bg-slate-50 hover:tw-text-primary tw-rounded-xl tw-font-medium tw-transition-colors">
+                <svg class="tw-w-5 tw-h-5 tw-mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                Vendors
+            </a>
+
+            <!-- Customers -->
+            <a href="#" class="tw-flex tw-items-center tw-px-4 tw-py-3 tw-text-slate-500 hover:tw-bg-slate-50 hover:tw-text-primary tw-rounded-xl tw-font-medium tw-transition-colors">
+                <svg class="tw-w-5 tw-h-5 tw-mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Customers
+            </a>
+        </nav>
+        
+        <!-- Bottom User Info -->
+        <div class="tw-absolute tw-bottom-0 tw-w-full tw-p-4 tw-border-t tw-border-slate-100">
+             <div class="tw-flex tw-items-center tw-gap-3">
+                <img class="tw-h-10 tw-w-10 tw-rounded-full" src="https://sell77.doobagency.com/storage/app/public/admin/2025-01-06-677b0921119b6.webp" alt="">
+                <div>
+                    <h6 class="tw-text-sm tw-font-bold tw-text-slate-700">Brandoz</h6>
+                    <p class="tw-text-xs tw-text-slate-500">Master Admin</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- =========================
+         NEW HEADER (Sticky Top)
+         ========================= -->
+    <header class="tw-fixed tw-top-0 tw-right-0 tw-left-0 lg:tw-left-64 tw-z-40 tw-h-20 glass-panel tw-px-8 tw-flex tw-items-center tw-justify-between tw-transition-all tw-duration-300">
+        <!-- Search Bar -->
+        <div class="tw-hidden md:tw-flex tw-items-center tw-w-96 tw-bg-slate-100/50 tw-rounded-full tw-px-4 tw-py-2 tw-border tw-border-slate-200 focus-within:tw-border-primary/50 focus-within:tw-ring-2 focus-within:tw-ring-primary/10 tw-transition-all">
+            <svg class="tw-w-5 tw-h-5 tw-text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" placeholder="Search orders, products..." class="tw-w-full tw-bg-transparent tw-border-none tw-outline-none tw-ml-2 tw-text-sm tw-text-slate-600 placeholder:tw-text-slate-400">
+        </div>
+
+        <!-- Right Actions -->
+        <div class="tw-flex tw-items-center tw-gap-4">
+            <!-- Language -->
+            <button class="tw-p-2 tw-rounded-full hover:tw-bg-slate-100 tw-transition-colors tw-relative group">
+                <img class="tw-w-6" src="https://sell77.doobagency.com/public/assets/front-end/img/flags/en.png" alt="EN">
+            </button>
+
+            <!-- Website -->
+            <a href="https://sell77.doobagency.com" target="_blank" class="tw-p-2 tw-text-slate-500 hover:tw-text-primary hover:tw-bg-blue-50 tw-rounded-full tw-transition-all" title="View Website">
+                <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+            </a>
+
+            <!-- Messages -->
+            <a href="#" class="tw-p-2 tw-text-slate-500 hover:tw-text-primary hover:tw-bg-blue-50 tw-rounded-full tw-transition-all tw-relative">
+                <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                <span class="tw-absolute tw-top-1 tw-right-1 tw-w-2.5 tw-h-2.5 tw-bg-danger tw-rounded-full tw-border-2 tw-border-white"></span>
+            </a>
+
+            <!-- Profile Dropdown Trigger -->
+            <div class="tw-flex tw-items-center tw-gap-2 tw-cursor-pointer tw-pl-2 tw-border-l tw-border-slate-200">
+                <img class="tw-h-9 tw-w-9 tw-rounded-full tw-border-2 tw-border-white tw-shadow-sm" src="https://sell77.doobagency.com/storage/app/public/admin/2025-01-06-677b0921119b6.webp" alt="">
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================
+         MAIN CONTENT (With Sidebar Offset)
+         ========================= -->
+    <main id="content" role="main" class="main pointer-event tw-p-6 tw-pt-28 lg:tw-pl-72 tw-transition-all tw-duration-300">
+        
+        <!-- Welcome Section -->
+        <div class="tw-mb-8" data-aos="fade-down" data-aos-duration="800">
+            <div class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-items-center tw-bg-white tw-p-6 tw-rounded-2xl tw-shadow-soft tw-border-l-4 tw-border-primary">
+                <div>
+                    <h1 class="tw-text-2xl tw-font-bold tw-text-slate-800 tw-mb-1">
+                        Welcome back, <span class="tw-text-primary">Brandoz</span> 👋
+                    </h1>
+                    <p class="tw-text-slate-500 tw-text-sm">Here's what's happening with your store today.</p>
+                </div>
+                <div class="tw-mt-4 md:tw-mt-0">
+                    <span class="tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-bg-blue-50 tw-text-primary tw-rounded-lg tw-font-medium tw-text-sm">
+                        <svg class="tw-w-4 tw-h-4 tw-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Today's Overview
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Business Analytics Grid -->
+        <div class="tw-mb-8">
+            <div class="tw-flex tw-justify-between tw-items-end tw-mb-4" data-aos="fade-right">
+                <h4 class="tw-flex tw-items-center tw-gap-2 tw-font-bold tw-text-slate-700 tw-text-lg">
+                    <span class="tw-p-2 tw-bg-blue-100 tw-rounded-lg tw-text-primary">
+                        <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </span>
+                    Business Analytics
+                </h4>
+                <select class="tw-bg-white tw-border-slate-200 tw-text-slate-600 tw-rounded-lg tw-px-3 tw-py-1 tw-text-sm focus:tw-ring-2 focus:tw-ring-primary tw-outline-none tw-shadow-sm">
+                    <option value="overall">Overall Statistics</option>
+                    <option value="today">Today's Statistics</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+
+            <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-6">
+                <!-- Card 1: Total Orders -->
+                <div class="glass-card tw-relative tw-overflow-hidden tw-p-6 tw-shadow-soft hover:tw-shadow-glow tw-transition-all tw-duration-300 hover:tw--translate-y-1 group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="tw-relative tw-z-10">
+                        <h5 class="tw-text-slate-500 tw-text-sm tw-font-medium tw-mb-2">Total Orders</h5>
+                        <h2 class="tw-text-3xl tw-font-bold tw-text-slate-800">10</h2>
+                        <a href="#" class="tw-text-xs tw-text-primary tw-font-medium tw-mt-2 tw-inline-flex tw-items-center hover:tw-underline">
+                            View Details 
+                            <svg class="tw-w-3 tw-h-3 tw-ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                    <!-- Floating SVG Icon -->
+                    <div class="tw-absolute tw-right-[-20px] tw-bottom-[-20px] tw-text-blue-50 floating-icon tw-z-0 group-hover:tw-text-blue-100 tw-transition-colors">
+                        <svg class="tw-w-32 tw-h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div class="tw-absolute tw-top-4 tw-right-4 tw-p-2 tw-bg-blue-50 tw-rounded-full tw-text-primary">
+                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/all-orders.png" class="tw-w-6 tw-h-6" alt="">
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Stores -->
+                <div class="glass-card tw-relative tw-overflow-hidden tw-p-6 tw-shadow-soft hover:tw-shadow-glow tw-transition-all tw-duration-300 hover:tw--translate-y-1 group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="tw-relative tw-z-10">
+                        <h5 class="tw-text-slate-500 tw-text-sm tw-font-medium tw-mb-2">Total Stores</h5>
+                        <h2 class="tw-text-3xl tw-font-bold tw-text-slate-800">4</h2>
+                        <a href="#" class="tw-text-xs tw-text-success tw-font-medium tw-mt-2 tw-inline-block hover:tw-underline">Active Now</a>
+                    </div>
+                    <div class="tw-absolute tw-right-[-20px] tw-bottom-[-20px] tw-text-green-50 floating-icon tw-z-0 group-hover:tw-text-green-100 tw-transition-colors">
+                        <svg class="tw-w-32 tw-h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <div class="tw-absolute tw-top-4 tw-right-4 tw-p-2 tw-bg-green-50 tw-rounded-full tw-text-success">
+                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/total-stores.png" class="tw-w-6 tw-h-6" alt="">
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Products -->
+                <div class="glass-card tw-relative tw-overflow-hidden tw-p-6 tw-shadow-soft hover:tw-shadow-glow tw-transition-all tw-duration-300 hover:tw--translate-y-1 group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="tw-relative tw-z-10">
+                        <h5 class="tw-text-slate-500 tw-text-sm tw-font-medium tw-mb-2">Total Products</h5>
+                        <h2 class="tw-text-3xl tw-font-bold tw-text-slate-800">203</h2>
+                        <a href="#" class="tw-text-xs tw-text-warning tw-font-medium tw-mt-2 tw-inline-block hover:tw-underline">Inventory</a>
+                    </div>
+                    <div class="tw-absolute tw-right-[-20px] tw-bottom-[-20px] tw-text-orange-50 floating-icon tw-z-0 group-hover:tw-text-orange-100 tw-transition-colors">
+                        <svg class="tw-w-32 tw-h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    </div>
+                    <div class="tw-absolute tw-top-4 tw-right-4 tw-p-2 tw-bg-orange-50 tw-rounded-full tw-text-warning">
+                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/total-product.png" class="tw-w-6 tw-h-6" alt="">
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Customers -->
+                <div class="glass-card tw-relative tw-overflow-hidden tw-p-6 tw-shadow-soft hover:tw-shadow-glow tw-transition-all tw-duration-300 hover:tw--translate-y-1 group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="tw-relative tw-z-10">
+                        <h5 class="tw-text-slate-500 tw-text-sm tw-font-medium tw-mb-2">Total Customers</h5>
+                        <h2 class="tw-text-3xl tw-font-bold tw-text-slate-800">8</h2>
+                        <a href="#" class="tw-text-xs tw-text-purple-500 tw-font-medium tw-mt-2 tw-inline-block hover:tw-underline">View Users</a>
+                    </div>
+                    <div class="tw-absolute tw-right-[-20px] tw-bottom-[-20px] tw-text-purple-50 floating-icon tw-z-0 group-hover:tw-text-purple-100 tw-transition-colors">
+                        <svg class="tw-w-32 tw-h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <div class="tw-absolute tw-top-4 tw-right-4 tw-p-2 tw-bg-purple-50 tw-rounded-full tw-text-purple-500">
+                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/total-customer.png" class="tw-w-6 tw-h-6" alt="">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status Row -->
+            <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-4 tw-gap-4 tw-mt-6">
+                <!-- Pending -->
+                <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-border-b-2 tw-border-blue-400 hover:tw-shadow-md tw-transition-all" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="tw-flex tw-justify-between tw-items-center">
+                        <div class="tw-flex tw-items-center tw-gap-2">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/pending.png" width="20" alt="">
+                            <h6 class="tw-text-sm tw-font-semibold tw-text-slate-600">Pending</h6>
+                        </div>
+                        <span class="tw-bg-blue-100 tw-text-blue-600 tw-px-2 tw-py-0.5 tw-rounded-md tw-text-xs tw-font-bold">9</span>
+                    </div>
+                </div>
+                <!-- Confirmed -->
+                <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-border-b-2 tw-border-green-400 hover:tw-shadow-md tw-transition-all" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="tw-flex tw-justify-between tw-items-center">
+                        <div class="tw-flex tw-items-center tw-gap-2">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/confirmed.png" width="20" alt="">
+                            <h6 class="tw-text-sm tw-font-semibold tw-text-slate-600">Confirmed</h6>
+                        </div>
+                        <span class="tw-bg-green-100 tw-text-green-600 tw-px-2 tw-py-0.5 tw-rounded-md tw-text-xs tw-font-bold">1</span>
+                    </div>
+                </div>
+                <!-- Packaging -->
+                <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-border-b-2 tw-border-yellow-400 hover:tw-shadow-md tw-transition-all" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="tw-flex tw-justify-between tw-items-center">
+                        <div class="tw-flex tw-items-center tw-gap-2">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/packaging.png" width="20" alt="">
+                            <h6 class="tw-text-sm tw-font-semibold tw-text-slate-600">Packaging</h6>
+                        </div>
+                        <span class="tw-bg-yellow-100 tw-text-yellow-600 tw-px-2 tw-py-0.5 tw-rounded-md tw-text-xs tw-font-bold">0</span>
+                    </div>
+                </div>
+                <!-- Delivered -->
+                <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-border-b-2 tw-border-green-600 hover:tw-shadow-md tw-transition-all" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="tw-flex tw-justify-between tw-items-center">
+                        <div class="tw-flex tw-items-center tw-gap-2">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/delivered.png" width="20" alt="">
+                            <h6 class="tw-text-sm tw-font-semibold tw-text-slate-600">Delivered</h6>
+                        </div>
+                        <span class="tw-bg-green-100 tw-text-green-800 tw-px-2 tw-py-0.5 tw-rounded-md tw-text-xs tw-font-bold">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Admin Wallet Section -->
+        <div class="tw-mb-8">
+            <h4 class="tw-flex tw-items-center tw-gap-2 tw-font-bold tw-text-slate-700 tw-text-lg tw-mb-4" data-aos="fade-right">
+                <span class="tw-p-2 tw-bg-slate-800 tw-text-white tw-rounded-lg">
+                    <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                </span>
+                Admin Wallet
+            </h4>
+            
+            <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-6">
+                <!-- Main Balance -->
+                <div class="tw-bg-gradient-to-br tw-from-slate-800 tw-to-slate-900 tw-text-white tw-p-8 tw-rounded-2xl tw-shadow-lg tw-flex tw-flex-col tw-justify-center tw-items-center tw-text-center tw-relative tw-overflow-hidden" data-aos="flip-up">
+                    <div class="tw-absolute tw-top-0 tw-right-0 tw-w-32 tw-h-32 tw-bg-white tw-opacity-5 tw-rounded-full tw--mr-10 tw--mt-10"></div>
+                    <img src="https://sell77.doobagency.com/public/assets/back-end/img/inhouse-earning.png" class="tw-w-16 tw-mb-4 tw-drop-shadow-lg" alt="">
+                    <h3 class="tw-text-4xl tw-font-bold tw-mb-1">$0.00</h3>
+                    <span class="tw-text-slate-400 tw-uppercase tw-tracking-wider tw-text-xs">In-house Earning</span>
+                </div>
+
+                <!-- Sub Wallets -->
+                <div class="lg:tw-col-span-2 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+                    <div class="tw-bg-white tw-p-5 tw-rounded-xl tw-shadow-sm hover:tw-shadow-md tw-flex tw-justify-between tw-items-center tw-border tw-border-slate-100" data-aos="fade-left" data-aos-delay="100">
+                        <div>
+                            <h4 class="tw-text-xl tw-font-bold tw-text-slate-800 tw-mb-1">$0.00</h4>
+                            <span class="tw-text-xs tw-text-slate-500 tw-uppercase">Commission Earned</span>
+                        </div>
+                        <div class="tw-p-3 tw-bg-blue-50 tw-rounded-full">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/ce.png" class="tw-w-8" alt="">
+                        </div>
+                    </div>
+                    
+                    <div class="tw-bg-white tw-p-5 tw-rounded-xl tw-shadow-sm hover:tw-shadow-md tw-flex tw-justify-between tw-items-center tw-border tw-border-slate-100" data-aos="fade-left" data-aos-delay="200">
+                        <div>
+                            <h4 class="tw-text-xl tw-font-bold tw-text-slate-800 tw-mb-1">$0.00</h4>
+                            <span class="tw-text-xs tw-text-slate-500 tw-uppercase">Delivery Charge</span>
+                        </div>
+                        <div class="tw-p-3 tw-bg-green-50 tw-rounded-full">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/dce.png" class="tw-w-8" alt="">
+                        </div>
+                    </div>
+
+                    <div class="tw-bg-white tw-p-5 tw-rounded-xl tw-shadow-sm hover:tw-shadow-md tw-flex tw-justify-between tw-items-center tw-border tw-border-slate-100" data-aos="fade-left" data-aos-delay="300">
+                        <div>
+                            <h4 class="tw-text-xl tw-font-bold tw-text-slate-800 tw-mb-1">$0.00</h4>
+                            <span class="tw-text-xs tw-text-slate-500 tw-uppercase">Tax Collected</span>
+                        </div>
+                        <div class="tw-p-3 tw-bg-purple-50 tw-rounded-full">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/ttc.png" class="tw-w-8" alt="">
+                        </div>
+                    </div>
+
+                    <div class="tw-bg-white tw-p-5 tw-rounded-xl tw-shadow-sm hover:tw-shadow-md tw-flex tw-justify-between tw-items-center tw-border tw-border-slate-100" data-aos="fade-left" data-aos-delay="400">
+                        <div>
+                            <h4 class="tw-text-xl tw-font-bold tw-text-slate-800 tw-mb-1">$0.00</h4>
+                            <span class="tw-text-xs tw-text-slate-500 tw-uppercase">Pending Amount</span>
+                        </div>
+                        <div class="tw-p-3 tw-bg-red-50 tw-rounded-full">
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/pa.png" class="tw-w-8" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Charts Section -->
+        <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-6 tw-mb-8">
+            <!-- Order Statistics (Line Chart) -->
+            <div class="lg:tw-col-span-2 tw-bg-white tw-p-6 tw-rounded-2xl tw-shadow-soft tw-relative" data-aos="fade-up">
+                <div class="tw-flex tw-justify-between tw-items-center tw-mb-6">
+                    <h5 class="tw-font-bold tw-text-slate-700">Order Statistics</h5>
+                    <div class="tw-flex tw-gap-2">
+                        <button class="tw-px-3 tw-py-1 tw-text-xs tw-bg-primary tw-text-white tw-rounded-full">Year</button>
+                        <button class="tw-px-3 tw-py-1 tw-text-xs tw-bg-slate-100 tw-text-slate-600 tw-rounded-full hover:tw-bg-slate-200">Month</button>
+                    </div>
+                </div>
+                <div class="tw-h-[300px] tw-w-full">
+                    <canvas id="orderStatsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- User Overview (Pie Chart) -->
+            <div class="tw-bg-white tw-p-6 tw-rounded-2xl tw-shadow-soft tw-flex tw-flex-col tw-justify-between" data-aos="fade-up" data-aos-delay="200">
+                <h5 class="tw-font-bold tw-text-slate-700 tw-mb-4">User Overview</h5>
+                <div class="tw-relative tw-h-[200px] tw-flex tw-justify-center tw-items-center">
+                    <canvas id="userOverviewChart"></canvas>
+                    <!-- Center Text -->
+                    <div class="tw-absolute tw-text-center tw-pointer-events-none">
+                        <h3 class="tw-text-2xl tw-font-bold tw-text-slate-800">12</h3>
+                        <p class="tw-text-xs tw-text-slate-500">Users</p>
+                    </div>
+                </div>
+                <div class="tw-mt-6 tw-space-y-3">
+                    <div class="tw-flex tw-justify-between tw-text-sm">
+                        <span class="tw-flex tw-items-center tw-gap-2"><span class="tw-w-2 tw-h-2 tw-bg-blue-500 tw-rounded-full"></span> Customer</span>
+                        <span class="tw-font-bold">8</span>
+                    </div>
+                    <div class="tw-flex tw-justify-between tw-text-sm">
+                        <span class="tw-flex tw-items-center tw-gap-2"><span class="tw-w-2 tw-h-2 tw-bg-teal-400 tw-rounded-full"></span> Vendor</span>
+                        <span class="tw-font-bold">4</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Earning Statistics -->
+        <div class="tw-bg-white tw-p-6 tw-rounded-2xl tw-shadow-soft tw-mb-8" data-aos="fade-up">
+             <div class="tw-flex tw-justify-between tw-items-center tw-mb-6">
+                <h5 class="tw-font-bold tw-text-slate-700">Earning Statistics</h5>
+                <div class="tw-flex tw-gap-2">
+                    <span class="tw-w-3 tw-h-3 tw-bg-primary tw-rounded-full"></span> <span class="tw-text-xs tw-mr-3">In-House</span>
+                    <span class="tw-w-3 tw-h-3 tw-bg-green-400 tw-rounded-full"></span> <span class="tw-text-xs">Commission</span>
+                </div>
+            </div>
+            <div class="tw-h-[300px]">
+                <canvas id="earningStatsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 5. Lists & Rankings Grid -->
+        <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-6">
+            
+            <!-- Top Customers -->
+            <div class="tw-bg-white tw-p-5 tw-rounded-2xl tw-shadow-soft" data-aos="fade-up">
+                <div class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-pb-4 tw-border-b tw-border-slate-100">
+                    <img src="https://sell77.doobagency.com/public/assets/back-end/img/top-customers.png" width="20" alt="">
+                    <h5 class="tw-font-bold tw-text-slate-800">Top Customers</h5>
+                </div>
+                <div class="tw-space-y-4">
+                    <!-- Customer Item -->
+                    <div class="tw-flex tw-items-center tw-gap-4 tw-p-3 tw-rounded-lg hover:tw-bg-slate-50 tw-transition-colors tw-cursor-pointer">
+                        <img class="tw-w-10 tw-h-10 tw-rounded-full tw-object-cover tw-border-2 tw-border-white tw-shadow-sm" src="https://sell77.doobagency.com/public/assets/back-end/img/placeholder/user.png" alt="">
+                        <div class="tw-flex-1">
+                            <h6 class="tw-font-semibold tw-text-slate-800">Yahya</h6>
+                            <span class="tw-text-xs tw-text-slate-500">8 Orders</span>
+                        </div>
+                        <div class="tw-bg-blue-50 tw-text-primary tw-p-2 tw-rounded-lg">
+                            <svg class="tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                        </div>
+                    </div>
+                    <!-- Customer Item -->
+                    <div class="tw-flex tw-items-center tw-gap-4 tw-p-3 tw-rounded-lg hover:tw-bg-slate-50 tw-transition-colors tw-cursor-pointer">
+                        <img class="tw-w-10 tw-h-10 tw-rounded-full tw-object-cover tw-border-2 tw-border-white tw-shadow-sm" src="https://sell77.doobagency.com/public/assets/back-end/img/placeholder/user.png" alt="">
+                        <div class="tw-flex-1">
+                            <h6 class="tw-font-semibold tw-text-slate-800">test</h6>
+                            <span class="tw-text-xs tw-text-slate-500">2 Orders</span>
+                        </div>
+                         <div class="tw-bg-slate-50 tw-text-slate-400 tw-p-2 tw-rounded-lg">
+                            <svg class="tw-w-4 tw-h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Selling Stores -->
+            <div class="tw-bg-white tw-p-5 tw-rounded-2xl tw-shadow-soft" data-aos="fade-up" data-aos-delay="100">
+                <div class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-pb-4 tw-border-b tw-border-slate-100">
+                     <img src="https://sell77.doobagency.com/public/assets/back-end/img/shop-info.png" width="20" alt="">
+                    <h5 class="tw-font-bold tw-text-slate-800">Top Stores</h5>
+                </div>
+                <div class="tw-space-y-3">
+                    <!-- Store Item -->
+                    <div class="tw-flex tw-justify-between tw-items-center tw-p-3 tw-bg-slate-50 tw-rounded-lg hover:tw-bg-blue-50 tw-transition-colors group tw-cursor-pointer">
+                        <div class="tw-flex tw-items-center tw-gap-3">
+                            <img class="tw-w-8 tw-h-8 tw-rounded-full" src="https://sell77.doobagency.com/storage/app/public/shop/2025-01-07-677d3ac4ca7db.webp" alt="">
+                            <h6 class="tw-font-medium tw-text-slate-700 group-hover:tw-text-primary">Amazon</h6>
+                        </div>
+                        <span class="tw-font-bold tw-text-slate-800">$0.00</span>
+                    </div>
+                     <div class="tw-flex tw-justify-between tw-items-center tw-p-3 tw-bg-slate-50 tw-rounded-lg hover:tw-bg-blue-50 tw-transition-colors group tw-cursor-pointer">
+                        <div class="tw-flex tw-items-center tw-gap-3">
+                            <img class="tw-w-8 tw-h-8 tw-rounded-full" src="https://sell77.doobagency.com/storage/app/public/shop/2025-01-07-677d4685c9f19.webp" alt="">
+                            <h6 class="tw-font-medium tw-text-slate-700 group-hover:tw-text-primary">12151</h6>
+                        </div>
+                        <span class="tw-font-bold tw-text-slate-800">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Products -->
+            <div class="tw-bg-white tw-p-5 tw-rounded-2xl tw-shadow-soft" data-aos="fade-up" data-aos-delay="200">
+                 <div class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-pb-4 tw-border-b tw-border-slate-100">
+                    <img src="https://sell77.doobagency.com/public/assets/back-end/img/most-popular-product.png" width="20" alt="">
+                    <h5 class="tw-font-bold tw-text-slate-800">Popular Products</h5>
+                </div>
+                <div class="tw-grid tw-grid-cols-2 tw-gap-4">
+                    <!-- Product Item -->
+                    <div class="tw-bg-white tw-p-3 tw-rounded-xl tw-border tw-border-slate-100 tw-text-center hover:tw-shadow-lg tw-transition-all tw-cursor-pointer group">
+                        <img class="tw-w-16 tw-h-16 tw-mx-auto tw-rounded-lg tw-mb-2 group-hover:tw-scale-110 tw-transition-transform" src="https://sell77.doobagency.com/storage/app/public/product/thumbnail/2025-01-07-677d3da7494bb.webp" alt="">
+                        <h6 class="tw-text-xs tw-font-medium tw-text-slate-700 tw-truncate">Camera Samsung</h6>
+                        <div class="tw-flex tw-justify-center tw-items-center tw-gap-1 tw-mt-1 tw-text-yellow-400 tw-text-xs">
+                            <svg class="tw-w-3 tw-h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                             <span>0</span>
+                        </div>
+                    </div>
+                     <!-- Product Item -->
+                    <div class="tw-bg-white tw-p-3 tw-rounded-xl tw-border tw-border-slate-100 tw-text-center hover:tw-shadow-lg tw-transition-all tw-cursor-pointer group">
+                        <img class="tw-w-16 tw-h-16 tw-mx-auto tw-rounded-lg tw-mb-2 group-hover:tw-scale-110 tw-transition-transform" src="https://sell77.doobagency.com/storage/app/public/product/thumbnail/2025-01-07-677d430fcec2b.webp" alt="">
+                        <h6 class="tw-text-xs tw-font-medium tw-text-slate-700 tw-truncate">Macbook Air</h6>
+                        <div class="tw-flex tw-justify-center tw-items-center tw-gap-1 tw-mt-1 tw-text-yellow-400 tw-text-xs">
+                             <svg class="tw-w-3 tw-h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                             <span>0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Keep Hidden Data Spans for Logic Functionality -->
+        <span id="order-statistics-data" class="d-none" data-inhouse-text="Inhouse" data-vendor-text="Vendor" data-inhouse-order-earn='{"1":0,"2":0,"3":0,"4":0,"5":5,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":15}' data-vendor-order-earn='{"1":0,"2":0,"3":0,"4":0,"5":0,"6":2,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}'></span>
+        <span id="user-overview-data" class="d-none" data-customer="8" data-vendor="4" data-delivery-man="0"></span>
+        <span id="earn-statistics-data" class="d-none" data-inhouse-earn='{"1":0,"2":100,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}' data-vendor-earn='{"1":0,"2":0,"3":50,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}'></span>
+
+    </main>
+
+    <!-- Original Footer (Preserved) -->
+    <div class="footer tw-pl-0 lg:tw-pl-64">
+        <!-- ... Footer Content ... -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://sell77.doobagency.com/public/assets/back-end/js/vendor.min.js"></script>
+    <script src="https://sell77.doobagency.com/public/assets/back-end/js/theme.min.js"></script>
+
+    <script>
+        // 1. Initialize Animations
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800,
+        });
+
+        // 2. Chart.js Implementation
+        const getOrderData = () => {
+            const span = document.getElementById('order-statistics-data');
+            const inhouse = JSON.parse(span.getAttribute('data-inhouse-order-earn'));
+            const vendor = JSON.parse(span.getAttribute('data-vendor-order-earn'));
+            return {
+                inhouse: Object.values(inhouse),
+                vendor: Object.values(vendor)
+            };
+        };
+
+        const getUserData = () => {
+            const span = document.getElementById('user-overview-data');
+            return [
+                parseInt(span.getAttribute('data-customer')),
+                parseInt(span.getAttribute('data-vendor')),
+                parseInt(span.getAttribute('data-delivery-man'))
+            ];
+        };
+
+        const getEarningData = () => {
+             const span = document.getElementById('earn-statistics-data');
+             const inhouse = JSON.parse(span.getAttribute('data-inhouse-earn'));
+             const vendor = JSON.parse(span.getAttribute('data-vendor-earn'));
+             return {
+                inhouse: Object.values(inhouse),
+                vendor: Object.values(vendor)
+            };
+        }
+
+        // --- Chart 1: Order Statistics ---
+        const ctxOrder = document.getElementById('orderStatsChart').getContext('2d');
+        const orderData = getOrderData();
+        
+        new Chart(ctxOrder, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'In-house',
+                    data: orderData.inhouse,
+                    borderColor: '#073B74',
+                    backgroundColor: 'rgba(7, 59, 116, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2
+                }, {
+                    label: 'Vendor',
+                    data: orderData.vendor,
+                    borderColor: '#00C9DB',
+                    backgroundColor: 'rgba(0, 201, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // --- Chart 2: User Overview ---
+        const ctxUser = document.getElementById('userOverviewChart').getContext('2d');
+        const userData = getUserData();
+        
+        new Chart(ctxUser, {
+            type: 'doughnut',
+            data: {
+                labels: ['Customer', 'Vendor', 'Delivery Man'],
+                datasets: [{
+                    data: userData,
+                    backgroundColor: ['#3b82f6', '#2dd4bf', '#f59e0b'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                cutout: '75%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // --- Chart 3: Earning Statistics ---
+        const ctxEarn = document.getElementById('earningStatsChart').getContext('2d');
+        const earnData = getEarningData();
+
+        new Chart(ctxEarn, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'In-house',
+                    data: earnData.inhouse,
+                    backgroundColor: '#073B74',
+                    borderRadius: 4,
+                }, {
+                    label: 'Vendor',
+                    data: earnData.vendor,
+                    backgroundColor: '#00C9DB',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
