@@ -280,7 +280,7 @@
             SCHOOL_START_TIME: "08:00",
             LATE_THRESHOLD_MINUTES: 15,
             SEVERE_LATE_MINUTES: 30,
-            DEPARTURE_START_TIME: "19:00",
+            DEPARTURE_START_TIME: "17:00",
             OVERTIME_THRESHOLD_MINUTES: 15
         };
 
@@ -402,9 +402,25 @@
             try {
                 let data;
                 try { data = JSON.parse(decodedText); } catch { throw new Error("رمز غير صالح"); }
-                if (!data.id || data.type !== 'student') throw new Error("الرمز غير صحيح");
+                
+                // Allow "student" or generic types if needed, but strictly check ID
+                if (!data.id) throw new Error("الرمز غير صحيح");
 
-                const studentKey = Object.keys(studentsCache).find(k => studentsCache[k].studentId === data.id);
+                // --- FIX: Robust Lookup Strategy ---
+                const scannedId = String(data.id).trim(); // Normalize ID
+                
+                // 1. Try to find key where studentId matches inside the object
+                let studentKey = Object.keys(studentsCache).find(k => 
+                    studentsCache[k].studentId && String(studentsCache[k].studentId) === scannedId
+                );
+
+                // 2. Fallback: Check if the key itself is the ID
+                if (!studentKey && studentsCache[scannedId]) {
+                    studentKey = scannedId;
+                    // Ensure studentId property exists for later use
+                    if(!studentsCache[studentKey].studentId) studentsCache[studentKey].studentId = scannedId;
+                }
+
                 if (!studentKey) throw new Error("الطالب غير مسجل");
 
                 await processAttendance(studentKey, studentsCache[studentKey]);
@@ -738,7 +754,9 @@
             }
         }
         function preloadData() {
-            db.ref('school/students').once('value', s => studentsCache = s.val() || {});
+            // Updated to use .on() instead of .once() to keep data live
+            db.ref('school/students').on('value', s => studentsCache = s.val() || {});
+            
             const today = new Date().toISOString().split('T')[0];
             db.ref(`school/attendance/${today}`).on('value', s => {
                 let inC = 0, outC = 0;
