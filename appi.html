@@ -280,8 +280,9 @@
             SCHOOL_START_TIME: "08:00",
             LATE_THRESHOLD_MINUTES: 15,
             SEVERE_LATE_MINUTES: 30,
-            DEPARTURE_START_TIME: "17:00",
-            OVERTIME_THRESHOLD_MINUTES: 15
+            DEPARTURE_START_TIME: "18:00",
+            OVERTIME_THRESHOLD_MINUTES: 15,
+            USE_24_HOUR_FORMAT: false // true = 24h format, false = 12h format
         };
 
         const firebaseConfig = {
@@ -610,7 +611,14 @@
             document.getElementById('student-name').innerText = data.name || "مستخدم غير معروف";
             document.getElementById('detail-class').innerText = data.classId || 'غير محدد';
             document.getElementById('detail-id').innerText = data.studentId || '---';
-            document.getElementById('detail-time').innerText = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+            
+            // إعدادات الوقت بناءً على التكوين
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: !CONFIG.USE_24_HOUR_FORMAT 
+            };
+            document.getElementById('detail-time').innerText = new Date().toLocaleTimeString('ar-EG', timeOptions);
             document.getElementById('detail-date').innerText = new Date().toLocaleDateString('ar-EG');
 
             const avatar = document.getElementById('result-avatar');
@@ -739,7 +747,13 @@
         }
         function updateClock() {
             const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour12: false, hour:'2-digit', minute:'2-digit'});
+            // إعدادات الوقت بناءً على التكوين
+            const timeOptions = { 
+                hour12: !CONFIG.USE_24_HOUR_FORMAT, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', timeOptions);
             document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB');
         }
         function createParticles() {
