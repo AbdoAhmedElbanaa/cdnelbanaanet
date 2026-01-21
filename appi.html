@@ -2,178 +2,296 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- تحسين العرض على الموبايل ومنع التكبير العشوائي -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام الحضور الذكي | Live Scanner</title>
+    <title>نظام الحضور الذكي | Live Scanner Pro</title>
     
     <!-- الخطوط -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- المكتبات -->
+    <!-- المكتبات الأساسية -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (v8 Compatible) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <!-- إعدادات التصميم -->
+    <!-- إعدادات Tailwind المخصصة -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' },
-                        dark: { bg: '#0f172a', card: '#1e293b' }
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.2)',
+                            300: 'rgba(255, 255, 255, 0.05)',
+                            dark: 'rgba(15, 23, 42, 0.6)'
+                        },
+                        brand: {
+                            main: '#3b82f6',
+                            glow: '#60a5fa'
+                        }
                     },
                     fontFamily: { sans: ['Tajawal', 'sans-serif'] },
-                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                    boxShadow: {
+                        'neon': '0 0 20px rgba(59, 130, 246, 0.5)',
+                        'neon-red': '0 0 20px rgba(239, 68, 68, 0.5)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    }
                 }
             }
         }
     </script>
 
     <style>
-        body { background-color: #0f172a; color: white; overflow: hidden; touch-action: none; }
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(34, 197, 94, 0.15) 0px, transparent 50%);
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        /* Glassmorphism Classes */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
-        /* تحسين مظهر الكاميرا */
-        #reader { width: 100%; height: 100%; object-fit: cover; border-radius: 1.5rem; overflow: hidden; }
-        #reader video { object-fit: cover; border-radius: 1.5rem; height: 100% !important; width: 100% !important; }
+
+        .glass-card-active {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Scanner Specifics */
+        #reader { width: 100%; height: 100%; border-radius: 1.5rem; overflow: hidden; transform: scaleX(-1); } 
+        /* scaleX(-1) mirrors camera for clearer UX if facing user, remove if back camera preferred mainly */
         
-        .scan-overlay {
-            position: absolute; inset: 0; pointer-events: none;
-            background: radial-gradient(circle, transparent 30%, rgba(15, 23, 42, 0.8) 70%);
-            z-index: 10;
+        #reader video { object-fit: cover; border-radius: 1.5rem; width: 100% !important; height: 100% !important; }
+
+        .scan-laser {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            box-shadow: 0 0 15px #3b82f6, 0 0 30px #3b82f6;
+            top: 50%;
+            z-index: 20;
+            opacity: 0.8;
+            animation: scan 2s infinite ease-in-out;
         }
-        .scan-line {
-            width: 100%; height: 2px; background: #0ea5e9;
-            box-shadow: 0 0 20px #0ea5e9;
-            position: absolute; top: 0;
-            animation: scanMove 2s infinite ease-in-out;
+
+        @keyframes scan {
+            0% { top: 10%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 90%; opacity: 0; }
         }
-        @keyframes scanMove { 0% { top: 10%; opacity: 0; } 50% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
+
+        .corner-border {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #3b82f6;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+
+        /* Result Modal Animation Base */
+        .result-modal-container {
+            will-change: transform, opacity;
+        }
+        
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            animation: float 20s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes float { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-100vh) rotate(360deg); } }
+
     </style>
 </head>
-<body class="h-screen flex flex-col justify-between p-4 md:p-6 relative">
+<body class="h-screen w-screen flex flex-col items-center justify-between p-4 relative">
 
-    <!-- شاشة البدء (ضرورية للموبايل لطلب الإذن) -->
-    <div id="start-screen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
-        <div class="relative w-32 h-32 mb-8">
-            <div class="absolute inset-0 bg-brand-500/20 rounded-full animate-ping"></div>
-            <div class="absolute inset-0 bg-brand-500/10 rounded-full animate-pulse"></div>
-            <div class="relative bg-slate-800 rounded-full w-full h-full flex items-center justify-center border border-brand-500/30">
-                <svg class="w-14 h-14 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <!-- خلفية الجسيمات المتحركة -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-[-1]"></div>
+
+    <!-- شاشة البداية / إذن الكاميرا -->
+    <div id="start-screen" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
+        <div class="relative mb-8 group">
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+            <div class="relative w-32 h-32 bg-slate-900 rounded-full border border-slate-700 flex items-center justify-center shadow-2xl">
+                <svg class="w-16 h-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/>
+                </svg>
             </div>
         </div>
-        <h2 class="text-3xl font-bold text-white mb-3">نظام الحضور</h2>
-        <p class="text-slate-400 mb-10 max-w-xs text-sm leading-relaxed">لبدء تسجيل الحضور، نحتاج للوصول إلى الكاميرا لمسح البطاقات.</p>
-        
-        <button onclick="initCamera()" class="w-full max-w-sm py-4 bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            تشغيل الماسح
+        <h1 class="text-4xl font-black text-white mb-2 tracking-tight">نظام الحضور الذكي</h1>
+        <p class="text-slate-400 mb-10 text-lg">يرجى منح صلاحية الكاميرا للبدء</p>
+        <button onclick="initCamera()" class="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 overflow-hidden">
+            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <span class="relative flex items-center gap-3 text-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                تشغيل النظام
+            </span>
         </button>
-        <p id="error-msg-start" class="mt-4 text-red-400 text-sm font-bold bg-red-900/20 p-2 rounded-lg border border-red-500/20 hidden">
-            <!-- سيتم كتابة الخطأ هنا -->
-        </p>
+        <p id="error-msg" class="mt-6 text-red-400 font-medium hidden bg-red-900/20 px-4 py-2 rounded-lg border border-red-500/20"></p>
     </div>
 
-    <!-- الخلفية الحية -->
-    <div class="fixed inset-0 -z-10 overflow-hidden">
-        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-    </div>
-
-    <!-- الهيدر -->
-    <header class="flex justify-between items-center z-50 mb-4">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/30">
-                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/></svg>
+    <!-- الرأس (Header) -->
+    <header class="w-full max-w-4xl flex justify-between items-center z-10 py-2">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
             <div>
-                <h1 class="font-bold text-lg leading-none">Live Scanner</h1>
-                <p id="live-clock" class="text-xs text-slate-400 font-mono mt-1">--:--:--</p>
+                <h2 class="font-bold text-xl text-white leading-tight">سجل الحضور</h2>
+                <div class="flex items-center gap-2">
+                    <span id="connection-dot" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span id="connection-text" class="text-xs text-slate-400">غير متصل</span>
+                </div>
             </div>
         </div>
-        <div id="connection-status" class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold border border-slate-700 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-slate-500"></span> جاري الاتصال...
+        <div class="glass-panel px-5 py-2 rounded-xl text-center min-w-[120px]">
+            <div id="live-clock" class="text-xl font-mono font-bold text-blue-400">--:--</div>
+            <div id="live-date" class="text-[10px] text-slate-400 uppercase tracking-wider">--/--/----</div>
         </div>
     </header>
 
-    <!-- منطقة الكاميرا -->
-    <main class="flex-1 flex flex-col items-center justify-start relative w-full max-w-md mx-auto h-full">
+    <!-- المحتوى الرئيسي (Main) -->
+    <main class="flex-1 w-full max-w-4xl flex flex-col md:flex-row gap-6 items-center justify-center py-4 relative z-10">
         
-        <!-- مفتاح الوضع -->
-        <div class="glass-panel p-1 rounded-2xl flex w-full mb-4 relative">
-            <div id="mode-indicator" class="absolute top-1 bottom-1 w-[48%] bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl shadow-lg transition-all duration-300 left-1"></div>
-            <button onclick="switchMode('in')" class="flex-1 py-3 text-center relative z-10 font-bold text-sm transition-colors duration-300 text-white" id="btn-in">حضور</button>
-            <button onclick="switchMode('out')" class="flex-1 py-3 text-center relative z-10 font-bold text-sm text-slate-400 transition-colors duration-300" id="btn-out">انصراف</button>
-        </div>
-
-        <!-- إطار الكاميرا -->
-        <div class="relative w-full flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 group min-h-[300px]">
-            <div id="reader" class="w-full h-full"></div>
-            
-            <!-- Overlay Graphics -->
-            <div class="scan-overlay flex items-center justify-center">
-                <div class="relative w-64 h-64 border-2 border-white/30 rounded-3xl">
-                    <div class="scan-line"></div>
-                    <!-- زوايا الإطار -->
-                    <div class="absolute top-[-2px] left-[-2px] w-8 h-8 border-t-4 border-l-4 border-brand-500 rounded-tl-xl"></div>
-                    <div class="absolute top-[-2px] right-[-2px] w-8 h-8 border-t-4 border-r-4 border-brand-500 rounded-tr-xl"></div>
-                    <div class="absolute bottom-[-2px] left-[-2px] w-8 h-8 border-b-4 border-l-4 border-brand-500 rounded-bl-xl"></div>
-                    <div class="absolute bottom-[-2px] right-[-2px] w-8 h-8 border-b-4 border-r-4 border-brand-500 rounded-br-xl"></div>
+        <!-- قسم التحكم والوضع (Left/Top on Mobile) -->
+        <div class="w-full md:w-1/3 flex flex-col gap-4 order-2 md:order-1">
+            <!-- تبديل الوضع -->
+            <div class="glass-panel p-2 rounded-2xl relative h-16">
+                <div id="mode-slider" class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] left-2"></div>
+                <div class="relative z-10 flex h-full">
+                    <button onclick="setMode('in')" id="btn-in" class="flex-1 flex items-center justify-center gap-2 font-bold text-white transition-colors duration-300">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        حضور
+                    </button>
+                    <button onclick="setMode('out')" id="btn-out" class="flex-1 flex items-center justify-center gap-2 font-bold text-slate-400 transition-colors duration-300">
+                        انصراف
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                    </button>
                 </div>
             </div>
+
+            <!-- إحصائيات سريعة -->
+            <div class="glass-panel p-4 rounded-2xl flex justify-between items-center">
+                <span class="text-slate-400 text-sm">عمليات اليوم</span>
+                <span id="daily-count" class="text-2xl font-bold text-white">0</span>
+            </div>
             
-            <!-- زر تبديل الكاميرا -->
-            <button onclick="flipCamera()" class="absolute bottom-4 right-4 z-20 p-3 bg-white/10 backdrop-blur rounded-full text-white hover:bg-white/20">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            </button>
+            <div class="text-center md:text-right px-2">
+                <p class="text-xs text-slate-500 leading-relaxed">قم بتوجيه رمز QR الخاص بالطالب أمام العدسة. سيتم التسجيل تلقائياً.</p>
+            </div>
         </div>
 
-        <p class="mt-4 text-slate-400 text-xs animate-pulse text-center">وجّه الرمز داخل المربع</p>
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-4 glass-panel p-4 rounded-2xl flex justify-between items-center text-xs text-slate-400 w-full max-w-md mx-auto">
-        <div>المسح اليومي: <span id="daily-count" class="text-white font-bold text-base ml-1">0</span></div>
-        <div class="flex items-center gap-1"><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> Live</div>
-    </footer>
-
-    <!-- Result Modal (Overlay) -->
-    <div id="result-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-800 w-full md:w-[400px] p-6 rounded-t-3xl md:rounded-3xl shadow-2xl relative transform translate-y-full md:translate-y-10 transition-transform duration-300" id="result-card">
-            <div class="absolute top-0 left-0 h-1.5 bg-slate-100 w-full rounded-t-3xl overflow-hidden"><div id="auto-close-bar" class="h-full bg-brand-500 w-0"></div></div>
-            <div class="flex flex-col items-center text-center mt-2">
-                <div id="result-icon-container" class="w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-lg transform transition-transform hover:scale-110"></div>
-                <h2 id="result-title" class="text-2xl font-black text-slate-800 dark:text-white mb-1"></h2>
-                <p id="result-msg" class="text-slate-500 text-sm mb-6"></p>
-                <div id="student-details" class="w-full bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 flex items-center gap-4 text-right hidden">
-                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-lg" id="student-avatar"></div>
-                    <div>
-                        <div class="font-bold text-slate-800 dark:text-white text-lg" id="student-name"></div>
-                        <div class="text-xs text-brand-500 font-bold" id="student-class"></div>
+        <!-- منطقة الكاميرا (Center/Focus) -->
+        <div class="w-full md:w-2/3 h-[400px] md:h-[500px] relative order-1 md:order-2">
+            <!-- إطار الكاميرا الخارجي -->
+            <div class="absolute inset-0 bg-slate-900 rounded-[2rem] border-[6px] border-slate-800 shadow-2xl overflow-hidden relative group">
+                <!-- عنصر الفيديو -->
+                <div id="reader" class="w-full h-full bg-black"></div>
+                
+                <!-- طبقة التراكب الجرافيكية -->
+                <div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+                    <div class="relative w-[280px] h-[280px]">
+                        <!-- الزوايا المضيئة -->
+                        <div class="corner-border border-t-4 border-l-4 rounded-tl-2xl top-0 left-0"></div>
+                        <div class="corner-border border-t-4 border-r-4 rounded-tr-2xl top-0 right-0"></div>
+                        <div class="corner-border border-b-4 border-l-4 rounded-bl-2xl bottom-0 left-0"></div>
+                        <div class="corner-border border-b-4 border-r-4 rounded-br-2xl bottom-0 right-0"></div>
+                        
+                        <!-- شعاع الليزر -->
+                        <div class="scan-laser"></div>
+                        
+                        <!-- أيقونة حالة الانتظار -->
+                        <div id="scan-status-icon" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- تظليل الحواف -->
+                <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/60 via-transparent to-black/60"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- النافذة المنبثقة للنتيجة (Result Sheet) -->
+    <div id="result-overlay" class="fixed inset-0 z-50 pointer-events-none flex items-end justify-center">
+        <!-- الخلفية المعتمة -->
+        <div id="result-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+
+        <!-- البطاقة -->
+        <div id="result-card" class="relative w-full max-w-lg bg-slate-900/90 backdrop-blur-2xl border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] rounded-t-[2.5rem] p-8 pb-12 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+            
+            <!-- مؤشر السحب (جمالي) -->
+            <div class="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-white/20 rounded-full"></div>
+
+            <!-- محتوى البطاقة -->
+            <div class="flex flex-col items-center text-center relative z-10">
+                
+                <!-- صورة الطالب مع حالة النجاح -->
+                <div class="relative mb-4">
+                    <div id="status-ring" class="absolute -inset-2 rounded-full border-4 border-dashed border-green-500/50 animate-[spin_10s_linear_infinite]"></div>
+                    <div id="result-avatar" class="w-24 h-24 rounded-full bg-slate-700 border-4 border-slate-800 shadow-xl overflow-hidden flex items-center justify-center text-3xl font-bold text-slate-400 relative z-10">
+                        <!-- Image or Initial -->
+                    </div>
+                    <div id="status-badge" class="absolute bottom-0 right-0 bg-green-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+
+                <!-- النصوص -->
+                <h2 id="student-name" class="text-3xl font-black text-white mb-1">اسم الطالب</h2>
+                <div class="flex items-center gap-3 text-sm font-medium mb-6">
+                    <span id="student-class" class="px-3 py-1 rounded-lg bg-slate-800 text-blue-400 border border-slate-700">الصف الدراسي</span>
+                    <span id="scan-time" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">--:-- AM</span>
+                </div>
+
+                <!-- رسالة الحالة الكبيرة -->
+                <div id="status-message" class="text-2xl font-bold text-green-400 mb-2">تم تسجيل الحضور بنجاح</div>
+            </div>
+
+            <!-- شريط التقدم للإغلاق -->
+            <div class="absolute bottom-0 left-0 w-full h-1.5 bg-slate-800">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-green-400 w-0"></div>
             </div>
         </div>
     </div>
 
-    <!-- Sounds -->
+    <!-- الأصوات -->
     <audio id="sound-success" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
     <audio id="sound-error" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
 
     <script>
-        // --- 1. Firebase Config ---
+        // --- تهيئة Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyADEyiGtrStnDfbNa6tGYFGkREbX4Xo0p4",
             authDomain: "hodurplus.firebaseapp.com",
@@ -184,256 +302,332 @@
             appId: "1:782910695769:web:11b0adaf3eb89230abc448",
             measurementId: "G-0ZYMVM6E4B"
         };
+        
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // --- 2. State & Variables ---
+        // --- المتغيرات العامة ---
         let html5QrcodeScanner = null;
-        let isCameraRunning = false;
-        let state = { mode: 'in', isScanning: false, studentsCache: {}, currentCameraId: null };
+        let isScanning = false;
+        let currentMode = 'in'; // 'in' or 'out'
+        let studentsCache = {};
+        let closeTimer = null;
 
-        // --- 3. Initialization ---
+        // --- تهيئة الصفحة ---
         document.addEventListener('DOMContentLoaded', () => {
-            setInterval(() => document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}), 1000);
+            updateClock();
+            setInterval(updateClock, 1000);
+            createParticles();
             
+            // مراقبة حالة الاتصال
             auth.onAuthStateChanged(user => {
-                const el = document.getElementById('connection-status');
-                if(user) {
-                    el.className = "px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 flex items-center gap-2";
-                    el.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]"></span> متصل';
+                const dot = document.getElementById('connection-dot');
+                const text = document.getElementById('connection-text');
+                if (user) {
+                    dot.className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+                    text.innerText = "متصل بالخادم";
+                    text.className = "text-xs text-green-400 font-bold";
                     preloadData();
                 } else {
-                    auth.signInAnonymously().catch(console.error);
+                    auth.signInAnonymously().catch(e => console.error("Auth Error:", e));
                 }
             });
         });
 
-        // --- 4. Camera Logic (Robust & Fallback) ---
+        // --- منطق الكاميرا ---
         async function initCamera() {
             const startScreen = document.getElementById('start-screen');
-            const errorMsg = document.getElementById('error-msg-start');
-            
-            // تحقق من الأمان (HTTPS)
-            if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                errorMsg.innerText = "تنبيه: الكاميرا تتطلب اتصالاً آمناً (HTTPS) لتعمل. يرجى التأكد من تشغيل الموقع عبر HTTPS.";
-                errorMsg.classList.remove('hidden');
-            }
+            const errorMsg = document.getElementById('error-msg');
 
             try {
-                if(!html5QrcodeScanner) {
+                if (!html5QrcodeScanner) {
                     html5QrcodeScanner = new Html5Qrcode("reader");
                 }
-                
-                const config = { 
-                    fps: 10, 
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0,
-                    // مهم: تعطيل الـ flip التلقائي لتجنب المشاكل في بعض المتصفحات
-                    disableFlip: false 
-                };
 
-                // محاولة 1: الكاميرا الخلفية (المفضلة)
+                // محاولة تشغيل الكاميرا الخلفية
+                const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+                
                 try {
-                    await html5QrcodeScanner.start(
-                        { facingMode: "environment" }, 
-                        config, 
-                        onScanSuccess, 
-                        onScanError
-                    );
-                } catch (err1) {
-                    console.warn("فشلت المحاولة الأولى (الخلفية)، جاري المحاولة بأي كاميرا...", err1);
-                    
-                    // محاولة 2: أي كاميرا متاحة (Fallback)
-                    // هذا يحل المشكلة إذا كان الجهاز لا يدعم environment أو كان لابتوب
-                    await html5QrcodeScanner.start(
-                        { facingMode: "user" }, 
-                        config, 
-                        onScanSuccess, 
-                        onScanError
-                    );
+                    await html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess);
+                } catch (e) {
+                    // Fallback to user camera if environment fails
+                    await html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
                 }
 
-                // نجاح
-                gsap.to(startScreen, { opacity: 0, duration: 0.5, onComplete: () => startScreen.classList.add('hidden') });
-                isCameraRunning = true;
+                // إخفاء شاشة البداية بتأثير سلس
+                gsap.to(startScreen, {
+                    opacity: 0,
+                    y: -50,
+                    duration: 0.6,
+                    ease: "power2.in",
+                    onComplete: () => startScreen.style.display = 'none'
+                });
 
             } catch (err) {
-                console.error("فشل نهائي للكاميرا:", err);
-                
-                let userMsg = "تعذر تشغيل الكاميرا.";
-                const errStr = err.toString();
-
-                if (errStr.includes("NotAllowedError") || errStr.includes("Permission")) {
-                    userMsg = "المتصفح يرفض الوصول للكاميرا. يرجى الضغط على قفل الأمان في شريط العنوان وتفعيل الكاميرا.";
-                } else if (errStr.includes("NotFoundError")) {
-                    userMsg = "لم يتم العثور على كاميرا في الجهاز.";
-                } else if (errStr.includes("NotReadableError")) {
-                    userMsg = "الكاميرا مشغولة حالياً بتطبيق آخر. أغلق التطبيقات الأخرى وحاول مرة أخرى.";
-                } else if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-                     userMsg = "الكاميرا لا تعمل إلا على اتصال آمن (HTTPS).";
-                }
-                
-                errorMsg.innerText = userMsg;
+                console.error("Camera Error:", err);
+                errorMsg.innerText = "تعذر الوصول للكاميرا. تأكد من السماح بالأذونات واستخدام HTTPS.";
                 errorMsg.classList.remove('hidden');
             }
         }
 
-        function flipCamera() {
-            alert("سيتم دعم التبديل اليدوي في التحديث القادم");
-        }
-
-        // --- 5. Scan Processing ---
+        // --- معالجة المسح الضوئي ---
         async function onScanSuccess(decodedText) {
-            if (state.isScanning) return;
-            state.isScanning = true;
-            pauseUI();
-
+            if (isScanning) return;
+            
             try {
-                // 1. Parse
-                let qrData;
-                try { qrData = JSON.parse(decodedText); } catch(e) { throw new Error("رمز غير صالح"); }
+                // إيقاف مؤقت للقراءة لمنع التكرار
+                isScanning = true;
+                showLoadingState(true);
+
+                // 1. تحليل البيانات
+                let data;
+                try { data = JSON.parse(decodedText); } catch { throw new Error("رمز غير صالح (ليس JSON)"); }
+                if (!data.id || data.type !== 'student') throw new Error("هذا الرمز لا يخص طالباً");
+
+                // 2. البحث في الذاكرة المحلية
+                const studentKey = Object.keys(studentsCache).find(k => studentsCache[k].studentId === data.id);
+                if (!studentKey) throw new Error("الطالب غير موجود في النظام");
                 
-                if (!qrData.id || qrData.type !== 'student') throw new Error("الرمز لا يخص طالب");
+                const student = studentsCache[studentKey];
 
-                // 2. Local Lookup
-                const studentKey = Object.keys(state.studentsCache).find(k => state.studentsCache[k].studentId === qrData.id);
-                if (!studentKey) throw new Error("الطالب غير مسجل");
-
-                const student = state.studentsCache[studentKey];
-
-                // 3. Firebase Transaction
+                // 3. إرسال إلى Firebase
                 await processAttendance(studentKey, student);
 
             } catch (error) {
-                showFeedback('error', 'خطأ', error.message);
-                playAudio('error');
+                showFeedback('error', { name: 'خطأ', classId: 'النظام', error: error.message });
             } finally {
-                setTimeout(() => {
-                    state.isScanning = false;
-                    resumeUI();
-                }, 2000); // تأخير بسيط لمنع التكرار
+                // سيتم إعادة التفعيل داخل showFeedback بعد انتهاء المؤقت
+                showLoadingState(false);
             }
         }
 
-        function onScanError(err) { /* Ignored to prevent log spam */ }
-
         async function processAttendance(key, student) {
-            const date = new Date().toISOString().split('T')[0];
-            const ts = Date.now(); // Number for Rules compliance
-            const ref = db.ref(`school/attendance/${date}/${key}`);
+            const today = new Date().toISOString().split('T')[0];
+            const now = Date.now();
+            const ref = db.ref(`school/attendance/${today}/${key}`);
 
             await ref.transaction((current) => {
-                if (state.mode === 'in') {
+                if (currentMode === 'in') {
                     if (current && current.checkInTime) throw new Error("ALREADY_IN");
                     return {
                         studentId: student.studentId,
                         name: student.name,
-                        classId: student.classId,
-                        checkInTime: ts,
+                        classId: student.classId || "غير محدد",
+                        checkInTime: now,
                         status: 'present',
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     };
                 } else {
                     if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN");
                     if (current.checkOutTime) throw new Error("ALREADY_OUT");
-                    return { ...current, checkOutTime: ts, status: 'checked_out' }; // Underscore for Rules
+                    return { ...current, checkOutTime: now, status: 'checked_out' };
                 }
             }, (error, committed, snapshot) => {
-                if (error) {
-                    console.error(error);
-                    showFeedback('error', 'خطأ تقني', 'فشل الاتصال');
-                    playAudio('error');
-                } else if (!committed) {
-                    showFeedback('warning', 'تنبيه', 'العملية مكررة أو مرفوضة');
-                    playAudio('error');
-                } else {
-                    const timeStr = new Date(ts).toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'});
-                    showFeedback('success', state.mode === 'in' ? 'تم الحضور' : 'تم الانصراف', timeStr, student);
-                    playAudio('success');
-                }
+                if (error) throw error;
+                if (!committed) throw new Error("فشلت العملية (تضارب بيانات)");
+                
+                // نجاح
+                showFeedback('success', student);
             }).catch(err => {
-                let msg = err.message;
-                if(msg === 'ALREADY_IN') msg = 'مسجل حضور مسبقاً';
-                if(msg === 'NOT_CHECKED_IN') msg = 'يجب تسجيل الحضور أولاً';
-                if(msg === 'ALREADY_OUT') msg = 'مسجل انصراف مسبقاً';
-                showFeedback('warning', 'مرفوض', msg, student);
-                playAudio('error');
+                let msg = "حدث خطأ غير متوقع";
+                if (err.message === 'ALREADY_IN') msg = "تم تسجيل حضوره مسبقاً";
+                else if (err.message === 'NOT_CHECKED_IN') msg = "لم يسجل حضور اليوم";
+                else if (err.message === 'ALREADY_OUT') msg = "تم تسجيل انصرافه مسبقاً";
+                
+                showFeedback('warning', { ...student, error: msg });
             });
         }
 
-        // --- 6. UI Helpers ---
-        function switchMode(m) {
-            state.mode = m;
-            const ind = document.getElementById('mode-indicator');
-            const bIn = document.getElementById('btn-in');
-            const bOut = document.getElementById('btn-out');
+        // --- واجهة المستخدم والمؤثرات ---
+        function showFeedback(type, student) {
+            const modal = document.getElementById('result-card');
+            const backdrop = document.getElementById('result-backdrop');
+            const overlay = document.getElementById('result-overlay');
+            const bar = document.getElementById('progress-bar');
             
-            if(m === 'in') {
-                ind.style.left = '1%'; 
-                ind.className = ind.className.replace(/from-red-500 to-rose-500/, 'from-green-500 to-emerald-500');
-                bIn.classList.add('text-white'); bIn.classList.remove('text-slate-400');
-                bOut.classList.remove('text-white'); bOut.classList.add('text-slate-400');
+            // 1. تجهيز البيانات
+            document.getElementById('student-name').innerText = student.name;
+            document.getElementById('student-class').innerText = student.classId || 'عام';
+            document.getElementById('scan-time').innerText = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+            
+            // الصورة
+            const avatar = document.getElementById('result-avatar');
+            if (student.photo) {
+                avatar.innerHTML = `<img src="${student.photo}" class="w-full h-full object-cover">`;
             } else {
-                ind.style.left = '51%';
-                ind.className = ind.className.replace(/from-green-500 to-emerald-500/, 'from-red-500 to-rose-500');
-                bOut.classList.add('text-white'); bOut.classList.remove('text-slate-400');
-                bIn.classList.remove('text-white'); bIn.classList.add('text-slate-400');
+                avatar.innerHTML = student.name.charAt(0);
             }
-        }
 
-        function showFeedback(type, title, msg, student=null) {
-            const modal = document.getElementById('result-modal');
-            const card = document.getElementById('result-card');
-            const iconBox = document.getElementById('result-icon-container');
-            const bar = document.getElementById('auto-close-bar');
+            // الألوان والأيقونات حسب النوع
+            const msgEl = document.getElementById('status-message');
+            const badge = document.getElementById('status-badge');
+            const ring = document.getElementById('status-ring');
 
-            // Reset
-            bar.style.width = '0%'; bar.style.transition = 'none';
-            document.getElementById('student-details').classList.add('hidden');
+            if (type === 'success') {
+                msgEl.innerText = currentMode === 'in' ? "أهلاً بك! تم تسجيل الحضور" : "مع السلامة! تم الانصراف";
+                msgEl.className = "text-2xl font-bold text-green-400 mb-2";
+                badge.className = "absolute bottom-0 right-0 bg-green-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
+                badge.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+                ring.className = "absolute -inset-2 rounded-full border-4 border-dashed border-green-500/50 animate-[spin_10s_linear_infinite]";
+                playAudio('success');
+                fireConfetti(); // تأثير الانفجار
+            } else if (type === 'warning') {
+                msgEl.innerText = student.error || "تنبيه";
+                msgEl.className = "text-2xl font-bold text-yellow-400 mb-2";
+                badge.className = "absolute bottom-0 right-0 bg-yellow-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
+                badge.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+                ring.className = "absolute -inset-2 rounded-full border-4 border-dashed border-yellow-500/50 animate-pulse";
+                playAudio('error');
+            } else {
+                msgEl.innerText = student.error || "خطأ";
+                msgEl.className = "text-2xl font-bold text-red-400 mb-2";
+                badge.className = "absolute bottom-0 right-0 bg-red-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
+                badge.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>';
+                ring.className = "absolute -inset-2 rounded-full border-4 border-dashed border-red-500/50";
+                playAudio('error');
+            }
 
-            // Style
-            let color = type === 'success' ? 'bg-green-100 text-green-600' : type === 'error' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-600';
-            let barColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500';
-            let icon = type === 'success' ? '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
-
-            iconBox.className = `w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-lg transform transition-transform hover:scale-110 ${color}`;
-            iconBox.innerHTML = icon;
-            bar.className = `h-full ${barColor} w-0`;
+            // 2. إظهار النافذة (GSAP)
+            overlay.classList.remove('pointer-events-none');
+            backdrop.classList.remove('opacity-0');
             
-            document.getElementById('result-title').innerText = title;
-            document.getElementById('result-msg').innerText = msg;
-
-            if(student) {
-                document.getElementById('student-details').classList.remove('hidden');
-                document.getElementById('student-name').innerText = student.name;
-                document.getElementById('student-class').innerText = student.classId; // تحسين: يمكن جلب اسم الصف
-                document.getElementById('student-avatar').innerText = student.name.charAt(0);
-            }
-
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            card.classList.remove('translate-y-full', 'md:translate-y-10');
-
-            // Auto close
-            setTimeout(() => { bar.style.transition = 'width 2s linear'; bar.style.width = '100%'; }, 100);
-            setTimeout(() => {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                card.classList.add('translate-y-full', 'md:translate-y-10');
-            }, 2100);
-        }
-
-        function playAudio(type) {
-            const a = document.getElementById(type === 'success' ? 'sound-success' : 'sound-error');
-            a.currentTime = 0; a.play().catch(()=>{});
-        }
-        function pauseUI() { document.querySelector('.scan-line').style.opacity = 0; }
-        function resumeUI() { document.querySelector('.scan-line').style.opacity = 1; }
-        
-        function preloadData() {
-            db.ref('school/students').once('value', s => state.studentsCache = s.val() || {});
-            db.ref(`school/attendance/${new Date().toISOString().split('T')[0]}`).on('value', s => {
-                document.getElementById('daily-count').innerText = s.numChildren();
+            // Animation: Slide Up with Elastic effect
+            gsap.to(modal, {
+                y: '0%',
+                duration: 0.8,
+                ease: "elastic.out(1, 0.75)"
             });
+
+            // 3. شريط التقدم (Timer)
+            gsap.fromTo(bar, { width: "0%" }, { width: "100%", duration: 3, ease: "linear" });
+
+            // 4. الإخفاء التلقائي
+            if (closeTimer) clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => {
+                hideFeedback();
+            }, 3000);
+        }
+
+        function hideFeedback() {
+            const modal = document.getElementById('result-card');
+            const backdrop = document.getElementById('result-backdrop');
+            const overlay = document.getElementById('result-overlay');
+
+            gsap.to(modal, {
+                y: '100%',
+                duration: 0.4,
+                ease: "power2.in",
+                onComplete: () => {
+                    overlay.classList.add('pointer-events-none');
+                    backdrop.classList.add('opacity-0');
+                    isScanning = false; // السماح بالمسح التالي
+                }
+            });
+        }
+
+        // --- تأثير الانفجار (Confetti) ---
+        function fireConfetti() {
+            const duration = 1500;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#3b82f6', '#10b981', '#f59e0b']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#3b82f6', '#10b981', '#f59e0b']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // --- أدوات مساعدة ---
+        function setMode(m) {
+            currentMode = m;
+            const slider = document.getElementById('mode-slider');
+            const btnIn = document.getElementById('btn-in');
+            const btnOut = document.getElementById('btn-out');
+
+            if (m === 'in') {
+                slider.style.left = '8px';
+                slider.classList.replace('from-red-600', 'from-blue-600');
+                slider.classList.replace('to-red-500', 'to-blue-500');
+                
+                btnIn.classList.replace('text-slate-400', 'text-white');
+                btnOut.classList.replace('text-white', 'text-slate-400');
+            } else {
+                slider.style.left = 'calc(50% + 4px)';
+                slider.classList.replace('from-blue-600', 'from-red-600');
+                slider.classList.replace('to-blue-500', 'to-red-500');
+
+                btnOut.classList.replace('text-slate-400', 'text-white');
+                btnIn.classList.replace('text-white', 'text-slate-400');
+            }
+        }
+
+        function showLoadingState(isLoading) {
+            const icon = document.getElementById('scan-status-icon');
+            icon.style.opacity = isLoading ? '1' : '0';
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour12: false, hour:'2-digit', minute:'2-digit'});
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB');
+        }
+
+        function playAudio(id) {
+            const audio = document.getElementById(id === 'success' ? 'sound-success' : 'sound-error');
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
+
+        function preloadData() {
+            // جلب الطلاب
+            db.ref('school/students').once('value', s => studentsCache = s.val() || {});
+            
+            // مراقبة العداد اليومي
+            const today = new Date().toISOString().split('T')[0];
+            db.ref(`school/attendance/${today}`).on('value', s => {
+                let count = 0;
+                if(s.exists()) {
+                    s.forEach(child => count++);
+                }
+                // Animate Number
+                const el = document.getElementById('daily-count');
+                const prev = parseInt(el.innerText);
+                if(prev !== count) {
+                    gsap.to(el, { innerText: count, duration: 1, snap: { innerText: 1 }, ease: "power1.out" });
+                }
+            });
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            for(let i=0; i<20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 5 + 2;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.top = `${Math.random() * 100 + 100}vh`; // start below screen
+                p.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                p.style.opacity = Math.random() * 0.5;
+                container.appendChild(p);
+            }
         }
     </script>
 </body>
