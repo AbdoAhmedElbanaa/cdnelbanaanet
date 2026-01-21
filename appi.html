@@ -479,19 +479,28 @@
                 student.statusType = status; 
                 showFeedback('success', student);
             }).catch(err => {
-                let msg = "خطأ غير متوقع";
-                // ترجمة رسائل الخطأ لتكون واضحة
-                if (err.message === 'ALREADY_IN') {
-                    // جلب وقت التسجيل السابق إن أمكن (يتطلب قراءة Snapshot، سنكتفي بالرسالة الآن)
+                let msg = "حدث خطأ غير متوقع";
+                // الحصول على رسالة الخطأ الآمنة
+                const errMsg = err.message || "";
+
+                // التحقق من نوع الخطأ واستبداله برسالة عربية
+                if (errMsg.includes('ALREADY_IN')) {
                     msg = "تم تسجيل حضورك من قبل لهذا اليوم";
                     showFeedback('warning', { ...student, error: msg });
-                } else if (err.message === 'NOT_CHECKED_IN') {
+                } else if (errMsg.includes('NOT_CHECKED_IN')) {
                     msg = "عذراً، يجب تسجيل الحضور أولاً";
                     showFeedback('error', { ...student, error: msg });
-                } else if (err.message === 'ALREADY_OUT') {
+                } else if (errMsg.includes('ALREADY_OUT')) {
                     msg = "تم تسجيل انصرافك من قبل";
                     showFeedback('warning', { ...student, error: msg });
+                } else if (errMsg.includes('TRANSACTION_FAILED')) {
+                    msg = "فشل الاتصال بالخادم، حاول مرة أخرى";
+                    showFeedback('error', { ...student, error: msg });
                 } else {
+                    // إذا كان الخطأ يحتوي على نص عربي، نعرضه كما هو، وإلا نعرض رسالة عامة
+                    // هذا يضمن عدم عرض أخطاء تقنية مثل "ReferenceError" للمستخدم
+                    const hasArabic = /[\u0600-\u06FF]/.test(errMsg);
+                    msg = hasArabic ? errMsg : "حدث خطأ تقني في النظام";
                     showFeedback('error', { ...student, error: msg });
                 }
             });
@@ -505,12 +514,14 @@
             const bar = document.getElementById('progress-bar');
             
             // تعبئة البيانات
-            document.getElementById('student-name').innerText = data.name;
+            document.getElementById('student-name').innerText = data.name || "مستخدم";
             document.getElementById('student-class').innerText = data.classId || 'عام';
             document.getElementById('scan-time').innerText = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
             
             const avatar = document.getElementById('result-avatar');
-            avatar.innerHTML = data.photo ? `<img src="${data.photo}" class="w-full h-full object-cover">` : data.name.charAt(0);
+            // تأمين ضد البيانات الناقصة
+            const initial = data.name ? data.name.charAt(0) : "?";
+            avatar.innerHTML = data.photo ? `<img src="${data.photo}" class="w-full h-full object-cover">` : initial;
 
             // تحديد الألوان والنصوص بناءً على الحالة
             const msgEl = document.getElementById('status-message');
@@ -553,7 +564,7 @@
 
             } else if (type === 'warning') {
                 msgEl.innerText = data.error;
-                subMsgEl.innerText = "يرجى مراجعة المشرف إذا كان هناك خطأ";
+                subMsgEl.innerText = "يرجى المحاولة مرة أخرى";
                 msgEl.className = "text-xl font-bold text-yellow-500 mb-1";
                 badge.className = "absolute bottom-0 right-0 bg-yellow-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
                 badge.innerHTML = '!';
