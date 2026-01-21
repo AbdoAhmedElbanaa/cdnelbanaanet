@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <!-- تحسين العرض على الموبايل ومنع التكبير العشوائي -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام الحضور الذكي | Live Scanner</title>
+    
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- المكتبات -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- إعدادات التصميم -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' },
+                        dark: { bg: '#0f172a', card: '#1e293b' }
+                    },
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0f172a; color: white; overflow: hidden; touch-action: none; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        /* تحسين مظهر الكاميرا */
+        #reader { width: 100%; height: 100%; object-fit: cover; border-radius: 1.5rem; overflow: hidden; }
+        #reader video { object-fit: cover; border-radius: 1.5rem; height: 100% !important; width: 100% !important; }
+        
+        .scan-overlay {
+            position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(circle, transparent 30%, rgba(15, 23, 42, 0.8) 70%);
+            z-index: 10;
+        }
+        .scan-line {
+            width: 100%; height: 2px; background: #0ea5e9;
+            box-shadow: 0 0 20px #0ea5e9;
+            position: absolute; top: 0;
+            animation: scanMove 2s infinite ease-in-out;
+        }
+        @keyframes scanMove { 0% { top: 10%; opacity: 0; } 50% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
+    </style>
+</head>
+<body class="h-screen flex flex-col justify-between p-4 md:p-6 relative">
+
+    <!-- شاشة البدء (ضرورية للموبايل لطلب الإذن) -->
+    <div id="start-screen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+        <div class="relative w-32 h-32 mb-8">
+            <div class="absolute inset-0 bg-brand-500/20 rounded-full animate-ping"></div>
+            <div class="absolute inset-0 bg-brand-500/10 rounded-full animate-pulse"></div>
+            <div class="relative bg-slate-800 rounded-full w-full h-full flex items-center justify-center border border-brand-500/30">
+                <svg class="w-14 h-14 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+        </div>
+        <h2 class="text-3xl font-bold text-white mb-3">نظام الحضور</h2>
+        <p class="text-slate-400 mb-10 max-w-xs text-sm leading-relaxed">لبدء تسجيل الحضور، نحتاج للوصول إلى الكاميرا لمسح البطاقات.</p>
+        
+        <button onclick="initCamera()" class="w-full max-w-sm py-4 bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            تشغيل الماسح
+        </button>
+        <p id="error-msg-start" class="mt-4 text-red-400 text-sm font-bold bg-red-900/20 p-2 rounded-lg border border-red-500/20 hidden">
+            <!-- سيتم كتابة الخطأ هنا -->
+        </p>
+    </div>
+
+    <!-- الخلفية الحية -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+    </div>
+
+    <!-- الهيدر -->
+    <header class="flex justify-between items-center z-50 mb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/></svg>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-none">Live Scanner</h1>
+                <p id="live-clock" class="text-xs text-slate-400 font-mono mt-1">--:--:--</p>
+            </div>
+        </div>
+        <div id="connection-status" class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold border border-slate-700 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span> جاري الاتصال...
+        </div>
+    </header>
+
+    <!-- منطقة الكاميرا -->
+    <main class="flex-1 flex flex-col items-center justify-start relative w-full max-w-md mx-auto h-full">
+        
+        <!-- مفتاح الوضع -->
+        <div class="glass-panel p-1 rounded-2xl flex w-full mb-4 relative">
+            <div id="mode-indicator" class="absolute top-1 bottom-1 w-[48%] bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl shadow-lg transition-all duration-300 left-1"></div>
+            <button onclick="switchMode('in')" class="flex-1 py-3 text-center relative z-10 font-bold text-sm transition-colors duration-300 text-white" id="btn-in">حضور</button>
+            <button onclick="switchMode('out')" class="flex-1 py-3 text-center relative z-10 font-bold text-sm text-slate-400 transition-colors duration-300" id="btn-out">انصراف</button>
+        </div>
+
+        <!-- إطار الكاميرا -->
+        <div class="relative w-full flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 group min-h-[300px]">
+            <div id="reader" class="w-full h-full"></div>
+            
+            <!-- Overlay Graphics -->
+            <div class="scan-overlay flex items-center justify-center">
+                <div class="relative w-64 h-64 border-2 border-white/30 rounded-3xl">
+                    <div class="scan-line"></div>
+                    <!-- زوايا الإطار -->
+                    <div class="absolute top-[-2px] left-[-2px] w-8 h-8 border-t-4 border-l-4 border-brand-500 rounded-tl-xl"></div>
+                    <div class="absolute top-[-2px] right-[-2px] w-8 h-8 border-t-4 border-r-4 border-brand-500 rounded-tr-xl"></div>
+                    <div class="absolute bottom-[-2px] left-[-2px] w-8 h-8 border-b-4 border-l-4 border-brand-500 rounded-bl-xl"></div>
+                    <div class="absolute bottom-[-2px] right-[-2px] w-8 h-8 border-b-4 border-r-4 border-brand-500 rounded-br-xl"></div>
+                </div>
+            </div>
+            
+            <!-- زر تبديل الكاميرا -->
+            <button onclick="flipCamera()" class="absolute bottom-4 right-4 z-20 p-3 bg-white/10 backdrop-blur rounded-full text-white hover:bg-white/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+        </div>
+
+        <p class="mt-4 text-slate-400 text-xs animate-pulse text-center">وجّه الرمز داخل المربع</p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-4 glass-panel p-4 rounded-2xl flex justify-between items-center text-xs text-slate-400 w-full max-w-md mx-auto">
+        <div>المسح اليومي: <span id="daily-count" class="text-white font-bold text-base ml-1">0</span></div>
+        <div class="flex items-center gap-1"><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> Live</div>
+    </footer>
+
+    <!-- Result Modal (Overlay) -->
+    <div id="result-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full md:w-[400px] p-6 rounded-t-3xl md:rounded-3xl shadow-2xl relative transform translate-y-full md:translate-y-10 transition-transform duration-300" id="result-card">
+            <div class="absolute top-0 left-0 h-1.5 bg-slate-100 w-full rounded-t-3xl overflow-hidden"><div id="auto-close-bar" class="h-full bg-brand-500 w-0"></div></div>
+            <div class="flex flex-col items-center text-center mt-2">
+                <div id="result-icon-container" class="w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-lg transform transition-transform hover:scale-110"></div>
+                <h2 id="result-title" class="text-2xl font-black text-slate-800 dark:text-white mb-1"></h2>
+                <p id="result-msg" class="text-slate-500 text-sm mb-6"></p>
+                <div id="student-details" class="w-full bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 flex items-center gap-4 text-right hidden">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-lg" id="student-avatar"></div>
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-white text-lg" id="student-name"></div>
+                        <div class="text-xs text-brand-500 font-bold" id="student-class"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sounds -->
+    <audio id="sound-success" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
+
+    <script>
+        // --- 1. Firebase Config ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyADEyiGtrStnDfbNa6tGYFGkREbX4Xo0p4",
+            authDomain: "hodurplus.firebaseapp.com",
+            databaseURL: "https://hodurplus-default-rtdb.firebaseio.com",
+            projectId: "hodurplus",
+            storageBucket: "hodurplus.firebasestorage.app",
+            messagingSenderId: "782910695769",
+            appId: "1:782910695769:web:11b0adaf3eb89230abc448",
+            measurementId: "G-0ZYMVM6E4B"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        // --- 2. State & Variables ---
+        let html5QrcodeScanner = null;
+        let isCameraRunning = false;
+        let state = { mode: 'in', isScanning: false, studentsCache: {}, currentCameraId: null };
+
+        // --- 3. Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}), 1000);
+            
+            auth.onAuthStateChanged(user => {
+                const el = document.getElementById('connection-status');
+                if(user) {
+                    el.className = "px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 flex items-center gap-2";
+                    el.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]"></span> متصل';
+                    preloadData();
+                } else {
+                    auth.signInAnonymously().catch(console.error);
+                }
+            });
+        });
+
+        // --- 4. Camera Logic (Robust & Fallback) ---
+        async function initCamera() {
+            const startScreen = document.getElementById('start-screen');
+            const errorMsg = document.getElementById('error-msg-start');
+            
+            // تحقق من الأمان (HTTPS)
+            if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                errorMsg.innerText = "تنبيه: الكاميرا تتطلب اتصالاً آمناً (HTTPS) لتعمل. يرجى التأكد من تشغيل الموقع عبر HTTPS.";
+                errorMsg.classList.remove('hidden');
+            }
+
+            try {
+                if(!html5QrcodeScanner) {
+                    html5QrcodeScanner = new Html5Qrcode("reader");
+                }
+                
+                const config = { 
+                    fps: 10, 
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    // مهم: تعطيل الـ flip التلقائي لتجنب المشاكل في بعض المتصفحات
+                    disableFlip: false 
+                };
+
+                // محاولة 1: الكاميرا الخلفية (المفضلة)
+                try {
+                    await html5QrcodeScanner.start(
+                        { facingMode: "environment" }, 
+                        config, 
+                        onScanSuccess, 
+                        onScanError
+                    );
+                } catch (err1) {
+                    console.warn("فشلت المحاولة الأولى (الخلفية)، جاري المحاولة بأي كاميرا...", err1);
+                    
+                    // محاولة 2: أي كاميرا متاحة (Fallback)
+                    // هذا يحل المشكلة إذا كان الجهاز لا يدعم environment أو كان لابتوب
+                    await html5QrcodeScanner.start(
+                        { facingMode: "user" }, 
+                        config, 
+                        onScanSuccess, 
+                        onScanError
+                    );
+                }
+
+                // نجاح
+                gsap.to(startScreen, { opacity: 0, duration: 0.5, onComplete: () => startScreen.classList.add('hidden') });
+                isCameraRunning = true;
+
+            } catch (err) {
+                console.error("فشل نهائي للكاميرا:", err);
+                
+                let userMsg = "تعذر تشغيل الكاميرا.";
+                const errStr = err.toString();
+
+                if (errStr.includes("NotAllowedError") || errStr.includes("Permission")) {
+                    userMsg = "المتصفح يرفض الوصول للكاميرا. يرجى الضغط على قفل الأمان في شريط العنوان وتفعيل الكاميرا.";
+                } else if (errStr.includes("NotFoundError")) {
+                    userMsg = "لم يتم العثور على كاميرا في الجهاز.";
+                } else if (errStr.includes("NotReadableError")) {
+                    userMsg = "الكاميرا مشغولة حالياً بتطبيق آخر. أغلق التطبيقات الأخرى وحاول مرة أخرى.";
+                } else if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                     userMsg = "الكاميرا لا تعمل إلا على اتصال آمن (HTTPS).";
+                }
+                
+                errorMsg.innerText = userMsg;
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function flipCamera() {
+            alert("سيتم دعم التبديل اليدوي في التحديث القادم");
+        }
+
+        // --- 5. Scan Processing ---
+        async function onScanSuccess(decodedText) {
+            if (state.isScanning) return;
+            state.isScanning = true;
+            pauseUI();
+
+            try {
+                // 1. Parse
+                let qrData;
+                try { qrData = JSON.parse(decodedText); } catch(e) { throw new Error("رمز غير صالح"); }
+                
+                if (!qrData.id || qrData.type !== 'student') throw new Error("الرمز لا يخص طالب");
+
+                // 2. Local Lookup
+                const studentKey = Object.keys(state.studentsCache).find(k => state.studentsCache[k].studentId === qrData.id);
+                if (!studentKey) throw new Error("الطالب غير مسجل");
+
+                const student = state.studentsCache[studentKey];
+
+                // 3. Firebase Transaction
+                await processAttendance(studentKey, student);
+
+            } catch (error) {
+                showFeedback('error', 'خطأ', error.message);
+                playAudio('error');
+            } finally {
+                setTimeout(() => {
+                    state.isScanning = false;
+                    resumeUI();
+                }, 2000); // تأخير بسيط لمنع التكرار
+            }
+        }
+
+        function onScanError(err) { /* Ignored to prevent log spam */ }
+
+        async function processAttendance(key, student) {
+            const date = new Date().toISOString().split('T')[0];
+            const ts = Date.now(); // Number for Rules compliance
+            const ref = db.ref(`school/attendance/${date}/${key}`);
+
+            await ref.transaction((current) => {
+                if (state.mode === 'in') {
+                    if (current && current.checkInTime) throw new Error("ALREADY_IN");
+                    return {
+                        studentId: student.studentId,
+                        name: student.name,
+                        classId: student.classId,
+                        checkInTime: ts,
+                        status: 'present',
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    };
+                } else {
+                    if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN");
+                    if (current.checkOutTime) throw new Error("ALREADY_OUT");
+                    return { ...current, checkOutTime: ts, status: 'checked_out' }; // Underscore for Rules
+                }
+            }, (error, committed, snapshot) => {
+                if (error) {
+                    console.error(error);
+                    showFeedback('error', 'خطأ تقني', 'فشل الاتصال');
+                    playAudio('error');
+                } else if (!committed) {
+                    showFeedback('warning', 'تنبيه', 'العملية مكررة أو مرفوضة');
+                    playAudio('error');
+                } else {
+                    const timeStr = new Date(ts).toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'});
+                    showFeedback('success', state.mode === 'in' ? 'تم الحضور' : 'تم الانصراف', timeStr, student);
+                    playAudio('success');
+                }
+            }).catch(err => {
+                let msg = err.message;
+                if(msg === 'ALREADY_IN') msg = 'مسجل حضور مسبقاً';
+                if(msg === 'NOT_CHECKED_IN') msg = 'يجب تسجيل الحضور أولاً';
+                if(msg === 'ALREADY_OUT') msg = 'مسجل انصراف مسبقاً';
+                showFeedback('warning', 'مرفوض', msg, student);
+                playAudio('error');
+            });
+        }
+
+        // --- 6. UI Helpers ---
+        function switchMode(m) {
+            state.mode = m;
+            const ind = document.getElementById('mode-indicator');
+            const bIn = document.getElementById('btn-in');
+            const bOut = document.getElementById('btn-out');
+            
+            if(m === 'in') {
+                ind.style.left = '1%'; 
+                ind.className = ind.className.replace(/from-red-500 to-rose-500/, 'from-green-500 to-emerald-500');
+                bIn.classList.add('text-white'); bIn.classList.remove('text-slate-400');
+                bOut.classList.remove('text-white'); bOut.classList.add('text-slate-400');
+            } else {
+                ind.style.left = '51%';
+                ind.className = ind.className.replace(/from-green-500 to-emerald-500/, 'from-red-500 to-rose-500');
+                bOut.classList.add('text-white'); bOut.classList.remove('text-slate-400');
+                bIn.classList.remove('text-white'); bIn.classList.add('text-slate-400');
+            }
+        }
+
+        function showFeedback(type, title, msg, student=null) {
+            const modal = document.getElementById('result-modal');
+            const card = document.getElementById('result-card');
+            const iconBox = document.getElementById('result-icon-container');
+            const bar = document.getElementById('auto-close-bar');
+
+            // Reset
+            bar.style.width = '0%'; bar.style.transition = 'none';
+            document.getElementById('student-details').classList.add('hidden');
+
+            // Style
+            let color = type === 'success' ? 'bg-green-100 text-green-600' : type === 'error' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-600';
+            let barColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500';
+            let icon = type === 'success' ? '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+
+            iconBox.className = `w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-lg transform transition-transform hover:scale-110 ${color}`;
+            iconBox.innerHTML = icon;
+            bar.className = `h-full ${barColor} w-0`;
+            
+            document.getElementById('result-title').innerText = title;
+            document.getElementById('result-msg').innerText = msg;
+
+            if(student) {
+                document.getElementById('student-details').classList.remove('hidden');
+                document.getElementById('student-name').innerText = student.name;
+                document.getElementById('student-class').innerText = student.classId; // تحسين: يمكن جلب اسم الصف
+                document.getElementById('student-avatar').innerText = student.name.charAt(0);
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('translate-y-full', 'md:translate-y-10');
+
+            // Auto close
+            setTimeout(() => { bar.style.transition = 'width 2s linear'; bar.style.width = '100%'; }, 100);
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                card.classList.add('translate-y-full', 'md:translate-y-10');
+            }, 2100);
+        }
+
+        function playAudio(type) {
+            const a = document.getElementById(type === 'success' ? 'sound-success' : 'sound-error');
+            a.currentTime = 0; a.play().catch(()=>{});
+        }
+        function pauseUI() { document.querySelector('.scan-line').style.opacity = 0; }
+        function resumeUI() { document.querySelector('.scan-line').style.opacity = 1; }
+        
+        function preloadData() {
+            db.ref('school/students').once('value', s => state.studentsCache = s.val() || {});
+            db.ref(`school/attendance/${new Date().toISOString().split('T')[0]}`).on('value', s => {
+                document.getElementById('daily-count').innerText = s.numChildren();
+            });
+        }
+    </script>
+</body>
+</html>
