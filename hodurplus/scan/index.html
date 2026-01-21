@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام الحضور الذكي | Live Scanner Pro</title>
+    
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- المكتبات الأساسية -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase SDK (v8 Compatible) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- إعدادات Tailwind المخصصة -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.2)',
+                            300: 'rgba(255, 255, 255, 0.05)',
+                            dark: 'rgba(15, 23, 42, 0.6)'
+                        }
+                    },
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    boxShadow: {
+                        'neon-green': '0 0 20px rgba(34, 197, 94, 0.5)',
+                        'neon-red': '0 0 20px rgba(239, 68, 68, 0.5)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(34, 197, 94, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #reader { width: 100%; height: 100%; border-radius: 1.5rem; overflow: hidden; } 
+        #reader video { object-fit: cover; border-radius: 1.5rem; width: 100% !important; height: 100% !important; }
+
+        .scan-laser {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #22c55e, transparent);
+            box-shadow: 0 0 15px #22c55e;
+            top: 50%;
+            z-index: 20;
+            opacity: 0.8;
+            animation: scan 1s infinite ease-in-out; /* أسرع للكاميرا 60fps */
+        }
+        
+        .mode-out .scan-laser {
+            background: linear-gradient(90deg, transparent, #ef4444, transparent);
+            box-shadow: 0 0 15px #ef4444;
+        }
+
+        @keyframes scan {
+            0% { top: 10%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 90%; opacity: 0; }
+        }
+
+        .corner-border {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #22c55e;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+        .mode-out .corner-border { border-color: #ef4444; }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            animation: float 20s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes float { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-100vh) rotate(360deg); } }
+
+        /* تأثير الوميض للتأخير الفادح */
+        .flash-red {
+            animation: flashRed 0.5s ease-in-out;
+        }
+        @keyframes flashRed {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(239, 68, 68, 0.3); }
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-between p-4 relative transition-colors duration-700">
+
+    <!-- طبقة تأثير الوميض -->
+    <div id="flash-overlay" class="fixed inset-0 pointer-events-none z-[60]"></div>
+
+    <!-- خلفية الجسيمات المتحركة -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-[-1]"></div>
+
+    <!-- شاشة البداية -->
+    <div id="start-screen" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
+        <div class="relative mb-8 group">
+            <div class="absolute inset-0 bg-green-500 rounded-full blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+            <div class="relative w-32 h-32 bg-slate-900 rounded-full border border-slate-700 flex items-center justify-center shadow-2xl">
+                <svg class="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/>
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-4xl font-black text-white mb-2 tracking-tight">نظام الحضور الذكي</h1>
+        <p class="text-slate-400 mb-10 text-lg">يرجى منح صلاحية الكاميرا (60 FPS Ready)</p>
+        <button onclick="initCamera()" class="group relative px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-2xl shadow-lg shadow-green-500/30 transition-all active:scale-95 overflow-hidden">
+            <span class="relative flex items-center gap-3 text-lg">تشغيل النظام</span>
+        </button>
+        <p id="error-msg" class="mt-6 text-red-400 font-medium hidden bg-red-900/20 px-4 py-2 rounded-lg border border-red-500/20"></p>
+    </div>
+
+    <!-- الرأس -->
+    <header class="w-full max-w-4xl flex justify-between items-center z-10 py-2">
+        <div class="flex items-center gap-4">
+            <div id="header-icon-bg" class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500">
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div>
+                <h2 class="font-bold text-xl text-white leading-tight">سجل الحضور</h2>
+                <div class="flex items-center gap-2">
+                    <span id="connection-dot" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span id="connection-text" class="text-xs text-slate-400">غير متصل</span>
+                </div>
+            </div>
+        </div>
+        <div class="glass-panel px-5 py-2 rounded-xl text-center min-w-[140px]">
+            <div id="live-clock" class="text-xl font-mono font-bold text-white">--:--</div>
+            <div id="live-date" class="text-[10px] text-slate-400 uppercase tracking-wider">--/--/----</div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 w-full max-w-4xl flex flex-col md:flex-row gap-6 items-center justify-center py-4 relative z-10">
+        
+        <!-- قسم التحكم -->
+        <div class="w-full md:w-1/3 flex flex-col gap-4 order-2 md:order-1">
+            <div class="glass-panel p-2 rounded-2xl relative h-16">
+                <div id="mode-slider" class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-gradient-to-r from-green-600 to-green-500 rounded-xl shadow-lg transition-all duration-500 ease-in-out left-2"></div>
+                <div class="relative z-10 flex h-full">
+                    <button onclick="attemptSetMode('in')" id="btn-in" class="flex-1 flex items-center justify-center gap-2 font-bold text-white transition-colors duration-300">حضور</button>
+                    <button onclick="attemptSetMode('out')" id="btn-out" class="flex-1 flex items-center justify-center gap-2 font-bold text-slate-400 transition-colors duration-300">انصراف</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-slate-400 text-sm">حضور اليوم</span>
+                    <span id="daily-in-count" class="text-xl font-bold text-green-400">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-sm">انصراف اليوم</span>
+                    <span id="daily-out-count" class="text-xl font-bold text-red-400">0</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded-xl text-xs text-slate-500 space-y-1 text-center">
+                <p>وقت بدء الدوام: <span class="text-white font-mono">08:00 ص</span></p>
+                <p>بدء الانصراف: <span class="text-white font-mono">02:00 م</span></p>
+            </div>
+        </div>
+
+        <!-- منطقة الكاميرا -->
+        <div class="w-full md:w-2/3 h-[400px] md:h-[500px] relative order-1 md:order-2">
+            <div id="camera-frame" class="absolute inset-0 bg-slate-900 rounded-[2rem] border-[6px] border-slate-800 shadow-2xl overflow-hidden relative group transition-colors duration-500">
+                <div id="reader" class="w-full h-full bg-black"></div>
+                <div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+                    <div class="relative w-[280px] h-[280px]">
+                        <div class="corner-border border-t-4 border-l-4 rounded-tl-2xl top-0 left-0"></div>
+                        <div class="corner-border border-t-4 border-r-4 rounded-tr-2xl top-0 right-0"></div>
+                        <div class="corner-border border-b-4 border-l-4 rounded-bl-2xl bottom-0 left-0"></div>
+                        <div class="corner-border border-b-4 border-r-4 rounded-br-2xl bottom-0 right-0"></div>
+                        <div class="scan-laser"></div>
+                        <div id="scan-status-icon" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- النافذة المنبثقة للنتيجة -->
+    <div id="result-overlay" class="fixed inset-0 z-50 pointer-events-none flex items-end justify-center">
+        <div id="result-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-md opacity-0 transition-opacity duration-300"></div>
+
+        <div id="result-card" class="relative w-full max-w-lg bg-slate-900 border-t border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] rounded-t-[2.5rem] p-6 pb-12 transform translate-y-full origin-bottom">
+            <div class="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-white/20 rounded-full"></div>
+
+            <div class="flex flex-col items-center text-center relative z-10">
+                <!-- الصورة -->
+                <div class="relative mb-3 card-item">
+                    <div id="status-ring" class="absolute -inset-2 rounded-full border-[3px] border-dashed border-gray-500/50"></div>
+                    <div id="result-avatar" class="w-20 h-20 rounded-full bg-slate-800 border-4 border-slate-900 shadow-xl overflow-hidden flex items-center justify-center text-3xl font-bold text-slate-400 relative z-10"></div>
+                    <div id="status-badge" class="absolute bottom-0 right-0 p-1.5 rounded-full border-4 border-slate-900 shadow-lg scale-0"></div>
+                </div>
+
+                <!-- الاسم والرسالة -->
+                <h2 id="student-name" class="text-2xl font-black text-white mb-1 card-item opacity-0">...</h2>
+                <div id="status-message" class="text-xl font-bold text-white mb-6 card-item opacity-0">...</div>
+
+                <!-- تفاصيل الطالب الكاملة -->
+                <div class="w-full bg-slate-800/50 rounded-2xl p-4 grid grid-cols-2 gap-4 text-right border border-white/5 card-item opacity-0 translate-y-4">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">الصف الدراسي</span>
+                        <span id="detail-class" class="text-sm font-bold text-white">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">رقم الطالب</span>
+                        <span id="detail-id" class="text-sm font-bold text-white font-mono">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">وقت المسح</span>
+                        <span id="detail-time" class="text-sm font-bold text-blue-400 font-mono">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">التاريخ</span>
+                        <span id="detail-date" class="text-sm font-bold text-slate-300 font-mono">...</span>
+                    </div>
+                </div>
+
+                <!-- رسالة فرعية -->
+                <div id="status-submessage" class="text-xs text-slate-400 mt-4 card-item opacity-0"></div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 w-full h-1.5 bg-slate-800">
+                <div id="progress-bar" class="h-full bg-white w-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الأصوات -->
+    <audio id="sound-success" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
+    <audio id="sound-warning" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-back-2575.mp3"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
+
+    <script>
+        const CONFIG = {
+            SCHOOL_START_TIME: "08:00",
+            LATE_THRESHOLD_MINUTES: 15,
+            SEVERE_LATE_MINUTES: 30,
+            DEPARTURE_START_TIME: "18:00",
+            OVERTIME_THRESHOLD_MINUTES: 15,
+            USE_24_HOUR_FORMAT: false // true = 24h format, false = 12h format
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyADEyiGtrStnDfbNa6tGYFGkREbX4Xo0p4",
+            authDomain: "hodurplus.firebaseapp.com",
+            databaseURL: "https://hodurplus-default-rtdb.firebaseio.com",
+            projectId: "hodurplus",
+            storageBucket: "hodurplus.firebasestorage.app",
+            messagingSenderId: "782910695769",
+            appId: "1:782910695769:web:11b0adaf3eb89230abc448",
+            measurementId: "G-0ZYMVM6E4B"
+        };
+        
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        let html5QrcodeScanner = null;
+        let isScanning = false;
+        let currentMode = 'in';
+        let studentsCache = {};
+        let closeTimer = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            createParticles();
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById('connection-dot').className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+                    document.getElementById('connection-text').innerText = "متصل";
+                    document.getElementById('connection-text').className = "text-xs text-green-400 font-bold";
+                    preloadData();
+                } else {
+                    auth.signInAnonymously().catch(console.error);
+                }
+            });
+        });
+
+        async function initCamera() {
+            const startScreen = document.getElementById('start-screen');
+            try {
+                if (!html5QrcodeScanner) html5QrcodeScanner = new Html5Qrcode("reader");
+                
+                // تحديث: 60 FPS
+                const config = { fps: 60, qrbox: { width: 280, height: 280 }, aspectRatio: 1.0 };
+                
+                try {
+                    await html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess);
+                } catch (e) {
+                    await html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
+                }
+                gsap.to(startScreen, { opacity: 0, y: -50, duration: 0.6, onComplete: () => startScreen.style.display = 'none' });
+            } catch (err) {
+                document.getElementById('error-msg').innerText = "خطأ في الكاميرا: " + err;
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function attemptSetMode(mode) {
+            if (mode === 'out') {
+                const now = new Date();
+                const [h, m] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
+                const departureTime = new Date();
+                departureTime.setHours(h, m, 0, 0);
+
+                if (now < departureTime) {
+                    showFeedback('error', { name: 'تنبيه', error: `لم يحن وقت الانصراف بعد (${CONFIG.DEPARTURE_START_TIME})` });
+                    playAudio('error');
+                    return;
+                }
+            }
+            setMode(mode);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const slider = document.getElementById('mode-slider');
+            const btnIn = document.getElementById('btn-in');
+            const btnOut = document.getElementById('btn-out');
+            const headerBg = document.getElementById('header-icon-bg');
+            const body = document.body;
+
+            if (mode === 'in') {
+                gsap.to(slider, { left: '8px', background: 'linear-gradient(to right, #16a34a, #22c55e)', duration: 0.4 });
+                btnIn.classList.replace('text-slate-400', 'text-white');
+                btnOut.classList.replace('text-white', 'text-slate-400');
+                headerBg.className = "w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500";
+                body.classList.remove('mode-out');
+            } else {
+                gsap.to(slider, { left: 'calc(50% + 4px)', background: 'linear-gradient(to right, #dc2626, #ef4444)', duration: 0.4 });
+                btnOut.classList.replace('text-slate-400', 'text-white');
+                btnIn.classList.replace('text-white', 'text-slate-400');
+                headerBg.className = "w-12 h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500";
+                body.classList.add('mode-out');
+            }
+        }
+
+        function translateError(errorMsg) {
+            if (!errorMsg) return "حدث خطأ غير معروف";
+            const msg = errorMsg.toString();
+            if (msg.includes('permission_denied') || msg.includes('PERMISSION_DENIED')) {
+                return "ليس لديك صلاحية (حالة غير معرفة أو قيود)";
+            }
+            if (msg.includes('COMPLETED_TODAY')) return "انتهت فترتك اليوم";
+            if (msg.includes('ALREADY_IN')) return "تم تسجيل حضورك مسبقاً";
+            if (msg.includes('NOT_CHECKED_IN')) return "يجب تسجيل الحضور أولاً";
+            if (msg.includes('ALREADY_OUT')) return "تم تسجيل انصرافك مسبقاً";
+            if (msg.includes('TRANSACTION_FAILED')) return "فشل الاتصال";
+            return /[\u0600-\u06FF]/.test(msg) ? msg : "خطأ تقني";
+        }
+
+        async function onScanSuccess(decodedText) {
+            if (isScanning) return;
+            isScanning = true;
+            showLoadingState(true);
+
+            try {
+                let data;
+                try { data = JSON.parse(decodedText); } catch { throw new Error("رمز غير صالح"); }
+                
+                // Allow "student" or generic types if needed, but strictly check ID
+                if (!data.id) throw new Error("الرمز غير صحيح");
+
+                // --- FIX: Robust Lookup Strategy ---
+                const scannedId = String(data.id).trim(); // Normalize ID
+                
+                // 1. Try to find key where studentId matches inside the object
+                let studentKey = Object.keys(studentsCache).find(k => 
+                    studentsCache[k].studentId && String(studentsCache[k].studentId) === scannedId
+                );
+
+                // 2. Fallback: Check if the key itself is the ID
+                if (!studentKey && studentsCache[scannedId]) {
+                    studentKey = scannedId;
+                    // Ensure studentId property exists for later use
+                    if(!studentsCache[studentKey].studentId) studentsCache[studentKey].studentId = scannedId;
+                }
+
+                if (!studentKey) throw new Error("الطالب غير مسجل");
+
+                await processAttendance(studentKey, studentsCache[studentKey]);
+
+            } catch (error) {
+                showFeedback('error', { name: 'خطأ', error: translateError(error.message) });
+            } finally {
+                showLoadingState(false);
+            }
+        }
+
+        async function processAttendance(key, student) {
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const nowTs = now.getTime();
+            const ref = db.ref(`school/attendance/${today}/${key}`);
+
+            let status = 'present';
+            let statusLabel = '';
+            
+            if (currentMode === 'in') {
+                const [sh, sm] = CONFIG.SCHOOL_START_TIME.split(':').map(Number);
+                const startTime = new Date(); startTime.setHours(sh, sm, 0, 0);
+                const diffMinutes = (now - startTime) / 60000;
+
+                if (diffMinutes > CONFIG.SEVERE_LATE_MINUTES) {
+                    status = 'severe_late'; statusLabel = 'تأخير فادح';
+                } else if (diffMinutes > CONFIG.LATE_THRESHOLD_MINUTES) {
+                    status = 'late'; statusLabel = 'متأخر';
+                } else {
+                    statusLabel = 'حضور في الوقت';
+                }
+            } else {
+                const [dh, dm] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
+                const deptTime = new Date(); deptTime.setHours(dh, dm, 0, 0);
+                const diffMinutes = (now - deptTime) / 60000;
+                if (diffMinutes > CONFIG.OVERTIME_THRESHOLD_MINUTES) {
+                    status = 'overtime'; statusLabel = 'وقت إضافي';
+                } else {
+                    status = 'checked_out'; statusLabel = 'انصراف';
+                }
+            }
+
+            await ref.transaction((current) => {
+                if (current && current.checkInTime && current.checkOutTime) throw new Error("COMPLETED_TODAY");
+                
+                if (currentMode === 'in') {
+                    if (current && current.checkInTime) throw new Error("ALREADY_IN");
+                    return {
+                        studentId: student.studentId,
+                        name: student.name,
+                        classId: student.classId || "غير محدد",
+                        checkInTime: nowTs,
+                        status: status,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    };
+                } else {
+                    if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN");
+                    if (current.checkOutTime) throw new Error("ALREADY_OUT");
+                    return { ...current, checkOutTime: nowTs, statusOut: status };
+                }
+            }, (error, committed, snapshot) => {
+                if (error) throw error;
+                if (!committed) throw new Error("TRANSACTION_FAILED");
+                
+                student.statusLabel = statusLabel;
+                student.statusType = status; 
+                showFeedback('success', student);
+            }).catch(err => {
+                showFeedback(
+                    err.message.includes('NOT_CHECKED_IN') ? 'error' : 'warning',
+                    { ...student, error: translateError(err.message) }
+                );
+            });
+        }
+
+        // ------------------ المؤثرات البصرية (GSAP + Confetti) ------------------
+
+        function animateSuccess(card, elements) {
+            // تأثير مرن سعيد
+            gsap.to(card, { y: '0%', duration: 1.2, ease: "elastic.out(1, 0.6)" });
+            gsap.fromTo(elements, 
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, delay: 0.1 }
+            );
+            
+            // قصاصات ملونة كلاسيكية
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#22c55e', '#3b82f6', '#f59e0b'] });
+        }
+
+        function animateLate(card, elements) {
+            // تأثير ثقيل مع اهتزاز بسيط
+            gsap.to(card, { y: '0%', duration: 0.6, ease: "back.out(1.2)" });
+            gsap.fromTo(card, { x: -10 }, { x: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" }); // Shake
+            
+            gsap.fromTo(elements, 
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 }
+            );
+
+            // أوراق متساقطة (قصاصات صفراء)
+            confetti({ 
+                particleCount: 50, spread: 100, origin: { y: 0 }, 
+                colors: ['#eab308', '#facc15'], 
+                gravity: 1.5, drift: 0.5, scalar: 1.2 
+            });
+        }
+
+        function animateSevereLate(card, elements) {
+            // وميض الشاشة
+            document.getElementById('flash-overlay').classList.add('flash-red');
+            setTimeout(() => document.getElementById('flash-overlay').classList.remove('flash-red'), 500);
+
+            // دخول عنيف واهتزاز قوي
+            gsap.to(card, { y: '0%', duration: 0.5, ease: "bounce.out" });
+            gsap.to(card, { x: 10, yoyo: true, repeat: 5, duration: 0.05 });
+
+            gsap.fromTo(elements, 
+                { scale: 0.8, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.4, stagger: 0.1 }
+            );
+
+            // انفجار أحمر
+            confetti({ 
+                particleCount: 100, spread: 360, origin: { x: 0.5, y: 0.5 }, 
+                colors: ['#ef4444', '#b91c1c'], 
+                startVelocity: 30, gravity: 3 
+            });
+        }
+
+        function animateCheckout(card, elements) {
+            // خروج سلس وانسيابي
+            gsap.to(card, { y: '0%', duration: 0.8, ease: "power3.out" });
+            gsap.fromTo(elements, 
+                { x: 50, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.6, stagger: 0.1 }
+            );
+
+            // قصاصات زرقاء هادئة
+            confetti({ 
+                particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, 
+                colors: ['#3b82f6', '#60a5fa'], drift: -1 
+            });
+        }
+
+        function animateOvertime(card, elements) {
+            // نبض واحتفال
+            gsap.to(card, { y: '0%', duration: 0.8, ease: "back.out(1.7)" });
+            
+            gsap.fromTo(elements, 
+                { scale: 0, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(2)" }
+            );
+
+            // نجوم ذهبية
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            const randomInRange = (min, max) => Math.random() * (max - min) + min;
+            
+            const interval = setInterval(function() {
+                const particleCount = 20;
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    colors: ['#FFD700', '#FDB931'],
+                    shapes: ['star']
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    colors: ['#FFD700', '#FDB931'],
+                    shapes: ['star']
+                }));
+            }, 250);
+            
+            setTimeout(() => clearInterval(interval), 1500);
+        }
+
+        // ----------------------------------------------------------------------
+
+        function showFeedback(type, data) {
+            const overlay = document.getElementById('result-overlay');
+            const backdrop = document.getElementById('result-backdrop');
+            const modal = document.getElementById('result-card');
+            const bar = document.getElementById('progress-bar');
+            
+            // تعبئة البيانات
+            document.getElementById('student-name').innerText = data.name || "مستخدم غير معروف";
+            document.getElementById('detail-class').innerText = data.classId || 'غير محدد';
+            document.getElementById('detail-id').innerText = data.studentId || '---';
+            
+            // إعدادات الوقت بناءً على التكوين
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: !CONFIG.USE_24_HOUR_FORMAT 
+            };
+            document.getElementById('detail-time').innerText = new Date().toLocaleTimeString('ar-EG', timeOptions);
+            document.getElementById('detail-date').innerText = new Date().toLocaleDateString('ar-EG');
+
+            const avatar = document.getElementById('result-avatar');
+            avatar.innerHTML = data.photo ? `<img src="${data.photo}" class="w-full h-full object-cover">` : (data.name ? data.name.charAt(0) : "?");
+
+            const msgEl = document.getElementById('status-message');
+            const subMsgEl = document.getElementById('status-submessage');
+            const badge = document.getElementById('status-badge');
+            const ring = document.getElementById('status-ring');
+            
+            // تحضير العناصر للأنيميشن (Stagger)
+            const cardElements = document.querySelectorAll('.card-item');
+
+            // إعادة تعيين الأنماط
+            ring.className = "absolute -inset-2 rounded-full border-[3px] border-dashed animate-[spin_10s_linear_infinite]";
+            
+            if (type === 'success') {
+                let colorClass = "text-green-500";
+                let bgClass = "bg-green-500";
+                let ringColor = "border-green-500/50";
+                let icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+                
+                // تحديد نوع الحالة والأنيميشن المناسب
+                if (data.statusType === 'late') {
+                    // --- متأخر ---
+                    colorClass = "text-yellow-500"; bgClass = "bg-yellow-500"; ringColor = "border-yellow-500/50";
+                    msgEl.innerText = "تم الحضور (متأخر)";
+                    animateLate(modal, cardElements);
+                    playAudio('warning');
+
+                } else if (data.statusType === 'severe_late') {
+                    // --- تأخير فادح ---
+                    colorClass = "text-red-600"; bgClass = "bg-red-600"; ringColor = "border-red-600/50";
+                    msgEl.innerText = "تم الحضور (تأخير فادح)";
+                    animateSevereLate(modal, cardElements);
+                    playAudio('error'); // صوت قوي
+
+                } else if (data.statusType === 'overtime') {
+                    // --- وقت إضافي ---
+                    colorClass = "text-purple-500"; bgClass = "bg-purple-500"; ringColor = "border-purple-500/50";
+                    msgEl.innerText = "تم الانصراف (وقت إضافي)";
+                    animateOvertime(modal, cardElements);
+                    playAudio('success');
+
+                } else if (data.statusType === 'checked_out') {
+                    // --- انصراف عادي ---
+                    colorClass = "text-blue-500"; bgClass = "bg-blue-500"; ringColor = "border-blue-500/50";
+                    msgEl.innerText = "تم تسجيل الانصراف";
+                    animateCheckout(modal, cardElements);
+                    playAudio('success');
+
+                } else {
+                    // --- حضور في الوقت (Default Success) ---
+                    msgEl.innerText = "تم تسجيل الحضور";
+                    animateSuccess(modal, cardElements);
+                    playAudio('success');
+                }
+
+                subMsgEl.innerText = data.statusLabel || "";
+                msgEl.className = `text-xl font-bold ${colorClass} mb-6 card-item`;
+                badge.className = `absolute bottom-0 right-0 ${bgClass} text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg`;
+                badge.innerHTML = icon;
+                
+                // أنيميشن للشارة (Pop)
+                gsap.fromTo(badge, { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(1.7)", delay: 0.5 });
+                
+                ring.classList.add(ringColor);
+                bar.className = `h-full ${bgClass} w-0`;
+
+            } else {
+                // --- خطأ / تحذير ---
+                const isWarning = type === 'warning';
+                msgEl.innerText = data.error;
+                subMsgEl.innerText = isWarning ? "يرجى المحاولة مرة أخرى" : "فشلت العملية";
+                
+                const color = isWarning ? "text-yellow-500" : "text-red-500";
+                const bg = isWarning ? "bg-yellow-500" : "bg-red-500";
+                
+                msgEl.className = `text-lg font-bold ${color} mb-6 px-4 leading-tight card-item`;
+                badge.className = `absolute bottom-0 right-0 ${bg} text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg`;
+                badge.innerHTML = isWarning ? '!' : 'X';
+                
+                ring.classList.add(`${isWarning ? 'border-yellow-500' : 'border-red-500'}/50`);
+                bar.className = `h-full ${bg} w-0`;
+                
+                // أنيميشن الخطأ (هزة)
+                gsap.to(modal, { y: '0%', duration: 0.5, ease: "power2.out" });
+                gsap.fromTo(modal, { x: -5 }, { x: 5, yoyo: true, repeat: 4, duration: 0.05, delay: 0.2 });
+                gsap.to(cardElements, { opacity: 1, duration: 0.3 });
+                
+                playAudio(isWarning ? 'warning' : 'error');
+            }
+
+            // عرض البطاقة
+            overlay.classList.remove('pointer-events-none');
+            backdrop.classList.remove('opacity-0');
+            
+            // شريط التقدم
+            gsap.fromTo(bar, { width: "0%" }, { width: "100%", duration: 3, ease: "linear" });
+
+            if (closeTimer) clearTimeout(closeTimer);
+            closeTimer = setTimeout(hideFeedback, 3000);
+        }
+
+        function hideFeedback() {
+            const modal = document.getElementById('result-card');
+            const backdrop = document.getElementById('result-backdrop');
+            const overlay = document.getElementById('result-overlay');
+
+            gsap.to(modal, {
+                y: '100%', duration: 0.4, ease: "power2.in",
+                onComplete: () => {
+                    overlay.classList.add('pointer-events-none');
+                    backdrop.classList.add('opacity-0');
+                    isScanning = false;
+                }
+            });
+        }
+
+        function showLoadingState(isLoading) {
+            document.getElementById('scan-status-icon').style.opacity = isLoading ? '1' : '0';
+        }
+        function playAudio(id) {
+            const a = document.getElementById(id === 'success' ? 'sound-success' : id === 'warning' ? 'sound-warning' : 'sound-error');
+            if(a) { a.currentTime = 0; a.play().catch(()=>{}); }
+        }
+        function updateClock() {
+            const now = new Date();
+            // إعدادات الوقت بناءً على التكوين
+            const timeOptions = { 
+                hour12: !CONFIG.USE_24_HOUR_FORMAT, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', timeOptions);
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB');
+        }
+        function createParticles() {
+            const c = document.getElementById('particles-container');
+            for(let i=0; i<15; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
+                p.style.width = Math.random()*4+'px'; p.style.height = p.style.width;
+                p.style.animationDuration = (Math.random()*20+10)+'s';
+                c.appendChild(p);
+            }
+        }
+        function preloadData() {
+            // Updated to use .on() instead of .once() to keep data live
+            db.ref('school/students').on('value', s => studentsCache = s.val() || {});
+            
+            const today = new Date().toISOString().split('T')[0];
+            db.ref(`school/attendance/${today}`).on('value', s => {
+                let inC = 0, outC = 0;
+                if(s.exists()) s.forEach(c => { if(c.val().statusOut) outC++; else inC++; });
+                document.getElementById('daily-in-count').innerText = inC;
+                document.getElementById('daily-out-count').innerText = outC;
+            });
+        }
+    </script>
+</body>
+</html>
