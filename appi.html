@@ -373,12 +373,16 @@
             if (!errorMsg) return "حدث خطأ غير معروف";
             const msg = errorMsg.toString();
             
+            // تحقق من الأخطاء التي تأتي من القواعد (permission denied)
+            if (msg.includes('permission_denied') || msg.includes('PERMISSION_DENIED')) {
+                return "ليس لديك صلاحية لتسجيل هذا النوع من الحضور (قد يكون بسبب حالة غير معرفة أو قيود)";
+            }
+
             if (msg.includes('COMPLETED_TODAY')) return "انتهت فترتك اليوم (تم تسجيل الحضور والانصراف)";
             if (msg.includes('ALREADY_IN')) return "تم تسجيل حضورك من قبل لهذا اليوم";
             if (msg.includes('NOT_CHECKED_IN')) return "عذراً، يجب تسجيل الحضور أولاً";
             if (msg.includes('ALREADY_OUT')) return "تم تسجيل انصرافك من قبل";
             if (msg.includes('TRANSACTION_FAILED')) return "فشل الاتصال بالخادم، حاول مرة أخرى";
-            if (msg.includes('permission_denied')) return "ليس لديك صلاحية للقيام بهذه العملية";
             
             // إذا كان النص يحتوي على أحرف عربية نعرضه كما هو
             return /[\u0600-\u06FF]/.test(msg) ? msg : "حدث خطأ تقني في النظام";
