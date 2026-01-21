@@ -455,6 +455,11 @@
             }
 
             await ref.transaction((current) => {
+                // ** التحقق إذا كان الطالب قد أتم الحضور والانصراف معاً **
+                if (current && current.checkInTime && current.checkOutTime) {
+                    throw new Error("COMPLETED_TODAY");
+                }
+
                 if (currentMode === 'in') {
                     if (current && current.checkInTime) throw new Error("ALREADY_IN"); // مسجل مسبقاً
                     return {
@@ -484,7 +489,10 @@
                 const errMsg = err.message || "";
 
                 // التحقق من نوع الخطأ واستبداله برسالة عربية
-                if (errMsg.includes('ALREADY_IN')) {
+                if (errMsg.includes('COMPLETED_TODAY')) {
+                    msg = "انتهت فترتك اليوم (تم تسجيل الحضور والانصراف)";
+                    showFeedback('warning', { ...student, error: msg });
+                } else if (errMsg.includes('ALREADY_IN')) {
                     msg = "تم تسجيل حضورك من قبل لهذا اليوم";
                     showFeedback('warning', { ...student, error: msg });
                 } else if (errMsg.includes('NOT_CHECKED_IN')) {
@@ -497,8 +505,6 @@
                     msg = "فشل الاتصال بالخادم، حاول مرة أخرى";
                     showFeedback('error', { ...student, error: msg });
                 } else {
-                    // إذا كان الخطأ يحتوي على نص عربي، نعرضه كما هو، وإلا نعرض رسالة عامة
-                    // هذا يضمن عدم عرض أخطاء تقنية مثل "ReferenceError" للمستخدم
                     const hasArabic = /[\u0600-\u06FF]/.test(errMsg);
                     msg = hasArabic ? errMsg : "حدث خطأ تقني في النظام";
                     showFeedback('error', { ...student, error: msg });
