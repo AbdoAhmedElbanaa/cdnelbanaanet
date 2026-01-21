@@ -68,7 +68,6 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
         }
 
-        /* تم إزالة transform: scaleX(-1) لإصلاح انعكاس الكاميرا */
         #reader { width: 100%; height: 100%; border-radius: 1.5rem; overflow: hidden; } 
         #reader video { object-fit: cover; border-radius: 1.5rem; width: 100% !important; height: 100% !important; }
 
@@ -76,12 +75,12 @@
             position: absolute;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, transparent, #22c55e, transparent); /* Default Green */
+            background: linear-gradient(90deg, transparent, #22c55e, transparent);
             box-shadow: 0 0 15px #22c55e;
             top: 50%;
             z-index: 20;
             opacity: 0.8;
-            animation: scan 1.5s infinite ease-in-out; /* أسرع قليلاً */
+            animation: scan 1.5s infinite ease-in-out;
         }
         
         .mode-out .scan-laser {
@@ -121,7 +120,7 @@
     <!-- خلفية الجسيمات المتحركة -->
     <div id="particles-container" class="fixed inset-0 pointer-events-none z-[-1]"></div>
 
-    <!-- شاشة البداية / إذن الكاميرا -->
+    <!-- شاشة البداية -->
     <div id="start-screen" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
         <div class="relative mb-8 group">
             <div class="absolute inset-0 bg-green-500 rounded-full blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
@@ -134,14 +133,12 @@
         <h1 class="text-4xl font-black text-white mb-2 tracking-tight">نظام الحضور الذكي</h1>
         <p class="text-slate-400 mb-10 text-lg">يرجى منح صلاحية الكاميرا للبدء</p>
         <button onclick="initCamera()" class="group relative px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-2xl shadow-lg shadow-green-500/30 transition-all active:scale-95 overflow-hidden">
-            <span class="relative flex items-center gap-3 text-lg">
-                تشغيل النظام
-            </span>
+            <span class="relative flex items-center gap-3 text-lg">تشغيل النظام</span>
         </button>
         <p id="error-msg" class="mt-6 text-red-400 font-medium hidden bg-red-900/20 px-4 py-2 rounded-lg border border-red-500/20"></p>
     </div>
 
-    <!-- الرأس (Header) -->
+    <!-- الرأس -->
     <header class="w-full max-w-4xl flex justify-between items-center z-10 py-2">
         <div class="flex items-center gap-4">
             <div id="header-icon-bg" class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500">
@@ -161,27 +158,19 @@
         </div>
     </header>
 
-    <!-- المحتوى الرئيسي (Main) -->
+    <!-- المحتوى الرئيسي -->
     <main class="flex-1 w-full max-w-4xl flex flex-col md:flex-row gap-6 items-center justify-center py-4 relative z-10">
         
-        <!-- قسم التحكم والوضع -->
+        <!-- قسم التحكم -->
         <div class="w-full md:w-1/3 flex flex-col gap-4 order-2 md:order-1">
-            <!-- تبديل الوضع (محسن) -->
             <div class="glass-panel p-2 rounded-2xl relative h-16">
-                <!-- Slider Background: Green for In, Red for Out -->
                 <div id="mode-slider" class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-gradient-to-r from-green-600 to-green-500 rounded-xl shadow-lg transition-all duration-500 ease-in-out left-2"></div>
-                
                 <div class="relative z-10 flex h-full">
-                    <button onclick="attemptSetMode('in')" id="btn-in" class="flex-1 flex items-center justify-center gap-2 font-bold text-white transition-colors duration-300">
-                        حضور
-                    </button>
-                    <button onclick="attemptSetMode('out')" id="btn-out" class="flex-1 flex items-center justify-center gap-2 font-bold text-slate-400 transition-colors duration-300">
-                        انصراف
-                    </button>
+                    <button onclick="attemptSetMode('in')" id="btn-in" class="flex-1 flex items-center justify-center gap-2 font-bold text-white transition-colors duration-300">حضور</button>
+                    <button onclick="attemptSetMode('out')" id="btn-out" class="flex-1 flex items-center justify-center gap-2 font-bold text-slate-400 transition-colors duration-300">انصراف</button>
                 </div>
             </div>
 
-            <!-- إحصائيات سريعة -->
             <div class="glass-panel p-4 rounded-2xl">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-slate-400 text-sm">حضور اليوم</span>
@@ -193,7 +182,6 @@
                 </div>
             </div>
 
-            <!-- تفاصيل الأوقات (للمستخدم) -->
             <div class="glass-panel p-3 rounded-xl text-xs text-slate-500 space-y-1 text-center">
                 <p>وقت بدء الدوام: <span class="text-white font-mono">08:00 ص</span></p>
                 <p>بدء الانصراف: <span class="text-white font-mono">02:00 م</span></p>
@@ -202,21 +190,15 @@
 
         <!-- منطقة الكاميرا -->
         <div class="w-full md:w-2/3 h-[400px] md:h-[500px] relative order-1 md:order-2">
-            <!-- إطار الكاميرا -->
             <div id="camera-frame" class="absolute inset-0 bg-slate-900 rounded-[2rem] border-[6px] border-slate-800 shadow-2xl overflow-hidden relative group transition-colors duration-500">
                 <div id="reader" class="w-full h-full bg-black"></div>
-                
-                <!-- طبقة التراكب -->
                 <div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
                     <div class="relative w-[280px] h-[280px]">
                         <div class="corner-border border-t-4 border-l-4 rounded-tl-2xl top-0 left-0"></div>
                         <div class="corner-border border-t-4 border-r-4 rounded-tr-2xl top-0 right-0"></div>
                         <div class="corner-border border-b-4 border-l-4 rounded-bl-2xl bottom-0 left-0"></div>
                         <div class="corner-border border-b-4 border-r-4 rounded-br-2xl bottom-0 right-0"></div>
-                        
                         <div class="scan-laser"></div>
-                        
-                        <!-- أيقونة التحميل -->
                         <div id="scan-status-icon" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300">
                             <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
                                 <svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -226,31 +208,49 @@
                 </div>
             </div>
         </div>
-
     </main>
 
-    <!-- النافذة المنبثقة للنتيجة -->
+    <!-- النافذة المنبثقة للنتيجة (محسنة) -->
     <div id="result-overlay" class="fixed inset-0 z-50 pointer-events-none flex items-end justify-center">
-        <div id="result-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        <div id="result-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-md opacity-0 transition-opacity duration-300"></div>
 
-        <div id="result-card" class="relative w-full max-w-lg bg-slate-900/90 backdrop-blur-2xl border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] rounded-t-[2.5rem] p-8 pb-12 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+        <div id="result-card" class="relative w-full max-w-lg bg-slate-900 border-t border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] rounded-t-[2.5rem] p-6 pb-12 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
             <div class="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-white/20 rounded-full"></div>
 
             <div class="flex flex-col items-center text-center relative z-10">
-                <div class="relative mb-4">
-                    <div id="status-ring" class="absolute -inset-2 rounded-full border-4 border-dashed border-gray-500/50"></div>
-                    <div id="result-avatar" class="w-24 h-24 rounded-full bg-slate-700 border-4 border-slate-800 shadow-xl overflow-hidden flex items-center justify-center text-3xl font-bold text-slate-400 relative z-10"></div>
+                <!-- الصورة -->
+                <div class="relative mb-3">
+                    <div id="status-ring" class="absolute -inset-2 rounded-full border-[3px] border-dashed border-gray-500/50"></div>
+                    <div id="result-avatar" class="w-20 h-20 rounded-full bg-slate-800 border-4 border-slate-900 shadow-xl overflow-hidden flex items-center justify-center text-3xl font-bold text-slate-400 relative z-10"></div>
                     <div id="status-badge" class="absolute bottom-0 right-0 p-1.5 rounded-full border-4 border-slate-900 shadow-lg"></div>
                 </div>
 
-                <h2 id="student-name" class="text-3xl font-black text-white mb-1">...</h2>
-                <div class="flex items-center gap-3 text-sm font-medium mb-6">
-                    <span id="student-class" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">...</span>
-                    <span id="scan-time" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">--:--</span>
+                <!-- الاسم والرسالة -->
+                <h2 id="student-name" class="text-2xl font-black text-white mb-1">...</h2>
+                <div id="status-message" class="text-xl font-bold text-white mb-6">...</div>
+
+                <!-- تفاصيل الطالب الكاملة (الجديد) -->
+                <div class="w-full bg-slate-800/50 rounded-2xl p-4 grid grid-cols-2 gap-4 text-right border border-white/5">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">الصف الدراسي</span>
+                        <span id="detail-class" class="text-sm font-bold text-white">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">رقم الطالب</span>
+                        <span id="detail-id" class="text-sm font-bold text-white font-mono">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">وقت المسح</span>
+                        <span id="detail-time" class="text-sm font-bold text-blue-400 font-mono">...</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-slate-400 mb-1">التاريخ</span>
+                        <span id="detail-date" class="text-sm font-bold text-slate-300 font-mono">...</span>
+                    </div>
                 </div>
 
-                <div id="status-message" class="text-2xl font-bold text-white mb-2">...</div>
-                <div id="status-submessage" class="text-sm text-slate-400 mb-2"></div>
+                <!-- رسالة فرعية -->
+                <div id="status-submessage" class="text-xs text-slate-400 mt-4"></div>
             </div>
 
             <div class="absolute bottom-0 left-0 w-full h-1.5 bg-slate-800">
@@ -265,17 +265,14 @@
     <audio id="sound-error" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
 
     <script>
-        // --- إعدادات النظام (قابلة للتعديل) ---
         const CONFIG = {
-            SCHOOL_START_TIME: "08:00",    // موعد بدء الدوام
-            LATE_THRESHOLD_MINUTES: 15,    // بعد كم دقيقة يعتبر متأخر
-            SEVERE_LATE_MINUTES: 30,       // بعد كم دقيقة يعتبر تأخير فادح
-            
-            DEPARTURE_START_TIME: "18:00", // متى يبدأ الانصراف (الساعة 2 ظهرًا)
-            OVERTIME_THRESHOLD_MINUTES: 15 // بعد كم دقيقة يعتبر وقت إضافي
+            SCHOOL_START_TIME: "08:00",
+            LATE_THRESHOLD_MINUTES: 15,
+            SEVERE_LATE_MINUTES: 30,
+            DEPARTURE_START_TIME: "14:00",
+            OVERTIME_THRESHOLD_MINUTES: 15
         };
 
-        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyADEyiGtrStnDfbNa6tGYFGkREbX4Xo0p4",
             authDomain: "hodurplus.firebaseapp.com",
@@ -291,10 +288,9 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // --- State ---
         let html5QrcodeScanner = null;
         let isScanning = false;
-        let currentMode = 'in'; // 'in' or 'out'
+        let currentMode = 'in';
         let studentsCache = {};
         let closeTimer = null;
 
@@ -303,11 +299,10 @@
             setInterval(updateClock, 1000);
             createParticles();
             auth.onAuthStateChanged(user => {
-                const dot = document.getElementById('connection-dot');
-                const text = document.getElementById('connection-text');
                 if (user) {
-                    dot.className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
-                    text.innerText = "متصل"; text.className = "text-xs text-green-400 font-bold";
+                    document.getElementById('connection-dot').className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+                    document.getElementById('connection-text').innerText = "متصل";
+                    document.getElementById('connection-text').className = "text-xs text-green-400 font-bold";
                     preloadData();
                 } else {
                     auth.signInAnonymously().catch(console.error);
@@ -315,21 +310,16 @@
             });
         });
 
-        // --- Camera Setup ---
         async function initCamera() {
             const startScreen = document.getElementById('start-screen');
             try {
                 if (!html5QrcodeScanner) html5QrcodeScanner = new Html5Qrcode("reader");
-                
-                // FPS أعلى (30) لأداء أسرع
                 const config = { fps: 30, qrbox: { width: 280, height: 280 }, aspectRatio: 1.0 };
-                
                 try {
                     await html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess);
                 } catch (e) {
                     await html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
                 }
-
                 gsap.to(startScreen, { opacity: 0, y: -50, duration: 0.6, onComplete: () => startScreen.style.display = 'none' });
             } catch (err) {
                 document.getElementById('error-msg').innerText = "خطأ في الكاميرا: " + err;
@@ -337,23 +327,17 @@
             }
         }
 
-        // --- Mode Switching Logic ---
         function attemptSetMode(mode) {
             if (mode === 'out') {
-                // التحقق من وقت الانصراف
                 const now = new Date();
                 const [h, m] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
                 const departureTime = new Date();
                 departureTime.setHours(h, m, 0, 0);
 
                 if (now < departureTime) {
-                    showFeedback('error', { 
-                        name: 'تنبيه', 
-                        classId: 'النظام', 
-                        error: `لم يحن وقت الانصراف بعد (${CONFIG.DEPARTURE_START_TIME})` 
-                    });
+                    showFeedback('error', { name: 'تنبيه', error: `لم يحن وقت الانصراف بعد (${CONFIG.DEPARTURE_START_TIME})` });
                     playAudio('error');
-                    return; // منع التبديل
+                    return;
                 }
             }
             setMode(mode);
@@ -364,34 +348,42 @@
             const slider = document.getElementById('mode-slider');
             const btnIn = document.getElementById('btn-in');
             const btnOut = document.getElementById('btn-out');
-            const frame = document.getElementById('camera-frame');
             const headerBg = document.getElementById('header-icon-bg');
             const body = document.body;
 
             if (mode === 'in') {
-                // الأخضر للحضور
                 slider.style.left = '8px';
                 slider.className = "absolute top-2 bottom-2 w-[calc(50%-8px)] rounded-xl shadow-lg transition-all duration-500 ease-in-out left-2 bg-gradient-to-r from-green-600 to-green-500";
-                
                 btnIn.classList.replace('text-slate-400', 'text-white');
                 btnOut.classList.replace('text-white', 'text-slate-400');
-                
                 headerBg.className = "w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500";
                 body.classList.remove('mode-out');
             } else {
-                // الأحمر للانصراف
                 slider.style.left = 'calc(50% + 4px)';
                 slider.className = "absolute top-2 bottom-2 w-[calc(50%-8px)] rounded-xl shadow-lg transition-all duration-500 ease-in-out left-2 bg-gradient-to-r from-red-600 to-red-500";
-
                 btnOut.classList.replace('text-slate-400', 'text-white');
                 btnIn.classList.replace('text-white', 'text-slate-400');
-
                 headerBg.className = "w-12 h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500";
                 body.classList.add('mode-out');
             }
         }
 
-        // --- Scan Logic ---
+        // دالة ترجمة الأخطاء المركزية
+        function translateError(errorMsg) {
+            if (!errorMsg) return "حدث خطأ غير معروف";
+            const msg = errorMsg.toString();
+            
+            if (msg.includes('COMPLETED_TODAY')) return "انتهت فترتك اليوم (تم تسجيل الحضور والانصراف)";
+            if (msg.includes('ALREADY_IN')) return "تم تسجيل حضورك من قبل لهذا اليوم";
+            if (msg.includes('NOT_CHECKED_IN')) return "عذراً، يجب تسجيل الحضور أولاً";
+            if (msg.includes('ALREADY_OUT')) return "تم تسجيل انصرافك من قبل";
+            if (msg.includes('TRANSACTION_FAILED')) return "فشل الاتصال بالخادم، حاول مرة أخرى";
+            if (msg.includes('permission_denied')) return "ليس لديك صلاحية للقيام بهذه العملية";
+            
+            // إذا كان النص يحتوي على أحرف عربية نعرضه كما هو
+            return /[\u0600-\u06FF]/.test(msg) ? msg : "حدث خطأ تقني في النظام";
+        }
+
         async function onScanSuccess(decodedText) {
             if (isScanning) return;
             isScanning = true;
@@ -399,16 +391,16 @@
 
             try {
                 let data;
-                try { data = JSON.parse(decodedText); } catch { throw new Error("رمز غير صالح"); }
-                if (!data.id || data.type !== 'student') throw new Error("الرمز لا يخص طالب");
+                try { data = JSON.parse(decodedText); } catch { throw new Error("رمز الاستجابة السريع غير صالح"); }
+                if (!data.id || data.type !== 'student') throw new Error("هذا الرمز لا يخص طالباً");
 
                 const studentKey = Object.keys(studentsCache).find(k => studentsCache[k].studentId === data.id);
-                if (!studentKey) throw new Error("الطالب غير مسجل");
+                if (!studentKey) throw new Error("الطالب غير مسجل في قاعدة البيانات");
 
                 await processAttendance(studentKey, studentsCache[studentKey]);
 
             } catch (error) {
-                showFeedback('error', { name: 'خطأ', classId: 'النظام', error: error.message });
+                showFeedback('error', { name: 'خطأ', error: translateError(error.message) });
             } finally {
                 showLoadingState(false);
             }
@@ -420,48 +412,37 @@
             const nowTs = now.getTime();
             const ref = db.ref(`school/attendance/${today}/${key}`);
 
-            // --- منطق احتساب الحالة ---
             let status = 'present';
             let statusLabel = '';
             
             if (currentMode === 'in') {
-                // حساب التأخير
                 const [sh, sm] = CONFIG.SCHOOL_START_TIME.split(':').map(Number);
                 const startTime = new Date(); startTime.setHours(sh, sm, 0, 0);
                 const diffMinutes = (now - startTime) / 60000;
 
                 if (diffMinutes > CONFIG.SEVERE_LATE_MINUTES) {
-                    status = 'severe_late';
-                    statusLabel = 'تأخير فادح';
+                    status = 'severe_late'; statusLabel = 'تأخير فادح';
                 } else if (diffMinutes > CONFIG.LATE_THRESHOLD_MINUTES) {
-                    status = 'late';
-                    statusLabel = 'متأخر';
+                    status = 'late'; statusLabel = 'متأخر';
                 } else {
                     statusLabel = 'حضور في الوقت';
                 }
             } else {
-                // حساب الوقت الإضافي
                 const [dh, dm] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
                 const deptTime = new Date(); deptTime.setHours(dh, dm, 0, 0);
                 const diffMinutes = (now - deptTime) / 60000;
-
                 if (diffMinutes > CONFIG.OVERTIME_THRESHOLD_MINUTES) {
-                    status = 'overtime';
-                    statusLabel = 'وقت إضافي';
+                    status = 'overtime'; statusLabel = 'وقت إضافي';
                 } else {
-                    status = 'checked_out';
-                    statusLabel = 'انصراف';
+                    status = 'checked_out'; statusLabel = 'انصراف';
                 }
             }
 
             await ref.transaction((current) => {
-                // ** التحقق إذا كان الطالب قد أتم الحضور والانصراف معاً **
-                if (current && current.checkInTime && current.checkOutTime) {
-                    throw new Error("COMPLETED_TODAY");
-                }
-
+                if (current && current.checkInTime && current.checkOutTime) throw new Error("COMPLETED_TODAY");
+                
                 if (currentMode === 'in') {
-                    if (current && current.checkInTime) throw new Error("ALREADY_IN"); // مسجل مسبقاً
+                    if (current && current.checkInTime) throw new Error("ALREADY_IN");
                     return {
                         studentId: student.studentId,
                         name: student.name,
@@ -471,75 +452,53 @@
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     };
                 } else {
-                    if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN"); // لم يسجل حضور
-                    if (current.checkOutTime) throw new Error("ALREADY_OUT"); // مسجل انصراف مسبقاً
+                    if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN");
+                    if (current.checkOutTime) throw new Error("ALREADY_OUT");
                     return { ...current, checkOutTime: nowTs, statusOut: status };
                 }
             }, (error, committed, snapshot) => {
                 if (error) throw error;
                 if (!committed) throw new Error("TRANSACTION_FAILED");
                 
-                // نجاح
                 student.statusLabel = statusLabel;
                 student.statusType = status; 
                 showFeedback('success', student);
             }).catch(err => {
-                let msg = "حدث خطأ غير متوقع";
-                // الحصول على رسالة الخطأ الآمنة
-                const errMsg = err.message || "";
-
-                // التحقق من نوع الخطأ واستبداله برسالة عربية
-                if (errMsg.includes('COMPLETED_TODAY')) {
-                    msg = "انتهت فترتك اليوم (تم تسجيل الحضور والانصراف)";
-                    showFeedback('warning', { ...student, error: msg });
-                } else if (errMsg.includes('ALREADY_IN')) {
-                    msg = "تم تسجيل حضورك من قبل لهذا اليوم";
-                    showFeedback('warning', { ...student, error: msg });
-                } else if (errMsg.includes('NOT_CHECKED_IN')) {
-                    msg = "عذراً، يجب تسجيل الحضور أولاً";
-                    showFeedback('error', { ...student, error: msg });
-                } else if (errMsg.includes('ALREADY_OUT')) {
-                    msg = "تم تسجيل انصرافك من قبل";
-                    showFeedback('warning', { ...student, error: msg });
-                } else if (errMsg.includes('TRANSACTION_FAILED')) {
-                    msg = "فشل الاتصال بالخادم، حاول مرة أخرى";
-                    showFeedback('error', { ...student, error: msg });
-                } else {
-                    const hasArabic = /[\u0600-\u06FF]/.test(errMsg);
-                    msg = hasArabic ? errMsg : "حدث خطأ تقني في النظام";
-                    showFeedback('error', { ...student, error: msg });
-                }
+                // استخدام دالة الترجمة المركزية هنا
+                showFeedback(
+                    err.message.includes('NOT_CHECKED_IN') ? 'error' : 'warning',
+                    { ...student, error: translateError(err.message) }
+                );
             });
         }
 
-        // --- Feedback UI ---
         function showFeedback(type, data) {
             const overlay = document.getElementById('result-overlay');
             const backdrop = document.getElementById('result-backdrop');
             const modal = document.getElementById('result-card');
             const bar = document.getElementById('progress-bar');
             
-            // تعبئة البيانات
-            document.getElementById('student-name').innerText = data.name || "مستخدم";
-            document.getElementById('student-class').innerText = data.classId || 'عام';
-            document.getElementById('scan-time').innerText = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+            // تعبئة البيانات الأساسية
+            document.getElementById('student-name').innerText = data.name || "مستخدم غير معروف";
             
+            // تعبئة التفاصيل في الشبكة
+            document.getElementById('detail-class').innerText = data.classId || 'غير محدد';
+            document.getElementById('detail-id').innerText = data.studentId || '---';
+            document.getElementById('detail-time').innerText = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('detail-date').innerText = new Date().toLocaleDateString('ar-EG');
+
             const avatar = document.getElementById('result-avatar');
-            // تأمين ضد البيانات الناقصة
             const initial = data.name ? data.name.charAt(0) : "?";
             avatar.innerHTML = data.photo ? `<img src="${data.photo}" class="w-full h-full object-cover">` : initial;
 
-            // تحديد الألوان والنصوص بناءً على الحالة
             const msgEl = document.getElementById('status-message');
             const subMsgEl = document.getElementById('status-submessage');
             const badge = document.getElementById('status-badge');
             const ring = document.getElementById('status-ring');
 
-            // Reset classes
-            ring.className = "absolute -inset-2 rounded-full border-4 border-dashed animate-[spin_10s_linear_infinite]";
+            ring.className = "absolute -inset-2 rounded-full border-[3px] border-dashed animate-[spin_10s_linear_infinite]";
             
             if (type === 'success') {
-                // تلوين حسب حالة التأخير/الوقت الإضافي
                 let colorClass = "text-green-500";
                 let bgClass = "bg-green-500";
                 let ringColor = "border-green-500/50";
@@ -559,19 +518,19 @@
                 }
 
                 subMsgEl.innerText = data.statusLabel || "";
-                msgEl.className = `text-2xl font-bold ${colorClass} mb-1`;
+                msgEl.className = `text-xl font-bold ${colorClass} mb-6`;
                 badge.className = `absolute bottom-0 right-0 ${bgClass} text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg`;
                 badge.innerHTML = icon;
                 ring.classList.add(ringColor);
                 bar.className = `h-full ${bgClass} w-0`;
 
                 playAudio('success');
-                if(currentMode === 'in' && !data.statusType.includes('late')) fireConfetti(); // احتفال فقط للحضور المنتظم
+                if(currentMode === 'in' && !data.statusType.includes('late')) fireConfetti();
 
             } else if (type === 'warning') {
                 msgEl.innerText = data.error;
-                subMsgEl.innerText = "يرجى المحاولة مرة أخرى";
-                msgEl.className = "text-xl font-bold text-yellow-500 mb-1";
+                subMsgEl.innerText = "يرجى مراجعة المشرف إذا تكرر الأمر";
+                msgEl.className = "text-lg font-bold text-yellow-500 mb-6 px-4 leading-tight";
                 badge.className = "absolute bottom-0 right-0 bg-yellow-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
                 badge.innerHTML = '!';
                 ring.classList.add("border-yellow-500/50");
@@ -580,7 +539,7 @@
             } else { // Error
                 msgEl.innerText = data.error;
                 subMsgEl.innerText = "فشلت العملية";
-                msgEl.className = "text-xl font-bold text-red-500 mb-1";
+                msgEl.className = "text-lg font-bold text-red-500 mb-6 px-4 leading-tight";
                 badge.className = "absolute bottom-0 right-0 bg-red-500 text-white p-1.5 rounded-full border-4 border-slate-900 shadow-lg";
                 badge.innerHTML = 'X';
                 ring.classList.add("border-red-500/50");
@@ -588,7 +547,6 @@
                 playAudio('error');
             }
 
-            // Animation
             overlay.classList.remove('pointer-events-none');
             backdrop.classList.remove('opacity-0');
             gsap.to(modal, { y: '0%', duration: 0.6, ease: "back.out(1.2)" });
@@ -613,7 +571,6 @@
             });
         }
 
-        // --- Helpers ---
         function showLoadingState(isLoading) {
             document.getElementById('scan-status-icon').style.opacity = isLoading ? '1' : '0';
         }
