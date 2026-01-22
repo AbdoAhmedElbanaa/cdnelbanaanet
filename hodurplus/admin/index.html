@@ -368,13 +368,10 @@
         // ==========================================
         // استبدل المفاتيح أدناه بمفاتيح Gemini الحقيقية الخاصة بك
         const GEMINI_KEYS = [
-            "AIzaSyDg7Ylbt5jWvqnzD35UFLlBxMCRRLebJwc",
-            "AIzaSyDSb2icGS9u8DZnF93UpDfImPN92cgXK6k",
-            "AIzaSyAFyiozGegDVKOKtoBLr0Kvc0DTIRPKLSM"
+            "-lMtk",
+            "",
+            ""
         ];
-
-        let aiEditorInstances = { html: null, css: null, js: null }; // لتخزين نسخ CodeMirror الخاصة بالذكاء الاصطناعي
-        let currentGeneratedCode = { html: '', css: '', js: '' };
 
 
         // ==========================================
@@ -2492,20 +2489,31 @@ function toggleDarkMode() {
         }
 
 
-        // ==========================================
-// AI STUDIO LOGIC (NEW)
+// ==========================================
+// AI STUDIO LOGIC (PRO DESIGN TOOLS V2.5)
 // ==========================================
 
+// إعدادات الذكاء الاصطناعي والمحرر
+let aiEditorInstances = { html: null, css: null, js: null };
+let currentGeneratedCode = { html: '', css: '', js: '' };
+
+// خيارات التصميم الافتراضية
+let aiDesignParams = {
+    style: 'modern',    // modern, classic, cyberpunk, minimalist
+    color: 'blue',      // blue, red, dark, gold, purple
+    layout: 'sidebar',  // sidebar, top-header, floating
+    features: []        // qr, chip, watermark
+};
+
 function openAIStudio() {
-    // إنشاء حاوية المودال إذا لم تكن موجودة
     let aiContainer = document.getElementById('ai-modal-container');
     if (!aiContainer) {
         aiContainer = document.createElement('div');
         aiContainer.id = 'ai-modal-container';
         aiContainer.className = 'fixed inset-0 z-[70] hidden';
         aiContainer.innerHTML = `
-            <div class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeAIStudio()"></div>
-            <div id="ai-modal-content" class="absolute inset-0 m-4 md:m-8 bg-[#0f172a] rounded-3xl shadow-2xl border border-purple-500/30 overflow-hidden flex flex-col transform scale-95 opacity-0 transition-all duration-300">
+            <div class="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity" onclick="closeAIStudio()"></div>
+            <div id="ai-modal-content" class="absolute inset-0 m-0 md:m-4 bg-[#0b0f19] md:rounded-3xl shadow-2xl border border-purple-500/20 overflow-hidden flex flex-col transform scale-95 opacity-0 transition-all duration-300">
                 </div>
         `;
         document.body.appendChild(aiContainer);
@@ -2514,224 +2522,535 @@ function openAIStudio() {
     const content = document.getElementById('ai-modal-content');
     aiContainer.classList.remove('hidden');
     
-    // GSAP Entrance Animation
-    gsap.to(content, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" });
+    gsap.to(content, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" });
 
     content.innerHTML = `
-        <div class="h-16 border-b border-white/10 flex justify-between items-center px-6 bg-gradient-to-r from-slate-900 to-slate-800 shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
-                    <svg class="w-5 h-5 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+        <div class="h-16 border-b border-white/5 flex justify-between items-center px-6 bg-[#0b0f19] shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-40 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative w-10 h-10 rounded-lg bg-[#1a1f2e] flex items-center justify-center text-white ring-1 ring-white/10">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
                 </div>
-                <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-200">AI Design Studio</h2>
+                <div>
+                    <h2 class="text-xl font-black text-white tracking-tight">AI Architect <span class="text-purple-500 text-xs font-mono bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">PRO 2.5</span></h2>
+                    <p class="text-[10px] text-slate-400">Powered by Gemini 1.5 Pro</p>
+                </div>
             </div>
-            <button onclick="closeAIStudio()" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <button onclick="closeAIStudio()" class="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <div class="flex-1 flex overflow-hidden">
-            <div class="w-1/3 border-l border-white/10 bg-[#1e293b]/50 p-6 flex flex-col gap-6 overflow-y-auto">
+            <div class="w-[350px] border-l border-white/5 bg-[#0f1420] flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-purple-900/50">
                 
-                <div>
-                    <label class="block text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">وصف التصميم</label>
-                    <textarea id="ai-prompt" class="w-full h-32 bg-[#0f172a] border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition resize-none shadow-inner" placeholder="صف البطاقة التي تريدها... مثال: بطاقة هوية طالب بأسلوب عصري وألوان زرقاء داكنة مع خلفية هندسية وتأثير زجاجي للبيانات."></textarea>
+                <div class="p-6 space-y-8">
+                    
+                    <section>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg> نمط التصميم</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${renderStyleOption('modern', 'عصري', 'bg-gradient-to-br from-blue-600 to-cyan-500')}
+                            ${renderStyleOption('cyberpunk', 'مستقبلي', 'bg-gradient-to-br from-purple-600 to-pink-500')}
+                            ${renderStyleOption('classic', 'رسمي', 'bg-gradient-to-br from-slate-600 to-slate-800')}
+                            ${renderStyleOption('minimalist', 'بسيط', 'bg-gradient-to-br from-emerald-500 to-teal-600')}
+                            ${renderStyleOption('glass', 'زجاجي', 'bg-gradient-to-br from-indigo-500 to-violet-500')}
+                            ${renderStyleOption('creative', 'إبداعي', 'bg-gradient-to-br from-orange-500 to-yellow-500')}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg> ألوان الهوية</h3>
+                        <div class="flex justify-between bg-[#161b28] p-3 rounded-xl border border-white/5">
+                            ${renderColorOption('blue', '#3b82f6')}
+                            ${renderColorOption('red', '#ef4444')}
+                            ${renderColorOption('green', '#10b981')}
+                            ${renderColorOption('purple', '#a855f7')}
+                            ${renderColorOption('gold', '#eab308')}
+                            ${renderColorOption('dark', '#1e293b')}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg> الهيكل</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            ${renderLayoutOption('sidebar', 'جانبي', 'M4 6h4v12H4z M10 6h10 M10 10h10 M10 14h10')}
+                            ${renderLayoutOption('header', 'علوي', 'M4 6h16v4H4z M8 12h8 M6 16h12')}
+                            ${renderLayoutOption('centered', 'مركزي', 'M8 6h8v6H8z M6 14h12 M8 17h8')}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> إضافات ذكية</h3>
+                        <div class="flex flex-col gap-2">
+                            ${renderFeatureToggle('qr', 'رمز QR للحضور')}
+                            ${renderFeatureToggle('chip', 'شريحة ذكية (Graphic)')}
+                            ${renderFeatureToggle('watermark', 'علامة مائية للخلفية')}
+                            ${renderFeatureToggle('barcode', 'باركود رقمي')}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">تعليمات إضافية (اختياري)</h3>
+                        <textarea id="ai-custom-prompt" class="w-full h-20 bg-[#161b28] border border-white/10 rounded-xl p-3 text-slate-300 text-xs focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition resize-none" placeholder="مثال: اجعل زوايا الصورة دائرية، أضف خطوط زخرفية..."></textarea>
+                    </section>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">أفكار جاهزة</label>
-                    <div class="flex flex-wrap gap-2">
-                        ${['تصميم مستقبلي (Cyberpunk)', 'بطاقة كلاسيكية رسمية', 'تصميم أطفال مرح', 'بطاقة هوية رياضية', 'تصميم زجاجي (Glassmorphism)', 'ستايل بسيط (Minimalist)'].map(tag => 
-                            `<button onclick="setAIPrompt('${tag}')" class="text-[10px] bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white px-3 py-1.5 rounded-full border border-white/5 transition">${tag}</button>`
-                        ).join('')}
-                    </div>
-                </div>
-
-                <button onclick="generateTemplateWithAI()" id="btn-generate-ai" class="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 transform hover:scale-[1.02] transition-all relative overflow-hidden group">
-                    <span class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                    <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span>توليد التصميم</span>
-                </button>
-
-                <div class="mt-auto pt-6 border-t border-white/10 text-center">
-                    <p class="text-[10px] text-slate-500">Powered by Gemini AI • Rotating Keys Security</p>
+                <div class="sticky bottom-0 bg-[#0f1420]/95 backdrop-blur border-t border-white/5 p-6 mt-auto z-10">
+                    <button onclick="generateTemplateWithAI()" id="btn-generate-ai" class="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] flex items-center justify-center gap-2 transform hover:scale-[1.02] transition-all relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                        <svg class="w-5 h-5 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        <span>توليد التصميم (Generate)</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="w-2/3 bg-black/20 flex flex-col relative">
+            <div class="flex-1 bg-[#0b0f19] flex flex-col relative min-w-0">
                 
-                <div id="ai-loader" class="absolute inset-0 bg-[#0f172a]/90 z-50 hidden flex-col items-center justify-center">
-                    <div class="w-24 h-24 relative">
-                        <div class="absolute inset-0 rounded-full border-4 border-purple-500/30"></div>
-                        <div class="absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin"></div>
-                        <div class="absolute inset-4 rounded-full bg-purple-500/20 blur-xl animate-pulse"></div>
+                <div id="ai-loader" class="absolute inset-0 bg-[#0b0f19]/90 z-50 hidden flex-col items-center justify-center backdrop-blur-sm">
+                    <div class="relative w-32 h-32">
+                        <div class="absolute inset-0 rounded-full border-t-4 border-r-4 border-purple-500 animate-spin"></div>
+                        <div class="absolute inset-4 rounded-full border-t-4 border-l-4 border-pink-500 animate-spin-slow"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
                     </div>
-                    <p class="mt-6 text-purple-300 font-bold animate-pulse">جاري تخيل التصميم...</p>
-                    <p id="ai-loader-text" class="text-xs text-slate-500 mt-2">جاري الاتصال بـ Gemini...</p>
+                    <h3 class="mt-8 text-xl font-bold text-white tracking-widest">GEMINI PROCESSING</h3>
+                    <p id="ai-loader-text" class="text-xs text-purple-400 mt-2 font-mono">Analyzing layout structure...</p>
                 </div>
 
-                <div class="h-12 border-b border-white/10 bg-[#0f172a] flex items-center px-4 gap-1">
-                    <button onclick="switchAITab('preview')" id="ai-tab-preview" class="ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-purple-600/20 border border-purple-500/50">معاينة</button>
-                    <button onclick="switchAITab('html')" id="ai-tab-html" class="ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">HTML</button>
-                    <button onclick="switchAITab('css')" id="ai-tab-css" class="ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">CSS</button>
-                    <button onclick="switchAITab('js')" id="ai-tab-js" class="ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">JS</button>
-                    
-                    <div class="flex-1"></div>
-                    <button onclick="importAICode()" class="px-4 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-500 transition flex items-center gap-1">
+                <div class="h-12 border-b border-white/5 bg-[#0f1420] flex items-center px-4 gap-2 justify-between shrink-0">
+                    <div class="flex gap-1 bg-[#161b28] p-1 rounded-lg">
+                        <button onclick="switchAITab('preview')" id="ai-tab-preview" class="px-4 py-1.5 rounded text-[10px] font-bold text-white bg-white/10 shadow-sm transition">معاينة</button>
+                        <button onclick="switchAITab('html')" id="ai-tab-html" class="px-4 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/5 transition">HTML</button>
+                        <button onclick="switchAITab('css')" id="ai-tab-css" class="px-4 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/5 transition">CSS</button>
+                        <button onclick="switchAITab('js')" id="ai-tab-js" class="px-4 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/5 transition">JS</button>
+                    </div>
+
+                    <button onclick="importAICode()" class="px-4 py-1.5 bg-green-600/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition flex items-center gap-2">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         اعتماد التصميم
                     </button>
                 </div>
 
-                <div class="flex-1 relative overflow-hidden">
-                    <div id="ai-view-preview" class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#1e293b] p-8 flex items-center justify-center overflow-auto">
-                        <div id="ai-preview-container" class="transform transition-all duration-500 hover:scale-[1.02] shadow-2xl">
-                             <div class="text-center text-slate-500">
-                                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                                <p>ادخل الوصف واضغط توليد لبدء السحر</p>
+                <div class="flex-1 relative overflow-hidden bg-[#1e1e1e]">
+                    <div id="ai-view-preview" class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-[#111] p-8 flex items-center justify-center overflow-auto">
+                        <div id="ai-preview-container" class="transform transition-all duration-500 hover:scale-[1.02] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                             <div class="text-center text-slate-600 opacity-50 flex flex-col items-center">
+                                <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                                <p class="text-sm font-mono uppercase tracking-widest">Design Workspace Ready</p>
                              </div>
                         </div>
                     </div>
-                    <div id="ai-view-html" class="absolute inset-0 hidden bg-[#282a36]"><textarea id="ai-code-html"></textarea></div>
-                    <div id="ai-view-css" class="absolute inset-0 hidden bg-[#282a36]"><textarea id="ai-code-css"></textarea></div>
-                    <div id="ai-view-js" class="absolute inset-0 hidden bg-[#282a36]"><textarea id="ai-code-js"></textarea></div>
+                    <div id="ai-view-html" class="absolute inset-0 hidden"><textarea id="ai-code-html"></textarea></div>
+                    <div id="ai-view-css" class="absolute inset-0 hidden"><textarea id="ai-code-css"></textarea></div>
+                    <div id="ai-view-js" class="absolute inset-0 hidden"><textarea id="ai-code-js"></textarea></div>
                 </div>
             </div>
         </div>
     `;
 
-    // تهيئة CodeMirror بعد الرسم
+// داخل دالة openAIStudio، في جزء setTimeout:
     setTimeout(() => {
-        const config = { theme: 'dracula', lineNumbers: true, lineWrapping: true };
+        const config = { 
+            theme: 'dracula', 
+            lineNumbers: true, 
+            lineWrapping: true, 
+            foldGutter: true, 
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"] 
+        };
+        
+        // إنشاء المحررات
         aiEditorInstances.html = CodeMirror.fromTextArea(document.getElementById('ai-code-html'), { ...config, mode: 'xml', htmlMode: true });
         aiEditorInstances.css = CodeMirror.fromTextArea(document.getElementById('ai-code-css'), { ...config, mode: 'css' });
         aiEditorInstances.js = CodeMirror.fromTextArea(document.getElementById('ai-code-js'), { ...config, mode: 'javascript' });
         
-        // تحديث المعاينة عند التعديل اليدوي في نافذة AI
+        // ربط التحديث المباشر للمعاينة عند الكتابة اليدوية
         [aiEditorInstances.html, aiEditorInstances.css, aiEditorInstances.js].forEach(ed => {
             ed.on('change', () => {
-                // حفظ التغييرات في المتغير المؤقت
                 currentGeneratedCode.html = aiEditorInstances.html.getValue();
                 currentGeneratedCode.css = aiEditorInstances.css.getValue();
                 currentGeneratedCode.js = aiEditorInstances.js.getValue();
-                renderAIPreview(); // تحديث المعاينة
+                // نستخدم debounce بسيط لعدم التحديث مع كل حرف
+                if(this.previewTimer) clearTimeout(this.previewTimer);
+                this.previewTimer = setTimeout(renderAIPreview, 500);
             });
         });
+
+        // تحديد الخيارات الافتراضية
+        selectStyle(aiDesignParams.style);
+        
+        // تفريغ المحتوى القديم عند الفتح
+        aiEditorInstances.html.setValue('');
+        aiEditorInstances.css.setValue('');
+        aiEditorInstances.js.setValue('');
+        currentGeneratedCode = { html: '', css: '', js: '' };
+        renderAIPreview(); // لتصفير المعاينة
+
     }, 100);
+
 }
+
+// --- Helper Functions for Rendering UI ---
+
+function renderStyleOption(id, name, gradientClass) {
+    return `
+    <div onclick="selectStyle('${id}')" id="style-${id}" class="style-option cursor-pointer rounded-xl p-1 border border-white/5 hover:border-purple-500/50 transition relative overflow-hidden group ${aiDesignParams.style === id ? 'ring-2 ring-purple-500 bg-white/5' : ''}">
+        <div class="h-12 rounded-lg ${gradientClass} mb-2 opacity-80 group-hover:opacity-100 transition"></div>
+        <p class="text-[10px] text-center text-slate-300 font-bold">${name}</p>
+        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-10 transition"></div>
+    </div>
+    `;
+}
+
+function renderColorOption(id, colorHex) {
+    return `
+    <div onclick="selectColor('${id}')" id="color-${id}" class="color-option w-8 h-8 rounded-full cursor-pointer relative flex items-center justify-center transition hover:scale-110 ${aiDesignParams.color === id ? 'ring-2 ring-offset-2 ring-offset-[#0f1420] ring-white' : ''}" style="background-color: ${colorHex}">
+        ${aiDesignParams.color === id ? '<svg class="w-4 h-4 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : ''}
+    </div>
+    `;
+}
+
+function renderLayoutOption(id, name, path) {
+    return `
+    <div onclick="selectLayout('${id}')" id="layout-${id}" class="layout-option cursor-pointer p-3 rounded-xl border border-white/5 bg-[#161b28] hover:bg-[#1e2536] hover:border-purple-500/30 transition flex flex-col items-center gap-2 ${aiDesignParams.layout === id ? 'bg-purple-600/10 border-purple-500/50' : ''}">
+        <svg class="w-8 h-8 ${aiDesignParams.layout === id ? 'text-purple-400' : 'text-slate-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${path}"/></svg>
+        <span class="text-[10px] font-bold text-slate-400">${name}</span>
+    </div>
+    `;
+}
+
+function renderFeatureToggle(id, label) {
+    return `
+    <label class="flex items-center gap-3 p-3 rounded-xl bg-[#161b28] border border-white/5 cursor-pointer hover:bg-[#1e2536] transition group">
+        <div class="relative flex items-center">
+            <input type="checkbox" onchange="toggleFeature('${id}')" class="peer sr-only">
+            <div class="w-9 h-5 bg-slate-700 peer-checked:bg-purple-600 rounded-full transition-all"></div>
+            <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-all peer-checked:translate-x-full"></div>
+        </div>
+        <span class="text-xs text-slate-300 font-bold group-hover:text-white transition">${label}</span>
+    </label>
+    `;
+}
+
+// --- Interaction Logic ---
+
+function selectStyle(id) {
+    aiDesignParams.style = id;
+    document.querySelectorAll('.style-option').forEach(el => el.classList.remove('ring-2', 'ring-purple-500', 'bg-white/5'));
+    document.getElementById(`style-${id}`).classList.add('ring-2', 'ring-purple-500', 'bg-white/5');
+}
+
+function selectColor(id) {
+    aiDesignParams.color = id;
+    document.getElementById('ai-modal-content').innerHTML = document.getElementById('ai-modal-content').innerHTML; // Re-render simple hack or update classes manually
+    // For better performance in real app, toggle classes manually:
+    document.querySelectorAll('.color-option').forEach(el => {
+        el.classList.remove('ring-2', 'ring-offset-2', 'ring-offset-[#0f1420]', 'ring-white');
+        el.innerHTML = '';
+    });
+    const selected = document.getElementById(`color-${id}`);
+    if(selected) {
+        selected.classList.add('ring-2', 'ring-offset-2', 'ring-offset-[#0f1420]', 'ring-white');
+        selected.innerHTML = '<svg class="w-4 h-4 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+    }
+}
+
+function selectLayout(id) {
+    aiDesignParams.layout = id;
+    document.querySelectorAll('.layout-option').forEach(el => {
+        el.classList.remove('bg-purple-600/10', 'border-purple-500/50');
+        el.querySelector('svg').classList.remove('text-purple-400');
+        el.querySelector('svg').classList.add('text-slate-500');
+    });
+    const el = document.getElementById(`layout-${id}`);
+    el.classList.add('bg-purple-600/10', 'border-purple-500/50');
+    el.querySelector('svg').classList.add('text-purple-400');
+    el.querySelector('svg').classList.remove('text-slate-500');
+}
+
+function toggleFeature(id) {
+    if (aiDesignParams.features.includes(id)) {
+        aiDesignParams.features = aiDesignParams.features.filter(f => f !== id);
+    } else {
+        aiDesignParams.features.push(id);
+    }
+}
+
 
 function closeAIStudio() {
     const aiContainer = document.getElementById('ai-modal-container');
     const content = document.getElementById('ai-modal-content');
-    
-    gsap.to(content, { scale: 0.9, opacity: 0, duration: 0.3, onComplete: () => {
-        aiContainer.classList.add('hidden');
-    }});
+    gsap.to(content, { scale: 0.9, opacity: 0, duration: 0.3, onComplete: () => { aiContainer.classList.add('hidden'); }});
 }
+
 
 function setAIPrompt(text) {
     document.getElementById('ai-prompt').value = text;
 }
 
 function switchAITab(tab) {
-    // UI Update
-    document.querySelectorAll('.ai-tab-btn').forEach(b => {
-        b.className = 'ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
+    // 1. تحديث شكل الأزرار
+    document.querySelectorAll('#ai-modal-content button').forEach(b => {
+        if(b.id && b.id.startsWith('ai-tab-')) {
+            b.className = 'px-4 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/5 transition';
+        }
     });
-    document.getElementById(`ai-tab-${tab}`).className = 'ai-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-purple-600/20 border border-purple-500/50';
+    
+    const activeBtn = document.getElementById(`ai-tab-${tab}`);
+    if(activeBtn) activeBtn.className = 'px-4 py-1.5 rounded text-[10px] font-bold text-white bg-white/10 shadow-sm transition';
 
-    // Visibility
+    // 2. إخفاء جميع التبويبات أولاً
     ['preview', 'html', 'css', 'js'].forEach(t => {
-        document.getElementById(`ai-view-${t}`).classList.add('hidden');
+        const el = document.getElementById(`ai-view-${t}`);
+        if(el) el.classList.add('hidden');
     });
-    document.getElementById(`ai-view-${tab}`).classList.remove('hidden');
+    
+    // 3. إظهار التبويب المطلوب
+    const target = document.getElementById(`ai-view-${tab}`);
+    if(target) target.classList.remove('hidden');
 
-    // Refresh Editors
-    if (tab !== 'preview') {
-        setTimeout(() => aiEditorInstances[tab].refresh(), 10);
+    // 4. (الخطوة الأهم) تحديث المحرر فوراً بعد الظهور
+    if (tab !== 'preview' && aiEditorInstances[tab]) {
+        // نستخدم setTimeout لضمان أن المتصفح قد أزال كلاس hidden قبل التحديث
+        setTimeout(() => {
+            aiEditorInstances[tab].refresh();
+        }, 50);
     }
 }
 
-async function generateTemplateWithAI() {
-    const prompt = document.getElementById('ai-prompt').value;
-    if (!prompt) return showToast('يرجى كتابة وصف للتصميم أولاً', 'error');
 
+// ==========================================
+// AI GENERATION LOGIC (ROBUST EXTRACTION)
+// ==========================================
+
+async function generateTemplateWithAI() {
+    const customPrompt = document.getElementById('ai-custom-prompt').value;
     const loader = document.getElementById('ai-loader');
     const loaderText = document.getElementById('ai-loader-text');
+    
+    // إظهار اللودر
     loader.classList.remove('hidden');
     loader.style.display = 'flex';
 
-    // اختيار مفتاح عشوائي
+    // استخدام مفتاح API
     const apiKey = GEMINI_KEYS[Math.floor(Math.random() * GEMINI_KEYS.length)];
     
-    // إعداد الـ Prompt للذكاء الاصطناعي
-    const systemInstruction = `
-    You are an expert Frontend Developer and UI/UX Designer specialized in creating Student ID Cards using HTML, CSS, and minimal JS.
-    
-    **Goal:** Create a stunning, modern, and professional Student ID Card template based on the user's description.
-    
-    **Constraints & Requirements:**
-    1. **Output Format:** Return ONLY a valid JSON object without markdown code blocks. The JSON must have keys: "html", "css", "js".
-    2. **HTML Structure:** Root element should not have a fixed ID, use classes. Use these placeholders strictly: {{student_name}}, {{student_class}}, {{student_id}}, {{student_photo}}, {{qr_code}}, {{academic_year}}.
-    3. **CSS:** - Make the card wrapper class named '.ai-id-card'. 
-       - Use 'Tajawal' font. 
-       - Ensure dimensions are approximately width: 320px, height: 500px (portrait).
-       - Use absolute positioning for layout flexibility.
-       - Add cool effects like gradients, box-shadows, border-radius.
-    4. **JS:** Write minimal JS to manipulate the element if needed (e.g., dynamic coloring based on class). The JS will receive a variable 'cardElement' representing the root DOM element and 'student' object.
-    
-    **User Description:** ${prompt}
-    `;
+    // إعدادات التصميم (كما هي في كودك)
+      // إعدادات التصميم
+const designPrompt = `
+Create a Student ID Card Design.
+- Style: ${aiDesignParams.style.toUpperCase()}.
+- Color Theme: ${aiDesignParams.color.toUpperCase()}.
+- Layout: ${aiDesignParams.layout.toUpperCase()}.
+- Features: ${aiDesignParams.features.join(', ') || 'Standard'}.
+- Notes: ${customPrompt || 'Professional'}.
+`;
+
+const systemInstruction = `
+You are a STRICT code generator API integrated into an AI Design Engine.
+
+Your task:
+Generate a SINGLE, VALID, ERROR-FREE JSON object containing HTML, CSS, and JS
+for a PROFESSIONAL STUDENT ID CARD.
+
+==============================
+CRITICAL OUTPUT RULES (MANDATORY)
+==============================
+1. Output RAW JSON ONLY.
+   - No markdown
+   - No explanations
+   - No comments outside JSON
+   - No extra text before or after
+2. JSON MUST be strictly valid and parsable.
+3. DO NOT use literal newlines inside JSON string values.
+   - Use escaped \\\\n only if absolutely necessary.
+   - Prefer fully minified single-line HTML and CSS.
+4. Escape ALL double quotes inside HTML, CSS, and JS using \\\"
+5. No trailing commas anywhere.
+6. If any rule is violated, the response is INVALID.
+
+==============================
+REQUIRED JSON STRUCTURE (STRICT)
+==============================
+{
+  "html": "<div class=\\\"ai-id-card\\\">...</div>",
+  "css": ".ai-id-card{...}",
+  "js": "/* optional JS */"
+}
+
+==============================
+DESIGN PROMPT (MUST BE APPLIED)
+==============================
+You MUST interpret and visually apply the following design instructions
+as REAL UI decisions (colors, layout, spacing, style, hierarchy),
+not as plain text:
+
+${designPrompt}
+
+- Style affects the overall visual language (modern, luxury, minimal, etc.)
+- Color Theme affects backgrounds, accents, text, and borders
+- Layout affects element positioning and structure
+- Features must be visually reflected when possible
+- Notes must guide the final professional polish
+
+==============================
+HTML REQUIREMENTS
+==============================
+- Root element MUST have class: ai-id-card
+- Use these placeholders EXACTLY (do not replace them):
+  {{student_name}}
+  {{student_class}}
+  {{student_id}}
+  {{student_photo}}
+  {{qr_code}}
+  {{academic_year}}
+- Include:
+  - Student photo section
+  - Student name
+  - Class
+  - Student ID
+  - Academic year
+  - QR code area
+- Clean, semantic, injection-ready structure
+
+==============================
+CSS REQUIREMENTS
+==============================
+- Font family: 'Tajawal', sans-serif
+- Use absolute positioning for main elements
+- Scoped ONLY to .ai-id-card and its children
+- Modern, professional, premium look
+- Rounded corners, subtle shadows, clean spacing
+- Optional soft gradients or light glassmorphism (not heavy)
+
+==============================
+JS REQUIREMENTS
+==============================
+- Optional
+- Must be safe and minimal
+- No external libraries
+- No DOM-breaking logic
+
+==============================
+FINAL VALIDATION CHECK
+==============================
+Before responding, verify:
+- Output is ONLY JSON
+- JSON syntax is valid
+- No literal newlines inside strings
+- All quotes are escaped
+- DesignPrompt has been applied visually
+
+When ALL rules are satisfied, output the JSON object immediately.
+`;
 
     try {
-        loaderText.innerText = "جاري الاتصال بـ Gemini...";
-        
+        console.log("--> Sending Request to Gemini...");
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: systemInstruction }] }]
+                contents: [{ parts: [{ text: systemInstruction }] }],
+                generationConfig: {
+                    response_mime_type: "application/json", 
+                    temperature: 0.7,
+                    maxOutputTokens: 8000
+                }
             })
         });
 
-        if (!response.ok) throw new Error('فشل الاتصال بـ AI');
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || `API Error: ${response.status}`);
+        }
 
         const data = await response.json();
-        loaderText.innerText = "جاري معالجة الكود...";
-
-        let generatedText = data.candidates[0].content.parts[0].text;
         
-        // تنظيف النص من علامات الـ Markdown إذا وجدت
-        generatedText = generatedText.replace(/```json/g, '').replace(/```/g, '').trim();
-        
-        const codeObj = JSON.parse(generatedText);
+        if (!data.candidates || !data.candidates[0].content) {
+            throw new Error("No content received.");
+        }
 
-        // تحديث المحرر والبيانات
-        currentGeneratedCode = codeObj;
-        aiEditorInstances.html.setValue(codeObj.html);
-        aiEditorInstances.css.setValue(codeObj.css);
-        aiEditorInstances.js.setValue(codeObj.js || '');
+        const rawText = data.candidates[0].content.parts[0].text;
+        console.log("--> Raw AI Response:", rawText);
 
-        renderAIPreview();
-        switchAITab('preview');
-        showToast('تم تصميم القالب بنجاح!', 'success');
+        loaderText.innerText = "جاري توزيع الأكواد على المحرر...";
+
+        // ==========================================
+        // استخدام دالة التوزيع الجديدة (The Fix)
+        // ==========================================
+        const success = distributeAICode(rawText);
+
+        if (success) {
+            showToast('تم تصميم الهوية بنجاح!', 'success');
+        }
 
     } catch (error) {
-        console.error(error);
-        showToast('حدث خطأ أثناء التوليد: ' + error.message, 'error');
+        console.error("AI Generation Error:", error);
+        showToast('خطأ: ' + error.message, 'error');
     } finally {
+        loader.style.display = 'none';
         loader.classList.add('hidden');
     }
 }
 
+// دالة تنظيف قوية جداً
+function cleanJSON(text) {
+    // 1. إزالة الماركداون
+    text = text.replace(/```json/g, '').replace(/```/g, '');
+    
+    // 2. البحث عن بداية ونهاية الـ JSON الحقيقية
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    
+    if (firstBrace !== -1 && lastBrace !== -1) {
+        text = text.substring(firstBrace, lastBrace + 1);
+    }
+
+    // 3. تنظيف المسافات البيضاء الزائدة في البداية والنهاية
+    text = text.trim();
+    
+    return text;
+}
+
+function refreshAllEditors() {
+    if(aiEditorInstances.html) aiEditorInstances.html.refresh();
+    if(aiEditorInstances.css) aiEditorInstances.css.refresh();
+    if(aiEditorInstances.js) aiEditorInstances.js.refresh();
+}
+
+
+
 function renderAIPreview() {
     const { html, css, js } = currentGeneratedCode;
     
-    const previewHtml = html
+    // روابط صور وهمية احترافية لتجنب أخطاء 404
+    const mockPhoto = "https://ui-avatars.com/api/?name=Student&background=cbd5e1&color=64748b&size=200&font-size=0.33";
+    const mockQR = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Student2024";
+
+    // استبدال المتغيرات بقيم آمنة
+    let previewHtml = html
         .replace(/{{student_name}}/g, 'أحمد محمد علي')
         .replace(/{{student_class}}/g, 'الأول الثانوي')
         .replace(/{{student_id}}/g, '2024001')
-        .replace(/{{academic_year}}/g, '2024/2025')
-        .replace(/{{student_photo}}/g, '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#e2e8f0;color:#64748b;font-weight:bold;font-size:24px;">img</div>')
-        .replace(/{{qr_code}}/g, '<div style="width:80px;height:80px;background:#000;margin:0 auto;opacity:0.8"></div>');
+        .replace(/{{academic_year}}/g, '2024/2025');
+
+    // معالجة ذكية للصورة:
+    // إذا كان الذكاء الاصطناعي قد وضع المتغير داخل src=""، فإننا نضع الرابط فقط
+    // إذا وضعه كعنصر مستقل، نضعه داخل وسم img
+    if (html.includes('src="{{student_photo}}"') || html.includes("src='{{student_photo}}'")) {
+        previewHtml = previewHtml.replace(/{{student_photo}}/g, mockPhoto);
+    } else {
+        // احتياطي في حال لم يستخدم img src
+        previewHtml = previewHtml.replace(/{{student_photo}}/g, `<img src="${mockPhoto}" style="width:100%;height:100%;object-fit:cover;">`);
+    }
+
+    // نفس الأمر للـ QR Code
+    if (html.includes('src="{{qr_code}}"') || html.includes("src='{{qr_code}}'")) {
+        previewHtml = previewHtml.replace(/{{qr_code}}/g, mockQR);
+    } else {
+        previewHtml = previewHtml.replace(/{{qr_code}}/g, `<img src="${mockQR}" style="width:100%;height:auto;display:block;margin:auto;">`);
+    }
 
     const container = document.getElementById('ai-preview-container');
     if (!container.shadowRoot) container.attachShadow({mode: 'open'});
@@ -2741,40 +3060,33 @@ function renderAIPreview() {
             @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
             body { font-family: 'Tajawal', sans-serif; margin: 0; background: transparent; display:flex; justify-content:center; padding: 20px; }
             * { box-sizing: border-box; }
+            /* User CSS */
             ${css}
         </style>
         <div id="ai-card-wrapper">${previewHtml}</div>
     `;
 
-    // تنفيذ JS
+    // تنفيذ الـ JS بشكل آمن
     try {
         const cardElement = container.shadowRoot.getElementById('ai-card-wrapper').firstElementChild;
-        if(js && cardElement) {
-            // محاكاة كائن الطالب
+        if(js && js.trim() !== "" && cardElement) {
             const studentMock = { name: 'أحمد محمد', classId: 'G10', studentId: '2024001' };
             const safeRun = new Function('cardElement', 'student', js);
             safeRun(cardElement, studentMock);
         }
-    } catch(e) { console.warn("AI JS Error:", e); }
+    } catch(e) { console.warn("AI JS Execution Warning:", e); }
 }
 
 function importAICode() {
     if (!currentGeneratedCode.html) return showToast('لا يوجد تصميم لاستيراده', 'error');
-
-    // إذا كان المحرر الرئيسي مفتوحاً، نضع القيم فيه
     if (cmEditorHTML && cmEditorCSS && cmEditorJS) {
         cmEditorHTML.setValue(currentGeneratedCode.html);
         cmEditorCSS.setValue(currentGeneratedCode.css);
         cmEditorJS.setValue(currentGeneratedCode.js || '');
-        
-        // إغلاق نافذة الـ AI
         closeAIStudio();
-        
-        // فتح تبويب المعاينة في المحرر الرئيسي لتأكيد الاستيراد
         updateLivePreview();
-        showToast('تم استيراد التصميم إلى المحرر بنجاح', 'success');
+        showToast('تم استيراد التصميم بنجاح', 'success');
     } else {
-        // حالة نادرة: فتح المحرر الرئيسي ثم وضع القيم
         openTemplateEditor();
         setTimeout(() => {
             cmEditorHTML.setValue(currentGeneratedCode.html);
@@ -2783,6 +3095,81 @@ function importAICode() {
             closeAIStudio();
         }, 500);
     }
+}
+
+
+function distributeAICode(rawText) {
+    console.log("--> بدء معالجة وتوزيع الرد...");
+
+    // 1. تنظيف النص من علامات الـ Markdown إذا وجدت
+    // يزيل ```json و ``` وأي مسافات زائدة
+    let cleanText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    let finalHtml = "", finalCss = "", finalJs = "";
+    let isParsed = false;
+
+    // 2. المحاولة الأولى: تحويل JSON قياسي (الأفضل والأسرع)
+    try {
+        const jsonObj = JSON.parse(cleanText);
+        finalHtml = jsonObj.html || jsonObj.HTML || "";
+        finalCss = jsonObj.css || jsonObj.CSS || "";
+        finalJs = jsonObj.js || jsonObj.JS || "";
+        isParsed = true;
+        console.log("--> تم التحليل بنجاح باستخدام JSON.parse");
+    } catch (e) {
+        console.warn("--> فشل JSON.parse، جاري استخدام الاستخراج اليدوي (Regex Fallback)...");
+    }
+
+    // 3. المحاولة الثانية: الاستخراج اليدوي في حال فشل JSON.parse
+    // هذا الجزء ضروري لأن الذكاء الاصطناعي أحياناً يرسل JSON فيه أخطاء طفيفة تكسر الـ Parse
+    if (!isParsed) {
+        // دالة مساعدة لفك التشفير (تحويل \" إلى " و \n إلى سطر جديد)
+        const unescapeContent = (str) => {
+            if (!str) return "";
+            return str
+                .replace(/\\"/g, '"')      // تحويل \" إلى "
+                .replace(/\\n/g, '\n')     // تحويل \n إلى سطر جديد حقيقي
+                .replace(/\\t/g, '\t')     // تحويل \t إلى مسافة بادئة
+                .replace(/\\\\/g, '\\');   // تحويل \\ إلى \
+        };
+
+        // Regex يبحث عن المفتاح "html" ثم يأخذ كل شيء بين علامتي التنصيص للقيمة
+        // (?:[^"\\]|\\.)* : هذا النمط يتجاهل علامات التنصيص المحمية بـ Backslash (مثل \") ويعتبرها جزءاً من النص
+        const htmlMatch = cleanText.match(/"html"\s*:\s*"((?:[^"\\]|\\.)*)"/i);
+        const cssMatch = cleanText.match(/"css"\s*:\s*"((?:[^"\\]|\\.)*)"/i);
+        const jsMatch = cleanText.match(/"js"\s*:\s*"((?:[^"\\]|\\.)*)"/i);
+
+        if (htmlMatch) finalHtml = unescapeContent(htmlMatch[1]);
+        if (cssMatch) finalCss = unescapeContent(cssMatch[1]);
+        if (jsMatch) finalJs = unescapeContent(jsMatch[1]);
+    }
+
+    // 4. التحقق النهائي: هل حصلنا على بيانات؟
+    if (!finalHtml && !finalCss) {
+        showToast('لم يتمكن النظام من قراءة الكود المولد. حاول مرة أخرى.', 'error');
+        return false;
+    }
+
+    // 5. تحديث المتغير العالمي للكود المولد
+    currentGeneratedCode = { html: finalHtml, css: finalCss, js: finalJs };
+
+    // 6. وضع القيم داخل محررات CodeMirror
+    if (aiEditorInstances.html) aiEditorInstances.html.setValue(finalHtml);
+    if (aiEditorInstances.css) aiEditorInstances.css.setValue(finalCss);
+    if (aiEditorInstances.js) aiEditorInstances.js.setValue(finalJs);
+
+    // 7. تحديث المعاينة والانتقال لتبويب المعاينة
+    renderAIPreview(); // دالة رسم المعاينة الموجودة في كودك
+    switchAITab('preview'); // الانتقال لتبويب المعاينة
+
+    // 8. إنعاش المحررات (مهم جداً لضمان ظهور النص بعد إزالة hidden)
+    setTimeout(() => {
+        if(aiEditorInstances.html) aiEditorInstances.html.refresh();
+        if(aiEditorInstances.css) aiEditorInstances.css.refresh();
+        if(aiEditorInstances.js) aiEditorInstances.js.refresh();
+    }, 200);
+
+    return true;
 }
 
     </script>
