@@ -444,6 +444,129 @@
     background-color: #475569;
 }
 
+/* === Hero Header Style === */
+.dashboard-hero-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* خلفية داكنة */
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem; /* حواف دائرية */
+    padding: 2rem; /* مساحة داخلية */
+    box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.3); /* ظل ناعم */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* إطار خفيف */
+    margin-bottom: 2rem;
+    min-height: 180px; /* ضمان وجود ارتفاع */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* تأثير الخلفية المتحركة (اختياري) */
+.dashboard-hero-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+    animation: rotateGradient 20s linear infinite;
+    pointer-events: none;
+}
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === أنماط التخطيط (Layout Modes) === */
+/* 1. النمط الشبكي (الافتراضي) */
+.layout-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+}
+
+/* 2. نمط القائمة المرنة (Flex/List) */
+.layout-mode-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* تعديل عرض البطاقات في وضع الفليكس لتأخذ العرض الكامل */
+.layout-mode-flex > div {
+    grid-column: span 12 !important; 
+    width: 100% !important;
+}
+
+/* === نافذة التخصيص === */
+.customizer-modal {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+.dark .customizer-modal {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+.widget-toggle-item {
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.widget-toggle-item:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.dark .widget-toggle-item:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+/* إخفاء العناصر */
+.widget-hidden {
+    display: none !important;
+}
+/* تنسيقات البحث السريع */
+#global-search-results.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.search-result-category {
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #94a3b8;
+    background: rgba(241, 245, 249, 0.5);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.dark .search-result-category {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(255,255,255,0.05);
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.search-result-item:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    border-left: 3px solid #6366f1;
+}
+
+.search-highlight {
+    color: #4f46e5;
+    background-color: rgba(99, 102, 241, 0.1);
+    border-radius: 2px;
+    padding: 0 2px;
+}
+.dark .search-highlight {
+    color: #818cf8;
+}
     </style>
 </head>
 
@@ -719,32 +842,69 @@
         </div>
 
         <!-- 2. الهيدر (Header) -->
-        <header class="h-20 glass-panel border-b border-white/20 flex items-center justify-between px-8 z-40">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-slate-500 hover:text-brand-500 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                        </button>
-                <h2 id="page-title" class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <span class="text-brand-500">#</span> الرئيسية
-                </h2>
-            </div>
+        <header class="h-24 px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300">
+    
+    <div class="absolute inset-x-4 inset-y-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-lg shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 -z-10"></div>
 
-            <div class="flex items-center gap-4">
-                <button onclick="generateMockData()" class="px-3 py-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg text-xs font-bold border border-yellow-500/20 hover:bg-yellow-500/20 transition flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                    توليد بيانات تجريبية
-                </button>
-                <div class="relative hidden sm:block">
-                    <input type="text" placeholder="بحث سريع..." class="bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-full py-2 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 w-64 transition-all">
-                    <svg class="w-4 h-4 text-slate-400 absolute top-3 right-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-                <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition relative">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
+    <div class="flex items-center gap-6">
+        <button onclick="toggleSidebar()" class="md:hidden p-3 bg-white dark:bg-slate-700 rounded-xl shadow-sm text-slate-500 hover:text-brand-600 transition hover:scale-105 active:scale-95">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        
+        <div>
+            <h2 id="page-title" class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2 tracking-tight">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">#</span> الرئيسية
+            </h2>
+            <p class="text-xs text-slate-400 font-medium hidden sm:block" id="current-date-display">...جارِ التحميل</p>
+        </div>
+    </div>
+
+    <div class="flex-1 max-w-xl mx-6 hidden md:block">
+        <div class="relative group z-50">
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
-        </header>
+            
+            <input 
+                type="text" 
+                id="global-search-input" 
+                placeholder="ابحث عن طالب، معلم، أو فصل..." 
+                class="w-full pr-12 pl-4 py-3 bg-slate-100/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-brand-500/30 rounded-2xl text-sm font-bold text-slate-700 dark:text-white transition-all outline-none focus:bg-white dark:focus:bg-slate-900 focus:shadow-xl focus:shadow-brand-500/10 placeholder-slate-400"
+                autocomplete="off"
+            >
+
+            <div 
+                id="global-search-results" 
+                class="absolute top-full left-0 right-0 mt-3 bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-slate-100 dark:border-slate-700 rounded-2xl shadow-2xl hidden opacity-0 translate-y-2 transition-all duration-200 overflow-hidden max-h-[70vh] overflow-y-auto scrollbar-thin"
+            >
+            </div>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+        
+        <button class="relative p-3 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-brand-600 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 hover:shadow-md group">
+            <svg class="w-6 h-6 transform group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-800"></span>
+        </button>
+
+        <div class="h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <div class="flex items-center gap-3 pl-2 cursor-pointer hover:bg-white/40 dark:hover:bg-slate-700/40 p-1.5 rounded-2xl transition-colors border border-transparent hover:border-slate-200/50">
+            <div class="text-right hidden lg:block">
+                <h4 class="text-sm font-bold text-slate-800 dark:text-white leading-tight">المدير العام</h4>
+                <p class="text-[10px] text-slate-500 font-bold bg-green-100 text-green-700 px-1.5 rounded-md inline-block mt-0.5">متصل</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-lg shadow-brand-500/20">
+                <div class="w-full h-full bg-white dark:bg-slate-800 rounded-[10px] flex items-center justify-center">
+                    <span class="font-black text-brand-600 text-lg">A</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</header>
 
         <!-- منطقة المحتوى الديناميكي -->
         <div id="content-area" class="flex-1 overflow-y-auto p-6 md:p-8 relative scroll-smooth">
@@ -1031,7 +1191,7 @@ async function checkUserRole(user) {
 
         // 4. إذا نجح التحقق، نظهر التطبيق
         showAppScreen(user);
-
+        
     } catch (error) {
         // تسجيل الخروج فوراً إذا فشل التحقق
         auth.signOut();
@@ -1085,7 +1245,9 @@ function showAppScreen(user) {
         }, 50);
 
         showToast(`مرحباً بك، ${user.email}`, 'success');
+
     }, 500);
+    
 }
 
 // تسجيل الخروج
@@ -1116,7 +1278,7 @@ function fetchData() {
         if (data.settings) {
             appState.settings = { ...appState.settings, ...data.settings };
         }
-        
+
         renderContent(appState.currentSection);
     });
 }
@@ -1222,58 +1384,260 @@ function goToToday() {
             container.innerHTML = html;
         }
 
-        // --- View: Dashboard ---
+
+        // دالة لتحديث تاريخ الداشبورد عند تغيير الفلتر الموجود داخل البطاقة
+function updateDashboardDate(newDate) {
+    if (!appState.filters) appState.filters = {};
+    appState.filters.dashboardDate = newDate;
+    renderContent('dashboard'); // إعادة رسم الداشبورد بالتاريخ الجديد
+}
+// --- إعدادات الداشبورد الافتراضية ---
+const defaultDashboardConfig = {
+    layout: 'grid', // 'grid' or 'flex'
+    hiddenWidgets: [] // Array of IDs to hide
+};
+
+// 1. تحميل الإعدادات
+function getDashboardConfig() {
+    const saved = localStorage.getItem('dashboard_config');
+    return saved ? JSON.parse(saved) : defaultDashboardConfig;
+}
+
+// 2. تطبيق الإعدادات (تستدعى عند الرسم)
+function applyDashboardConfig() {
+    const config = getDashboardConfig();
+    const container = document.getElementById('dashboard-main-container');
+    
+    if (!container) return;
+
+    // تطبيق الـ Layout
+    container.className = config.layout === 'flex' ? 'layout-mode-flex' : 'layout-mode-grid';
+
+    // تطبيق الإخفاء
+    const allWidgets = document.querySelectorAll('[data-widget-id]');
+    allWidgets.forEach(el => {
+        const id = el.getAttribute('data-widget-id');
+        if (config.hiddenWidgets.includes(id)) {
+            el.classList.add('widget-hidden');
+        } else {
+            el.classList.remove('widget-hidden');
+        }
+    });
+}
+
+// 3. فتح نافذة التخصيص
+function openCustomizeModal() {
+    const config = getDashboardConfig();
+    
+    // تعريف الويدجتس المتاحة (الاسم والـ ID)
+    const widgets = [
+        { id: 'w_stats_students', name: 'إحصائية الطلاب' },
+        { id: 'w_stats_teachers', name: 'إحصائية المعلمين' },
+        { id: 'w_stats_classes', name: 'إحصائية الشعب' },
+        { id: 'w_stats_attendance', name: 'نسبة الحضور (البطاقة)' },
+        { id: 'w_chart_main', name: 'رسم بياني: الحضور الفعلي' },
+        { id: 'w_chart_students', name: 'رسم بياني: توزيع الطلاب' },
+        { id: 'w_chart_teachers', name: 'رسم بياني: توزيع المعلمين' },
+        { id: 'w_chart_rooms', name: 'رسم بياني: المرافق' },
+        { id: 'w_gender_daily', name: 'تحليل: جندر الحضور اليومي' },
+        { id: 'w_gender_lesson', name: 'تحليل: جندر الحصص' }
+    ];
+
+    const modalHtml = `
+        <div id="dashboard-customizer" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCustomizer()"></div>
+            <div class="customizer-modal relative w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-100 transition-all animate-fade-in-up">
+                
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110 4m6-8a2 2 0 100-4m0 4a2 2 0 110 4m6 8a2 2 0 100-4m0 4a2 2 0 110 4z"/></svg>
+                        تخصيص العرض
+                    </h3>
+                    <button onclick="closeCustomizer()" class="text-slate-400 hover:text-red-500 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+
+                <div class="p-6 max-h-[60vh] overflow-y-auto space-y-6">
+                    
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-500 uppercase mb-3">طريقة التخطيط (Layout)</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="layout_mode" value="grid" class="peer sr-only" ${config.layout === 'grid' ? 'checked' : ''}>
+                                <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-900/20 transition flex flex-col items-center gap-2">
+                                    <svg class="w-6 h-6 text-slate-400 peer-checked:text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">شبكة (Grid)</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="layout_mode" value="flex" class="peer sr-only" ${config.layout === 'flex' ? 'checked' : ''}>
+                                <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-900/20 transition flex flex-col items-center gap-2">
+                                    <svg class="w-6 h-6 text-slate-400 peer-checked:text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">قائمة (List)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-500 uppercase mb-3">العناصر المعروضة (Widgets)</h4>
+                        <div class="space-y-2">
+                            ${widgets.map(w => `
+                                <label class="widget-toggle-item flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-200">${w.name}</span>
+                                    <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" name="visible_widgets" value="${w.id}" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ${!config.hiddenWidgets.includes(w.id) ? 'right-0 border-brand-500' : 'right-5 border-slate-300'}" ${!config.hiddenWidgets.includes(w.id) ? 'checked' : ''} onclick="this.classList.toggle('right-0'); this.classList.toggle('right-5'); this.classList.toggle('border-brand-500'); this.classList.toggle('border-slate-300');"/>
+                                        <label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex gap-3">
+                    <button onclick="saveCustomization()" class="flex-1 btn-primary py-3 rounded-xl font-bold">حفظ وتطبيق</button>
+                    <button onclick="resetCustomization()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-300 transition">إعادة ضبط</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // إزالة أي مودال قديم
+    const oldModal = document.getElementById('dashboard-customizer');
+    if(oldModal) oldModal.remove();
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeCustomizer() {
+    const modal = document.getElementById('dashboard-customizer');
+    if(modal) modal.remove();
+}
+
+// 4. حفظ الإعدادات في LocalStorage
+function saveCustomization() {
+    const layout = document.querySelector('input[name="layout_mode"]:checked').value;
+    const checkboxes = document.querySelectorAll('input[name="visible_widgets"]');
+    const hiddenWidgets = [];
+    
+    checkboxes.forEach(cb => {
+        if (!cb.checked) {
+            hiddenWidgets.push(cb.value);
+        }
+    });
+
+    const newConfig = { layout, hiddenWidgets };
+    localStorage.setItem('dashboard_config', JSON.stringify(newConfig));
+    
+    closeCustomizer();
+    
+    // إعادة تطبيق الإعدادات فوراً (بدون إعادة تحميل الصفحة)
+    applyDashboardConfig();
+    showToast('تم حفظ تخصيص العرض بنجاح', 'success');
+}
+
+function resetCustomization() {
+    localStorage.removeItem('dashboard_config');
+    closeCustomizer();
+    applyDashboardConfig(); // سيعود للافتراضي
+    showToast('تمت استعادة العرض الافتراضي', 'success');
+}
 // ============================================================
-// دالة عرض لوحة القيادة (التصميم الجديد المفعم بالحيوية)
+// دالة عرض لوحة القيادة (مع الهيدر الجديد ومنطق التخصيص)
 // ============================================================
 function renderDashboard() {
-    // 1. حساب البيانات الحقيقية
+    // 1. البيانات
+    const defaultDate = new Date().toISOString().split('T')[0];
+    const displayDate = (appState.filters && appState.filters.dashboardDate) ? appState.filters.dashboardDate : defaultDate;
+
     const studentCount = Object.keys(appState.students || {}).length;
     const teacherCount = Object.keys(appState.teachers || {}).length;
     const classCount = Object.keys(appState.classes || {}).length;
     
-    let todayPresent = 0;
-    if (appState.attendance) {
-        todayPresent = Object.values(appState.attendance).filter(r => r.checkInTime).length;
+    let specificDayPresent = 0;
+    if (appState.attendance && appState.attendance[displayDate]) {
+        specificDayPresent = Object.values(appState.attendance[displayDate]).filter(r => 
+            r.status === 'present' || r.status === 'late' || r.status === 'severe_late'
+        ).length;
     }
-    const attendanceRate = studentCount > 0 ? Math.round((todayPresent / studentCount) * 100) : 0;
+    const attendanceRate = studentCount > 0 ? Math.round((specificDayPresent / studentCount) * 100) : 0;
 
-    // بدء تشغيل الرسوم البيانية + أنيميشن GSAP للدخول
-    // نستخدم setTimeout لضمان وجود العناصر في DOM قبل التحريك
+    // --- منطق الجندر ---
+    const studentsArr = Object.values(appState.students || {});
+    const studentGenderMap = {};
+    studentsArr.forEach(s => studentGenderMap[s.studentId] = s.gender);
+
+    let dailyMale = 0, dailyFemale = 0;
+    const dailyRecords = appState.attendance[displayDate] || {};
+    Object.values(dailyRecords).forEach(r => {
+        if (r.status !== 'absent') {
+            const gender = studentGenderMap[r.studentId];
+            if (gender === 'male') dailyMale++; else if (gender === 'female') dailyFemale++;
+        }
+    });
+
+    let lessonMale = 0, lessonFemale = 0;
+    const lessonData = appState.lessonAttendance[displayDate] || {};
+    Object.values(lessonData).forEach(lessonRecords => {
+        Object.values(lessonRecords).forEach(record => {
+            const gender = studentGenderMap[record.studentId];
+            if (gender === 'male') lessonMale++; else if (gender === 'female') lessonFemale++;
+        });
+    });
+
+    const totalDailyPresent = dailyMale + dailyFemale || 1;
+    const dailyMalePct = Math.round((dailyMale / totalDailyPresent) * 100);
+    const dailyFemalePct = Math.round((dailyFemale / totalDailyPresent) * 100);
+
+    const totalLessonPresent = lessonMale + lessonFemale || 1;
+    const lessonMalePct = Math.round((lessonMale / totalLessonPresent) * 100);
+    const lessonFemalePct = Math.round((lessonFemale / totalLessonPresent) * 100);
+    // -----------------
+
+    // تشغيل الأنيميشن وتطبيق التخصيص بعد الرسم
+// بدء تشغيل الرسوم البيانية + أنيميشن GSAP للدخول
     setTimeout(() => {
-        initRealDashboardCharts();
+        initRealDashboardCharts(); // الرسوم البيانية القديمة
         animateDashboardEntrance(); // تشغيل أنيميشن الدخول
+        // **تطبيق التخصيص المحفوظ**
+        applyDashboardConfig();
     }, 100);
 
     return `
         <div class="space-y-8 pb-10 dashboard-container-gsap">
-            <div class="flex flex-col md:flex-row justify-between items-end gap-6 header-gsap-target">
-                <div class="header-text-gsap opacity-0 transform translate-y-4">
-                    <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2 flex items-center gap-3">
-                        <span>لوحة القيادة</span>
-                        <span class="header-title-accent">المركزية</span>
-                        <span class="text-3xl">🚀</span>
-                    </h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-base font-medium flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        نظرة شاملة على الأداء المدرسي لحظة بلحظة
-                    </p>
-                </div>
-                <div class="flex gap-3 header-buttons-gsap opacity-0 transform translate-y-4">
-                     <button class="px-5 py-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 shadow-sm hover:shadow-md transition flex items-center gap-2">
-                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110 4m6-8a2 2 0 100-4m0 4a2 2 0 110 4m6 8a2 2 0 100-4m0 4a2 2 0 110 4z"/></svg>
-                        تخصيص العرض
-                    </button>
-                    <button onclick="openScanner()" class="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-2xl hover:from-brand-700 hover:to-brand-600 transition-all font-bold text-sm shadow-lg shadow-brand-500/30 flex items-center gap-3 hover:scale-105 active:scale-95">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/></svg>
-                        تسجيل حضور سريع
-                    </button>
+            
+            <div class="dashboard-hero-header header-gsap-target opacity-0 transform translate-y-4">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="p-2 bg-indigo-500/20 rounded-lg border border-indigo-500/30 text-indigo-400">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>
+                             </div>
+                             <h2 class="text-3xl font-black text-white tracking-tight">لوحة القيادة المركزية <span class="text-indigo-400">🚀</span></h2>
+                        </div>
+                        <p class="text-slate-400 font-medium text-sm max-w-lg">
+                            مرحباً بك في مركز العمليات. لديك نظرة شاملة على الأداء الأكاديمي والإداري. البيانات محدثة بتاريخ: <span class="text-white font-mono bg-white/10 px-2 py-0.5 rounded ml-1">${displayDate}</span>
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="openCustomizeModal()" class="px-5 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-sm backdrop-blur-md transition flex items-center gap-2 group shadow-lg">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors group-hover:rotate-90 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            تخصيص العرض
+                        </button>
+
+                        <button onclick="openScanner()" class="px-6 py-3 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-xl shadow-brand-500/20 flex items-center gap-2 hover:translate-y-[-2px] transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5V12m0 0h2m-2 0h-2m-4 5.343l-1.172 1.172a4 4 0 005.656 0L10 17.343l-1.172-1.172a4 4 0 00-5.656 0z"/></svg>
+                            تسجيل سريع
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-12 gap-6">
+            <div id="dashboard-main-container" class="layout-mode-grid">
                 
-                <div class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-blue p-6 card-gsap-target opacity-0 transform translate-y-8">
+                <div data-widget-id="w_stats_students" class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-blue p-6 card-gsap-target opacity-0 transform translate-y-8">
                     <div class="card-deco-blob"></div> <div class="card-content">
                         <div>
                             <p class="stat-label">
@@ -1281,18 +1645,13 @@ function renderDashboard() {
                                 إجمالي الطلاب
                             </p>
                              <h3 class="stat-value-counter"><span class="counter-gsap" data-target="${studentCount}">0</span></h3>
-                            <p class="stat-subtext">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                نشط في النظام
-                            </p>
+                            <p class="stat-subtext">نشط في النظام</p>
                         </div>
-                        <div class="icon-container-floating">
-                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
-                        </div>
+                        <div class="icon-container-floating"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg></div>
                     </div>
                 </div>
 
-                <div class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-purple p-6 card-gsap-target opacity-0 transform translate-y-8">
+                <div data-widget-id="w_stats_teachers" class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-purple p-6 card-gsap-target opacity-0 transform translate-y-8">
                     <div class="card-deco-blob"></div>
                     <div class="card-content">
                         <div>
@@ -1301,18 +1660,13 @@ function renderDashboard() {
                                 الكادر التعليمي
                             </p>
                             <h3 class="stat-value-counter"><span class="counter-gsap" data-target="${teacherCount}">0</span></h3>
-                             <p class="stat-subtext">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                معلم وموظف
-                            </p>
+                             <p class="stat-subtext">معلم وموظف</p>
                         </div>
-                         <div class="icon-container-floating">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2 .712V17a1 1 0 001 1z"/></svg>
-                        </div>
+                         <div class="icon-container-floating"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2 .712V17a1 1 0 001 1z"/></svg></div>
                     </div>
                 </div>
 
-                <div class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-orange p-6 card-gsap-target opacity-0 transform translate-y-8">
+                <div data-widget-id="w_stats_classes" class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-orange p-6 card-gsap-target opacity-0 transform translate-y-8">
                     <div class="card-deco-blob"></div>
                     <div class="card-content">
                         <div>
@@ -1321,57 +1675,47 @@ function renderDashboard() {
                                 الشعب والفصول
                             </p>
                             <h3 class="stat-value-counter"><span class="counter-gsap" data-target="${classCount}">0</span></h3>
-                             <p class="stat-subtext">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                                قاعة دراسية
-                            </p>
+                             <p class="stat-subtext">قاعة دراسية</p>
                         </div>
-                         <div class="icon-container-floating">
-                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"/></svg>
-                        </div>
+                         <div class="icon-container-floating"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"/></svg></div>
                     </div>
                 </div>
 
-                 <div class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-emerald p-6 card-gsap-target opacity-0 transform translate-y-8">
+                <div data-widget-id="w_stats_attendance" class="col-span-12 sm:col-span-6 lg:col-span-3 vibrant-card card-emerald p-6 card-gsap-target opacity-0 transform translate-y-8 relative overflow-visible group-filter">
                     <div class="card-deco-blob"></div>
-                    <div class="card-content">
+                    <div class="absolute top-4 left-4 z-30 transition-transform duration-300 hover:scale-105">
+                        <div class="relative flex items-center">
+                            <div class="absolute right-2 pointer-events-none text-emerald-800 dark:text-emerald-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
+                            <input type="date" value="${displayDate}" onchange="updateDashboardDate(this.value)" class="w-full pr-7 pl-2 py-1 bg-white/40 dark:bg-emerald-900/40 backdrop-blur-md border border-white/50 dark:border-emerald-500/30 rounded-lg text-[10px] font-bold text-emerald-900 dark:text-emerald-100 shadow-sm outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer appearance-none hover:bg-white/50 transition-colors">
+                        </div>
+                    </div>
+                    <div class="card-content mt-4">
                         <div>
-                            <p class="stat-label">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                نسبة حضور اليوم
-                            </p>
-                            <h3 class="stat-value-counter flex items-baseline">
-                                <span class="counter-gsap" data-target="${attendanceRate}">0</span>
-                                <span class="text-2xl ml-1 text-emerald-600 dark:text-emerald-400">%</span>
-                            </h3>
-                             <p class="stat-subtext">
-                                ${todayPresent} طالب حاضر الآن
-                            </p>
+                            <p class="stat-label"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> نسبة الحضور</p>
+                            <h3 class="stat-value-counter flex items-baseline"><span class="counter-gsap" data-target="${attendanceRate}">0</span><span class="text-2xl ml-1 text-emerald-600 dark:text-emerald-400">%</span></h3>
+                             <p class="stat-subtext">${specificDayPresent} طالب حاضر</p>
                         </div>
-                         <div class="icon-container-floating">
-                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                        </div>
+                         <div class="icon-container-floating"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div>
                     </div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-8 premium-glass rounded-[2rem] p-6 min-h-[400px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.2s">
+                <div data-widget-id="w_chart_main" class="col-span-12 lg:col-span-8 premium-glass rounded-[2rem] p-6 min-h-[400px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.2s">
                     <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                         <span class="w-1 h-6 bg-brand-500 rounded-full"></span>
                         تحليل الحضور الفعلي (آخر 7 أيام نشطة)
                     </h3>
-                    <div id="main-attendance-chart" class="w-full h-[320px] flex items-center justify-center">
-                        <span class="loader"></span>
-                    </div>
+                    <div id="main-attendance-chart" class="w-full h-[320px] flex items-center justify-center"><span class="loader"></span></div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-4 premium-glass rounded-[2rem] p-6 min-h-[400px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.3s">
+                <div data-widget-id="w_chart_students" class="col-span-12 lg:col-span-4 premium-glass rounded-[2rem] p-6 min-h-[400px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.3s">
                     <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                         <span class="w-1 h-6 bg-purple-500 rounded-full"></span>
                         توزيع الطلاب حسب الصفوف
                     </h3>
                     <div id="students-pie-chart" class="w-full h-[320px]"></div>
                 </div>
-                 <div class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[350px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.4s">
+
+                <div data-widget-id="w_chart_teachers" class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[350px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.4s">
                     <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                         <span class="w-1 h-6 bg-orange-500 rounded-full"></span>
                          توزيع الحصص على المعلمين
@@ -1379,7 +1723,7 @@ function renderDashboard() {
                     <div id="teachers-bar-chart" class="w-full h-[280px]"></div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[350px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.5s">
+                <div data-widget-id="w_chart_rooms" class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[350px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.5s">
                      <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                         <span class="w-1 h-6 bg-pink-500 rounded-full"></span>
                         تحليل مرافق المدرسة
@@ -1387,55 +1731,125 @@ function renderDashboard() {
                     <div id="classrooms-radar-chart" class="w-full h-[280px]"></div>
                 </div>
 
+                <div data-widget-id="w_gender_daily" class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[300px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.6s">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="w-1 h-6 bg-blue-500 rounded-full"></span>
+                            توزيع الحضور ليوم <span class="font-mono text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded mr-1">${displayDate}</span>
+                        </h3>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between text-sm font-bold mb-2">
+                                <span class="flex items-center gap-1 text-blue-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> ذكور (${dailyMale})</span>
+                                <span class="text-slate-400">${dailyMalePct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                                <div class="bg-blue-500 h-3 rounded-full transition-all duration-1000 ease-out relative" style="width: ${dailyMalePct}%">
+                                     <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-bold mb-2">
+                                <span class="flex items-center gap-1 text-pink-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> إناث (${dailyFemale})</span>
+                                <span class="text-slate-400">${dailyFemalePct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                                <div class="bg-pink-500 h-3 rounded-full transition-all duration-1000 ease-out relative" style="width: ${dailyFemalePct}%">
+                                    <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-widget-id="w_gender_lesson" class="col-span-12 lg:col-span-6 premium-glass rounded-[2rem] p-6 min-h-[300px] card-gsap-target opacity-0 transform translate-y-8" style="animation-delay: 0.7s">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="w-1 h-6 bg-purple-500 rounded-full"></span>
+                            تفاعل الحصص (تراكمي لليوم المحدد)
+                        </h3>
+                    </div>
+                    <div class="flex items-center justify-center gap-8 py-4">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="relative w-24 h-24 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-700" />
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="${251.2 - (251.2 * lessonMalePct / 100)}" class="text-blue-500 transition-all duration-1000" stroke-linecap="round" />
+                                </svg>
+                                <span class="absolute text-xl font-black text-slate-700 dark:text-white">${lessonMalePct}%</span>
+                            </div>
+                            <span class="text-sm font-bold text-blue-600">ذكور (${lessonMale})</span>
+                        </div>
+                        <div class="h-16 w-px bg-slate-200 dark:bg-slate-700"></div>
+                        <div class="flex flex-col items-center gap-2">
+                             <div class="relative w-24 h-24 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-700" />
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="${251.2 - (251.2 * lessonFemalePct / 100)}" class="text-pink-500 transition-all duration-1000" stroke-linecap="round" />
+                                </svg>
+                                <span class="absolute text-xl font-black text-slate-700 dark:text-white">${lessonFemalePct}%</span>
+                            </div>
+                            <span class="text-sm font-bold text-pink-500">إناث (${lessonFemale})</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     `;
 }
 
-// ============================================================
-// دالة GSAP الجديدة لتحريك دخول عناصر لوحة القيادة والأرقام
-// ============================================================
+
+// ==========================================
+// دالة تشغيل أنيميشن الدخول (GSAP) - النسخة المصححة
+// ==========================================
 function animateDashboardEntrance() {
     // التأكد من تحميل مكتبة GSAP
     if (typeof gsap === 'undefined') {
-        console.warn("GSAP not loaded. Skipping animations.");
-        // في حالة عدم وجود GSAP، نقوم بإظهار العناصر يدوياً
-        document.querySelectorAll('.header-text-gsap, .header-buttons-gsap, .card-gsap-target').forEach(el => {
-            el.style.opacity = 1;
-            el.style.transform = 'none';
-        });
-        document.querySelectorAll('.counter-gsap').forEach(counter => {
-             counter.innerText = counter.getAttribute('data-target');
+        document.querySelectorAll('.header-gsap-target, .card-gsap-target').forEach(el => {
+            el.classList.remove('opacity-0', 'translate-y-4', 'translate-y-8');
         });
         return;
     }
 
-    // إعداد جدول زمني للأنيميشن (Timeline)
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    // 1. تحريك الهيدر (النص ثم الأزرار)
-    tl.to(".header-text-gsap", { y: 0, opacity: 1, duration: 0.8 })
-      .to(".header-buttons-gsap", { y: 0, opacity: 1, duration: 0.8 }, "-=0.6");
+    // 1. تحريك الهيدر (Hero Section)
+    tl.to('.header-gsap-target', {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.2,
+        // تم حذف clearProps: "all" لضمان عدم اختفاء العنصر
+    });
 
-    // 2. تحريك البطاقات بشكل متتابع (Stagger)
-    tl.to(".card-gsap-target", {
+    // 2. تحريك الأزرار داخل الهيدر
+    tl.to('.header-buttons-gsap', {
+        y: 0,
+        opacity: 1,
+        duration: 0.8
+    }, "-=0.6");
+
+    // 3. تحريك الكروت والرسوم البيانية
+    tl.to('.card-gsap-target', {
         y: 0,
         opacity: 1,
         duration: 0.8,
-        stagger: 0.1 // تأخير 0.1 ثانية بين كل بطاقة والأخرى
-    }, "-=0.5"); // تبدأ قبل انتهاء أنيميشن الهيدر بقليل
-
-    // 3. تحريك عداد الأرقام (Counting Animation)
-    // يتم تشغيل هذا بالتزامن مع ظهور البطاقات
-    gsap.utils.toArray(".counter-gsap").forEach(counter => {
-        const targetValue = parseInt(counter.getAttribute('data-target')) || 0;
+        stagger: 0.1,
+        // تم حذف clearProps: "all"
+    }, "-=0.8");
+    
+    // 4. تحريك عدادات الأرقام
+    const counters = document.querySelectorAll('.counter-gsap');
+    counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
         gsap.to(counter, {
-            innerText: targetValue,
+            innerHTML: target,
             duration: 2,
-            snap: { innerText: 1 }, // لضمان عد أرقام صحيحة
-            ease: "power2.inOut",
-            // في حال كانت القيمة 0، لا تقم بالعد لكي لا يبدو غريباً
-            onStart: () => { if(targetValue === 0) counter.innerText = 0; }
+            snap: { innerHTML: 1 },
+            ease: "power1.inOut"
         });
     });
 }
@@ -4103,38 +4517,7 @@ function setTemplateDefault(id) {
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
-
-        // ==========================================
-        // 9. Utilities & Mock Data
-        // ==========================================
-        function generateMockData() {
-            const mock = {
-                teachers: {
-                    t1: { name: 'أحمد محمد', subject: 'رياضيات', email: 'ahmed@school.com' },
-                    t2: { name: 'سارة علي', subject: 'فيزياء', email: 'sara@school.com' },
-                    t3: { name: 'خالد يوسف', subject: 'لغة عربية', email: 'khaled@school.com' }
-                },
-                classes: {
-                    c1: { name: 'الأول الثانوي (أ)', levelId: 'G10-A', type: 'ثانوي', teachers: ['t1', 't2'] },
-                    c2: { name: 'الثاني الثانوي (ب)', levelId: 'G11-B', type: 'ثانوي', teachers: ['t1', 't3'] },
-                    c3: { name: 'الثالث المتوسط', levelId: 'G9', type: 'متوسط', teachers: ['t3'] }
-                },
-                students: {
-                    s1: { name: 'عمر خالد', studentId: '2024001', classId: 'c1' },
-                    s2: { name: 'منى السيد', studentId: '2024002', classId: 'c1' },
-                    s3: { name: 'يوسف أحمد', studentId: '2024003', classId: 'c2' }
-                },
-                classrooms: {
-                    r1: { name: 'معمل الحاسب 1', floor: '1', number: '101', type: 'معمل', capacity: 30 },
-                    r2: { name: 'قاعة المتنبي', floor: '2', number: '205', type: 'فصل', capacity: 25 }
-                },
-                lessons: {
-                    l1: { name: 'جبر وهندسة', duration: 45, teacherId: 't1', classId: 'c1' },
-                    l2: { name: 'ميكانيكا', duration: 45, teacherId: 't2', classId: 'c1' }
-                }
-            };
-            db.ref('school').update(mock).then(() => showToast('تم توليد البيانات التجريبية بنجاح'));
-        }
+document.getElementById('current-date-display').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
         // ==========================================
         // 10. ID Card Printing
@@ -5071,7 +5454,7 @@ function initLoginHeroAnimations() {
 function renderSettings() {
     const s = appState.settings;
     return `
-        <div class="max-w-4xl mx-auto space-y-8 animate-fade-in pb-10">
+        <div class="max-w-7xl mx-auto space-y-8 animate-fade-in pb-10">
             <div class="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-xl relative overflow-hidden">
                  <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-500 to-slate-800"></div>
                  <h2 class="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
@@ -5176,6 +5559,269 @@ function handleSaveSettings(e) {
         btn.disabled = false;
         btn.innerHTML = originalText;
     });
+}
+// ==========================================
+// نظام البحث السريع الشامل (Global Search)
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    initGlobalSearch();
+});
+
+function initGlobalSearch() {
+    const input = document.getElementById('global-search-input');
+    const resultsContainer = document.getElementById('global-search-results');
+
+    if (!input || !resultsContainer) return;
+
+    // عند الكتابة
+    input.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (query.length > 0) {
+            performSearch(query, resultsContainer);
+        } else {
+            hideSearchResults();
+        }
+    });
+
+    // عند التركيز (Focus) - إظهار النتائج إذا كان هناك نص
+    input.addEventListener('focus', () => {
+        if (input.value.trim().length > 0) {
+            resultsContainer.classList.add('active');
+        }
+    });
+
+    // إغلاق النتائج عند النقر خارج الصندوق
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.relative.w-full.max-w-md')) {
+            hideSearchResults();
+        }
+    });
+}
+
+function hideSearchResults() {
+    const resultsContainer = document.getElementById('global-search-results');
+    if(resultsContainer) resultsContainer.classList.remove('active');
+}
+
+function performSearch(query, container) {
+    const results = {
+        students: [],
+        teachers: [],
+        classes: [],
+        lessons: [],
+        classrooms: []
+    };
+
+    // 1. بحث في الطلاب (الاسم، المعرف، اسم ولي الأمر)
+    if (appState.students) {
+        Object.values(appState.students).forEach(s => {
+            if ((s.name && s.name.toLowerCase().includes(query)) || 
+                (s.studentId && s.studentId.includes(query)) ||
+                (s.guardianName && s.guardianName.toLowerCase().includes(query))) {
+                results.students.push(s);
+            }
+        });
+    }
+
+    // 2. بحث في المعلمين (الاسم، المادة، الهاتف)
+    if (appState.teachers) {
+        Object.values(appState.teachers).forEach(t => {
+            if ((t.name && t.name.toLowerCase().includes(query)) || 
+                (t.subject && t.subject.toLowerCase().includes(query)) ||
+                (t.phone && t.phone.includes(query))) {
+                results.teachers.push(t);
+            }
+        });
+    }
+
+    // 3. بحث في الفصول
+    if (appState.classes) {
+        Object.values(appState.classes).forEach(c => {
+            if (c.name && c.name.toLowerCase().includes(query)) {
+                results.classes.push(c);
+            }
+        });
+    }
+
+    // 4. بحث في المواد/الحصص
+    if (appState.lessons) {
+        Object.values(appState.lessons).forEach(l => {
+            if (l.name && l.name.toLowerCase().includes(query)) {
+                results.lessons.push(l);
+            }
+        });
+    }
+    
+    // 5. بحث في القاعات
+    if (appState.classrooms) {
+        Object.values(appState.classrooms).forEach(r => {
+            if (r.name && r.name.toLowerCase().includes(query)) {
+                results.classrooms.push(r);
+            }
+        });
+    }
+
+    renderSearchResultsHTML(results, container, query);
+}
+
+function renderSearchResultsHTML(results, container, query) {
+    const hasResults = Object.values(results).some(arr => arr.length > 0);
+    
+    if (!hasResults) {
+        container.innerHTML = `
+            <div class="p-6 text-center text-slate-400">
+                <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <p class="text-sm font-bold">لا توجد نتائج مطابقة لـ "${query}"</p>
+            </div>
+        `;
+        container.classList.add('active');
+        return;
+    }
+
+    let html = '';
+
+    // دالة مساعدة لتمييز النص المطابق
+    const highlight = (text) => {
+        if(!text) return '';
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="search-highlight">$1</span>');
+    };
+
+    // --- قسم الطلاب ---
+    if (results.students.length > 0) {
+        html += `<div class="search-result-category">الطلاب (${results.students.length})</div>`;
+        results.students.slice(0, 5).forEach(s => {
+            html += `
+                <div class="search-result-item" onclick="navigateToResult('students', '${s.id || ''}')">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                        ${s.photoUrl ? `<img src="${s.photoUrl}" class="w-full h-full rounded-full object-cover">` : s.name.charAt(0)}
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-800 dark:text-white">${highlight(s.name)}</div>
+                        <div class="text-[10px] text-slate-500">ID: ${highlight(s.studentId)}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // --- قسم المعلمين ---
+    if (results.teachers.length > 0) {
+        html += `<div class="search-result-category">المعلمين (${results.teachers.length})</div>`;
+        results.teachers.slice(0, 5).forEach(t => {
+            html += `
+                <div class="search-result-item" onclick="navigateToResult('teachers', '${t.id}')">
+                    <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-800 dark:text-white">${highlight(t.name)}</div>
+                        <div class="text-[10px] text-slate-500">${highlight(t.subject)}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // --- قسم الفصول ---
+    if (results.classes.length > 0) {
+        html += `<div class="search-result-category">الفصول الدراسية</div>`;
+        results.classes.forEach(c => {
+            html += `
+                <div class="search-result-item" onclick="navigateToResult('classes', '${c.id}')">
+                    <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 dark:text-white">${highlight(c.name)}</div>
+                </div>
+            `;
+        });
+    }
+    
+    // --- قسم المواد ---
+    if (results.lessons.length > 0) {
+        html += `<div class="search-result-category">المواد والحصص</div>`;
+        results.lessons.slice(0, 5).forEach(l => {
+            html += `
+                <div class="search-result-item" onclick="navigateToResult('lessons', '${l.id}')">
+                    <div class="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-xs">
+                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <div>
+                         <div class="text-sm font-bold text-slate-800 dark:text-white">${highlight(l.name)}</div>
+                         <div class="text-[10px] text-slate-500">${l.startTime} - ${l.endTime}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    container.innerHTML = html;
+    container.classList.add('active');
+}
+
+// دالة التنقل عند النقر على نتيجة
+function navigateToResult(type, id) {
+    // إخفاء القائمة
+    hideSearchResults();
+    
+    // تفريغ مربع البحث
+    document.getElementById('global-search-input').value = '';
+
+    // التنقل للقسم المناسب
+    switch(type) {
+        case 'students':
+            // الذهاب لقسم الطلاب
+            appState.currentSection = 'students';
+            renderContent('students');
+            // (اختياري) يمكن إضافة كود هنا لفتح مودال التعديل للطالب مباشرة إذا كان المعرف متاحاً
+            // if(id) openEditModal('students', id); 
+            showToast('تم الانتقال إلى سجل الطالب', 'success');
+            break;
+            
+        case 'teachers':
+            appState.currentSection = 'teachers';
+            renderContent('teachers');
+             // if(id) openEditModal('teachers', id); 
+             showToast('تم الانتقال إلى المعلم', 'success');
+            break;
+            
+        case 'classes':
+            appState.currentSection = 'classes';
+            renderContent('classes');
+            showToast('تم الانتقال إلى الفصل الدراسي', 'success');
+            break;
+
+         case 'lessons':
+            appState.currentSection = 'lessons'; // أو القسم الذي يحتوي المواد
+            renderContent('lessons'); // قد تحتاج لتحديد الفصل أولاً إذا كان النظام يتطلب ذلك
+            showToast('تم الانتقال إلى جدول المواد', 'success');
+            break;
+    }
+}
+// دالة لتبديل ظهور البحث في وضع الهاتف
+function toggleMobileSearch() {
+    const searchWrapper = document.getElementById('search-container-wrapper');
+    const branding = document.getElementById('header-branding');
+    const input = document.getElementById('global-search-input');
+
+    // التبديل بين إظهار وإخفاء البحث
+    if (searchWrapper.classList.contains('hidden')) {
+        // فتح البحث
+        searchWrapper.classList.remove('hidden');
+        searchWrapper.classList.add('block', 'animate-fade-in-down');
+        // إخفاء العنوان لإفساح المجال في الشاشات الصغيرة جداً
+        if(window.innerWidth < 640) {
+           branding.classList.add('opacity-0'); 
+        }
+        input.focus();
+    } else {
+        // إغلاق البحث
+        searchWrapper.classList.add('hidden');
+        searchWrapper.classList.remove('block', 'animate-fade-in-down');
+        branding.classList.remove('opacity-0');
+    }
 }
 </script>
 </body>
