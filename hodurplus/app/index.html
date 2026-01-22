@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تطبيق الطالب الذكي</title>
+    
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- المكتبات -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- مكتبة QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- إعدادات Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        dark: { bg: '#0f172a', card: '#1e293b', text: '#f1f5f9' }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.5)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* تخصيصات عامة */
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dark body { background-color: #020617; color: #f8fafc; }
+
+        /* إخفاء شريط التمرير للحصول على مظهر التطبيق */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* Swiper Customization */
+        .swiper { width: 100%; padding-top: 20px; padding-bottom: 40px; }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 85%;
+            height: 220px;
+            border-radius: 24px;
+            transition: all 0.3s;
+        }
+        .swiper-slide-active { transform: scale(1.05); box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.4); }
+        .swiper-pagination-bullet { width: 8px; height: 8px; background: #cbd5e1; opacity: 1; transition: all 0.3s; }
+        .swiper-pagination-bullet-active { width: 24px; border-radius: 4px; background: #3b82f6; }
+
+        /* Loader */
+        .loader-ring {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* تأثيرات الدخول */
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-morphism {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .floating-icon { position: absolute; opacity: 0; pointer-events: none; z-index: 10; }
+        
+/* Toast Notification - التعديل الجديد */
+        #toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            z-index: 9999; /* رفع الطبقة للتأكد من ظهورها فوق كل شيء */
+            
+            /* التعديل 1: تحريكه للأعلى بنسبة 200% من حجمه بدلاً من رقم ثابت */
+            transform: translateX(-50%) translateY(-200%);
+            
+            /* التعديل 2: جعله شفافاً تماماً عند الاختفاء */
+            opacity: 0;
+            
+            /* التعديل 3: منع الضغط عليه وهو مختفي */
+            pointer-events: none;
+            
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        #toast-notification.show {
+            /* إعادته لمكانه الطبيعي */
+            transform: translateX(-50%) translateY(0);
+            
+            /* إظهاره */
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        /* Swiper Cards Effect Tweak */
+        .swiper-slide {
+            height: auto; /* السماح للطول بالتمدد حسب المحتوى */
+            min-height: 320px;
+            transition: transform 0.3s;
+        }
+        
+        .swiper-slide-active {
+            /* تحسين الظل للشريحة النشطة */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+/* 1. إجبار الحاوية الرئيسية على عدم فرض مؤشر السحب */
+#lessons-slider-wrapper {
+    cursor: default !important; /* يلغي اليد من الخلفية */
+    pointer-events: auto !important;
+}
+
+/* 2. إعادة مؤشر السحب للشرائح نفسها فقط (ما عدا الزر) */
+.swiper-slide {
+    cursor: grab !important;
+}
+.swiper-slide:active {
+    cursor: grabbing !important;
+}
+
+/* 3. إصلاح الزر (الأهم) */
+button.swiper-no-swiping {
+    /* خدعة 3D: ترفع الزر "فيزياء" فوق طبقات الكروت */
+    transform: translateZ(50px) !important; 
+    
+    /* إجبار المؤشر واللمس */
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    
+    /* عزل الزر عن أحداث السلايدر */
+    z-index: 9999 !important;
+}
+/* ==========================================
+   Timeline Styles (للجدول الزمني للحصص)
+   ========================================== */
+.timeline-container {
+    position: relative;
+    padding-right: 20px; /* مسافة للخط العمودي */
+}
+
+/* الخط العمودي */
+.timeline-line {
+    position: absolute;
+    right: 7px; /* مكان الخط */
+    top: 10px;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0; /* لون الخط */
+    border-radius: 2px;
+}
+.dark .timeline-line { background: #334155; }
+
+/* عنصر في التايم لاين */
+.timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* النقطة (The Dot) */
+.timeline-dot {
+    position: absolute;
+    right: -24px; /* لضبطها فوق الخط */
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    z-index: 10;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+.dark .timeline-dot { border-color: #1e293b; }
+
+/* بطاقة المحتوى */
+.timeline-content {
+    flex: 1;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s;
+}
+.dark .timeline-content {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+/* ضبط عرض الشريحة لتكون في المنتصف تماماً */
+.swiper-slide {
+    width: 85% !important; /* عرض مثالي للموبايل */
+    max-width: 450px;      /* أقصى عرض للتابلت */
+    margin: 0 auto;
+    opacity: 1;
+}
+/* الشرائح غير النشطة تكون شفافة قليلاً وأصغر */
+.swiper-slide:not(.swiper-slide-active) {
+    opacity: 0.6;
+    transform: scale(0.9);
+}
+    </style>
+</head>
+<body class="antialiased min-h-screen transition-colors duration-500">
+
+    <!-- Toast -->
+    <div id="toast-notification" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-slate-100 dark:border-slate-700">
+        <div id="toast-icon" class="text-green-500"></div>
+        <span id="toast-message" class="text-sm font-bold"></span>
+    </div>
+
+    <!-- Modals -->
+    <!-- 1. ID Card Modal -->
+    <div id="id-card-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden modal-content relative flex flex-col items-center p-8">
+            
+            <button onclick="closeModal('id-card-modal')" class="absolute top-4 right-4 z-20 w-8 h-8 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6">بطاقة الطالب الرقمية</h3>
+
+            <div id="printable-id-card" class="relative w-[320px] h-[500px] bg-white rounded-2xl shadow-xl overflow-hidden text-slate-800 border border-slate-200">
+                
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
+                <div class="absolute top-0 w-full h-32 bg-gradient-to-b from-brand-600 to-brand-800 rounded-b-[3rem]"></div>
+                
+                <div class="absolute top-4 left-0 right-0 text-center">
+                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-white border border-white/20">
+                        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                        <span class="text-[10px] font-bold tracking-widest uppercase">School Identity</span>
+                    </div>
+                </div>
+
+                <div class="relative mt-12 flex justify-center">
+                    <div class="w-28 h-28 rounded-full p-1 bg-white shadow-lg">
+                        <img id="modal-id-img" src="" class="w-full h-full rounded-full object-cover bg-slate-200" alt="Student Photo">
+                    </div>
+                    <div class="absolute bottom-1 right-[30%] w-6 h-6 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center text-white shadow-sm" title="Active Student">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3 px-4">
+                    <h2 id="modal-id-name" class="text-xl font-black text-slate-800 leading-tight mb-1">اسم الطالب</h2>
+                    <p id="modal-id-class" class="text-sm font-medium text-brand-600 bg-brand-50 inline-block px-3 py-0.5 rounded-md border border-brand-100"></p>
+                    
+                    <div class="flex justify-center gap-4 mt-4 text-xs text-slate-500">
+                        <div class="text-center">
+                            <span class="block font-bold text-slate-700">الرقم الأكاديمي</span>
+                            <span id="modal-id-number" class="font-mono text-sm tracking-wider"></span>
+                        </div>
+                        <div class="w-px h-8 bg-slate-200"></div>
+                        <div class="text-center">
+                            <span class="block font-bold text-slate-700">العام الدراسي</span>
+                            <span>2025 - 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-0 w-full bg-slate-50 border-t border-slate-100 p-4 flex flex-col items-center">
+                    <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+                        <div id="qrcode" class="w-[100px] h-[100px]"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2 font-mono">Scan for Validation</p>
+                </div>
+            </div>
+
+            <div class="mt-8 w-full max-w-[320px]">
+                <button onclick="downloadIdCard()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition active:scale-95">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>تحميل الهوية (PDF)</span>
+                </button>
+                <p class="text-center text-xs text-slate-400 mt-3">يمكنك استخدام هذا الملف للطباعة أو الدخول الإلكتروني</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Full Profile Modal -->
+<div id="profile-modal" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-md sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl h-[90vh] sm:h-auto overflow-hidden modal-content relative flex flex-col">
+            
+            <div class="relative h-40 bg-gradient-to-r from-brand-600 to-indigo-600">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                
+                <button onclick="closeModal('profile-modal')" class="absolute top-6 left-6 w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center backdrop-blur-md transition z-20">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="relative px-8 pb-8 -mt-16 flex-1 overflow-y-auto">
+                <div class="flex flex-col items-center text-center mb-8">
+                    <div class="relative mb-4">
+                        <div class="w-32 h-32 rounded-[2rem] p-1.5 bg-white dark:bg-slate-900 shadow-2xl rotate-3">
+                            <img id="profile-img-large" src="" class="w-full h-full rounded-[1.7rem] object-cover bg-slate-200" alt="Profile">
+                        </div>
+                        <div class="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-xl shadow-lg border-4 border-white dark:border-slate-900">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 id="profile-name-large" class="text-2xl font-black text-slate-800 dark:text-white leading-tight mb-2"></h2>
+                    <span id="profile-id-badge" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono text-sm font-bold border border-slate-200 dark:border-slate-700">
+                        <i data-lucide="hash" class="w-3 h-3"></i>
+                        <span id="profile-id-text"></span>
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 flex flex-col items-center text-center relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-brand-500/5 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-brand-500/10"></div>
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-brand-500 mb-2"></i>
+                        <span class="text-xs text-slate-400 font-bold mb-1">الصف الدراسي</span>
+                        <h4 id="profile-class-large" class="text-lg font-black text-slate-800 dark:text-white"></h4>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 flex flex-col items-center text-center relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-orange-500/5 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-orange-500/10"></div>
+                        <i data-lucide="calendar" class="w-6 h-6 text-orange-500 mb-2"></i>
+                        <span class="text-xs text-slate-400 font-bold mb-1">العمر</span>
+                        <h4 id="profile-age-large" class="text-lg font-black text-slate-800 dark:text-white"></h4>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    
+                    <div class="relative z-10 flex items-center gap-4 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                            <i data-lucide="user-check" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-white/60 font-bold">ولي الأمر المسجل</span>
+                            <h4 id="profile-guardian-large" class="text-lg font-bold"></h4>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 bg-black/20 rounded-xl p-3 flex items-center justify-between border border-white/5">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="phone" class="w-4 h-4 text-emerald-400"></i>
+                            <span id="profile-phone-large" class="font-mono text-sm tracking-wider"></span>
+                        </div>
+                        <button class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">اتصال</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- 3. School Contact Modal -->
+    <div id="school-contact-modal" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl h-[90vh] sm:h-auto overflow-hidden modal-content relative flex flex-col">
+            
+            <div class="px-8 pt-8 pb-6 flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white">مدرستنا</h2>
+                    <p class="text-slate-500 text-sm mt-1">بيانات التواصل والموقع الجغرافي</p>
+                </div>
+                <button onclick="closeModal('school-contact-modal')" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="relative w-full h-64 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3454.673322197624!2d31.2357!3d30.0444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDAyJzM5LjgiTiAzMcKwMTQnMDguNSJF!5e0!3m2!1sen!2seg!4v1600000000000!5m2!1sen!2seg" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+                
+                <a href="https://maps.google.com" target="_blank" class="absolute bottom-4 left-4 bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg flex items-center gap-2 hover:scale-105 transition">
+                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                    فتح في Google Maps
+                </a>
+            </div>
+
+            <div class="p-8 space-y-6 overflow-y-auto">
+                
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white">العنوان</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed mt-1">شارع المدرسة النموذجية، الحي الأول، مدينة المستقبل، القاهرة.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="phone-call" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800 dark:text-white">أرقام الهاتف</h4>
+                        <div class="flex flex-col gap-1 mt-1">
+                            <a href="tel:0123456789" class="text-sm font-mono text-slate-500 hover:text-emerald-500 transition dir-ltr text-right">012 3456 789</a>
+                            <a href="tel:19999" class="text-sm font-mono text-slate-500 hover:text-emerald-500 transition dir-ltr text-right">Hotline: 19999</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="globe" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white">الموقع الإلكتروني</h4>
+                        <a href="#" class="text-sm text-indigo-500 hover:underline mt-1 block">www.myschool.edu.eg</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===========================
+         شاشة الدخول (Login Screen)
+         =========================== -->
+    <section id="login-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#020617] overflow-hidden">
+        
+        <!-- حاوية الأيقونات المتفجرة -->
+        <div id="explosion-container" class="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <!-- سيتم توليد الأيقونات هنا بالجافاسكربت -->
+        </div>
+
+        <!-- منطقة الشعار (Intro) -->
+        <div id="intro-logo" class="relative z-20 flex flex-col items-center mb-10 scale-0">
+            <div class="w-24 h-24 bg-gradient-to-tr from-brand-600 to-cyan-400 rounded-3xl flex items-center justify-center shadow-glow mb-4 rotate-3">
+                <i data-lucide="graduation-cap" class="w-12 h-12 text-white"></i>
+            </div>
+            <h1 class="text-4xl font-black text-slate-800 dark:text-white tracking-tight">مدرستنا <span class="text-brand-500">الذكية</span></h1>
+            <p class="text-slate-500 text-sm mt-1">بوابة الطالب الإلكترونية</p>
+        </div>
+
+        <!-- منطقة الدخول (Bottom Sheet Style) -->
+        <div id="login-form-container" class="absolute bottom-0 w-full max-w-md bg-white dark:bg-[#0f172a] rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-8 transform translate-y-full transition-transform duration-700 z-30 border-t border-slate-100 dark:border-slate-800/50">
+            <div class="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-8"></div>
+            
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 text-center">تسجيل الدخول</h2>
+            <p class="text-slate-400 text-xs text-center mb-8">قم بإدخال الرقم التعريفي للطالب للمتابعة</p>
+
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div class="relative group">
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                        <i data-lucide="user" class="w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors"></i>
+                    </div>
+                    <input type="text" id="student-id" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 pr-12 pl-4 text-slate-800 dark:text-white font-bold focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder:text-slate-400 placeholder:font-normal" placeholder="رقم الطالب (مثال: 18196710)" required>
+                </div>
+
+                <button type="submit" id="btn-login" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:to-brand-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-brand-500/30 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <span>دخول آمن</span>
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-[10px] text-slate-400">جميع الحقوق محفوظة &copy; 2026</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================
+         شاشة التطبيق الرئيسية (App View)
+         =========================== -->
+    <section id="app-view" class="hidden min-h-screen bg-[#f8fafc] dark:bg-[#020617] relative shadow-2xl overflow-hidden">
+        
+        <!-- خلفية جمالية -->
+        <div class="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-brand-50/80 to-transparent dark:from-brand-900/20 pointer-events-none"></div>
+
+        <!-- 1. الهيدر (Header) -->
+        <header class="relative pt-8 px-6 pb-4 flex justify-between items-center z-10">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-brand-500 to-cyan-400">
+                        <img id="header-avatar" src="https://ui-avatars.com/api/?name=User&background=0f172a&color=fff" alt="Student" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-[#020617]">
+                    </div>
+                    <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-[#020617] rounded-full"></span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 dark:text-white leading-tight" id="header-name">اسم الطالب</h2>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700" id="header-class">الصف</span>
+                        <span class="text-[10px] text-slate-400" id="header-age"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm active:scale-90 transition">
+                    <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-yellow-400"></i>
+                </button>
+                <button onclick="logout()" class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 flex items-center justify-center text-red-500 shadow-sm active:scale-90 transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 2. جدول الحصص (Smart Slider) -->
+        <div class="mt-4 mb-2 pl-4">
+            <div class="flex justify-between items-center px-6 mb-3 pr-6">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-brand-500 rounded-full"></span>
+                    جدول اليوم
+                </h3>
+                <span class="text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/20 px-2 py-1 rounded-lg" id="current-time-display">الحصص</span>
+            </div>
+
+            <div class="swiper mySwiper !pb-8 !pt-2">
+                <div class="swiper-wrapper" id="lessons-slider-wrapper">
+                    <!-- سيتم حقن البطاقات هنا -->
+                    <div class="swiper-slide skeleton-slide"></div>
+                    <div class="swiper-slide skeleton-slide"></div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- NEW: 3. البطاقات السريعة (Quick Actions) -->
+        <div class="px-6 mb-8">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 px-2">الخدمات السريعة</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <!-- ID Card Button -->
+                <button onclick="openIdCard()" class="bg-gradient-to-br from-indigo-500 to-indigo-700 p-5 rounded-2xl shadow-lg shadow-indigo-500/20 text-white relative overflow-hidden group transition active:scale-95 text-right">
+                    <div class="absolute top-0 left-0 w-24 h-24 bg-white/10 rounded-full -translate-x-8 -translate-y-8 blur-2xl group-hover:bg-white/20 transition"></div>
+                    <i data-lucide="id-card" class="w-8 h-8 mb-3 text-white/90"></i>
+                    <h4 class="font-bold text-lg leading-tight">هويتي</h4>
+                    <p class="text-xs text-indigo-100 opacity-80 mt-1">عرض بطاقة الطالب</p>
+                </button>
+
+                <!-- Profile Button -->
+                <button onclick="openProfile()" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-800 dark:text-white relative overflow-hidden group transition active:scale-95 text-right">
+                    <i data-lucide="user-circle" class="w-8 h-8 mb-3 text-brand-500"></i>
+                    <h4 class="font-bold text-lg leading-tight">بياناتي</h4>
+                    <p class="text-xs text-slate-400 mt-1">الملف الشخصي</p>
+                </button>
+
+
+            </div>
+                            <button onclick="openSchoolContact()" class="mt-4 w-full bg-slate-900 dark:bg-white rounded-[2rem] p-1 relative overflow-hidden group shadow-xl">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                
+                <div class="relative bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-100 dark:to-white rounded-[1.8rem] p-5 flex items-center justify-between border border-white/5 dark:border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/40 text-white group-hover:scale-110 transition-transform duration-300">
+                            <i data-lucide="map-pinned" class="w-7 h-7"></i>
+                        </div>
+                        <div class="text-right">
+                            <h4 class="text-lg font-black text-white dark:text-slate-900 leading-tight">التواصل مع المدرسة</h4>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">الموقع الجغرافي • أرقام التواصل</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-10 h-10 rounded-full bg-white/5 dark:bg-slate-900/5 flex items-center justify-center text-white dark:text-slate-900">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </button>
+        </div>
+
+        <!-- 5. سجل حصص اليوم (Today's Lessons Log) -->
+        <div class="px-6 mb-8 mt-2">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <i data-lucide="history" class="w-5 h-5 text-brand-500"></i>
+                سجل حصص اليوم
+            </h3>
+            
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-card border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                <div class="absolute right-8 top-0 bottom-0 w-0.5 bg-slate-100 dark:bg-slate-700"></div>
+
+                <div id="today-lessons-list" class="space-y-6 relative">
+                    <div class="text-center py-4">
+                        <div class="loader-ring mx-auto text-brand-500"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. تحليل الحضور (Charts + Daily) -->
+        <div class="px-6 space-y-6 relative z-10 pb-10">
+            
+            <!-- إحصائيات سريعة (Daily Summary) -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-card border border-slate-100 dark:border-slate-700/50 mb-6">
+                
+                <div class="flex flex-col gap-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <i data-lucide="calendar-days" class="w-5 h-5 text-brand-500"></i>
+                            سجل الحضور
+                        </h3>
+                        
+                        <div class="relative">
+                            <input type="date" id="date-picker-input" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" onchange="handleDateSelection(this)">
+                            <button class="w-9 h-9 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center hover:bg-brand-50 hover:text-brand-600 transition">
+                                <i data-lucide="calendar-search" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex p-1 bg-slate-100 dark:bg-slate-900/50 rounded-xl">
+                        <button onclick="setAttendanceFilter('daily')" id="filter-daily" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-600 shadow-sm">
+                            يومي
+                        </button>
+                        <button onclick="setAttendanceFilter('weekly')" id="filter-weekly" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-white/50">
+                            أسبوعي
+                        </button>
+                        <button onclick="setAttendanceFilter('monthly')" id="filter-monthly" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-white/50">
+                            شهري
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="daily-attendance-container" class="flex gap-3 overflow-x-auto pb-4 snap-x min-h-[110px]">
+                    <div class="w-full text-center py-4"><div class="loader-ring mx-auto text-brand-500"></div></div>
+                </div>
+
+                <div class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-700/50 flex justify-around text-center">
+                    <div>
+                        <span class="block text-xl font-black text-emerald-500" id="stat-days-present">0</span>
+                        <span class="text-[10px] text-slate-400 font-bold">حضور</span>
+                    </div>
+                    <div>
+                        <span class="block text-xl font-black text-orange-500" id="stat-days-late">0</span>
+                        <span class="text-[10px] text-slate-400 font-bold">تأخير</span>
+                    </div>
+                    <div>
+                        <span class="block text-xl font-black text-red-500" id="stat-days-absent">0</span>
+                        <span class="text-[10px] text-slate-400 font-bold">غياب</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. سجل حضور الحصص (Lessons History) -->
+            <div class="mb-10">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center justify-between">
+                    <span>متابعة حضور الحصص</span>
+                    <button class="text-xs text-brand-500 font-bold">عرض الكل</button>
+                </h3>
+                <div class="space-y-3" id="lessons-history-list">
+                    <!-- سيتم تعبئة السجل هنا -->
+                </div>
+            </div>
+            
+            <div class="h-8"></div> <!-- Spacer -->
+        </div>
+
+        
+
+
+    </section>
+    <!-- Day Details Modal -->
+<div id="day-details-modal" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl h-[90vh] sm:h-[80vh] overflow-hidden modal-content relative flex flex-col">
+            
+            <div class="relative bg-brand-600 p-6 pb-12 rounded-b-[3rem] z-10 shrink-0">
+                <button onclick="closeModal('day-details-modal')" class="absolute top-6 left-6 w-8 h-8 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center backdrop-blur-md transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <div class="text-center text-white mt-2">
+                    <p class="opacity-80 text-sm mb-1" id="modal-day-name">الخميس</p>
+                    <h2 class="text-3xl font-black" id="modal-day-date">24 يناير</h2>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto -mt-8 relative z-20 px-6 pb-6">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 mb-6 text-center">
+                    <div id="modal-status-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm mb-4">
+                        </div>
+                    
+                    <div class="flex justify-between items-center px-4">
+                        <div class="text-center">
+                            <span class="block text-xs text-slate-400 mb-1">وقت الحضور</span>
+                            <p class="text-xl font-black text-slate-800 dark:text-white font-mono" id="modal-checkin">--:--</p>
+                        </div>
+                        <div class="w-px h-8 bg-slate-100 dark:bg-slate-700"></div>
+                        <div class="text-center">
+                            <span class="block text-xs text-slate-400 mb-1">وقت الانصراف</span>
+                            <p class="text-xl font-black text-slate-800 dark:text-white font-mono" id="modal-checkout">--:--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-slate-800 dark:text-white mb-4 px-2 flex items-center gap-2">
+                    <i data-lucide="list-checks" class="w-4 h-4 text-brand-500"></i>
+                    حصص هذا اليوم
+                </h3>
+                
+                <div id="modal-day-lessons" class="space-y-3 pb-8">
+                    <div class="text-center text-slate-400 text-xs py-4">جاري تحميل البيانات...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // ==========================================
+        // 0. إعدادات وقواعد الحضور (Smart Config)
+        // ==========================================
+        let CONFIG = {
+            SCHOOL_START_TIME: "08:00",
+            LATE_THRESHOLD_MINUTES: 15,
+            SEVERE_LATE_MINUTES: 30,
+            DEPARTURE_START_TIME: "14:00",
+            OVERTIME_THRESHOLD_MINUTES: 15,
+            USE_24_HOUR_FORMAT: false 
+        };
+
+        // ==========================================
+        // دالة جلب إعدادات المدرسة من قاعدة البيانات
+        // ==========================================
+        async function fetchSettings() {
+            try {
+                // جلب البيانات من المسار الجديد الذي حددته
+                const snap = await db.ref('school/settings').once('value');
+                const remoteSettings = snap.val();
+
+                if (remoteSettings) {
+                    // تحديث القيم الموجودة في CONFIG بالقيم القادمة من السيرفر
+                    // نستخدم Spread Operator لدمج القيم الجديدة
+                    CONFIG = { ...CONFIG, ...remoteSettings };
+                    console.log("School Settings Loaded:", CONFIG);
+                }
+            } catch (e) {
+                console.error("Error fetching school settings:", e);
+                // في حالة الخطأ، سيستمر التطبيق بالعمل بالقيم الافتراضية
+            }
+        }
+        // ==========================================
+        // 1. إعدادات Firebase
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyADEyiGtrStnDfbNa6tGYFGkREbX4Xo0p4",
+            authDomain: "hodurplus.firebaseapp.com",
+            databaseURL: "https://hodurplus-default-rtdb.firebaseio.com",
+            projectId: "hodurplus",
+            storageBucket: "hodurplus.firebasestorage.app",
+            messagingSenderId: "782910695769",
+            appId: "1:782910695769:web:11b0adaf3eb89230abc448"
+        };
+        
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        // ==========================================
+        // 2. حالة التطبيق (State)
+        // ==========================================
+        let currentUser = null;
+        let studentData = null;
+        let myClass = null;
+        let myLessons = [];
+        let teachersCache = {};
+        let swiperInstance = null;
+        let classroomsCache = {}; // لتخزين بيانات القاعات
+        let attendedLessonIds = []; // لتخزين IDs الحصص التي تم تسجيلها اليوم
+        let attendanceDataCache = []; // لتخزين البيانات الخام ومنع تكرار الطلب
+        let currentFilter = 'daily';  // الفلتر الحالي: daily, weekly, monthly
+
+        // تهيئة الأيقونات
+        lucide.createIcons();
+
+        // ==========================================
+        // 3. الأنيميشن عند التحميل (Intro)
+        // ==========================================
+        window.onload = () => {
+            initLoginAnimation();
+            
+            auth.onAuthStateChanged(user => {
+                if(user && localStorage.getItem('studentLoggedIn') === 'true') {
+                    loadStudentData(localStorage.getItem('studentId'));
+                }
+            });
+        };
+
+        function initLoginAnimation() {
+            const container = document.getElementById('explosion-container');
+            const icons = ['book', 'pencil', 'graduation-cap', 'calculator', 'flask-conical', 'globe', 'backpack'];
+            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+            
+            for(let i=0; i<15; i++) {
+                const iconName = icons[Math.floor(Math.random() * icons.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const el = document.createElement('div');
+                el.className = 'floating-icon';
+                el.innerHTML = `<i data-lucide="${iconName}" style="color: ${color}; width: ${Math.random()*20 + 20}px; height: ${Math.random()*20 + 20}px;"></i>`;
+                container.appendChild(el);
+            }
+            lucide.createIcons();
+
+            const tl = gsap.timeline();
+            tl.to("#intro-logo", { scale: 1, duration: 1, ease: "elastic.out(1, 0.5)" });
+            document.querySelectorAll('.floating-icon').forEach(icon => {
+                tl.to(icon, {
+                    x: gsap.utils.random(-200, 200),
+                    y: gsap.utils.random(-300, 300),
+                    rotation: gsap.utils.random(-180, 180),
+                    opacity: 1,
+                    scale: gsap.utils.random(0.5, 1.5),
+                    duration: 1.5,
+                    ease: "power4.out"
+                }, "-=0.8");
+            });
+            tl.to("#login-form-container", { y: 0, duration: 0.8, ease: "power3.out" }, "-=0.5");
+        }
+// دالة ذكية لحساب حالة الحضور بناءً على الإعدادات
+// دالة مساعدة لحساب فرق الوقت والملاحظة (للحضور اليومي والحصص)
+        function calculateTimeNote(scheduledTimeStr, actualTimestamp, dateStr) {
+            if (!actualTimestamp || !scheduledTimeStr) return { diff: 0, text: '--', color: 'slate' };
+
+            // تكوين وقت الجدول المتوقع لهذا اليوم المحدد
+            const targetDate = new Date(dateStr); // تاريخ اليوم المحدد
+            const [h, m] = scheduledTimeStr.split(':').map(Number);
+            targetDate.setHours(h, m, 0, 0);
+
+            const actualDate = new Date(actualTimestamp);
+            
+            // الفرق بالدقائق
+            const diffMinutes = Math.floor((actualDate - targetDate) / 60000);
+
+            if (diffMinutes <= 0) {
+                return { diff: diffMinutes, text: 'حضور مبكر/في الوقت', color: 'emerald' };
+            } else if (diffMinutes <= 15) {
+                return { diff: diffMinutes, text: `تأخير بسيط (${diffMinutes} د)`, color: 'emerald' };
+            } else if (diffMinutes <= 30) {
+                return { diff: diffMinutes, text: `تأخير (${diffMinutes} د)`, color: 'orange' };
+            } else {
+                return { diff: diffMinutes, text: `تأخير شديد (${diffMinutes} د)`, color: 'red' };
+            }
+        }
+
+        // تحديث دالة حساب حالة الحضور اليومي لتشمل الملاحظة
+        function calculateAttendanceStatus(checkInTimestamp, dateStr = null) {
+            if (!checkInTimestamp) return { status: 'absent', label: 'غياب', color: 'red', note: 'لم يتم الحضور' };
+
+            // إذا لم يتم تمرير التاريخ، نستخدم تاريخ تسجيل الدخول
+            const checkInDate = new Date(checkInTimestamp);
+            const todayStr = dateStr || checkInDate.toISOString().split('T')[0];
+
+            // نستخدم دالة الملاحظات الجديدة بناءً على وقت بدء المدرسة في الإعدادات
+            const timeCalc = calculateTimeNote(CONFIG.SCHOOL_START_TIME, checkInTimestamp, todayStr);
+            
+            let status = 'present';
+            if (timeCalc.diff > CONFIG.SEVERE_LATE_MINUTES) status = 'severe_late';
+            else if (timeCalc.diff > CONFIG.LATE_THRESHOLD_MINUTES) status = 'late';
+
+            return { 
+                status: status, 
+                label: timeCalc.text.split('(')[0].trim(), // النص المختصر
+                color: timeCalc.color,
+                note: timeCalc.text // النص الكامل مع الدقائق
+            };
+        }
+
+        
+        // ==========================================
+        // 4. منطق تسجيل الدخول
+        // ==========================================
+        async function handleLogin(e) {
+            e.preventDefault();
+            let rawInput = document.getElementById('student-id').value.trim();
+            const studentId = rawInput.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            const btn = document.getElementById('btn-login');
+            
+            btn.innerHTML = '<div class="loader-ring"></div>';
+            btn.disabled = true;
+
+            try {
+                if(!auth.currentUser) await auth.signInAnonymously();
+
+                const snapshot = await db.ref('school/students').orderByChild('studentId').equalTo(studentId).once('value');
+                if (snapshot.exists()) {
+                    const key = Object.keys(snapshot.val())[0];
+                    const data = snapshot.val()[key];
+                    data.key = key;
+
+                    localStorage.setItem('studentLoggedIn', 'true');
+                    localStorage.setItem('studentId', studentId);
+                    localStorage.setItem('studentKey', key);
+
+                    transitionToApp(data);
+                } else {
+                    throw new Error("رقم الطالب غير موجود");
+                }
+            } catch (error) {
+                console.error(error);
+                let msg = error.message.includes("غير موجود") ? "رقم الطالب غير صحيح" : "مشكلة في الاتصال";
+                btn.innerHTML = `<span>${msg}</span> <i data-lucide="x-circle" class="w-5 h-5"></i>`;
+                btn.classList.add('bg-red-600');
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('bg-red-600');
+                    btn.innerHTML = '<span>دخول آمن</span> <i data-lucide="arrow-left" class="w-5 h-5"></i>';
+                    lucide.createIcons();
+                }, 2500);
+            }
+        }
+
+        function transitionToApp(data) {
+            studentData = data;
+            gsap.to("#login-screen", { y: "-100%", duration: 0.8, ease: "power3.in", onComplete: () => {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-view').classList.remove('hidden');
+                initApp();
+            }});
+        }
+
+// ==========================================
+        // تعديل دالة initApp لضمان جلب بيانات القاعات
+        // ==========================================
+        async function initApp() {
+            showLessonsLoading();
+            updateHeader();
+            await fetchSettings();
+            await fetchClassInfo();
+            await fetchTeachers();
+            await fetchClassrooms(); 
+            await fetchLessons();
+            await fetchAttendance(); // الحضور اليومي
+            await fetchLessonAttendance(); // <-- الدالة الجديدة (حضور الحصص)
+
+
+            buildTimeTable();
+            
+            setInterval(() => {
+                buildTimeTable();
+                updateTimeAndSlide();
+            }, 60000);
+        }
+        // ==========================================
+        // دالة جديدة لجلب بيانات القاعات (Classrooms)
+        // ==========================================
+        async function fetchClassrooms() {
+            try {
+                const snap = await db.ref('school/classrooms').once('value');
+                classroomsCache = snap.val() || {};
+            } catch (e) { console.error("Error fetching classrooms:", e); }
+        }
+        async function loadStudentData(studentId) {
+             if(!auth.currentUser) await auth.signInAnonymously();
+             const snapshot = await db.ref('school/students').orderByChild('studentId').equalTo(studentId).once('value');
+             if(snapshot.exists()) {
+                 const key = Object.keys(snapshot.val())[0];
+                 const data = snapshot.val()[key];
+                 data.key = key;
+                 studentData = data;
+                 document.getElementById('login-screen').style.display = 'none';
+                 document.getElementById('app-view').classList.remove('hidden');
+                 initApp();
+             }
+        }
+
+        // ==========================================
+        // تحديث الشريط العلوي (Header) فقط
+        // ==========================================
+        function updateHeader() {
+            // التحقق من توفر بيانات الطالب
+            if (!studentData) return;
+
+            // 1. تحديث الاسم
+            const headerName = document.getElementById('header-name');
+            if (headerName) headerName.innerText = studentData.name;
+
+            // 2. تحديث العمر
+            const headerAge = document.getElementById('header-age');
+            if (headerAge) headerAge.innerText = `${studentData.age} سنة`;
+
+            // 3. تحديث الصورة الشخصية في الهيدر
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) {
+                if (studentData.photoUrl) {
+                    headerAvatar.src = studentData.photoUrl;
+                } else {
+                    // نستخدم دالة التوليد المحلي التي أضفناها سابقاً
+                    // إذا لم تكن الدالة موجودة لسبب ما، نستخدم رابط احتياطي
+                    headerAvatar.src = (typeof generateLocalAvatar === 'function') 
+                        ? generateLocalAvatar(studentData.name) 
+                        : `https://ui-avatars.com/api/?name=${studentData.name}`;
+                }
+            }
+
+            // ملاحظة: قمنا بإزالة الأسطر التي كانت تحدث profile-img و modal-id-img
+            // لأن هذه العناصر تم تغييرها أو حذفها، ويتم التعامل معها الآن
+            // داخل الدوال openProfile() و openIdCard()
+        }
+
+        async function fetchClassInfo() {
+            if(!studentData.classId) return;
+            const snap = await db.ref(`school/classes/${studentData.classId}`).once('value');
+            myClass = snap.val();
+            if(myClass) document.getElementById('header-class').innerText = myClass.name;
+        }
+
+        async function fetchTeachers() {
+            try {
+                const snap = await db.ref('school/teachers').once('value');
+                teachersCache = snap.val() || {};
+            } catch (e) { console.error(e); }
+        }
+
+        async function fetchLessons() {
+            const snap = await db.ref('school/lessons').once('value');
+            const allLessons = snap.val() || {};
+            
+            // تحويل الكائن إلى مصفوفة ثم الفلترة والترتيب
+            myLessons = Object.entries(allLessons)
+                .map(([key, l]) => ({ ...l, id: key }))
+                .filter(l => l.classId === studentData.classId);
+
+            // ترتيب الحصص بناءً على وقت البدء (startTime)
+            myLessons.sort((a, b) => {
+                return parseTime(a.startTime) - parseTime(b.startTime);
+            });
+        }
+// تحويل الوقت من "14:41" إلى دقائق "881" للمقارنة
+        function parseTime(timeStr) {
+            if(!timeStr) return 0;
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+        // تحديد حالة الحصة بناءً على الوقت الحالي
+        function getLessonStatus(startStr, endStr) {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const start = parseTime(startStr);
+            const end = parseTime(endStr);
+
+            if (currentMinutes > end) return 'past';
+            if (currentMinutes >= start && currentMinutes <= end) return 'current';
+            return 'upcoming';
+        }
+
+        // حساب الدقائق المتبقية
+        function getMinutesUntil(startStr) {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const start = parseTime(startStr);
+            let diff = start - currentMinutes;
+            if (diff < 60) return diff;
+            return Math.floor(diff / 60) + " ساعة";
+        }
+
+        // تحويل الوقت لشكل مقروء (02:41 PM)
+        function formatTime12(timeStr) {
+            if(!timeStr) return "--:--";
+            let [h, m] = timeStr.split(':').map(Number);
+            const ampm = h >= 12 ? 'م' : 'ص';
+            h = h % 12;
+            h = h ? h : 12; 
+            m = m < 10 ? '0'+m : m;
+            return `${h}:${m} ${ampm}`;
+        }
+
+// دالة لاختيار أيقونة المادة بناءً على اسمها
+function getSubjectIcon(subjectName) {
+    if (!subjectName) return 'book-open';
+    const name = subjectName.toLowerCase();
+    
+    if (name.includes('رياض') || name.includes('math') || name.includes('جبر') || name.includes('هندسة')) return 'calculator';
+    if (name.includes('علوم') || name.includes('فيزياء') || name.includes('كيمياء') || name.includes('science')) return 'flask-conical';
+    if (name.includes('أحياء') || name.includes('biology')) return 'dna';
+    if (name.includes('عرب') || name.includes('arabic') || name.includes('نحو')) return 'align-right';
+    if (name.includes('نجليز') || name.includes('english')) return 'languages';
+    if (name.includes('تاريخ') || name.includes('history')) return 'hourglass';
+    if (name.includes('جغراف') || name.includes('geo')) return 'globe-2';
+    if (name.includes('حاسب') || name.includes('computer') || name.includes('تكنولوجيا')) return 'laptop';
+    if (name.includes('دين') || name.includes('islamic')) return 'moon-star';
+    if (name.includes('فني') || name.includes('art') || name.includes('رسم')) return 'palette';
+    if (name.includes('رياضة') || name.includes('sport') || name.includes('بدنية')) return 'trophy';
+    
+    return 'book-open-check'; // أيقونة افتراضية
+}
+
+
+function buildTimeTable() {
+    const wrapper = document.getElementById('lessons-slider-wrapper');
+    wrapper.innerHTML = '';
+
+    if (myLessons.length === 0) {
+        wrapper.innerHTML = `<div class="swiper-slide bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center border border-slate-100 dark:border-slate-700 min-h-[400px] shadow-xl"><i data-lucide="calendar-off" class="w-20 h-20 text-slate-300 mb-6 stroke-1"></i><h3 class="text-2xl font-bold text-slate-500">لا توجد حصص اليوم</h3><p class="text-slate-400 mt-2 text-sm">استمتع بوقتك!</p></div>`;
+        lucide.createIcons();
+        return;
+    }
+
+    let activeSlideIndex = 0;
+    let foundActive = false;
+
+    myLessons.forEach((lesson, index) => {
+        const teacher = (lesson.teacherId && teachersCache[lesson.teacherId]) ? teachersCache[lesson.teacherId] : { name: 'غير محدد' };
+        const classroom = (lesson.classroomId && classroomsCache[lesson.classroomId]) 
+            ? classroomsCache[lesson.classroomId] 
+            : { name: 'غير محدد', floor: '-', number: '-', capacity: '-' };
+
+        const status = getLessonStatus(lesson.startTime, lesson.endTime);
+        const isAttended = attendedLessonIds.includes(lesson.id);
+
+        // تحديد الشريحة النشطة
+        if (status === 'current' && !foundActive) {
+            activeSlideIndex = index;
+            foundActive = true;
+        } else if (status === 'upcoming' && !foundActive) {
+            activeSlideIndex = index;
+            foundActive = true;
+        }
+
+        // اختيار أيقونة المادة الذكية
+        const subjectIcon = getSubjectIcon(lesson.name);
+
+        // إعدادات الألوان والحالة
+        let bgGradient, textColor, subTextColor, iconColor, borderColor, statusBadge, glassBg;
+        let actionButton = '';
+
+        if (status === 'past') {
+            bgGradient = 'from-slate-700 to-slate-800 grayscale';
+            textColor = 'text-white/80'; subTextColor = 'text-white/60'; iconColor = 'text-white/50'; 
+            borderColor = 'border-white/5';
+            glassBg = 'bg-white/5';
+            statusBadge = `<span class="bg-black/30 text-white/70 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold border border-white/5 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> انتهت</span>`;
+            
+            if (isAttended) {
+                 actionButton = `<div class="mt-auto w-full py-4 flex items-center justify-center gap-2 text-emerald-300 text-sm font-bold border border-emerald-500/20 bg-emerald-500/10 rounded-2xl"><i data-lucide="check-circle-2" class="w-5 h-5"></i><span>تم الحضور</span></div>`;
+            } else {
+                 actionButton = `<div class="mt-auto w-full py-4 flex items-center justify-center gap-2 text-white/40 text-sm font-bold border border-white/5 rounded-2xl"><i data-lucide="x-circle" class="w-5 h-5"></i><span>انتهت (لم تحضر)</span></div>`;
+            }
+
+        } else if (status === 'current') {
+            bgGradient = 'from-brand-600 to-indigo-600';
+            textColor = 'text-white'; subTextColor = 'text-white/90'; iconColor = 'text-brand-200'; 
+            borderColor = 'border-white/20';
+            glassBg = 'bg-white/10';
+            statusBadge = `<span class="bg-white/20 text-white backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold border border-white/30 animate-pulse flex items-center gap-2 shadow-lg shadow-brand-500/20"><span class="w-2 h-2 bg-white rounded-full animate-ping"></span> جارية الآن</span>`;
+
+            if (isAttended) {
+                actionButton = `
+                    <button disabled class="swiper-no-swiping relative z-50 mt-auto w-full bg-emerald-500 text-white font-bold py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 opacity-100 cursor-not-allowed border border-emerald-400">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                        <span>تم تسجيل الحضور</span>
+                    </button>
+                `;
+            } else {
+                actionButton = `
+                    <button 
+                        class="swiper-no-swiping relative z-50 mt-auto w-full bg-white text-brand-600 font-bold py-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(255,255,255,0.4)] hover:bg-indigo-50 transition flex items-center justify-center gap-2 transform active:scale-95 group"
+                        onclick="registerClassAttendance('${lesson.id}', '${lesson.name}')"
+                        ontouchend="registerClassAttendance('${lesson.id}', '${lesson.name}')"
+                        onpointerdown="event.stopPropagation()"
+                        onmousedown="event.stopPropagation()"
+                        ontouchstart="event.stopPropagation()"
+                        style="cursor: pointer !important; transform: translateZ(20px);" 
+                    >
+                        <i data-lucide="fingerprint" class="w-6 h-6 group-hover:scale-110 transition-transform text-brand-500"></i>
+                        <span>تسجيل حضور</span>
+                    </button>
+                `;
+            }
+
+        } else {
+            bgGradient = 'bg-white dark:bg-slate-800';
+            textColor = 'text-slate-800 dark:text-white'; subTextColor = 'text-slate-500 dark:text-slate-400'; iconColor = 'text-brand-500'; 
+            borderColor = 'border-slate-100 dark:border-slate-700';
+            glassBg = 'bg-slate-50 dark:bg-slate-700/30';
+            statusBadge = `<span class="bg-brand-50 dark:bg-slate-700 text-brand-600 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-bold border border-brand-100 dark:border-slate-600 flex items-center gap-1"><i data-lucide="calendar-clock" class="w-3 h-3"></i> قادمة</span>`;
+            
+            let waitTime = getMinutesUntil(lesson.startTime);
+            actionButton = `<div class="mt-auto w-full py-4 flex items-center justify-center gap-2 text-slate-400 text-sm font-bold border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800/50"><i data-lucide="clock" class="w-4 h-4"></i><span>تبدأ خلال ${waitTime} دقيقة</span></div>`;
+        }
+
+        const bgClass = status === 'upcoming' ? bgGradient : `bg-gradient-to-br ${bgGradient}`;
+        const formattedStart = formatTime12(lesson.startTime);
+        const formattedEnd = formatTime12(lesson.endTime);
+
+        const slide = document.createElement('div');
+        // min-h-[500px] ليكون طويلاً وكبيراً
+        slide.className = `swiper-slide shadow-2xl relative flex flex-col p-6 ${borderColor} border min-h-[500px] rounded-[2.5rem] overflow-hidden`;
+        
+        slide.innerHTML = `
+            <div class="absolute inset-0 ${bgClass}"></div>
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
+            ${status === 'current' ? `<div class="absolute -right-32 -top-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>` : ''}
+            
+            <div class="relative z-10 flex justify-between items-center mb-8">
+                ${statusBadge}
+                <div class="flex items-center gap-2 font-mono text-xs font-bold ${textColor} opacity-90 bg-black/5 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
+                    <span>${formattedEnd}</span>
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i>
+                    <span>${formattedStart}</span>
+                </div>
+            </div>
+
+            <div class="relative z-10 mb-8 text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-[1.5rem] ${glassBg} backdrop-blur-md mb-4 shadow-lg border border-white/10 relative group">
+                    <div class="absolute inset-0 bg-current opacity-5 rounded-[1.5rem] blur-lg text-inherit"></div>
+                    <i data-lucide="${subjectIcon}" class="w-10 h-10 ${textColor} group-hover:scale-110 transition-transform duration-500"></i>
+                </div>
+                
+                <h3 class="text-3xl font-black mb-2 truncate ${textColor} tracking-tight">${lesson.name}</h3>
+                
+                <div class="inline-flex items-center gap-2 text-sm ${subTextColor} px-3 py-1 rounded-full ${glassBg} border border-white/5">
+                    <i data-lucide="graduation-cap" class="w-4 h-4 ${iconColor}"></i>
+                    <span class="truncate font-medium">أ. ${teacher.name}</span>
+                </div>
+            </div>
+
+            <div class="relative z-10 mb-6 ${glassBg} rounded-[2rem] p-4 backdrop-blur-md border border-white/10 shadow-sm">
+                
+                <div class="flex items-center gap-4 mb-4 pb-4 border-b border-white/5">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/10 shadow-inner ${textColor}">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase tracking-wider opacity-60 ${textColor}">مكان الحصة</p>
+                        <h4 class="text-lg font-black ${textColor}">${classroom.name}</h4>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-white/5">
+                        <i data-lucide="layers" class="w-5 h-5 mb-1 ${textColor} opacity-60"></i>
+                        <span class="text-[10px] ${textColor} opacity-50">الدور</span>
+                        <span class="text-sm font-black ${textColor}">${classroom.floor}</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-white/5">
+                        <i data-lucide="hash" class="w-5 h-5 mb-1 ${textColor} opacity-60"></i>
+                        <span class="text-[10px] ${textColor} opacity-50">رقم</span>
+                        <span class="text-sm font-black ${textColor}">${classroom.number}</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-white/5">
+                        <i data-lucide="users" class="w-5 h-5 mb-1 ${textColor} opacity-60"></i>
+                        <span class="text-[10px] ${textColor} opacity-50">السعة</span>
+                        <span class="text-sm font-black ${textColor}">${classroom.capacity || '-'}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative z-10 mt-auto">
+                ${actionButton}
+            </div>
+        `;
+        wrapper.appendChild(slide);
+    });
+
+    if (swiperInstance) swiperInstance.destroy(true, true);
+
+    swiperInstance = new Swiper(".mySwiper", {
+        // الإعدادات المحدثة للتمركز المثالي
+        effect: "creative",
+        creativeEffect: {
+            limitProgress: 2,
+            prev: {
+                shadow: true,
+                translate: [0, 0, -300],
+                scale: 0.85,
+                opacity: 0.5,
+            },
+            next: {
+                // دفع الشريحة التالية بعيداً لترك المجال للوسطى
+                translate: ["-125%", 0, 0], 
+                scale: 0.85,
+                opacity: 0.5,
+            },
+        },
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto", // الاعتماد على عرض CSS
+        spaceBetween: 20,
+        initialSlide: activeSlideIndex,
+        
+        // إعدادات اللمس
+        touchStartPreventDefault: false,
+        preventClicks: false,
+        preventClicksPropagation: false,
+        noSwiping: true,
+        noSwipingClass: 'swiper-no-swiping',
+        noSwipingSelector: 'button',
+        pagination: { el: ".swiper-pagination", clickable: true },
+    });
+    
+    lucide.createIcons();
+    
+    setTimeout(() => { 
+        if(myLessons.length > 0) swiperInstance.slideTo(activeSlideIndex); 
+    }, 400);
+}
+function registerClassAttendance(lessonId, lessonName) {
+    if (!studentData || !studentData.key) { showToast('خطأ في بيانات الطالب', 'error'); return; }
+    
+    // تأثير بصري سريع (اختياري)
+    showToast('جاري تسجيل الحضور...', 'success');
+
+    const today = new Date().toISOString().split('T')[0];
+    const lessonRef = db.ref(`school/lessonAttendance/${today}/${lessonId}/${studentData.key}`);
+    
+    lessonRef.once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            showToast(`تم تسجيل الحضور مسبقاً!`, 'error');
+            // تحديث الواجهة للتأكد من أن الزر مغلق
+            if (!attendedLessonIds.includes(lessonId)) attendedLessonIds.push(lessonId);
+            buildTimeTable();
+        } else {
+            lessonRef.set({
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                status: 'present',
+                studentId: studentData.studentId,
+                studentName: studentData.name,
+                lessonName: lessonName,
+                classId: studentData.classId
+            }).then(() => {
+                showToast(`تم إثبات حضورك في حصة ${lessonName}`, 'success');
+                
+                // 1. تحديث القائمة المحلية فوراً ليظهر الزر مغلقاً
+                attendedLessonIds.push(lessonId);
+                
+                // 2. تحديث قائمة الحضور في الأسفل
+                fetchLessonAttendance(); 
+                
+                // 3. إعادة بناء السلايدر ليظهر الزر الجديد (تم التسجيل)
+                buildTimeTable();
+
+            }).catch(err => { 
+                console.error(err);
+                showToast('حدث خطأ أثناء التسجيل', 'error'); 
+            });
+        }
+    });
+}
+
+// ==========================================
+        // 5. سجل الحصص (Timeline View) - المعدلة
+        // ==========================================
+        async function fetchLessonAttendance() {
+            const container = document.getElementById('today-lessons-list'); // الحاوية القديمة
+            const today = new Date().toISOString().split('T')[0];
+            
+            // تنظيف وإعداد الحاوية للتايم لاين
+            container.innerHTML = `<div class="timeline-container" id="timeline-inner"><div class="timeline-line"></div></div>`;
+            const timelineInner = document.getElementById('timeline-inner');
+
+            attendedLessonIds = []; 
+
+            try {
+                const snap = await db.ref(`school/lessonAttendance/${today}`).once('value');
+                const allLessonsData = snap.val() || {};
+                
+                let myAttendedLessons = [];
+
+                Object.keys(allLessonsData).forEach(lessonId => {
+                    const lessonStudents = allLessonsData[lessonId];
+                    if (lessonStudents && lessonStudents[studentData.key]) {
+                        attendedLessonIds.push(lessonId);
+                        myAttendedLessons.push({
+                            lessonId: lessonId,
+                            ...lessonStudents[studentData.key]
+                        });
+                    }
+                });
+
+                // ترتيب حسب الوقت (الأحدث في الأعلى)
+                myAttendedLessons.sort((a, b) => b.timestamp - a.timestamp);
+                
+                if (myAttendedLessons.length === 0) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-8 text-center opacity-50">
+                            <i data-lucide="clipboard-x" class="w-12 h-12 text-slate-300 mb-2"></i>
+                            <p class="text-xs text-slate-500">لم يتم تسجيل حضور في أي حصة اليوم</p>
+                        </div>
+                    `;
+                } else {
+                    myAttendedLessons.forEach((record, index) => {
+                        const timeStr = new Date(record.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                        const lessonInfo = myLessons.find(l => l.id === record.lessonId) || { name: record.lessonName };
+                        
+                        // اختيار لون النقطة بناءً على المادة (اختياري، هنا نستخدم الأزرق للكل)
+                        const dotColor = "bg-brand-500";
+                        
+                        const itemHtml = `
+                        <div class="timeline-item animate-fade-in" style="animation-delay: ${index * 100}ms">
+                            <div class="timeline-content w-full relative group hover:scale-[1.02] cursor-default">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h4 class="font-bold text-slate-800 dark:text-white text-base">${lessonInfo.name}</h4>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-2 py-1 rounded-lg" dir="ltr">${timeStr}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-500"></i>
+                                    <span>تم تسجيل الحضور بنجاح</span>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-dot ${dotColor}"></div>
+                        </div>
+                        `;
+                        
+                        timelineInner.innerHTML += itemHtml;
+                    });
+                }
+                lucide.createIcons();
+                buildTimeTable();
+
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p class="text-red-500 text-center text-xs">فشل تحميل سجل الحصص</p>';
+            }
+        }
+
+
+        // ==========================================
+        // 6. الحضور والغياب (المحدثة مع الفلاتر)
+        // ==========================================
+        async function fetchAttendance() {
+            // تحميل مبدئي
+            if (attendanceDataCache.length === 0) {
+                try {
+                    // جلب آخر 60 يوم لضمان وجود بيانات كافية للشهور
+                    const snap = await db.ref('school/attendance').limitToLast(60).once('value');
+                    const data = snap.val() || {};
+                    
+                    let records = [];
+                    let stats = { present: 0, late: 0, absent: 0 };
+                    
+                    Object.keys(data).forEach(date => {
+                        const dayRecords = data[date];
+                        let record = null;
+                        
+                        if (dayRecords[studentData.key]) {
+                            record = dayRecords[studentData.key];
+                        } else {
+                            Object.values(dayRecords).forEach(r => {
+                                if (r.studentId === studentData.studentId) record = r;
+                            });
+                        }
+
+                        if(record) {
+                            const statusObj = calculateAttendanceStatus(record.checkInTime, date);
+                            records.push({ 
+                                date, 
+                                ...record,
+                                calculatedStatus: statusObj
+                            });
+
+                            if(statusObj.status === 'present') stats.present++;
+                            else if(statusObj.status.includes('late')) stats.late++;
+                        }
+                    });
+
+                    // حفظ البيانات في الكاش وتحديث العدادات
+                    attendanceDataCache = records;
+                    document.getElementById('stat-days-present').innerText = stats.present;
+                    document.getElementById('stat-days-late').innerText = stats.late;
+                    
+                } catch (e) {
+                    console.error("Error fetching attendance:", e);
+                    document.getElementById('daily-attendance-container').innerHTML = '<p class="text-red-500 text-center text-xs w-full">فشل الاتصال</p>';
+                    return;
+                }
+            }
+
+            // استدعاء دالة الرسم بناءً على الفلتر الحالي
+            renderAttendanceList();
+            renderHistoryList(); // تحديث القائمة السفلية أيضاً
+        }
+
+        // ==========================================
+        // دوال الفلترة والرسم (Render Logic)
+        // ==========================================
+        
+        function setAttendanceFilter(filter) {
+            currentFilter = filter;
+            
+            // تحديث شكل الأزرار
+            ['daily', 'weekly', 'monthly'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === filter) {
+                    btn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-600 shadow-sm scale-105';
+                } else {
+                    btn.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-white/50';
+                }
+            });
+
+            renderAttendanceList();
+        }
+
+        function renderAttendanceList() {
+            const container = document.getElementById('daily-attendance-container');
+            container.innerHTML = '';
+
+            let dataToRender = [];
+
+            if (currentFilter === 'daily') {
+                // عرض يومي (كما كان سابقاً)
+                dataToRender = [...attendanceDataCache].reverse();
+                
+                if(dataToRender.length === 0) {
+                     container.innerHTML = '<div class="w-full text-center text-xs text-slate-400 py-2">لا يوجد سجل</div>';
+                     return;
+                }
+
+                dataToRender.forEach(rec => {
+                    const dateObj = new Date(rec.date);
+                    const dayName = dateObj.toLocaleDateString('ar-EG', { weekday: 'short' });
+                    const dayNum = dateObj.getDate();
+                    const st = rec.calculatedStatus;
+                    
+                    const colorClass = st.color === 'emerald' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                                       st.color === 'orange'  ? 'bg-orange-50 border-orange-200 text-orange-700' :
+                                                                'bg-red-50 border-red-200 text-red-700';
+
+                    const card = document.createElement('div');
+                    card.onclick = () => openDayDetails(rec);
+                    card.className = `cursor-pointer snap-start min-w-[85px] flex flex-col items-center justify-center p-3 rounded-2xl border ${colorClass} relative overflow-hidden active:scale-95 transition-transform`;
+                    card.innerHTML = `
+                        <span class="text-[10px] font-bold opacity-70 mb-1">${dayName}</span>
+                        <span class="text-xl font-black mb-1">${dayNum}</span>
+                        <div class="w-full h-1 bg-black/10 rounded-full mt-1 overflow-hidden">
+                            <div class="h-full ${st.color === 'emerald' ? 'bg-emerald-500' : st.color === 'orange' ? 'bg-orange-500' : 'bg-red-500'} w-full"></div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } else if (currentFilter === 'weekly') {
+                // تجميع البيانات أسبوعياً
+                const weeks = groupDataByWeek(attendanceDataCache);
+                
+                if(weeks.length === 0) {
+                     container.innerHTML = '<div class="w-full text-center text-xs text-slate-400 py-2">لا يوجد بيانات أسبوعية</div>';
+                     return;
+                }
+
+                weeks.forEach(week => {
+                    const card = document.createElement('div');
+                    card.className = `snap-start min-w-[140px] p-4 rounded-2xl bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 flex flex-col gap-2`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center text-xs font-bold text-slate-500 dark:text-slate-300">
+                            <span>الأسبوع ${week.weekNum}</span>
+                            <span class="text-[10px] opacity-70">${week.month}</span>
+                        </div>
+                        <div class="flex gap-1 mt-1">
+                            <div class="flex-1 bg-emerald-100 text-emerald-700 text-center rounded py-1 text-xs font-black" title="حضور">
+                                ${week.present}
+                            </div>
+                            <div class="flex-1 bg-orange-100 text-orange-700 text-center rounded py-1 text-xs font-black" title="تأخير">
+                                ${week.late}
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-center text-slate-400 mt-1">${week.range}</div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } else if (currentFilter === 'monthly') {
+                // تجميع البيانات شهرياً
+                const months = groupDataByMonth(attendanceDataCache);
+                
+                if(months.length === 0) {
+                     container.innerHTML = '<div class="w-full text-center text-xs text-slate-400 py-2">لا يوجد بيانات شهرية</div>';
+                     return;
+                }
+
+                months.forEach(month => {
+                    const card = document.createElement('div');
+                    card.className = `snap-start min-w-[120px] p-4 rounded-2xl bg-gradient-to-br from-brand-50 to-white dark:from-slate-800 dark:to-slate-700 border border-brand-100 dark:border-slate-600 flex flex-col items-center justify-center text-center`;
+                    card.innerHTML = `
+                        <h4 class="font-black text-slate-800 dark:text-white mb-2">${month.name}</h4>
+                        <div class="w-16 h-16 rounded-full border-4 border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center relative">
+                            <span class="text-xl font-bold text-emerald-600">${month.present}</span>
+                            <span class="absolute -bottom-1 -right-1 bg-orange-100 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-white dark:border-slate-800">${month.late}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-2">أيام حضور</span>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // ==========================================
+        // دوال مساعدة للتجميع (Grouping Helpers)
+        // ==========================================
+
+        function groupDataByWeek(data) {
+            let weeks = {};
+            data.forEach(rec => {
+                const d = new Date(rec.date);
+                // الحصول على رقم الأسبوع والسنة كمفتاح
+                const weekNum = getWeekNumber(d);
+                const key = `${d.getFullYear()}-W${weekNum}`;
+                
+                if (!weeks[key]) {
+                    weeks[key] = { 
+                        weekNum, 
+                        year: d.getFullYear(),
+                        month: d.toLocaleDateString('ar-EG', {month: 'short'}),
+                        present: 0, 
+                        late: 0, 
+                        absent: 0,
+                        startDate: d, 
+                        endDate: d 
+                    };
+                }
+                
+                // تحديث العدادات
+                const st = rec.calculatedStatus;
+                if (st.status === 'present') weeks[key].present++;
+                else if (st.status.includes('late')) weeks[key].late++;
+                else weeks[key].absent++;
+
+                // تحديث نطاق التاريخ
+                if (d < weeks[key].startDate) weeks[key].startDate = d;
+                if (d > weeks[key].endDate) weeks[key].endDate = d;
+            });
+
+            // تحويل الكائن لمصفوفة وتنسيق التاريخ
+            return Object.values(weeks).map(w => ({
+                ...w,
+                range: `${w.startDate.getDate()} - ${w.endDate.getDate()}`
+            })).reverse();
+        }
+
+        function groupDataByMonth(data) {
+            let months = {};
+            data.forEach(rec => {
+                const d = new Date(rec.date);
+                const key = `${d.getFullYear()}-${d.getMonth()}`;
+                
+                if (!months[key]) {
+                    months[key] = { 
+                        name: d.toLocaleDateString('ar-EG', {month: 'long'}),
+                        present: 0, 
+                        late: 0
+                    };
+                }
+                
+                const st = rec.calculatedStatus;
+                if (st.status === 'present') months[key].present++;
+                else if (st.status.includes('late')) months[key].late++;
+            });
+            return Object.values(months).reverse();
+        }
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+            return weekNo;
+        }
+
+        // ==========================================
+        // التعامل مع اختيار التاريخ (Calendar Picker)
+        // ==========================================
+        function handleDateSelection(input) {
+            const selectedDate = input.value; // YYYY-MM-DD
+            if (!selectedDate) return;
+
+            // البحث عن السجل في البيانات المحفوظة
+            const record = attendanceDataCache.find(r => r.date === selectedDate);
+            
+            if (record) {
+                // إذا وجدنا سجلاً لهذا اليوم، نفتح التفاصيل مباشرة
+                openDayDetails(record);
+            } else {
+                // إذا لم يوجد، نفتح المودال ببيانات فارغة لإظهار الحصص فقط (إن وجدت) أو رسالة "لا يوجد حضور"
+                // سنقوم بإنشاء كائن وهمي لعرض التاريخ
+                const mockRecord = {
+                    date: selectedDate,
+                    checkInTime: null,
+                    checkOutTime: null,
+                    calculatedStatus: { status: 'absent', label: 'لا يوجد سجل', color: 'slate', note: '' }
+                };
+                openDayDetails(mockRecord);
+                showToast('لا يوجد سجل دخول ومغادرة لهذا اليوم', 'error');
+            }
+            
+            // إعادة تعيين الحقل ليسمح باختيار نفس اليوم مرة أخرى
+            input.value = '';
+        }
+
+        // دالة مساعدة لتحديث القائمة السفلية (History List)
+        // (مأخوذة من الكود السابق وتم فصلها لإعادة استخدامها)
+        function renderHistoryList() {
+            const historyList = document.getElementById('lessons-history-list');
+            if(!historyList) return;
+            
+            historyList.innerHTML = '';
+            
+            if(attendanceDataCache.length === 0) {
+                 historyList.innerHTML = `<div class="text-center py-6 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700"><p class="text-slate-400 text-sm">لا توجد سجلات حضور حديثة</p></div>`;
+            } else {
+                // عرض آخر 10 أيام
+                [...attendanceDataCache].reverse().slice(0, 10).forEach(rec => {
+                    const st = rec.calculatedStatus;
+                    const timeStr = rec.checkInTime ? formatTime(rec.checkInTime) : '--:--';
+                    
+                    const item = document.createElement('div');
+                    item.onclick = () => openDayDetails(rec);
+                    item.className = "flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm transition hover:translate-x-[-5px] cursor-pointer group mb-3";
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${st.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' : st.color === 'orange' ? 'bg-orange-100 text-orange-600' : 'bg-red-100 text-red-600'}">
+                                <i data-lucide="calendar" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-white text-sm group-hover:text-brand-500 transition-colors">${rec.date}</h4>
+                                <p class="text-[10px] text-slate-400 font-mono flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> ${timeStr}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <span class="block text-xs font-bold px-2 py-1 rounded-lg mb-1 ${st.color === 'emerald' ? 'bg-emerald-50 text-emerald-600' : st.color === 'orange' ? 'bg-orange-50 text-orange-600' : 'bg-red-50 text-red-600'}">
+                                ${st.label}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-medium block">${st.note}</span>
+                        </div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+        }
+
+        // ==========================================
+        // دالة عرض اللودر (Skeleton) قبل الجدول
+        // ==========================================
+        function showLessonsLoading() {
+            const wrapper = document.getElementById('lessons-slider-wrapper');
+            
+            // تدمير السلايدر القديم إذا وجد لتجنب المشاكل
+            if (swiperInstance) {
+                swiperInstance.destroy(true, true);
+                swiperInstance = null;
+            }
+
+            wrapper.innerHTML = '';
+            
+            // إنشاء 3 كروت تحميل وهمية (Skeleton Cards)
+            // نستخدم نفس أبعاد وتصميم الكارت الأصلي لكن بألوان رمادية ومتحركة
+            const skeletonHTML = `
+                <div class="swiper-slide bg-white dark:bg-slate-800 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-700 min-h-[450px] shadow-sm">
+                    <div class="animate-pulse flex flex-col h-full">
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                            <div class="h-6 w-24 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                        </div>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="h-10 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                                <div class="h-4 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-700/30 rounded-3xl p-4 mb-6 space-y-4">
+                            <div class="flex gap-4 mb-2">
+                                <div class="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-700"></div>
+                                <div class="space-y-2 flex-1">
+                                    <div class="h-3 w-1/4 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                                    <div class="h-5 w-1/2 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="h-16 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto h-14 w-full bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                    </div>
+                </div>
+            `;
+
+            // تكرار الكارت 3 مرات لملء الشاشة
+            wrapper.innerHTML = skeletonHTML.repeat(1);
+        }
+
+
+
+        // ==========================================
+        // 8. دالة فتح تفاصيل اليوم (الميزة الجديدة)
+        // ==========================================
+async function openDayDetails(record) {
+            const modal = document.getElementById('day-details-modal');
+            const dateObj = new Date(record.date);
+            
+            // بيانات الرأس
+            document.getElementById('modal-day-name').innerText = dateObj.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric' });
+            document.getElementById('modal-day-date').innerText = dateObj.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+            document.getElementById('modal-checkin').innerText = record.checkInTime ? formatTime(record.checkInTime) : '--:--';
+            document.getElementById('modal-checkout').innerText = record.checkOutTime ? formatTime(record.checkOutTime) : '--:--';
+            
+            // حالة الحضور اليومي وملاحظة التأخير
+            const st = record.calculatedStatus || calculateAttendanceStatus(record.checkInTime, record.date);
+            const badge = document.getElementById('modal-status-badge');
+            
+            // عرض ملاحظة دقيقة (مثلاً: تأخير 25 د)
+            badge.className = `inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm mb-4 ${st.color === 'emerald' ? 'bg-emerald-100 text-emerald-700' : st.color === 'orange' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`;
+            badge.innerHTML = `<i data-lucide="clock" class="w-4 h-4"></i> ${st.note}`; // هنا نستخدم st.note
+
+            // الحصص
+            const lessonsContainer = document.getElementById('modal-day-lessons');
+            lessonsContainer.innerHTML = '<div class="loader-ring mx-auto text-brand-500 my-4"></div>';
+            
+            modal.classList.add('open');
+            lucide.createIcons();
+
+            try {
+                const snap = await db.ref(`school/lessonAttendance/${record.date}`).once('value');
+                const lessonsData = snap.val() || {};
+                
+                let dayLessons = [];
+                Object.keys(lessonsData).forEach(lessonId => {
+                    const lessonRecord = lessonsData[lessonId][studentData.key];
+                    if (lessonRecord) {
+                        // البحث عن تفاصيل الحصة الأصلية لجلب وقت بدايتها
+                        const originalLesson = myLessons.find(l => l.id === lessonId);
+                        dayLessons.push({
+                            id: lessonId,
+                            originalStart: originalLesson ? originalLesson.startTime : null, // وقت الجدول
+                            ...lessonRecord
+                        });
+                    }
+                });
+
+                lessonsContainer.innerHTML = '';
+                
+                if (dayLessons.length === 0) {
+                    lessonsContainer.innerHTML = `<div class="flex flex-col items-center justify-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-700 rounded-2xl"><p class="text-xs text-slate-400">لا توجد حصص مسجلة</p></div>`;
+                } else {
+                    dayLessons.sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    dayLessons.forEach(l => {
+                        const time = new Date(l.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                        
+                        // *** حاسبة الوقت لكل حصة ***
+                        // نقارن وقت الحضور بوقت بدء الحصة
+                        let timeNoteHTML = '';
+                        if(l.originalStart) {
+                            const note = calculateTimeNote(l.originalStart, l.timestamp, record.date);
+                            const noteColor = note.diff > 10 ? 'text-red-500' : (note.diff > 0 ? 'text-orange-500' : 'text-emerald-500');
+                            timeNoteHTML = `<span class="text-[10px] font-bold ${noteColor} bg-white px-2 py-0.5 rounded shadow-sm">${note.text}</span>`;
+                        }
+
+                        lessonsContainer.innerHTML += `
+                            <div class="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-transparent hover:border-slate-200 transition">
+                                <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center text-brand-500 shadow-sm shrink-0">
+                                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-slate-800 dark:text-white text-sm">${l.lessonName}</h4>
+                                        ${timeNoteHTML}
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">سُجل الحضور: ${time}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                lucide.createIcons();
+
+            } catch (e) {
+                console.error(e);
+                lessonsContainer.innerHTML = '<p class="text-red-400 text-xs text-center">خطأ في البيانات</p>';
+            }
+        }
+        // ==========================================
+        // دالة توليد صورة افتراضية (SVG) محلياً
+        // حل نهائي لمشكلة CORS والملف الفارغ
+        // ==========================================
+        function generateLocalAvatar(name) {
+            // استخراج الأحرف الأولى (أول حرفين)
+            const initials = name.split(' ')
+                .slice(0, 2)
+                .map(n => n[0])
+                .join('')
+                .toUpperCase();
+            
+            // إنشاء كود SVG
+            const svgString = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <rect width="100" height="100" fill="#0f172a"/>
+                <text x="50" y="55" font-size="40" font-weight="bold" fill="#ffffff" font-family="Arial, sans-serif" text-anchor="middle" dominant-baseline="middle">
+                    ${initials}
+                </text>
+            </svg>`;
+
+            // تحويل الـ SVG إلى Base64 Data URL
+            return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+        }
+        // ==========================================
+        // 7. وظائف البطاقات (Modals)
+        // ==========================================
+function openIdCard() {
+            if(!studentData) return;
+            
+            // تعبئة البيانات النصية في الواجهة
+            document.getElementById('modal-id-name').innerText = studentData.name;
+            document.getElementById('modal-id-class').innerText = document.getElementById('header-class').innerText;
+            document.getElementById('modal-id-number').innerText = studentData.studentId;
+            
+            // معالجة الصورة الشخصية (حل مشكلة CORS)
+            const imgElement = document.getElementById('modal-id-img');
+            if (studentData.photoUrl) {
+                imgElement.crossOrigin = "Anonymous"; 
+                imgElement.src = studentData.photoUrl;
+            } else {
+                imgElement.removeAttribute('crossOrigin'); 
+                imgElement.src = generateLocalAvatar(studentData.name);
+            }
+
+            // === إنشاء QR Code ===
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ''; // تنظيف الكود القديم
+            
+            // 1. تجهيز البيانات (بدون لغة عربية لضمان عمل المكتبة)
+            // نلتزم بالشكل الذي طلبته: {"id":"xxxxxxxx","type":"student"}
+            const qrData = JSON.stringify({
+                id: String(studentData.studentId), // تحويل لرقم نصي لضمان الصيغة
+                type: "student"
+            });
+
+            // 2. إنشاء الـ QR Code
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 100,
+                height: 100,
+                colorDark : "#1e293b",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H // مستوى تصحيح عالي H لضمان الدقة
+            });
+
+            // فتح النافذة
+            const modal = document.getElementById('id-card-modal');
+            modal.classList.add('open');
+        }
+
+        // === دالة تحميل البطاقة كـ PDF ===
+function downloadIdCard() {
+            const btn = document.querySelector('#id-card-modal button[onclick="downloadIdCard()"]');
+            const originalText = btn.innerHTML;
+            
+            // تغيير الزر لوضعية التحميل
+            btn.innerHTML = '<span class="loader-ring w-5 h-5 border-2"></span> جاري المعالجة...';
+            btn.disabled = true;
+
+            const element = document.getElementById('printable-id-card');
+            
+            // إعدادات محسنة لضمان جودة الصورة وحجم الملف
+            const opt = {
+                margin:       0,
+                filename:     `Student_ID_${studentData.studentId}.pdf`,
+                image:        { type: 'jpeg', quality: 1 }, // جودة قصوى
+                html2canvas:  { 
+                    scale: 4,       // دقة عالية جداً للنصوص
+                    useCORS: true,  // محاولة التعامل مع الصور الخارجية إن وجدت
+                    logging: false,
+                    scrollY: 0      // منع مشاكل التمرير
+                },
+                jsPDF: { 
+                    unit: 'px', 
+                    format: [322, 502], // نفس أبعاد العنصر (320 width + borders)
+                    orientation: 'portrait',
+                    hotfixes: ['px_scaling'] 
+                }
+            };
+
+            // استخدام setTimeout صغير لضمان رسم المتصفح للتغييرات قبل التحويل
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showToast('تم تحميل الهوية بنجاح', 'success');
+                }).catch(err => {
+                    console.error("PDF Error:", err);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showToast('حدث خطأ، حاول مرة أخرى', 'error');
+                });
+            }, 500);
+        }
+        
+function openProfile() {
+            if(!studentData) return;
+            
+            // تعبئة البيانات في التصميم الفاخر الجديد
+            document.getElementById('profile-name-large').innerText = studentData.name;
+            document.getElementById('profile-id-text').innerText = studentData.studentId;
+            document.getElementById('profile-class-large').innerText = document.getElementById('header-class').innerText;
+            document.getElementById('profile-age-large').innerText = `${studentData.age} سنة`;
+            
+            document.getElementById('profile-guardian-large').innerText = studentData.guardianName || 'غير مسجل';
+            document.getElementById('profile-phone-large').innerText = studentData.guardianPhone || '--';
+            
+            // الصورة الشخصية
+            const imgElement = document.getElementById('profile-img-large');
+            if (studentData.photoUrl) {
+                imgElement.src = studentData.photoUrl;
+            } else {
+                imgElement.src = generateLocalAvatar(studentData.name);
+            }
+            
+            const modal = document.getElementById('profile-modal');
+            modal.classList.add('open');
+        }
+        function openSchoolContact() {
+            const modal = document.getElementById('school-contact-modal');
+            modal.classList.add('open');
+            lucide.createIcons(); // لتحديث الأيقونات داخل المودال
+        }
+
+        // Helpers
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const icon = document.getElementById('toast-icon');
+            const message = document.getElementById('toast-message');
+            message.innerText = msg;
+            icon.className = type === 'success' ? 'text-green-500' : 'text-red-500';
+            icon.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'x-circle'}" class="w-6 h-6"></i>`;
+            lucide.createIcons();
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function getCurrentPeriodIndex() {
+            const now = new Date();
+            const hour = now.getHours();
+            const startHour = 8;
+            let idx = hour - startHour;
+            return idx < 0 ? 0 : idx;
+        }
+
+        function updateTimeAndSlide() {
+            const now = new Date();
+            document.getElementById('current-time-display').innerText = now.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: false});
+        }
+
+        function formatTime(timestamp) {
+            if(!timestamp) return '--:--';
+            if(!isNaN(timestamp) && String(timestamp).length > 10) {
+                 const d = new Date(Number(timestamp));
+                 return d.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+            }
+            if(String(timestamp).includes(':')) return timestamp; 
+            return timestamp;
+        }
+
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+        function logout() { localStorage.removeItem('studentLoggedIn'); localStorage.removeItem('studentId'); localStorage.removeItem('studentKey'); location.reload(); }
+
+
+        // ==========================================
+        // 9. إدارة النوافذ المنبثقة (Modals & Click Outside)
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // تفعيل الإغلاق عند الضغط خارج المودال
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal.id);
+                    }
+                });
+            });
+        });
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if(modal) {
+                modal.classList.remove('open');
+                // إعادة تعيين محتوى المودال (اختياري لتنظيف الذاكرة)
+                if(modalId === 'day-details-modal') {
+                    setTimeout(() => {
+                        document.getElementById('modal-day-lessons').innerHTML = '';
+                    }, 300);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
