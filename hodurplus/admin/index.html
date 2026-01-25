@@ -1102,6 +1102,12 @@
                 ]
             },
             {
+                category: "الاشعارات العامة",
+                items: [
+                    { id: 'notifications', title: 'الاشعارات العامة', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9' },
+                ]
+            },
+            {
                 category: "النظام",
                 items: [
                     { id: 'settings', title: 'الإعدادات العامة', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' }
@@ -1326,7 +1332,8 @@ function fetchData() {
         appState.attendance = data.attendance || {};
         appState.lessonAttendance = data.lessonAttendance || {};
         appState.schoolInfo = data.info || {};
-        
+        appState.general_notifications = data.general_notifications || {};
+
         // دمج الإعدادات القادمة من السيرفر مع القيم الافتراضية
         if (data.settings) {
             appState.settings = { ...appState.settings, ...data.settings };
@@ -1491,6 +1498,7 @@ function renderSidebar() {
                 case 'id_cards': html = renderIDCards(); break;
                 case 'templates': html = renderTemplates(); break;
                 case 'lesson_monitoring': html = renderLessonMonitoring(); break;
+                case 'notifications': html = renderNotifications(); break;
                 case 'settings': html = renderSettings(); break; // <-- إضافة حالة الإعدادات
                 default: html = '<div class="text-center p-10">جاري العمل على هذا القسم...</div>';
             }
@@ -2833,6 +2841,9 @@ function renderStudents() {
                         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')]"></div>
                         
                         <div class="absolute top-4 left-4 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                            <button onclick="openStudentNotifModal('${id}')" class="relative w-9 h-9 bg-white/90 dark:bg-slate-900/90 text-amber-500 rounded-xl shadow-lg flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all" title="إرسال تنبيه/إشعار"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                ${s.notifications ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full border border-white">${Object.keys(s.notifications).length}</span>` : ''}
+                            </button>
                             <button onclick="printID('${id}')" class="w-9 h-9 bg-white/90 dark:bg-slate-900/90 text-emerald-600 dark:text-emerald-400 rounded-xl shadow-lg flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all" title="طباعة الهوية">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                             </button>
@@ -7029,6 +7040,595 @@ function toggleMobileSearch() {
         branding.classList.remove('opacity-0');
     }
 }
+
+function renderNotifications() {
+    // جلب البيانات (يمكن تحسينها لتكون realtime في دالة fetchData)
+    const notifications = appState.general_notifications || {}; 
+    const notifIds = Object.keys(notifications).reverse(); // الأحدث أولاً
+
+    return `
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-8 mb-8 text-white shadow-2xl border border-white/10">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]"></div>
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold mb-3">
+                        <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                        مركز الرسائل
+                    </div>
+                    <h3 class="text-4xl font-black mb-2">الاشعارات العامة</h3>
+                    <p class="text-slate-300 text-sm max-w-lg">إرسال التنبيهات والتعاميم لكافة الطلاب والمعلمين والمستخدمين.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="openGenericModal('sendGeneralNotification')" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white rounded-xl font-bold shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        إشعار جديد
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 h-[600px]">
+            
+            <div class="col-span-12 md:col-span-4 flex flex-col gap-4">
+                <div class="premium-glass rounded-[2rem] p-4 h-full overflow-hidden flex flex-col border border-white/40">
+                    <div class="flex justify-between items-center mb-4 px-2">
+                        <h4 class="font-bold text-slate-700 dark:text-white">المرسلة مؤخراً</h4>
+                        <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-lg text-xs font-bold">${notifIds.length}</span>
+                    </div>
+                    
+                    <div class="overflow-y-auto custom-scrollbar flex-1 space-y-2 pr-1" id="notif-list-container">
+                        ${notifIds.length === 0 ? '<div class="text-center py-10 text-slate-400 text-sm">لا توجد إشعارات</div>' : 
+                          notifIds.map(id => {
+                              const n = notifications[id];
+                              const iconColor = n.type === 'alert' ? 'text-red-500 bg-red-100' : (n.type === 'success' ? 'text-green-500 bg-green-100' : 'text-blue-500 bg-blue-100');
+                              return `
+                                <div onclick="viewNotificationDetail('${id}')" class="group p-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 hover:border-indigo-500 cursor-pointer transition-all hover:shadow-md relative overflow-hidden">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 rounded-full ${iconColor} flex items-center justify-center shrink-0">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h5 class="font-bold text-sm text-slate-800 dark:text-white truncate">${n.title}</h5>
+                                            <p class="text-xs text-slate-500 truncate">${n.message}</p>
+                                            <div class="flex justify-between items-center mt-2">
+                                                <span class="text-[10px] text-slate-400 font-mono">${new Date(n.timestamp).toLocaleDateString('ar-EG')}</span>
+                                                <button onclick="event.stopPropagation(); deleteGeneralNotif('${id}')" class="text-red-400 hover:text-red-600 p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                              `;
+                          }).join('')
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-12 md:col-span-8">
+                <div class="premium-glass rounded-[2rem] p-8 h-full border border-white/40 relative flex items-center justify-center" id="notification-detail-view">
+                    <div class="text-center opacity-50">
+                        <div class="w-24 h-24 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto flex items-center justify-center mb-4">
+                            <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-600 dark:text-slate-300">اختر إشعاراً للعرض</h3>
+                        <p class="text-sm text-slate-400">ستظهر تفاصيل الرسالة هنا</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+// ==========================================
+// 1. وظائف الإشعارات العامة (General)
+// ==========================================
+
+// دالة عرض تفاصيل الإشعار في الجانب الأيسر
+function viewNotificationDetail(notifId) {
+    const n = appState.general_notifications[notifId];
+    if (!n) return;
+    
+    const container = document.getElementById('notification-detail-view');
+    
+    container.innerHTML = `
+        <div class="w-full h-full flex flex-col animate-fade-in-up">
+            <div class="border-b border-slate-100 dark:border-white/10 pb-6 mb-6">
+                <div class="flex justify-between items-start">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white leading-tight mb-2">${n.title}</h2>
+                    <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase ${n.type === 'alert' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}">${n.type}</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-slate-500">
+                    <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span>بواسطة: ${n.sender || 'الإدارة'}</span>
+                    </div>
+                    <span>•</span>
+                    <span>${new Date(n.timestamp).toLocaleString('ar-EG')}</span>
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-2">
+                <p class="text-lg leading-loose text-slate-600 dark:text-slate-300 whitespace-pre-line">
+                    ${n.message}
+                </p>
+            </div>
+
+            <div class="pt-6 mt-6 border-t border-slate-100 dark:border-white/10 flex justify-end gap-3">
+                <button onclick="openEditGeneralNotif('${notifId}')" class="text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-lg transition flex items-center gap-2 font-bold text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    تعديل
+                </button>
+
+                <button onclick="deleteGeneralNotif('${notifId}')" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition flex items-center gap-2 font-bold text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    حذف
+                </button>
+            </div>
+        </div>
+    `;
+}
+function openEditGeneralNotif(notifId) {
+    const n = appState.general_notifications[notifId];
+    if (!n) return;
+
+    // نفتح الموديل العادي أولاً
+    openGenericModal('sendGeneralNotification');
+
+    // نملأ البيانات
+    setTimeout(() => {
+        document.getElementById('g-notif-title').value = n.title;
+        document.getElementById('g-notif-message').value = n.message;
+        document.getElementById('g-notif-type').value = n.type;
+        
+        // نغير العنوان والزر ليعرف المستخدم أنه تعديل
+        const header = document.querySelector('#modal-content-body h3');
+        if(header) header.textContent = 'تعديل الإشعار العام';
+        
+        const submitBtn = document.querySelector('#modal-content-body button[type="submit"]');
+        if(submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+
+        // نضيف ID في خاصية data للفورم لنستخدمه عند الحفظ
+        const form = document.querySelector('#modal-content-body form');
+        form.setAttribute('data-editing-id', notifId);
+    }, 50);
+}
+// دالة فتح مودال إضافة إشعار عام
+function openGenericModal(type) {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    if (type === 'sendGeneralNotification') {
+        modalContent.innerHTML = `
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-3 shadow-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white">إرسال تعميم جديد</h3>
+                <p class="text-slate-500 text-sm">سيظهر هذا الإشعار في لوحة جميع المستخدمين</p>
+            </div>
+            
+            <form onsubmit="handleSendGeneralNotif(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">عنوان الرسالة</label>
+                    <input type="text" id="g-notif-title" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-purple-500 outline-none" placeholder="مثال: تعليق الدراسة غداً...">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">نوع التنبيه</label>
+                        <select id="g-notif-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none">
+                            <option value="info">ℹ️ معلومة</option>
+                            <option value="warning">⚠️ تحذير</option>
+                            <option value="alert">🚨 تنبيه هام</option>
+                            <option value="success">✅ نجاح/تهنئة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">الجمهور المستهدف</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none" disabled>
+                            <option selected>الكل (طلاب ومعلمين)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">نص الرسالة</label>
+                    <textarea id="g-notif-message" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-purple-500 outline-none resize-none" placeholder="اكتب محتوى الإشعار هنا..."></textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-purple-500/30 transition transform hover:scale-[1.02]">إرسال الآن</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    // كود فتح المودال (التحكم بالـ CSS)
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+        modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+// دالة الحفظ في الفايربيس (إشعارات عامة)
+function handleSendGeneralNotif(e) {
+    e.preventDefault();
+    const title = document.getElementById('g-notif-title').value;
+    const message = document.getElementById('g-notif-message').value;
+    const type = document.getElementById('g-notif-type').value;
+    
+    // التحقق هل هو تعديل أم إضافة جديدة
+    const editingId = e.target.getAttribute('data-editing-id');
+
+    const notifData = {
+        title,
+        message,
+        type,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        sender: 'الإدارة'
+    };
+
+    let promise;
+    if (editingId) {
+        // حالة التعديل (Update)
+        promise = db.ref(`school/general_notifications/${editingId}`).update(notifData);
+    } else {
+        // حالة الإضافة الجديدة (Push)
+        promise = db.ref('school/general_notifications').push(notifData);
+    }
+
+    promise.then(() => {
+         // 🔔 OneSignal - إشعار عام
+            return sendGeneralNotification_OS({
+                titleAr: title,
+                bodyAr: message,
+                titleEn: title,
+                bodyEn: message
+            });
+            closeModal();
+            showToast(editingId ? 'تم تعديل الإشعار بنجاح' : 'تم إرسال الإشعار بنجاح', 'success');
+            // إذا كان المستخدم فاتح التفاصيل، نعيد تحميلها لعرض التعديل
+            if(editingId && document.getElementById('notification-detail-view')) {
+                 // نحتاج تحديث الـ state محلياً فوراً للعرض السريع أو انتظار الـ Listener
+                 // هنا سنعيد رسم القسم بالكامل للأمان
+                 renderContent('notifications');
+            }
+            
+        })
+        .catch(err => showToast('حدث خطأ: ' + err.message, 'error'));
+}
+
+function deleteGeneralNotif(id) {
+    if(confirm('هل أنت متأكد من حذف هذا الإشعار؟')) {
+        db.ref(`school/general_notifications/${id}`).remove()
+            .then(() => {
+                showToast('تم الحذف', 'success');
+                // تنظيف منطقة العرض
+                document.getElementById('notification-detail-view').innerHTML = '<div class="text-center p-10 opacity-50">تم حذف العنصر</div>';
+                // تحديث القائمة يتم تلقائياً عبر listener الفايربيس، لكن سنعيد الرسم لضمان التزامن
+                setTimeout(() => renderContent('notifications'), 500); 
+            });
+    }
+}
+
+
+// ==========================================
+// 2. وظائف إشعارات الطلاب (Student Specific)
+// ==========================================
+
+// دالة فتح مودال الطالب المحدد
+function openStudentNotifModal(studentId) {
+    const student = appState.students[studentId];
+    if(!student) return;
+
+    const sNotifs = student.notifications || {};
+    const sNotifKeys = Object.keys(sNotifs).reverse();
+
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+
+    modalContent.innerHTML = `
+        <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+            <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-black text-xl">
+                ${student.name.charAt(0)}
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-800">مراسلة الطالب: ${student.name}</h3>
+                <p class="text-xs text-slate-500">إرسال تنبيه خاص أو ملاحظة سلوكية</p>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <form id="student-notif-form" onsubmit="handleSendStudentNotif(event, '${studentId}')" class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative transition-colors duration-300">
+                <input type="hidden" id="s-notif-editing-id" value="">
+                
+                <div class="flex justify-between items-center mb-2">
+                    <span id="form-mode-label" class="text-xs font-bold text-slate-400 uppercase">رسالة جديدة</span>
+                    <button type="button" id="cancel-edit-btn" onclick="resetStudentNotifForm()" class="hidden text-xs text-red-500 font-bold hover:underline">إلغاء التعديل</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-3">
+                    <div class="col-span-2">
+                        <input type="text" id="s-notif-title" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-amber-500" placeholder="عنوان التنبيه">
+                    </div>
+                    <div>
+                        <select id="s-notif-type" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold outline-none">
+                            <option value="alert">🔴 إنذار</option>
+                            <option value="warning">🟠 تنبيه</option>
+                            <option value="info">🔵 ملاحظة</option>
+                            <option value="success">🟢 تشجيع</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea id="s-notif-message" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium outline-none resize-none mb-3" placeholder="تفاصيل الرسالة..."></textarea>
+                
+                <button type="submit" id="s-notif-submit-btn" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition">إرسال للطالب</button>
+            </form>
+
+            <div>
+                <h4 class="text-xs font-black text-slate-400 uppercase mb-2">سجل التنبيهات السابق (${sNotifKeys.length})</h4>
+                <div class="max-h-[200px] overflow-y-auto space-y-2 custom-scrollbar">
+                    ${sNotifKeys.length === 0 ? '<p class="text-center text-xs text-slate-400 py-4">سجل الطالب نظيف</p>' : 
+                      sNotifKeys.map(k => {
+                          const n = sNotifs[k];
+                          const typeColors = { alert: 'bg-red-100 text-red-600', warning: 'bg-orange-100 text-orange-600', success: 'bg-green-100 text-green-600', info: 'bg-blue-100 text-blue-600' };
+                          // قمنا بإضافة JSON.stringify للبيانات لتمريرها لدالة التعديل بسهولة
+                          const safeTitle = n.title.replace(/'/g, "&apos;");
+                          const safeMsg = n.message.replace(/'/g, "&apos;");
+                          
+                          return `
+                            <div class="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 group hover:border-amber-300 transition-colors">
+                                <div class="w-8 h-8 rounded-lg ${typeColors[n.type] || 'bg-gray-100'} flex items-center justify-center shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start w-full">
+                                        <h5 class="text-sm font-bold text-slate-800">${n.title}</h5>
+                                        <span class="text-[10px] text-slate-400 font-mono">${new Date(n.timestamp).toLocaleDateString('en-US')}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5">${n.message}</p>
+                                </div>
+                                <button onclick="prepareEditStudentNotif('${k}', '${safeTitle}', '${safeMsg}', '${n.type}')" class="opacity-0 group-hover:opacity-100 text-blue-500 hover:text-blue-700 p-1 transition-opacity" title="تعديل">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                </button>
+                            </div>
+                          `;
+                      }).join('')
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+        modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+// دالة حفظ إشعار الطالب
+function handleSendStudentNotif(e, studentId) {
+    e.preventDefault();
+    const title = document.getElementById('s-notif-title').value;
+    const message = document.getElementById('s-notif-message').value;
+    const type = document.getElementById('s-notif-type').value;
+    const editingId = document.getElementById('s-notif-editing-id').value;
+
+    const notifData = {
+        title,
+        message,
+        type,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        isRead: false
+    };
+
+    let promise;
+    if (editingId) {
+        // تعديل
+        promise = db.ref(`school/students/${studentId}/notifications/${editingId}`).update(notifData);
+    } else {
+        // إضافة جديدة
+        promise = db.ref(`school/students/${studentId}/notifications`).push(notifData);
+    }
+
+    promise.then(() => {
+            const student = appState.students[studentId];
+
+    if (student) {
+        sendStudentNotification_OS({
+            studentId: student.studentId, // رقم الطالب
+            studentKey: studentId,         // Firebase UID
+            titleAr: title,
+            bodyAr: message,
+            titleEn: title,
+            bodyEn: message
+        });
+    }
+        showToast(editingId ? 'تم تحديث التنبيه' : 'تم إرسال التنبيه للطالب', 'success');
+        
+        // بدلاً من إغلاق الموديل، سنعيد تحميله لرؤية التغيير فوراً
+        // ننتظر قليلاً ليتم التحديث في السيرفر
+        setTimeout(() => {
+             // إعادة فتح الموديل سيجلب البيانات الجديدة
+             openStudentNotifModal(studentId);
+        }, 300);
+    }).catch(err => {
+        showToast('خطأ: ' + err.message, 'error');
+    });
+}
+// دالة تجهيز الفورم للتعديل
+function prepareEditStudentNotif(notifId, title, message, type) {
+    document.getElementById('s-notif-editing-id').value = notifId;
+    document.getElementById('s-notif-title').value = title;
+    document.getElementById('s-notif-message').value = message;
+    document.getElementById('s-notif-type').value = type;
+    
+    // تغيير واجهة المستخدم لتبدو كوضع تعديل
+    document.getElementById('s-notif-submit-btn').textContent = 'حفظ التعديلات';
+    document.getElementById('s-notif-submit-btn').classList.replace('bg-amber-500', 'bg-blue-600');
+    document.getElementById('s-notif-submit-btn').classList.replace('hover:bg-amber-600', 'hover:bg-blue-700');
+    
+    document.getElementById('student-notif-form').classList.add('bg-blue-50', 'border-blue-200');
+    document.getElementById('form-mode-label').textContent = 'جاري تعديل رسالة...';
+    document.getElementById('form-mode-label').classList.add('text-blue-500');
+    
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+    
+    // التركيز على العنوان
+    document.getElementById('s-notif-title').focus();
+}
+
+// دالة إلغاء التعديل والعودة للإضافة
+function resetStudentNotifForm() {
+    document.getElementById('student-notif-form').reset();
+    document.getElementById('s-notif-editing-id').value = '';
+    
+    document.getElementById('s-notif-submit-btn').textContent = 'إرسال للطالب';
+    document.getElementById('s-notif-submit-btn').classList.replace('bg-blue-600', 'bg-amber-500');
+    document.getElementById('s-notif-submit-btn').classList.replace('hover:bg-blue-700', 'hover:bg-amber-600');
+    
+    document.getElementById('student-notif-form').classList.remove('bg-blue-50', 'border-blue-200');
+    document.getElementById('form-mode-label').textContent = 'رسالة جديدة';
+    document.getElementById('form-mode-label').classList.remove('text-blue-500');
+    
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
+}
+
+
+
+// ===================================================
+// 🔔 OneSignal Integration (ADMIN PANEL - ADD ONLY)
+// ===================================================
+
+// ⚠️ حط القيم الحقيقية
+const ONESIGNAL_APP_ID = "PUT_YOUR_ONESIGNAL_APP_ID";
+const ONESIGNAL_REST_API_KEY = "PUT_YOUR_REST_API_KEY";
+
+// -----------------------------------
+// Core sender
+// -----------------------------------
+async function sendToOneSignal(payload) {
+    const res = await fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Basic ${ONESIGNAL_REST_API_KEY}`
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+        console.error("OneSignal Error:", data);
+        throw new Error(data.errors || "OneSignal failed");
+    }
+    return data;
+}
+
+// -----------------------------------
+// General Notification (ALL USERS)
+// -----------------------------------
+function sendGeneralNotification_OS({
+    titleAr,
+    bodyAr,
+    titleEn,
+    bodyEn
+}) {
+    return sendToOneSignal({
+        app_id: ONESIGNAL_APP_ID,
+        included_segments: ["All"],
+        headings: {
+            ar: titleAr,
+            en: titleEn || titleAr
+        },
+        contents: {
+            ar: bodyAr,
+            en: bodyEn || bodyAr
+        },
+        data: {
+            source: "admin_panel",
+            scope: "general"
+        }
+    });
+}
+
+// -----------------------------------
+// Student Notification (FLEXIBLE TAGS)
+// -----------------------------------
+function sendStudentNotification_OS({
+    studentId,   // مثال: 30804224
+    studentKey,  // مثال: -OjaJ2DZ_wy8yljsvT4X
+    titleAr,
+    bodyAr,
+    titleEn,
+    bodyEn
+}) {
+    const filters = [];
+
+    // student_id = 30804224
+    if (studentId) {
+        filters.push({
+            field: "tag",
+            key: "student_id",
+            relation: "=",
+            value: String(studentId)
+        });
+    }
+
+    // student = UID
+    if (studentKey) {
+        if (filters.length) filters.push({ operator: "OR" });
+        filters.push({
+            field: "tag",
+            key: "student",
+            relation: "=",
+            value: String(studentKey)
+        });
+    }
+
+    // uid = UID
+    if (studentKey) {
+        if (filters.length) filters.push({ operator: "OR" });
+        filters.push({
+            field: "tag",
+            key: "uid",
+            relation: "=",
+            value: String(studentKey)
+        });
+    }
+
+    // student_uid = UID (legacy)
+    if (studentKey) {
+        if (filters.length) filters.push({ operator: "OR" });
+        filters.push({
+            field: "tag",
+            key: "student_uid",
+            relation: "=",
+            value: String(studentKey)
+        });
+    }
+
+    return sendToOneSignal({
+        app_id: ONESIGNAL_APP_ID,
+        filters,
+        headings: {
+            ar: titleAr,
+            en: titleEn || titleAr
+        },
+        contents: {
+            ar: bodyAr,
+            en: bodyEn || bodyAr
+        },
+        data: {
+            source: "admin_panel",
+            scope: "student"
+        }
+    });
+}
+
+
+
 </script>
 </body>
 </html>
