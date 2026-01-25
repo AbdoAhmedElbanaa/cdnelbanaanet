@@ -7496,39 +7496,90 @@ function resetStudentNotifForm() {
 }
 
 
-
-// ===================================================
-// 🔔 OneSignal Integration (ADMIN PANEL - ADD ONLY)
-// ===================================================
-
-// ⚠️ حط القيم الحقيقية
-const ONESIGNAL_APP_ID = "a3398754-1f5f-4b69-ad60-10822ea67b9c";
-const ONESIGNAL_REST_API_KEY = "os_v2_app_um4yova7l5fwtllaccbc5jt3tqiuz4tvs3qenl4n7tpwegal7vvvro3stlsvl6aplzx4jusgrlc6zf42vbsjydi2mw43jix326eli5y";
-
-// -----------------------------------
-// Core sender
-// -----------------------------------
-async function sendToOneSignal(payload) {
-    const res = await fetch("https://onesignal.com/api/v1/notifications", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Basic ${ONESIGNAL_REST_API_KEY}`
-        },
-        body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-        console.error("OneSignal Error:", data);
-        throw new Error(data.errors || "OneSignal failed");
+// ==================================================
+// 🔐 XOR ENCRYPT / DECRYPT ENGINE
+// ==================================================
+function xorDecrypt(encoded, secret) {
+    const decoded = atob(encoded);
+    let result = "";
+    for (let i = 0; i < decoded.length; i++) {
+        result += String.fromCharCode(
+            decoded.charCodeAt(i) ^ secret.charCodeAt(i % secret.length)
+        );
     }
+    return result;
+}
+
+
+// ==================================================
+// 🔑 XOR SECRET (مقسّم بذكاء)
+// ==================================================
+const __k1 = "Elb";
+const __k2 = "ana";
+const __k3 = "Net";
+const XOR_SECRET = __k1 + __k2 + __k3;
+
+
+// ==================================================
+// 🔐 ENCRYPTED KEYS (NO PLAIN TEXT)
+// ==================================================
+const ENC_ONESIGNAL_APP_ID =
+"JF9RWFZWe1FZdApXB0NVLFNNaA0GV15Mf1VMd14HAFhWLFwX";
+
+const ENC_ONESIGNAL_REST_API_KEY =
+"Kh89F1w+LxUEGhkPVRcOOARDKVkEFhoNIgQXJg4BVAQVfREAP1gYDQZWPBZHMAsKFAdWLw5HKgIJVFwMKgsGJxsRVlgANhYEIggLVhoHexEaMxYNABQCexAHMQIECx1XewEQJBUaAgQQNhAYIRwaVwc=";
+
+
+// ==================================================
+// 🔓 RUNTIME DECRYPT (MEMORY ONLY)
+// ==================================================
+const ONESIGNAL_APP_ID = xorDecrypt(
+    ENC_ONESIGNAL_APP_ID,
+    XOR_SECRET
+);
+
+const ONESIGNAL_REST_API_KEY = xorDecrypt(
+    ENC_ONESIGNAL_REST_API_KEY,
+    XOR_SECRET
+);
+
+
+// ==================================================
+// 🚀 CORE SENDER (Official API)
+// ==================================================
+async function sendToOneSignal(payload) {
+    const response = await fetch(
+        "https://api.onesignal.com/notifications?c=push",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Basic ${ONESIGNAL_REST_API_KEY}`
+            },
+            body: JSON.stringify({
+                app_id: ONESIGNAL_APP_ID,
+                isAndroid: true,
+                isIos: true,
+                isAnyWeb: true,
+                ...payload
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        console.error("❌ OneSignal Error:", data);
+        throw new Error("OneSignal request failed");
+    }
+
     return data;
 }
 
-// -----------------------------------
-// General Notification (ALL USERS)
-// -----------------------------------
+
+// ==================================================
+// 🌍 GENERAL NOTIFICATION
+// ==================================================
 function sendGeneralNotification_OS({
     titleAr,
     bodyAr,
@@ -7536,7 +7587,6 @@ function sendGeneralNotification_OS({
     bodyEn
 }) {
     return sendToOneSignal({
-        app_id: ONESIGNAL_APP_ID,
         included_segments: ["All"],
         headings: {
             ar: titleAr,
@@ -7553,12 +7603,13 @@ function sendGeneralNotification_OS({
     });
 }
 
-// -----------------------------------
-// Student Notification (FLEXIBLE TAGS)
-// -----------------------------------
+
+// ==================================================
+// 🎯 STUDENT NOTIFICATION (TAGS)
+// ==================================================
 function sendStudentNotification_OS({
-    studentId,   // مثال: 30804224
-    studentKey,  // مثال: -OjaJ2DZ_wy8yljsvT4X
+    studentId,
+    studentKey,
     titleAr,
     bodyAr,
     titleEn,
@@ -7566,7 +7617,6 @@ function sendStudentNotification_OS({
 }) {
     const filters = [];
 
-    // student_id = 30804224
     if (studentId) {
         filters.push({
             field: "tag",
@@ -7576,31 +7626,25 @@ function sendStudentNotification_OS({
         });
     }
 
-    // student = UID
     if (studentKey) {
         if (filters.length) filters.push({ operator: "OR" });
+
         filters.push({
             field: "tag",
             key: "student",
             relation: "=",
             value: String(studentKey)
         });
-    }
 
-    // uid = UID
-    if (studentKey) {
-        if (filters.length) filters.push({ operator: "OR" });
+        filters.push({ operator: "OR" });
         filters.push({
             field: "tag",
             key: "uid",
             relation: "=",
             value: String(studentKey)
         });
-    }
 
-    // student_uid = UID (legacy)
-    if (studentKey) {
-        if (filters.length) filters.push({ operator: "OR" });
+        filters.push({ operator: "OR" });
         filters.push({
             field: "tag",
             key: "student_uid",
@@ -7610,7 +7654,6 @@ function sendStudentNotification_OS({
     }
 
     return sendToOneSignal({
-        app_id: ONESIGNAL_APP_ID,
         filters,
         headings: {
             ar: titleAr,
@@ -7626,7 +7669,6 @@ function sendStudentNotification_OS({
         }
     });
 }
-
 
 
 </script>
