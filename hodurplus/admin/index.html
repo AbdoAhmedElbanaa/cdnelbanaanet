@@ -909,11 +909,28 @@
 
     <div class="flex items-center gap-4">
         
-        <button class="relative p-3 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-brand-600 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 hover:shadow-md group">
-            <svg class="w-6 h-6 transform group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-800"></span>
-        </button>
+        <button onclick="openSmartNotificationHub()" 
+    class="group relative p-2.5 rounded-2xl overflow-hidden
+           bg-white/60 dark:bg-slate-800/40 
+           border border-slate-200 dark:border-white/10
+           backdrop-blur-xl
+           shadow-sm hover:shadow-md hover:shadow-brand-500/10 dark:hover:shadow-brand-500/20
+           transition-all duration-300 ease-out
+           active:scale-95">
+    
+    <div class="absolute inset-0 bg-gradient-to-tr from-brand-500/0 via-brand-500/0 to-brand-500/5 dark:to-brand-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+    <div class="absolute top-2.5 right-3 z-10">
+        <span class="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-rose-500 opacity-75"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-rose-500 border border-white dark:border-slate-800 shadow-sm"></span>
+    </div>
+
+    <svg class="w-6 h-6 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-white transition-colors duration-300 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9599 4.07997 18.2999 5.37997 18.2999H18.66C19.96 18.2999 20.45 16.9599 19.74 15.7699L18.59 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/>
+        <path class="opacity-50 group-hover:opacity-100 transition-opacity duration-300" d="M13.87 3.2C13.87 3.2 12.87 2 12 2C11.13 2 10.13 3.2 10.13 3.2" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"/>
+    </svg>
+</button>
 
         <div class="h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
 
@@ -1080,7 +1097,7 @@
             {
                 category: "الشؤون الأكاديمية",
                 items: [
-                    { id: 'classes', title: 'ادارة الفصول', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+                    { id: 'classes', title: 'المراحل التعليمية', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
                     { id: 'classrooms', title: 'القاعات والمعامل', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
                     { id: 'lessons', title: 'المواد والدروس', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
                     { id: 'teachers', title: 'المعلمين', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
@@ -2321,9 +2338,9 @@ if (detailedChartEl) {
 }
 
 
-// --- View: Classes (Redesigned & Professional) ---
+// --- View: Classes (Redesigned with Import/Export) ---
 function renderClasses() {
-    const classIds = Object.keys(appState.classes);
+    const classIds = Object.keys(appState.classes || {});
     const totalClasses = classIds.length;
     
     // احتساب تحليلات سريعة
@@ -2331,7 +2348,7 @@ function renderClasses() {
     const totalStudents = Object.keys(appState.students || {}).length;
 
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 p-8 mb-10 text-white shadow-2xl shadow-brand-500/20 border border-white/10">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 p-8 mb-10 text-white shadow-2xl shadow-brand-500/20 border border-white/10">
             <div class="absolute top-[-10%] left-[-5%] w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
             <div class="absolute bottom-[-20%] right-[10%] w-60 h-60 bg-cyan-400/10 rounded-full blur-3xl"></div>
             
@@ -2344,20 +2361,47 @@ function renderClasses() {
                         </span>
                         إدارة الهيكل التعليمي
                     </div>
-                    <h3 class="text-4xl lg:text-5xl font-black mb-3 tracking-tight text-white">الصفوف الدراسية</h3>
+                    <h3 class="text-4xl lg:text-5xl font-black mb-3 tracking-tight text-white">المراحل التعليمية</h3>
                     <p class="text-white/80 max-w-md text-sm lg:text-base leading-relaxed font-medium">
-                        قم بإدارة الفصول، تعيين المعلمين، ومتابعة الكثافة الطلابية لكل صف دراسي بمنتهى السهولة.
+                        إدارة المراحل التعليمية تعيين المعلمين، ومتابعة الكثافة الطلابية لكل صف دراسي بمنتهى السهولة.
                     </p>
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-3">
+                    
+                    <button onclick="openImportClassesModal()" class="group px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        استيراد
+                    </button>
+
+                    <div class="relative">
+                        <button onclick="document.getElementById('classes-export-menu').classList.toggle('hidden')" class="px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            تصدير
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        
+                        <div id="classes-export-menu" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-fade-in-up">
+                            <a href="#" onclick="exportClasses('xls'); document.getElementById('classes-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Excel (.xlsx)
+                            </a>
+                            <a href="#" onclick="exportClasses('csv'); document.getElementById('classes-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> CSV
+                            </a>
+                            <a href="#" onclick="exportClasses('pdf'); document.getElementById('classes-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> PDF
+                            </a>
+                        </div>
+                    </div>
+
                     <button onclick="requestDelete('classes', 'all')" class="group px-6 py-3 bg-red-500/20 hover:bg-red-500 backdrop-blur-md border border-red-500/30 rounded-2xl transition-all duration-300 font-bold text-sm flex items-center gap-2 text-white">
                         <svg class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        تصفير الكل
+                        تصفير
                     </button>
+                    
                     <button onclick="openModal('addClass')" class="px-8 py-3 bg-white text-brand-900 dark:bg-brand-600 dark:text-white rounded-2xl hover:bg-cyan-50 dark:hover:bg-slate-800 transition-all duration-300 font-extrabold text-sm shadow-xl flex items-center gap-2 transform hover:scale-105 active:scale-95 border border-white/20">
                         <svg class="w-6 h-6 text-brand-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                        إضافة صف جديد
+                        إضافة صف
                     </button>
                 </div>
             </div>
@@ -2483,7 +2527,6 @@ function renderClasses() {
         </div>
     `;
 }
- 
 
 // --- View: Teachers (Ultra-Premium Redesign) ---
 function renderTeachers() {
@@ -2495,28 +2538,53 @@ function renderTeachers() {
     const avgAge = tIds.length ? Math.round(tIds.reduce((sum, id) => sum + parseInt(appState.teachers[id].age || 0), 0) / tIds.length) : 0;
 
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-purple-700 via-indigo-800 to-slate-900 p-8 mb-10 text-white shadow-2xl border border-white/10">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-purple-700 via-indigo-800 to-slate-900 p-8 mb-10 text-white shadow-2xl border border-white/10">
             <div class="absolute top-[-20%] left-[-10%] w-80 h-80 bg-purple-500/20 rounded-full blur-[100px] animate-pulse"></div>
             <div class="absolute bottom-[-15%] right-[5%] w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px]"></div>
             
             <div class="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
                 <div class="text-center lg:text-right">
                     <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-purple-200 text-[10px] font-black mb-4 uppercase tracking-[0.2em]">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        نخبة الكوادر التعليمية
+                        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+                        إدارة الكادر الأكاديمي
                     </div>
                     <h3 class="text-4xl lg:text-5xl font-black mb-3 tracking-tight">أعضاء هيئة التدريس</h3>
                     <p class="text-purple-100/70 max-w-md text-sm lg:text-base leading-relaxed font-medium">
-                        إدارة ملفات المعلمين، متابعة التخصصات الأكاديمية، وتنظيم قنوات التواصل مع الكادر التعليمي.
+                        إدارة ملفات المعلمين، التخصصات، التقارير، وتنظيم الهيكل التعليمي للمدرسة.
                     </p>
                 </div>
 
-                <div class="flex flex-wrap justify-center gap-4">
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="openImportTeachersModal()" class="group px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        استيراد
+                    </button>
+
+                    <div class="relative">
+                        <button onclick="document.getElementById('teachers-export-menu').classList.toggle('hidden')" class="px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            تصدير
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        
+                        <div id="teachers-export-menu" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-fade-in-up">
+                            <a href="#" onclick="exportTeachers('xls'); document.getElementById('teachers-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Excel (.xlsx)
+                            </a>
+                            <a href="#" onclick="exportTeachers('csv'); document.getElementById('teachers-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> CSV
+                            </a>
+                            <a href="#" onclick="exportTeachers('pdf'); document.getElementById('teachers-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> PDF
+                            </a>
+                        </div>
+                    </div>
+
                     <button onclick="openModal('addTeacher')" class="group px-8 py-4 bg-white text-indigo-900 rounded-2xl hover:bg-purple-50 transition-all duration-300 font-black text-sm shadow-xl flex items-center gap-3 transform hover:scale-105 active:scale-95">
                         <div class="w-6 h-6 rounded-lg bg-indigo-100 flex items-center justify-center group-hover:rotate-90 transition-transform">
                             <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         </div>
-                        إضافة معلم جديد
+                        إضافة معلم
                     </button>
                 </div>
             </div>
@@ -2629,14 +2697,13 @@ function renderTeachers() {
     `;
 }
 
-
 // --- View: Lessons (Ultra-Professional Redesign) ---
 function renderLessons() {
     const classIds = Object.keys(appState.classes || {});
     const totalLessons = classIds.reduce((sum, id) => sum + (appState.classes[id].lessons ? Object.keys(appState.classes[id].lessons).length : 0), 0);
     
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-purple-700 to-brand-800 p-8 mb-10 text-white shadow-2xl border border-white/10">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-purple-700 to-brand-800 p-8 mb-10 text-white shadow-2xl border border-white/10">
             <div class="absolute top-[-10%] right-[-5%] w-48 h-48 bg-white/10 rounded-full blur-[80px] animate-pulse"></div>
             <div class="absolute bottom-[-15%] left-[5%] w-56 h-56 bg-brand-400/20 rounded-full blur-[100px]"></div>
             
@@ -3482,18 +3549,19 @@ function getFilteredLessonData() {
                 </div>
             `;
         }
-// --- View: Classrooms (Ultra-Modern Redesign) ---
+
+// --- View: Classrooms (Ultra-Modern with Import/Export) ---
 function renderClassrooms() {
     const roomIds = Object.keys(appState.classrooms || {});
     const totalRooms = roomIds.length;
     
     // تحليلات المرافق
     const totalCapacity = roomIds.reduce((sum, id) => sum + parseInt(appState.classrooms[id].capacity || 0), 0);
-    const labsCount = roomIds.filter(id => appState.classrooms[id].type.includes('معمل') || appState.classrooms[id].type.includes('Lab')).length;
+    const labsCount = roomIds.filter(id => (appState.classrooms[id].type || '').includes('معمل') || (appState.classrooms[id].type || '').includes('Lab')).length;
     const floorsCount = [...new Set(roomIds.map(id => appState.classrooms[id].floor))].length;
 
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-800 via-slate-900 to-brand-900 p-8 mb-10 text-white shadow-2xl border border-white/5">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-slate-800 via-slate-900 to-brand-900 p-8 mb-10 text-white shadow-2xl border border-white/5">
             <div class="absolute top-[-20%] right-[-10%] w-72 h-72 bg-brand-500/10 rounded-full blur-[100px] animate-pulse"></div>
             <div class="absolute bottom-[-10%] left-[-5%] w-56 h-56 bg-emerald-500/10 rounded-full blur-[80px]"></div>
             
@@ -3510,9 +3578,35 @@ function renderClassrooms() {
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-3">
+                    
+                    <button onclick="openImportClassroomsModal()" class="group px-6 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/10 flex items-center gap-2">
+                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        استيراد
+                    </button>
+
+                    <div class="relative">
+                        <button onclick="document.getElementById('classrooms-export-menu').classList.toggle('hidden')" class="px-6 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/10 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            تصدير
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        
+                        <div id="classrooms-export-menu" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-fade-in-up">
+                            <a href="#" onclick="exportClassrooms('xls'); document.getElementById('classrooms-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Excel (.xlsx)
+                            </a>
+                            <a href="#" onclick="exportClassrooms('csv'); document.getElementById('classrooms-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> CSV
+                            </a>
+                            <a href="#" onclick="exportClassrooms('pdf'); document.getElementById('classrooms-export-menu').classList.add('hidden')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> PDF
+                            </a>
+                        </div>
+                    </div>
+
                     <button onclick="openModal('addClassroom')" class="px-10 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl transition-all duration-300 font-black text-sm shadow-xl shadow-emerald-500/20 flex items-center gap-3 transform hover:scale-105 active:scale-95">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        إضافة مرفق جديد
+                        إضافة مرفق
                     </button>
                 </div>
             </div>
@@ -3560,7 +3654,7 @@ function renderClassrooms() {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             ${roomIds.map(id => {
                 const r = appState.classrooms[id];
-                const isLab = r.type.includes('معمل') || r.type.includes('Lab');
+                const isLab = (r.type || '').includes('معمل') || (r.type || '').includes('Lab');
                 
                 return `
                 <div class="group relative bg-white dark:bg-slate-800/40 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-white/5 overflow-hidden">
@@ -3635,6 +3729,7 @@ function renderClassrooms() {
         </div>
     `;
 }
+
 // --- View: Lesson Monitoring (القسم الجديد) ---
 function renderLessonMonitoring() {
     // 1. استخدام دالة التجميع الجديدة بدلاً من البحث المباشر
@@ -6456,7 +6551,7 @@ function renderSettings() {
     return `
         <div class="max-w-7xl mx-auto space-y-10 animate-fade-in pb-32">
             
-            <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 p-10 shadow-2xl shadow-brand-900/20">
+            <div class="relative rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 p-10 shadow-2xl shadow-brand-900/20">
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="flex items-center gap-6">
@@ -7071,7 +7166,7 @@ function renderNotifications() {
     const notifIds = Object.keys(notifications).reverse(); // الأحدث أولاً
 
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-8 mb-8 text-white shadow-2xl border border-white/10">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-8 mb-8 text-white shadow-2xl border border-white/10">
             <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]"></div>
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
@@ -7946,8 +8041,8 @@ async function exportStudents(type) {
                 { "م": "" }
             ];
             
-            const finalData = [...headerInfo, ...exportData];
-            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
+            const finalData = [...exportData];
+            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: false });
             const workbook = XLSX.utils.book_new();
             
             if(!workbook.Workbook) workbook.Workbook = {};
@@ -8205,6 +8300,1247 @@ async function exportStudents(type) {
     } catch (err) {
         console.error("Export Error:", err);
         showToast('حدث خطأ أثناء التصدير', 'error');
+    }
+}
+
+
+
+
+// ==========================================
+// منطق استيراد المعلمين
+// ==========================================
+let importTeachersDataRaw = [];
+
+function openImportTeachersModal() {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    modalContent.innerHTML = `
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white">استيراد المعلمين</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Excel (XLS, XLSX) أو CSV</p>
+        </div>
+
+        <div id="import-teacher-step-1" class="space-y-6">
+            <div class="relative border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center cursor-pointer" onclick="document.getElementById('import-teacher-file').click()">
+                <input type="file" id="import-teacher-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleTeacherImportFile(event)">
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <p class="font-bold text-slate-700 dark:text-slate-300">اختر الملف</p>
+            </div>
+        </div>
+        <div id="import-teacher-step-2" class="hidden space-y-4"></div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100'), 10);
+}
+
+function handleTeacherImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        importTeachersDataRaw = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (importTeachersDataRaw.length === 0) {
+            showToast('الملف فارغ!', 'error');
+            return;
+        }
+        renderTeacherMappingUI();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function renderTeacherMappingUI() {
+    const fileHeaders = Object.keys(importTeachersDataRaw[0]);
+    const fields = [
+        { key: 'name', label: 'اسم المعلم (مطلوب)', required: true },
+        { key: 'subject', label: 'المادة الدراسية', required: true },
+        { key: 'phone', label: 'رقم الهاتف' },
+        { key: 'age', label: 'العمر' },
+        { key: 'email', label: 'البريد الإلكتروني' }
+    ];
+
+    let html = `<div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">`;
+    fields.forEach(f => {
+        const suggested = fileHeaders.find(h => h.includes(f.label) || h.toLowerCase().includes(f.key)) || "";
+        html += `
+            <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-lg">
+                <span class="text-xs font-bold w-1/3">${f.label}</span>
+                <span class="text-slate-400">➜</span>
+                <select id="map-t-${f.key}" class="flex-1 text-xs border rounded p-1">
+                    <option value="">-- تجاهل --</option>
+                    ${fileHeaders.map(h => `<option value="${h}" ${h === suggested ? 'selected' : ''}>${h}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    });
+    html += `</div><button onclick="processTeacherImport()" class="w-full py-3 mt-4 bg-purple-600 text-white rounded-xl font-bold">بدء الاستيراد</button>`;
+
+    document.getElementById('import-teacher-step-1').classList.add('hidden');
+    const step2 = document.getElementById('import-teacher-step-2');
+    step2.innerHTML = html;
+    step2.classList.remove('hidden');
+}
+
+async function processTeacherImport() {
+    const nameHeader = document.getElementById('map-t-name').value;
+    const subjectHeader = document.getElementById('map-t-subject').value;
+
+    if (!nameHeader || !subjectHeader) {
+        showToast('يجب تحديد الاسم والمادة', 'error');
+        return;
+    }
+
+    const updates = {};
+    importTeachersDataRaw.forEach(row => {
+        const name = String(row[nameHeader] || "").trim();
+        if (!name) return;
+
+        const teacherId = db.ref('school/teachers').push().key;
+        const extract = (k) => {
+            const h = document.getElementById(`map-t-${k}`).value;
+            return h ? String(row[h] || "").trim() : "";
+        };
+
+        updates[`school/teachers/${teacherId}`] = {
+            name: name,
+            firstName: name.split(' ')[0],
+            familyName: name.split(' ').slice(-1)[0] || "",
+            subject: extract('subject'),
+            phone: extract('phone'),
+            age: extract('age'),
+            email: extract('email'),
+            password: "School@1593572468", // كلمة مرور افتراضية
+            photoUrl: ""
+        };
+    });
+
+    try {
+        await db.ref().update(updates);
+        closeModal();
+        showToast('تم استيراد المعلمين بنجاح', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+
+// ==========================================
+// وظيفة تصدير المعلمين (A4 Layout)
+// ==========================================
+async function exportTeachers(type) {
+    const teachers = Object.values(appState.teachers || {});
+    
+    if (teachers.length === 0) {
+        showToast('لا توجد بيانات معلمين للتصدير', 'warning');
+        return;
+    }
+
+    showToast('جاري تحضير الملف...', 'info');
+
+    try {
+        const context = await prepareExportContext();
+        
+        const exportData = teachers.map((t, index) => ({
+            "م": index + 1,
+            "الاسم": t.name,
+            "المادة": t.subject,
+            "الهاتف": t.phone,
+            "العمر": t.age || '-',
+            "البريد": t.email || '-'
+        }));
+
+        if (type === 'xls' || type === 'csv') {
+            const headerInfo = [
+                { "م": `المدرسة: ${context.school.name}` },
+                { "م": `تقرير المعلمين - ${context.generatedAt}` },
+                { "م": "" }
+            ];
+            const finalData = [...exportData];
+            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: false });
+            const workbook = XLSX.utils.book_new();
+            if(!workbook.Workbook) workbook.Workbook = {};
+            if(!workbook.Workbook.Views) workbook.Workbook.Views = [];
+            if(!workbook.Workbook.Views[0]) workbook.Workbook.Views[0] = {};
+            workbook.Workbook.Views[0].RTL = true;
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Teachers");
+            XLSX.writeFile(workbook, `Teachers_${new Date().getTime()}.${type === 'xls' ? 'xlsx' : 'csv'}`);
+            showToast('تم التصدير بنجاح', 'success');
+        } 
+        else if (type === 'pdf') {
+            const tableRows = teachers.map((t, index) => `
+                <tr class="data-row">
+                    <td class="text-center font-mono">${index + 1}</td>
+                    <td class="text-right padding-right bold">${t.name}</td>
+                    <td class="text-center bold" style="color:#4338ca;">${t.subject}</td>
+                    <td class="text-center font-mono" style="direction:ltr;">${t.phone}</td>
+                    <td class="text-center">${t.age || '-'}</td>
+                    <td class="text-center font-mono" style="font-size:10px;">${t.email || '-'}</td>
+                </tr>
+            `).join('');
+
+            // نفس هيكل الطباعة الموحد
+            const logoHtml = context.school.logo 
+                ? `<img src="${context.school.logo}" crossorigin="anonymous" class="school-logo">`
+                : `<div class="school-logo-placeholder">شعار</div>`;
+
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+                    .print-wrapper { font-family: 'Tajawal', sans-serif; direction: rtl; width: 100%; color: #1f2937; }
+                    table.layout-table { width: 100%; border-collapse: collapse; border: none; }
+                    thead.layout-header { display: table-header-group; }
+                    tfoot.layout-footer { display: table-footer-group; }
+                    .header-container { padding-bottom: 10px; border-bottom: 2px solid #374151; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+                    .header-info { text-align: right; }
+                    .school-name { font-size: 20px; font-weight: 800; color: #000; }
+                    .school-logo { height: 70px; width: auto; object-fit: contain; }
+                    .students-table { width: 100%; border-collapse: collapse; font-size: 11px; border: 1px solid #d1d5db; }
+                    .students-table th { background-color: #f3f4f6; color: #111827; font-weight: 800; padding: 10px 5px; border: 1px solid #d1d5db; text-align: center; }
+                    .students-table td { padding: 8px 5px; border: 1px solid #e5e7eb; vertical-align: middle; }
+                    .data-row:nth-child(even) { background-color: #fcfcfc; }
+                    .font-mono { font-family: monospace; }
+                    .bold { font-weight: 700; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    .padding-right { padding-right: 10px !important; }
+                    .footer-container { margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-end; }
+                    .signature-box { text-align: center; width: 40%; }
+                    .signature-line { border-top: 1px dotted #9ca3af; width: 80%; margin: 0 auto; padding-top: 5px; }
+                </style>
+
+                <div class="print-wrapper">
+                    <table class="layout-table">
+                        <thead class="layout-header">
+                            <tr><td>
+                                <div class="header-container">
+                                    <div class="header-info">
+                                        <div style="font-size:14px;">وزارة التربية والتعليم</div>
+                                        <div class="school-name">مدرسة: ${context.school.name}</div>
+                                        <div style="font-size:11px;">${context.school.address}</div>
+                                    </div>
+                                    <div>${logoHtml}</div>
+                                </div>
+                                <div style="height: 10px;"></div>
+                            </td></tr>
+                        </thead>
+                        <tfoot class="layout-footer">
+                            <tr><td>
+                                <div style="height: 20px;"></div>
+                                <div class="footer-container">
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:40px;">يعتمد، شؤون الموظفين</div>
+                                        <div class="signature-line"><span style="font-size:10px;">مسؤول النظام</span></div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:5px;">مدير المدرسة</div>
+                                        <div style="font-weight:700; margin-bottom:30px;">أ/ ${context.school.principal}</div>
+                                        <div class="signature-line" style="border-top:1px solid #000;"><span style="font-size:10px;">التوقيع</span></div>
+                                    </div>
+                                </div>
+                                <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:10px;">${context.generatedAt}</div>
+                            </td></tr>
+                        </tfoot>
+                        <tbody>
+                            <tr><td>
+                                <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-weight:700;">سجل بيانات أعضاء هيئة التدريس</div>
+                                    <div style="font-size:12px;">${context.generatedAt}</div>
+                                </div>
+                                <table class="students-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%;">#</th>
+                                            <th style="width:25%;">الاسم</th>
+                                            <th style="width:15%;">المادة</th>
+                                            <th style="width:15%;">الهاتف</th>
+                                            <th style="width:10%;">العمر</th>
+                                            <th style="width:30%;">البريد الإلكتروني</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `Teachers_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().from(printContent).set(opt).save();
+            showToast('تم تحميل PDF بنجاح', 'success');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+// ==========================================
+// منطق استيراد الصفوف (Classes Import)
+// ==========================================
+let importClassesDataRaw = [];
+
+function openImportClassesModal() {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    modalContent.innerHTML = `
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-tr from-brand-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-500/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white">استيراد الصفوف الدراسية</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Excel (XLS, XLSX) أو CSV</p>
+        </div>
+
+        <div id="import-class-step-1" class="space-y-6">
+            <div class="relative border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center cursor-pointer" onclick="document.getElementById('import-class-file').click()">
+                <input type="file" id="import-class-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleClassImportFile(event)">
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <p class="font-bold text-slate-700 dark:text-slate-300">اختر الملف</p>
+            </div>
+        </div>
+        <div id="import-class-step-2" class="hidden space-y-4"></div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100'), 10);
+}
+
+function handleClassImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        importClassesDataRaw = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (importClassesDataRaw.length === 0) {
+            showToast('الملف فارغ!', 'error');
+            return;
+        }
+        renderClassMappingUI();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function renderClassMappingUI() {
+    const fileHeaders = Object.keys(importClassesDataRaw[0]);
+    const fields = [
+        { key: 'name', label: 'اسم الصف (مطلوب)', required: true },
+        { key: 'levelId', label: 'المرحلة (مثال: G10)', required: true },
+        { key: 'type', label: 'النوع (مثال: ثانوي)', required: true }
+    ];
+
+    let html = `<div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">`;
+    fields.forEach(f => {
+        const suggested = fileHeaders.find(h => h.includes(f.label) || h.toLowerCase().includes(f.key)) || "";
+        html += `
+            <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-lg">
+                <span class="text-xs font-bold w-1/3">${f.label}</span>
+                <span class="text-slate-400">➜</span>
+                <select id="map-c-${f.key}" class="flex-1 text-xs border rounded p-1">
+                    <option value="">-- تجاهل --</option>
+                    ${fileHeaders.map(h => `<option value="${h}" ${h === suggested ? 'selected' : ''}>${h}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    });
+    html += `</div><button onclick="processClassImport()" class="w-full py-3 mt-4 bg-brand-600 text-white rounded-xl font-bold">بدء الاستيراد</button>`;
+
+    document.getElementById('import-class-step-1').classList.add('hidden');
+    const step2 = document.getElementById('import-class-step-2');
+    step2.innerHTML = html;
+    step2.classList.remove('hidden');
+}
+
+async function processClassImport() {
+    const nameHeader = document.getElementById('map-c-name').value;
+    const levelIdHeader = document.getElementById('map-c-levelId').value;
+
+    if (!nameHeader || !levelIdHeader) {
+        showToast('اسم الصف والمرحلة حقول مطلوبة', 'error');
+        return;
+    }
+
+    const updates = {};
+    importClassesDataRaw.forEach(row => {
+        const name = String(row[nameHeader] || "").trim();
+        if (!name) return;
+
+        const classId = db.ref('school/classes').push().key;
+        const extract = (k) => {
+            const h = document.getElementById(`map-c-${k}`).value;
+            return h ? String(row[h] || "").trim() : "";
+        };
+
+        updates[`school/classes/${classId}`] = {
+            name: name,
+            levelId: extract('levelId') || "General",
+            type: extract('type') || "عام"
+        };
+    });
+
+    try {
+        await db.ref().update(updates);
+        closeModal();
+        showToast('تم استيراد الصفوف بنجاح', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+
+// ==========================================
+// وظيفة تصدير الصفوف (Classes Export - A4 Layout)
+// ==========================================
+async function exportClasses(type) {
+    const classes = Object.values(appState.classes || {});
+    
+    if (classes.length === 0) {
+        showToast('لا توجد بيانات صفوف للتصدير', 'warning');
+        return;
+    }
+
+    showToast('جاري تحضير الملف...', 'info');
+
+    try {
+        const context = await prepareExportContext();
+        
+        const exportData = classes.map((c, index) => ({
+            "م": index + 1,
+            "اسم الصف": c.name,
+            "المرحلة": c.levelId,
+            "النوع": c.type,
+            "عدد المعلمين": c.teachers ? c.teachers.length : 0
+        }));
+
+        if (type === 'xls' || type === 'csv') {
+            const headerInfo = [
+                { "م": `المدرسة: ${context.school.name}` },
+                { "م": `تقرير الصفوف الدراسية - ${context.generatedAt}` },
+                { "م": "" }
+            ];
+            const finalData = [...headerInfo, ...exportData];
+            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: false });
+            const workbook = XLSX.utils.book_new();
+            if(!workbook.Workbook) workbook.Workbook = {};
+            if(!workbook.Workbook.Views) workbook.Workbook.Views = [];
+            if(!workbook.Workbook.Views[0]) workbook.Workbook.Views[0] = {};
+            workbook.Workbook.Views[0].RTL = true;
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Classes");
+            XLSX.writeFile(workbook, `Classes_${new Date().getTime()}.${type === 'xls' ? 'xlsx' : 'csv'}`);
+            showToast('تم التصدير بنجاح', 'success');
+        } 
+        else if (type === 'pdf') {
+            const tableRows = classes.map((c, index) => `
+                <tr class="data-row">
+                    <td class="text-center font-mono">${index + 1}</td>
+                    <td class="text-right padding-right bold">${c.name}</td>
+                    <td class="text-center">${c.levelId}</td>
+                    <td class="text-center">${c.type}</td>
+                    <td class="text-center font-mono">${c.teachers ? c.teachers.length : 0}</td>
+                </tr>
+            `).join('');
+
+            const logoHtml = context.school.logo 
+                ? `<img src="${context.school.logo}" crossorigin="anonymous" class="school-logo">`
+                : `<div class="school-logo-placeholder">شعار</div>`;
+
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+                    .print-wrapper { font-family: 'Tajawal', sans-serif; direction: rtl; width: 100%; color: #1f2937; }
+                    table.layout-table { width: 100%; border-collapse: collapse; border: none; }
+                    thead.layout-header { display: table-header-group; }
+                    tfoot.layout-footer { display: table-footer-group; }
+                    .header-container { padding-bottom: 10px; border-bottom: 2px solid #374151; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+                    .header-info { text-align: right; }
+                    .school-name { font-size: 20px; font-weight: 800; color: #000; }
+                    .school-logo { height: 70px; width: auto; object-fit: contain; }
+                    .students-table { width: 100%; border-collapse: collapse; font-size: 11px; border: 1px solid #d1d5db; }
+                    .students-table th { background-color: #f3f4f6; color: #111827; font-weight: 800; padding: 10px 5px; border: 1px solid #d1d5db; text-align: center; }
+                    .students-table td { padding: 8px 5px; border: 1px solid #e5e7eb; vertical-align: middle; }
+                    .data-row:nth-child(even) { background-color: #fcfcfc; }
+                    .font-mono { font-family: monospace; }
+                    .bold { font-weight: 700; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    .padding-right { padding-right: 10px !important; }
+                    .footer-container { margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-end; }
+                    .signature-box { text-align: center; width: 40%; }
+                    .signature-line { border-top: 1px dotted #9ca3af; width: 80%; margin: 0 auto; padding-top: 5px; }
+                </style>
+
+                <div class="print-wrapper">
+                    <table class="layout-table">
+                        <thead class="layout-header">
+                            <tr><td>
+                                <div class="header-container">
+                                    <div class="header-info">
+                                        <div style="font-size:14px;">وزارة التربية والتعليم</div>
+                                        <div class="school-name">مدرسة: ${context.school.name}</div>
+                                        <div style="font-size:11px;">${context.school.address}</div>
+                                    </div>
+                                    <div>${logoHtml}</div>
+                                </div>
+                                <div style="height: 10px;"></div>
+                            </td></tr>
+                        </thead>
+                        <tfoot class="layout-footer">
+                            <tr><td>
+                                <div style="height: 20px;"></div>
+                                <div class="footer-container">
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:40px;">يعتمد، الوكيل الإداري</div>
+                                        <div class="signature-line"><span style="font-size:10px;">مسؤول النظام</span></div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:5px;">مدير المدرسة</div>
+                                        <div style="font-weight:700; margin-bottom:30px;">أ/ ${context.school.principal}</div>
+                                        <div class="signature-line" style="border-top:1px solid #000;"><span style="font-size:10px;">التوقيع</span></div>
+                                    </div>
+                                </div>
+                                <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:10px;">${context.generatedAt}</div>
+                            </td></tr>
+                        </tfoot>
+                        <tbody>
+                            <tr><td>
+                                <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-weight:700;">سجل الهيكل التعليمي والصفوف</div>
+                                    <div style="font-size:12px;">${context.generatedAt}</div>
+                                </div>
+                                <table class="students-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%;">#</th>
+                                            <th style="width:35%;">اسم الصف</th>
+                                            <th style="width:20%;">المرحلة</th>
+                                            <th style="width:20%;">النوع</th>
+                                            <th style="width:20%;">عدد المعلمين</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `Classes_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().from(printContent).set(opt).save();
+            showToast('تم تحميل PDF بنجاح', 'success');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+
+// ==========================================
+// منطق استيراد المرافق والقاعات
+// ==========================================
+let importClassroomsDataRaw = [];
+
+function openImportClassroomsModal() {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    modalContent.innerHTML = `
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white">استيراد القاعات والمرافق</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Excel (XLS, XLSX) أو CSV</p>
+        </div>
+
+        <div id="import-room-step-1" class="space-y-6">
+            <div class="relative border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center cursor-pointer" onclick="document.getElementById('import-room-file').click()">
+                <input type="file" id="import-room-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleClassroomImportFile(event)">
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <p class="font-bold text-slate-700 dark:text-slate-300">اختر الملف</p>
+            </div>
+        </div>
+        <div id="import-room-step-2" class="hidden space-y-4"></div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100'), 10);
+}
+
+function handleClassroomImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        importClassroomsDataRaw = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (importClassroomsDataRaw.length === 0) {
+            showToast('الملف فارغ!', 'error');
+            return;
+        }
+        renderClassroomMappingUI();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function renderClassroomMappingUI() {
+    const fileHeaders = Object.keys(importClassroomsDataRaw[0]);
+    const fields = [
+        { key: 'name', label: 'اسم القاعة (مطلوب)', required: true },
+        { key: 'number', label: 'رقم القاعة' },
+        { key: 'type', label: 'النوع (فصل/معمل)', required: true },
+        { key: 'capacity', label: 'السعة' },
+        { key: 'floor', label: 'الدور' }
+    ];
+
+    let html = `<div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">`;
+    fields.forEach(f => {
+        const suggested = fileHeaders.find(h => h.includes(f.label) || h.toLowerCase().includes(f.key)) || "";
+        html += `
+            <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-lg">
+                <span class="text-xs font-bold w-1/3">${f.label}</span>
+                <span class="text-slate-400">➜</span>
+                <select id="map-r-${f.key}" class="flex-1 text-xs border rounded p-1">
+                    <option value="">-- تجاهل --</option>
+                    ${fileHeaders.map(h => `<option value="${h}" ${h === suggested ? 'selected' : ''}>${h}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    });
+    html += `</div><button onclick="processClassroomImport()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl font-bold">بدء الاستيراد</button>`;
+
+    document.getElementById('import-room-step-1').classList.add('hidden');
+    const step2 = document.getElementById('import-room-step-2');
+    step2.innerHTML = html;
+    step2.classList.remove('hidden');
+}
+
+async function processClassroomImport() {
+    const nameHeader = document.getElementById('map-r-name').value;
+    const typeHeader = document.getElementById('map-r-type').value;
+
+    if (!nameHeader || !typeHeader) {
+        showToast('اسم القاعة والنوع حقول مطلوبة', 'error');
+        return;
+    }
+
+    const updates = {};
+    importClassroomsDataRaw.forEach(row => {
+        const name = String(row[nameHeader] || "").trim();
+        if (!name) return;
+
+        const roomId = db.ref('school/classrooms').push().key;
+        const extract = (k) => {
+            const h = document.getElementById(`map-r-${k}`).value;
+            return h ? String(row[h] || "").trim() : "";
+        };
+
+        updates[`school/classrooms/${roomId}`] = {
+            name: name,
+            number: extract('number') || "00",
+            type: extract('type') || "فصل",
+            capacity: extract('capacity') || "30",
+            floor: extract('floor') || "1"
+        };
+    });
+
+    try {
+        await db.ref().update(updates);
+        closeModal();
+        showToast('تم استيراد القاعات بنجاح', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+
+// ==========================================
+// وظيفة تصدير المرافق (Classrooms Export - A4 Layout)
+// ==========================================
+async function exportClassrooms(type) {
+    const rooms = Object.values(appState.classrooms || {});
+    
+    if (rooms.length === 0) {
+        showToast('لا توجد بيانات مرافق للتصدير', 'warning');
+        return;
+    }
+
+    showToast('جاري تحضير الملف...', 'info');
+
+    try {
+        const context = await prepareExportContext();
+        
+        const exportData = rooms.map((r, index) => ({
+            "م": index + 1,
+            "اسم القاعة": r.name,
+            "رقم القاعة": r.number,
+            "النوع": r.type,
+            "الدور": r.floor,
+            "السعة": r.capacity
+        }));
+
+        if (type === 'xls' || type === 'csv') {
+            const headerInfo = [
+                { "م": `المدرسة: ${context.school.name}` },
+                { "م": `تقرير البنية التحتية والمرافق - ${context.generatedAt}` },
+                { "م": "" }
+            ];
+            const finalData = [...headerInfo, ...exportData];
+            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: false });
+            const workbook = XLSX.utils.book_new();
+            if(!workbook.Workbook) workbook.Workbook = {};
+            if(!workbook.Workbook.Views) workbook.Workbook.Views = [];
+            if(!workbook.Workbook.Views[0]) workbook.Workbook.Views[0] = {};
+            workbook.Workbook.Views[0].RTL = true;
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Classrooms");
+            XLSX.writeFile(workbook, `Classrooms_${new Date().getTime()}.${type === 'xls' ? 'xlsx' : 'csv'}`);
+            showToast('تم التصدير بنجاح', 'success');
+        } 
+        else if (type === 'pdf') {
+            const tableRows = rooms.map((r, index) => `
+                <tr class="data-row">
+                    <td class="text-center font-mono">${index + 1}</td>
+                    <td class="text-right padding-right bold">${r.name}</td>
+                    <td class="text-center font-mono">${r.number}</td>
+                    <td class="text-center">${r.type}</td>
+                    <td class="text-center font-mono">${r.floor}</td>
+                    <td class="text-center font-mono bold" style="color:#059669;">${r.capacity}</td>
+                </tr>
+            `).join('');
+
+            const logoHtml = context.school.logo 
+                ? `<img src="${context.school.logo}" crossorigin="anonymous" class="school-logo">`
+                : `<div class="school-logo-placeholder">شعار</div>`;
+
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+                    .print-wrapper { font-family: 'Tajawal', sans-serif; direction: rtl; width: 100%; color: #1f2937; }
+                    table.layout-table { width: 100%; border-collapse: collapse; border: none; }
+                    thead.layout-header { display: table-header-group; }
+                    tfoot.layout-footer { display: table-footer-group; }
+                    .header-container { padding-bottom: 10px; border-bottom: 2px solid #374151; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+                    .header-info { text-align: right; }
+                    .school-name { font-size: 20px; font-weight: 800; color: #000; }
+                    .school-logo { height: 70px; width: auto; object-fit: contain; }
+                    .students-table { width: 100%; border-collapse: collapse; font-size: 11px; border: 1px solid #d1d5db; }
+                    .students-table th { background-color: #f3f4f6; color: #111827; font-weight: 800; padding: 10px 5px; border: 1px solid #d1d5db; text-align: center; }
+                    .students-table td { padding: 8px 5px; border: 1px solid #e5e7eb; vertical-align: middle; }
+                    .data-row:nth-child(even) { background-color: #fcfcfc; }
+                    .font-mono { font-family: monospace; }
+                    .bold { font-weight: 700; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    .padding-right { padding-right: 10px !important; }
+                    .footer-container { margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-end; }
+                    .signature-box { text-align: center; width: 40%; }
+                    .signature-line { border-top: 1px dotted #9ca3af; width: 80%; margin: 0 auto; padding-top: 5px; }
+                </style>
+
+                <div class="print-wrapper">
+                    <table class="layout-table">
+                        <thead class="layout-header">
+                            <tr><td>
+                                <div class="header-container">
+                                    <div class="header-info">
+                                        <div style="font-size:14px;">وزارة التربية والتعليم</div>
+                                        <div class="school-name">مدرسة: ${context.school.name}</div>
+                                        <div style="font-size:11px;">${context.school.address}</div>
+                                    </div>
+                                    <div>${logoHtml}</div>
+                                </div>
+                                <div style="height: 10px;"></div>
+                            </td></tr>
+                        </thead>
+                        <tfoot class="layout-footer">
+                            <tr><td>
+                                <div style="height: 20px;"></div>
+                                <div class="footer-container">
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:40px;">يعتمد، مسؤول المرافق</div>
+                                        <div class="signature-line"><span style="font-size:10px;">مسؤول النظام</span></div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div style="font-weight:800; margin-bottom:5px;">مدير المدرسة</div>
+                                        <div style="font-weight:700; margin-bottom:30px;">أ/ ${context.school.principal}</div>
+                                        <div class="signature-line" style="border-top:1px solid #000;"><span style="font-size:10px;">التوقيع</span></div>
+                                    </div>
+                                </div>
+                                <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:10px;">${context.generatedAt}</div>
+                            </td></tr>
+                        </tfoot>
+                        <tbody>
+                            <tr><td>
+                                <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-weight:700;">سجل البنية التحتية والقاعات</div>
+                                    <div style="font-size:12px;">${context.generatedAt}</div>
+                                </div>
+                                <table class="students-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%;">#</th>
+                                            <th style="width:30%;">اسم القاعة</th>
+                                            <th style="width:15%;">رقم القاعة</th>
+                                            <th style="width:20%;">النوع</th>
+                                            <th style="width:15%;">الدور</th>
+                                            <th style="width:15%;">السعة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `Classrooms_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().from(printContent).set(opt).save();
+            showToast('تم تحميل PDF بنجاح', 'success');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('حدث خطأ', 'error');
+    }
+}
+// ==========================================
+// 🧠 مركز الإشعارات الذكي (Smart Notification Hub)
+// ==========================================
+
+let currentNotifTab = 'ai'; // التاب الافتراضي
+
+function openSmartNotificationHub() {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    // هيكل الموديل مع التابات
+    modalContent.innerHTML = `
+        <div class="h-[80vh] flex flex-col">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                        مركز الإشعارات الموحد
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">متابعة فورية وتحليلات ذكية للنظام</p>
+                </div>
+            </div>
+
+            <div class="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mb-6 border border-slate-200 dark:border-white/5">
+                <button onclick="switchNotifTab('ai')" id="tab-btn-ai" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 bg-white dark:bg-slate-700 shadow-sm text-brand-600 dark:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    تحليلات الذكاء الاصطناعي
+                </button>
+                <button onclick="switchNotifTab('general')" id="tab-btn-general" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                    التعاميم العامة
+                </button>
+                <button onclick="switchNotifTab('students')" id="tab-btn-students" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    إشعارات الطلاب
+                </button>
+            </div>
+
+            <div id="notif-content-area" class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                </div>
+        </div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+        modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100');
+    }, 10);
+
+    // تحميل المحتوى الافتراضي
+    renderAIInsights();
+}
+
+// دالة التبديل بين التابات
+function switchNotifTab(tab) {
+    currentNotifTab = tab;
+    
+    // تحديث ستايل الأزرار
+    const buttons = ['ai', 'general', 'students'];
+    buttons.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+            btn.className = "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 bg-white dark:bg-slate-700 shadow-sm text-brand-600 dark:text-white";
+        } else {
+            btn.className = "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50";
+        }
+    });
+
+    // تحميل المحتوى المناسب
+    if (tab === 'ai') renderAIInsights();
+    else if (tab === 'general') renderGeneralNotifs();
+    else if (tab === 'students') renderStudentNotifs();
+}
+
+// ----------------------------------------------------
+// 1️⃣ منطق تحليلات الذكاء الاصطناعي (Smart AI Insights) - PRO VERSION
+// ----------------------------------------------------
+function renderAIInsights() {
+    const container = document.getElementById('notif-content-area');
+    
+    // --- 1. Data Aggregation & Analysis ---
+    const students = Object.values(appState.students || {});
+    const teachers = Object.values(appState.teachers || {});
+    const classes = Object.values(appState.classes || {});
+    const attendanceDays = Object.values(appState.attendance || {});
+    const lessonAttendanceDays = Object.values(appState.lessonAttendance || {});
+
+    // A. Attendance Analysis (Risk Detection)
+    const lateStats = {};
+    let totalLates = 0;
+    
+    // Check Daily Attendance
+    attendanceDays.forEach(dayRecords => {
+        Object.values(dayRecords).forEach(record => {
+            if (record.status === 'late' || record.status === 'severe_late') {
+                lateStats[record.studentId] = (lateStats[record.studentId] || 0) + 1;
+                totalLates++;
+            }
+        });
+    });
+
+    // Check Lesson Attendance
+    lessonAttendanceDays.forEach(dayLessons => {
+        Object.values(dayLessons).forEach(lessonRecords => {
+            Object.values(lessonRecords).forEach(record => {
+                if (record.status === 'late' || record.status === 'severe_late') {
+                    const sid = record.studentId; 
+                    if(sid) {
+                        lateStats[sid] = (lateStats[sid] || 0) + 1;
+                        totalLates++;
+                    }
+                }
+            });
+        });
+    });
+
+    const topLateStudents = students
+        .map(s => ({ ...s, lateCount: lateStats[s.studentId] || 0 }))
+        .filter(s => s.lateCount > 0)
+        .sort((a, b) => b.lateCount - a.lateCount)
+        .slice(0, 3);
+
+    // B. Behavioral Analysis (Notifications)
+    const alertStats = {};
+    const successStats = {};
+    
+    students.forEach(s => {
+        if (s.notifications) {
+            Object.values(s.notifications).forEach(n => {
+                if (n.type === 'alert' || n.type === 'warning') {
+                    alertStats[s.studentId] = (alertStats[s.studentId] || 0) + 1;
+                } else if (n.type === 'success') {
+                    successStats[s.studentId] = (successStats[s.studentId] || 0) + 1;
+                }
+            });
+        }
+    });
+
+    const troubledStudents = students
+        .map(s => ({ ...s, alertCount: alertStats[s.studentId] || 0 }))
+        .filter(s => s.alertCount > 0)
+        .sort((a, b) => b.alertCount - a.alertCount)
+        .slice(0, 3);
+
+    const starStudents = students
+        .map(s => ({ ...s, successCount: successStats[s.studentId] || 0 }))
+        .filter(s => s.successCount > 0)
+        .sort((a, b) => b.successCount - a.successCount)
+        .slice(0, 3);
+
+    // --- 2. HTML Generation ---
+    let html = `<div class="space-y-6 animate-fade-in-up">`;
+
+    // 🚨 Insight 1: Attendance Risks (رادار المخاطر)
+    if (topLateStudents.length > 0) {
+        html += `
+            <div class="relative overflow-hidden bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-900/20 dark:to-red-900/10 border border-rose-100 dark:border-rose-500/20 rounded-3xl p-5 shadow-sm">
+                <div class="absolute -top-6 -left-6 opacity-5 rotate-12">
+                    <svg class="w-32 h-32 text-rose-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                </div>
+                <div class="relative z-10">
+                    <h4 class="font-black text-rose-800 dark:text-rose-400 mb-3 flex items-center gap-2 text-lg">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                        </span>
+                        رادار مخاطر الحضور
+                    </h4>
+                    <p class="text-sm text-rose-700/80 dark:text-rose-300 mb-4 font-medium">
+                        تم رصد <span class="font-black text-rose-900 dark:text-white text-lg">${totalLates}</span> حالة تأخير/غياب. الطلاب الأكثر تأثراً:
+                    </p>
+                    <div class="space-y-2">
+                        ${topLateStudents.map(s => `
+                            <div class="flex items-center justify-between bg-white/60 dark:bg-black/20 p-2.5 rounded-xl backdrop-blur-sm border border-rose-100 dark:border-rose-500/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-xs shadow-sm">
+                                        ${s.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${s.name}</p>
+                                        <p class="text-[9px] text-slate-500 dark:text-slate-400">كود: ${s.studentId}</p>
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-200 dark:bg-rose-800 text-rose-800 dark:text-rose-200 text-[10px] font-black">${s.lateCount} تأخير</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ⚠️ Insight 2: Behavioral Alerts (تنبيهات سلوكية)
+    if (troubledStudents.length > 0) {
+        html += `
+            <div class="relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/10 border border-amber-100 dark:border-amber-500/20 rounded-3xl p-5 shadow-sm">
+                <div class="relative z-10">
+                    <h4 class="font-black text-amber-800 dark:text-amber-400 mb-3 flex items-center gap-2 text-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        تنبيهات سلوكية نشطة
+                    </h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        ${troubledStudents.map(s => `
+                            <div class="bg-white/60 dark:bg-black/20 p-3 rounded-xl backdrop-blur-sm border border-amber-200/50 dark:border-amber-500/10 hover:bg-white/80 transition-colors">
+                                <p class="text-[10px] font-bold text-slate-500 mb-1">الطالب</p>
+                                <p class="text-xs font-black text-slate-800 dark:text-slate-200 truncate">${s.name}</p>
+                                <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                    ${s.alertCount} تنبيهات
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 🌟 Insight 3: Star Students (لوحة الشرف)
+    if (starStudents.length > 0) {
+        html += `
+            <div class="relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/10 border border-indigo-100 dark:border-indigo-500/20 rounded-3xl p-5 shadow-sm">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <svg class="w-24 h-24 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+                <div class="relative z-10">
+                    <h4 class="font-black text-indigo-800 dark:text-indigo-400 mb-3 flex items-center gap-2 text-lg">
+                        <svg class="w-5 h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        لوحة الشرف (التميز)
+                    </h4>
+                    <div class="space-y-3">
+                        ${starStudents.map(s => `
+                            <div class="flex items-center gap-3 bg-white/40 dark:bg-black/10 p-2 rounded-xl backdrop-blur-sm">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-sm shadow-md shadow-indigo-500/20 border-2 border-white dark:border-slate-800">
+                                    ${s.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="text-xs font-black text-slate-800 dark:text-white">${s.name}</p>
+                                    <p class="text-[10px] text-indigo-600 dark:text-indigo-300 font-bold">${s.successCount} إشادات أكاديمية</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 📊 Insight 4: General Stats & Health
+    html += `
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-700/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5 text-center shadow-sm">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">إجمالي الطلاب</p>
+                <p class="text-2xl font-black text-slate-800 dark:text-white mt-1">${students.length}</p>
+            </div>
+            <div class="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-700/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5 text-center shadow-sm">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">الصفوف النشطة</p>
+                <p class="text-2xl font-black text-slate-800 dark:text-white mt-1">${classes.length}</p>
+            </div>
+        </div>
+    `;
+
+    html += `</div>`;
+    
+    // Empty State Handling
+    if (students.length === 0) {
+        html = `
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                </div>
+                <p class="text-slate-500 font-bold">جاري تجميع البيانات...</p>
+                <p class="text-xs text-slate-400 mt-2">سيبدأ الذكاء الاصطناعي بالتحليل فور توفر بيانات كافية.</p>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+
+// ----------------------------------------------------
+// 2️⃣ منطق التعاميم العامة (General Notifications)
+// ----------------------------------------------------
+function renderGeneralNotifs() {
+    const container = document.getElementById('notif-content-area');
+    const notifs = appState.general_notifications || {};
+    const notifKeys = Object.keys(notifs).sort((a, b) => notifs[b].timestamp - notifs[a].timestamp);
+
+    if (notifKeys.length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                <p>لا توجد تعاميم عامة حالياً</p>
+            </div>`;
+        return;
+    }
+
+    const html = notifKeys.map(key => {
+        const n = notifs[key];
+        const date = new Date(n.timestamp).toLocaleDateString('ar-EG');
+        const typeColor = n.type === 'alert' ? 'red' : n.type === 'warning' ? 'amber' : 'emerald';
+        
+        return `
+            <div class="group bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-${typeColor}-500/50 transition-all shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-${typeColor}-500"></span>
+                        <h5 class="font-bold text-slate-800 dark:text-white">${n.title}</h5>
+                    </div>
+                    <span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-500">${date}</span>
+                </div>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed pl-4 border-r-2 border-slate-200 dark:border-slate-700 mr-1 pr-3">
+                    ${n.message}
+                </p>
+                <div class="mt-3 flex items-center justify-end gap-2 text-[10px] text-slate-400">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span>بواسطة: ${n.sender || 'الإدارة'}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = `<div class="space-y-3 animate-fade-in-up">${html}</div>`;
+}
+
+// ----------------------------------------------------
+// 3️⃣ منطق إشعارات الطلاب (Student Notifications)
+// ----------------------------------------------------
+function renderStudentNotifs() {
+    const container = document.getElementById('notif-content-area');
+    const students = appState.students || {};
+    let hasNotifs = false;
+    
+    let html = `<div class="space-y-6 animate-fade-in-up">`;
+
+    // البحث عن الطلاب الذين لديهم إشعارات
+    Object.keys(students).forEach(studentId => {
+        const student = students[studentId];
+        if (student.notifications) {
+            const studentNotifs = Object.values(student.notifications).sort((a, b) => b.timestamp - a.timestamp);
+            if (studentNotifs.length > 0) {
+                hasNotifs = true;
+                
+                html += `
+                    <div class="bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-3 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700">
+                            <div class="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-xs">
+                                ${student.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-sm text-slate-800 dark:text-white">${student.name}</h5>
+                                <p class="text-[10px] text-slate-500">كود: ${student.studentId}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                            ${studentNotifs.map(n => `
+                                <div class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors flex gap-3">
+                                    <div class="mt-1">
+                                        ${n.type === 'warning' 
+                                            ? '<div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>' 
+                                            : n.type === 'alert' 
+                                                ? '<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>'
+                                                : '<div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>'
+                                        }
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-baseline">
+                                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${n.title}</span>
+                                            <span class="text-[9px] text-slate-400 font-mono">${new Date(n.timestamp).toLocaleDateString('ar-EG')}</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 mt-0.5">${n.message}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    });
+
+    html += `</div>`;
+
+    if (!hasNotifs) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <p>لا توجد إشعارات خاصة بالطلاب</p>
+            </div>`;
+    } else {
+        container.innerHTML = html;
     }
 }
 </script>
