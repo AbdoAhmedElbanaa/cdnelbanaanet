@@ -258,13 +258,13 @@
     <audio id="sound-warning" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-back-2575.mp3"></audio>
     <audio id="sound-error" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
 
-    <script>
-        // القيم الافتراضية في حال لم يتم تحميل البيانات بعد
+<script>
+        // 1. التهيئة الأولية (سيتم تحديثها تلقائياً من قاعدة البيانات)
         let CONFIG = {
-            SCHOOL_START_TIME: "08:00",
+            SCHOOL_START_TIME: "07:30",        // قيمة افتراضية
             LATE_THRESHOLD_MINUTES: 15,
             SEVERE_LATE_MINUTES: 30,
-            DEPARTURE_START_TIME: "14:00",
+            DEPARTURE_START_TIME: "13:30",
             OVERTIME_THRESHOLD_MINUTES: 15,
             USE_24_HOUR_FORMAT: false
         };
@@ -288,33 +288,85 @@
         let isScanning = false;
         let currentMode = 'in';
         let studentsCache = {};
+        let classesCache = {}; // لتخزين أسماء الفصول
         let closeTimer = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             updateClock();
-            updateSettingsUI(); // تحديث الواجهة بالقيم الافتراضية أولاً
+            updateSettingsUI();
             setInterval(updateClock, 1000);
             createParticles();
+            
+            // تسجيل الدخول المجهول للقراءة/الكتابة
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    document.getElementById('connection-dot').className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
-                    document.getElementById('connection-text').innerText = "متصل";
-                    document.getElementById('connection-text').className = "text-xs text-green-400 font-bold";
+                    updateConnectionStatus(true);
                     preloadData();
                 } else {
+                    updateConnectionStatus(false);
                     auth.signInAnonymously().catch(console.error);
                 }
             });
         });
 
+        function updateConnectionStatus(isConnected) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            if(isConnected) {
+                dot.className = "w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]";
+                text.innerText = "متصل";
+                text.className = "text-xs text-green-400 font-bold";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
+                text.innerText = "جاري الاتصال...";
+                text.className = "text-xs text-slate-400";
+            }
+        }
+
+        // --- دالة جلب البيانات وربطها بقاعدة البيانات الحقيقية ---
+        function preloadData() {
+            // 1. جلب الإعدادات (Settings)
+            db.ref('school/settings').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const val = snapshot.val();
+                    // دمج الإعدادات القادمة مع الإعدادات الحالية
+                    CONFIG = { ...CONFIG, ...val };
+                    console.log("تم تحديث إعدادات المدرسة:", CONFIG);
+                    updateSettingsUI();
+                }
+            });
+
+            // 2. جلب الفصول (Classes) لعرض اسم الفصل بدلاً من الرمز
+            db.ref('school/classes').on('value', (snapshot) => {
+                classesCache = snapshot.val() || {};
+            });
+
+            // 3. جلب الطلاب (Students)
+            db.ref('school/students').on('value', (snapshot) => {
+                studentsCache = snapshot.val() || {};
+            });
+            
+            // 4. مراقبة عداد الحضور اليومي
+            const today = new Date().toISOString().split('T')[0];
+            db.ref(`school/attendance/${today}`).on('value', (snapshot) => {
+                let inCount = 0, outCount = 0;
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        const val = child.val();
+                        if (val.checkOutTime) outCount++;
+                        else inCount++;
+                    });
+                }
+                document.getElementById('daily-in-count').innerText = inCount;
+                document.getElementById('daily-out-count').innerText = outCount;
+            });
+        }
+
         async function initCamera() {
             const startScreen = document.getElementById('start-screen');
             try {
                 if (!html5QrcodeScanner) html5QrcodeScanner = new Html5Qrcode("reader");
-                
-                // تحديث: 60 FPS
                 const config = { fps: 60, qrbox: { width: 280, height: 280 }, aspectRatio: 1.0 };
-                
                 try {
                     await html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess);
                 } catch (e) {
@@ -326,6 +378,166 @@
                 document.getElementById('error-msg').classList.remove('hidden');
             }
         }
+
+        // --- منطق المسح الضوئي المعدل للبحث عن الطالب ---
+        async function onScanSuccess(decodedText) {
+            if (isScanning) return;
+            isScanning = true;
+            showLoadingState(true);
+
+            try {
+                let scannedId;
+                // محاولة قراءة QR سواء كان JSON أو نص عادي
+                try { 
+                    const data = JSON.parse(decodedText); 
+                    scannedId = String(data.id || data.studentId).trim();
+                } catch { 
+                    scannedId = String(decodedText).trim(); 
+                }
+
+                if (!scannedId) throw new Error("الرمز غير صالح");
+
+                // البحث عن الطالب في الكاش باستخدام studentId الموجود داخل كائن الطالب
+                // المفتاح في قاعدة البيانات (مثل -Oj_On8s...) هو ما نحتاجه للتسجيل
+                let foundStudentKey = null;
+                let foundStudentData = null;
+
+                // التكرار على مفاتيح الطلاب للعثور على studentId المطابق
+                for (const [key, data] of Object.entries(studentsCache)) {
+                    if (data.studentId && String(data.studentId) === scannedId) {
+                        foundStudentKey = key;
+                        foundStudentData = data;
+                        break;
+                    }
+                }
+
+                if (!foundStudentKey) throw new Error("الطالب غير مسجل في النظام");
+
+                // إضافة اسم الفصل للعرض (من classesCache)
+                if (foundStudentData.classId && classesCache[foundStudentData.classId]) {
+                    foundStudentData.classNameDisplay = classesCache[foundStudentData.classId].name;
+                }
+
+                await processAttendance(foundStudentKey, foundStudentData);
+
+            } catch (error) {
+                showFeedback('error', { name: 'خطأ', error: translateError(error.message) });
+            } finally {
+                showLoadingState(false);
+            }
+        }
+
+        // --- منطق تسجيل الحضور (محدث ليتوافق مع الرولز والإعدادات) ---
+        async function processAttendance(studentKey, student) {
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const nowTs = firebase.database.ServerValue.TIMESTAMP; // استخدام توقيت السيرفر للدقة
+            
+            // المسار: school/attendance/YYYY-MM-DD/StudentKey
+            const ref = db.ref(`school/attendance/${today}/${studentKey}`);
+
+            // حساب الحالة بناءً على CONFIG القادمة من الداتابيس
+            let status = 'present';
+            let statusLabel = '';
+            let delayMinutes = 0;
+            
+            if (currentMode === 'in') {
+                const [sh, sm] = CONFIG.SCHOOL_START_TIME.split(':').map(Number);
+                const startTime = new Date(); 
+                startTime.setHours(sh, sm, 0, 0);
+                
+                // حساب الفرق بالدقائق
+                const diffMs = now - startTime;
+                delayMinutes = Math.floor(diffMs / 60000);
+
+                if (delayMinutes > CONFIG.SEVERE_LATE_MINUTES) {
+                    status = 'severe_late'; 
+                    statusLabel = `تأخير فادح (${delayMinutes} د)`;
+                } else if (delayMinutes > CONFIG.LATE_THRESHOLD_MINUTES) {
+                    status = 'late'; 
+                    statusLabel = `متأخر (${delayMinutes} د)`;
+                } else {
+                    statusLabel = 'حضور في الوقت';
+                    delayMinutes = 0; // لا نحسب تأخير إذا كان في الوقت المسموح
+                }
+            } else {
+                // منطق الانصراف
+                const [dh, dm] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
+                const deptTime = new Date(); 
+                deptTime.setHours(dh, dm, 0, 0);
+                
+                // التحقق من الوقت الإضافي
+                const diffMinutes = (now - deptTime) / 60000;
+                if (diffMinutes > CONFIG.OVERTIME_THRESHOLD_MINUTES) {
+                    status = 'overtime'; 
+                    statusLabel = 'وقت إضافي';
+                } else {
+                    status = 'checked_out'; 
+                    statusLabel = 'انصراف';
+                }
+            }
+
+            // تنفيذ الترانزاكشن (Transaction) لضمان عدم التضارب
+            await ref.transaction((currentData) => {
+                if (currentMode === 'in') {
+                    // إذا كان مسجل حضور بالفعل
+                    if (currentData && currentData.checkInTime) {
+                         // إذا حاول تسجيل الحضور مرة أخرى، نرفض العملية
+                        throw new Error("ALREADY_IN"); 
+                    }
+                    
+                    // إنشاء سجل جديد
+                    return {
+                        studentId: student.studentId, // الـ ID الرقمي (8 أرقام)
+                        name: student.name,
+                        classId: student.classId || "unknown",
+                        checkInTime: nowTs,
+                        status: status,
+                        timestamp: nowTs,
+                        delayMinutes: delayMinutes > 0 ? delayMinutes : null
+                    };
+                } else {
+                    // وضع الانصراف
+                    if (!currentData || !currentData.checkInTime) throw new Error("NOT_CHECKED_IN");
+                    if (currentData.checkOutTime) throw new Error("ALREADY_OUT"); // انصرف مسبقاً
+                    
+                    // تحديث السجل الموجود بوقت الانصراف
+                    return { 
+                        ...currentData, 
+                        checkOutTime: nowTs, 
+                        statusOut: status 
+                    };
+                }
+            }, (error, committed, snapshot) => {
+                if (error) {
+                    // معالجة الأخطاء التي تم رميها داخل الترانزاكشن
+                    const msg = error.message;
+                    let handled = false;
+                    
+                    if(msg.includes('ALREADY_IN')) {
+                        showFeedback('warning', { ...student, error: "تم تسجيل الحضور مسبقاً" });
+                        handled = true;
+                    } else if (msg.includes('NOT_CHECKED_IN')) {
+                        showFeedback('error', { ...student, error: "يجب تسجيل الحضور أولاً" });
+                        handled = true;
+                    } else if (msg.includes('ALREADY_OUT')) {
+                        showFeedback('warning', { ...student, error: "تم تسجيل الانصراف مسبقاً" });
+                        handled = true;
+                    }
+
+                    if(!handled) {
+                        showFeedback('error', { ...student, error: translateError(msg) });
+                    }
+                } else if (committed) {
+                    // نجاح العملية
+                    student.statusLabel = statusLabel;
+                    student.statusType = status; 
+                    showFeedback('success', student);
+                }
+            });
+        }
+
+        // --- دوال مساعدة للواجهة ---
 
         function attemptSetMode(mode) {
             if (mode === 'out') {
@@ -369,162 +581,10 @@
         function translateError(errorMsg) {
             if (!errorMsg) return "حدث خطأ غير معروف";
             const msg = errorMsg.toString();
-            if (msg.includes('permission_denied') || msg.includes('PERMISSION_DENIED')) {
-                return "ليس لديك صلاحية (حالة غير معرفة أو قيود)";
-            }
-            if (msg.includes('COMPLETED_TODAY')) return "انتهت فترتك اليوم";
-            if (msg.includes('ALREADY_IN')) return "تم تسجيل حضورك مسبقاً";
-            if (msg.includes('NOT_CHECKED_IN')) return "يجب تسجيل الحضور أولاً";
-            if (msg.includes('ALREADY_OUT')) return "تم تسجيل انصرافك مسبقاً";
-            if (msg.includes('TRANSACTION_FAILED')) return "فشل الاتصال";
-            return /[\u0600-\u06FF]/.test(msg) ? msg : "خطأ تقني";
+            if (msg.includes('permission_denied')) return "ليس لديك صلاحية الوصول للقاعدة";
+            if (msg.includes('ALREADY_IN')) return "تم تسجيل الحضور مسبقاً";
+            return msg;
         }
-
-        async function onScanSuccess(decodedText) {
-            if (isScanning) return;
-            isScanning = true;
-            showLoadingState(true);
-
-            try {
-                let data;
-                try { data = JSON.parse(decodedText); } catch { throw new Error("رمز غير صالح"); }
-                
-                if (!data.id) throw new Error("الرمز غير صحيح");
-
-                const scannedId = String(data.id).trim(); 
-                
-                let studentKey = Object.keys(studentsCache).find(k => 
-                    studentsCache[k].studentId && String(studentsCache[k].studentId) === scannedId
-                );
-
-                if (!studentKey && studentsCache[scannedId]) {
-                    studentKey = scannedId;
-                    if(!studentsCache[studentKey].studentId) studentsCache[studentKey].studentId = scannedId;
-                }
-
-                if (!studentKey) throw new Error("الطالب غير مسجل");
-
-                await processAttendance(studentKey, studentsCache[studentKey]);
-
-            } catch (error) {
-                showFeedback('error', { name: 'خطأ', error: translateError(error.message) });
-            } finally {
-                showLoadingState(false);
-            }
-        }
-
-        async function processAttendance(key, student) {
-            const today = new Date().toISOString().split('T')[0];
-            const now = new Date();
-            const nowTs = now.getTime();
-            const ref = db.ref(`school/attendance/${today}/${key}`);
-
-            let status = 'present';
-            let statusLabel = '';
-            
-            if (currentMode === 'in') {
-                const [sh, sm] = CONFIG.SCHOOL_START_TIME.split(':').map(Number);
-                const startTime = new Date(); startTime.setHours(sh, sm, 0, 0);
-                const diffMinutes = (now - startTime) / 60000;
-
-                if (diffMinutes > CONFIG.SEVERE_LATE_MINUTES) {
-                    status = 'severe_late'; statusLabel = 'تأخير فادح';
-                } else if (diffMinutes > CONFIG.LATE_THRESHOLD_MINUTES) {
-                    status = 'late'; statusLabel = 'متأخر';
-                } else {
-                    statusLabel = 'حضور في الوقت';
-                }
-            } else {
-                const [dh, dm] = CONFIG.DEPARTURE_START_TIME.split(':').map(Number);
-                const deptTime = new Date(); deptTime.setHours(dh, dm, 0, 0);
-                const diffMinutes = (now - deptTime) / 60000;
-                if (diffMinutes > CONFIG.OVERTIME_THRESHOLD_MINUTES) {
-                    status = 'overtime'; statusLabel = 'وقت إضافي';
-                } else {
-                    status = 'checked_out'; statusLabel = 'انصراف';
-                }
-            }
-
-            await ref.transaction((current) => {
-                if (current && current.checkInTime && current.checkOutTime) throw new Error("COMPLETED_TODAY");
-                
-                if (currentMode === 'in') {
-                    if (current && current.checkInTime) throw new Error("ALREADY_IN");
-                    return {
-                        studentId: student.studentId,
-                        name: student.name,
-                        classId: student.classId || "غير محدد",
-                        checkInTime: nowTs,
-                        status: status,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    };
-                } else {
-                    if (!current || !current.checkInTime) throw new Error("NOT_CHECKED_IN");
-                    if (current.checkOutTime) throw new Error("ALREADY_OUT");
-                    return { ...current, checkOutTime: nowTs, statusOut: status };
-                }
-            }, (error, committed, snapshot) => {
-                if (error) throw error;
-                if (!committed) throw new Error("TRANSACTION_FAILED");
-                
-                student.statusLabel = statusLabel;
-                student.statusType = status; 
-                showFeedback('success', student);
-            }).catch(err => {
-                showFeedback(
-                    err.message.includes('NOT_CHECKED_IN') ? 'error' : 'warning',
-                    { ...student, error: translateError(err.message) }
-                );
-            });
-        }
-
-        // ------------------ المؤثرات البصرية (GSAP + Confetti) ------------------
-
-        function animateSuccess(card, elements) {
-            gsap.to(card, { y: '0%', duration: 1.2, ease: "elastic.out(1, 0.6)" });
-            gsap.fromTo(elements, 
-                { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, delay: 0.1 }
-            );
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#22c55e', '#3b82f6', '#f59e0b'] });
-        }
-
-        function animateLate(card, elements) {
-            gsap.to(card, { y: '0%', duration: 0.6, ease: "back.out(1.2)" });
-            gsap.fromTo(card, { x: -10 }, { x: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" }); 
-            gsap.fromTo(elements, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 });
-            confetti({ particleCount: 50, spread: 100, origin: { y: 0 }, colors: ['#eab308', '#facc15'], gravity: 1.5, drift: 0.5, scalar: 1.2 });
-        }
-
-        function animateSevereLate(card, elements) {
-            document.getElementById('flash-overlay').classList.add('flash-red');
-            setTimeout(() => document.getElementById('flash-overlay').classList.remove('flash-red'), 500);
-            gsap.to(card, { y: '0%', duration: 0.5, ease: "bounce.out" });
-            gsap.to(card, { x: 10, yoyo: true, repeat: 5, duration: 0.05 });
-            gsap.fromTo(elements, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.1 });
-            confetti({ particleCount: 100, spread: 360, origin: { x: 0.5, y: 0.5 }, colors: ['#ef4444', '#b91c1c'], startVelocity: 30, gravity: 3 });
-        }
-
-        function animateCheckout(card, elements) {
-            gsap.to(card, { y: '0%', duration: 0.8, ease: "power3.out" });
-            gsap.fromTo(elements, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, stagger: 0.1 });
-            confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#3b82f6', '#60a5fa'], drift: -1 });
-        }
-
-        function animateOvertime(card, elements) {
-            gsap.to(card, { y: '0%', duration: 0.8, ease: "back.out(1.7)" });
-            gsap.fromTo(elements, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(2)" });
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-            const randomInRange = (min, max) => Math.random() * (max - min) + min;
-            const interval = setInterval(function() {
-                const particleCount = 20;
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FDB931'], shapes: ['star'] }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FDB931'], shapes: ['star'] }));
-            }, 250);
-            setTimeout(() => clearInterval(interval), 1500);
-        }
-
-        // ----------------------------------------------------------------------
 
         function showFeedback(type, data) {
             const overlay = document.getElementById('result-overlay');
@@ -533,7 +593,8 @@
             const bar = document.getElementById('progress-bar');
             
             document.getElementById('student-name').innerText = data.name || "مستخدم غير معروف";
-            document.getElementById('detail-class').innerText = data.classId || 'غير محدد';
+            // استخدام اسم الفصل من الكائن الجديد إذا وجد
+            document.getElementById('detail-class').innerText = data.classNameDisplay || data.classId || 'غير محدد';
             document.getElementById('detail-id').innerText = data.studentId || '---';
             
             const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: !CONFIG.USE_24_HOUR_FORMAT };
@@ -541,7 +602,7 @@
             document.getElementById('detail-date').innerText = new Date().toLocaleDateString('ar-EG');
 
             const avatar = document.getElementById('result-avatar');
-            avatar.innerHTML = data.photo ? `<img src="${data.photo}" class="w-full h-full object-cover">` : (data.name ? data.name.charAt(0) : "?");
+            avatar.innerHTML = data.photoUrl ? `<img src="${data.photoUrl}" class="w-full h-full object-cover">` : (data.name ? data.name.charAt(0) : "?");
 
             const msgEl = document.getElementById('status-message');
             const subMsgEl = document.getElementById('status-submessage');
@@ -564,12 +625,12 @@
                     playAudio('warning');
                 } else if (data.statusType === 'severe_late') {
                     colorClass = "text-red-600"; bgClass = "bg-red-600"; ringColor = "border-red-600/50";
-                    msgEl.innerText = "تم الحضور (تأخير فادح)";
+                    msgEl.innerText = "تأخير فادح!";
                     animateSevereLate(modal, cardElements);
                     playAudio('error'); 
                 } else if (data.statusType === 'overtime') {
                     colorClass = "text-purple-500"; bgClass = "bg-purple-500"; ringColor = "border-purple-500/50";
-                    msgEl.innerText = "تم الانصراف (وقت إضافي)";
+                    msgEl.innerText = "انصراف (وقت إضافي)";
                     animateOvertime(modal, cardElements);
                     playAudio('success');
                 } else if (data.statusType === 'checked_out') {
@@ -594,7 +655,7 @@
             } else {
                 const isWarning = type === 'warning';
                 msgEl.innerText = data.error;
-                subMsgEl.innerText = isWarning ? "يرجى المحاولة مرة أخرى" : "فشلت العملية";
+                subMsgEl.innerText = isWarning ? "يرجى التحقق من الحالة" : "فشلت العملية";
                 const color = isWarning ? "text-yellow-500" : "text-red-500";
                 const bg = isWarning ? "bg-yellow-500" : "bg-red-500";
                 msgEl.className = `text-lg font-bold ${color} mb-6 px-4 leading-tight card-item`;
@@ -647,8 +708,8 @@
         }
 
         function formatTimeDisplay(timeStr) {
+            if (!timeStr) return "--:--";
             if (CONFIG.USE_24_HOUR_FORMAT) return timeStr;
-            // تحويل بسيط من 24h إلى 12h للعرض
             const [h, m] = timeStr.split(':');
             let hour = parseInt(h);
             const ampm = hour >= 12 ? 'م' : 'ص';
@@ -658,7 +719,6 @@
         }
 
         function updateSettingsUI() {
-            // تحديث النصوص في الواجهة
             document.getElementById('lbl-start-time').innerText = formatTimeDisplay(CONFIG.SCHOOL_START_TIME);
             document.getElementById('lbl-end-time').innerText = formatTimeDisplay(CONFIG.DEPARTURE_START_TIME);
         }
@@ -675,31 +735,42 @@
             }
         }
 
-        function preloadData() {
-            // جلب بيانات الطلاب
-            db.ref('school/students').on('value', s => studentsCache = s.val() || {});
-            
-            // جلب إحصائيات الحضور
-            const today = new Date().toISOString().split('T')[0];
-            db.ref(`school/attendance/${today}`).on('value', s => {
-                let inC = 0, outC = 0;
-                if(s.exists()) s.forEach(c => { if(c.val().statusOut) outC++; else inC++; });
-                document.getElementById('daily-in-count').innerText = inC;
-                document.getElementById('daily-out-count').innerText = outC;
-            });
-
-            // --- التعديل الجديد: جلب الإعدادات من قاعدة البيانات ---
-            // إذا كانت "settings" داخل مجلد "school"، يرجى تغيير المسار إلى 'school/settings'
-            db.ref('settings').on('value', (snapshot) => {
-                const val = snapshot.val();
-                if (val) {
-                    // دمج البيانات الجديدة مع القيم الافتراضية
-                    CONFIG = { ...CONFIG, ...val };
-                    console.log("تم تحديث الإعدادات:", CONFIG);
-                    updateSettingsUI();
-                    updateClock(); // تحديث الساعة فوراً في حال تغير تنسيق الوقت
-                }
-            });
+        // الرسوم المتحركة (Animations)
+        function animateSuccess(card, elements) {
+            gsap.to(card, { y: '0%', duration: 1.2, ease: "elastic.out(1, 0.6)" });
+            gsap.fromTo(elements, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, delay: 0.1 });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#22c55e', '#3b82f6', '#f59e0b'] });
+        }
+        function animateLate(card, elements) {
+            gsap.to(card, { y: '0%', duration: 0.6, ease: "back.out(1.2)" });
+            gsap.fromTo(card, { x: -10 }, { x: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" }); 
+            gsap.fromTo(elements, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 });
+            confetti({ particleCount: 50, spread: 100, origin: { y: 0 }, colors: ['#eab308', '#facc15'], gravity: 1.5, drift: 0.5, scalar: 1.2 });
+        }
+        function animateSevereLate(card, elements) {
+            document.getElementById('flash-overlay').classList.add('flash-red');
+            setTimeout(() => document.getElementById('flash-overlay').classList.remove('flash-red'), 500);
+            gsap.to(card, { y: '0%', duration: 0.5, ease: "bounce.out" });
+            gsap.to(card, { x: 10, yoyo: true, repeat: 5, duration: 0.05 });
+            gsap.fromTo(elements, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.1 });
+            confetti({ particleCount: 100, spread: 360, origin: { x: 0.5, y: 0.5 }, colors: ['#ef4444', '#b91c1c'], startVelocity: 30, gravity: 3 });
+        }
+        function animateCheckout(card, elements) {
+            gsap.to(card, { y: '0%', duration: 0.8, ease: "power3.out" });
+            gsap.fromTo(elements, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, stagger: 0.1 });
+            confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#3b82f6', '#60a5fa'], drift: -1 });
+        }
+        function animateOvertime(card, elements) {
+            gsap.to(card, { y: '0%', duration: 0.8, ease: "back.out(1.7)" });
+            gsap.fromTo(elements, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(2)" });
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            const randomInRange = (min, max) => Math.random() * (max - min) + min;
+            const interval = setInterval(function() {
+                const particleCount = 20;
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FDB931'], shapes: ['star'] }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FDB931'], shapes: ['star'] }));
+            }, 250);
+            setTimeout(() => clearInterval(interval), 1500);
         }
     </script>
 </body>
