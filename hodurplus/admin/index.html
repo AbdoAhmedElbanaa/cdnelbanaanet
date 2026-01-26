@@ -2758,7 +2758,7 @@ function renderStudents() {
     const femaleCount = studentIds.filter(id => appState.students[id].gender === 'female').length;
 
     return `
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-600 via-emerald-600 to-teal-800 p-8 mb-10 text-white shadow-2xl border border-white/10">
+        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-brand-600 via-emerald-600 to-teal-800 p-8 mb-10 text-white shadow-2xl border border-white/10">
             <div class="absolute top-[-20%] right-[-10%] w-72 h-72 bg-white/10 rounded-full blur-[100px] animate-pulse"></div>
             <div class="absolute bottom-[-10%] left-[-5%] w-56 h-56 bg-brand-400/20 rounded-full blur-[80px]"></div>
             
@@ -2775,7 +2775,31 @@ function renderStudents() {
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-3">
-                    <button onclick="openModal('addStudent')" class="px-10 py-4 bg-white text-emerald-700 dark:bg-slate-900 dark:text-white rounded-2xl hover:bg-emerald-50 dark:hover:bg-slate-800 transition-all duration-300 font-black text-sm shadow-xl flex items-center gap-3 transform hover:scale-105 active:scale-95 border border-white/20">
+                    <button onclick="openImportModal()" class="group px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        استيراد (Import)
+                    </button>
+
+                    <div class="relative group/export">
+                        <button class="px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all duration-300 font-bold text-sm border border-white/20 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            تصدير (Export)
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden group-hover/export:block z-50 animate-fade-in-up">
+                            <a href="#" onclick="exportStudents('xls')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Excel (.xlsx)
+                            </a>
+                            <a href="#" onclick="exportStudents('csv')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> CSV
+                            </a>
+                            <a href="#" onclick="exportStudents('pdf')" class="block px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-600 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> PDF
+                            </a>
+                        </div>
+                    </div>
+
+                    <button onclick="openModal('addStudent')" class="px-8 py-4 bg-white text-emerald-700 dark:bg-slate-900 dark:text-white rounded-2xl hover:bg-emerald-50 dark:hover:bg-slate-800 transition-all duration-300 font-black text-sm shadow-xl flex items-center gap-3 transform hover:scale-105 active:scale-95 border border-white/20">
                         <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         تسجيل طالب جديد
                     </button>
@@ -7609,7 +7633,6 @@ function sendGeneralNotification_OS({
 // ==================================================
 function sendStudentNotification_OS({
     studentId,
-    studentKey,
     titleAr,
     bodyAr,
     titleEn,
@@ -7623,33 +7646,6 @@ function sendStudentNotification_OS({
             key: "student_id",
             relation: "=",
             value: String(studentId)
-        });
-    }
-
-    if (studentKey) {
-        if (filters.length) filters.push({ operator: "OR" });
-
-        filters.push({
-            field: "tag",
-            key: "student",
-            relation: "=",
-            value: String(studentKey)
-        });
-
-        filters.push({ operator: "OR" });
-        filters.push({
-            field: "tag",
-            key: "uid",
-            relation: "=",
-            value: String(studentKey)
-        });
-
-        filters.push({ operator: "OR" });
-        filters.push({
-            field: "tag",
-            key: "student_uid",
-            relation: "=",
-            value: String(studentKey)
         });
     }
 
@@ -7671,6 +7667,546 @@ function sendStudentNotification_OS({
 }
 
 
+
+
+// ==========================================
+// منطق الاستيراد الذكي (Smart Import Logic)
+// ==========================================
+let importDataRaw = []; // لتخزين البيانات الخام من الملف
+
+function openImportModal() {
+    const modalContent = document.getElementById('modal-content-body');
+    const modalContainer = document.getElementById('modal-container');
+    
+    modalContent.innerHTML = `
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white">استيراد بيانات الطلاب</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">يدعم ملفات Excel (XLS, XLSX) و CSV</p>
+        </div>
+
+        <div id="import-step-1" class="space-y-6">
+            <div class="relative border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center cursor-pointer" onclick="document.getElementById('import-file-input').click()">
+                <input type="file" id="import-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleImportFile(event)">
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <p class="font-bold text-slate-700 dark:text-slate-300">اضغط لرفع الملف</p>
+                <p class="text-xs text-slate-400 mt-1">أو اسحب الملف وأفلته هنا</p>
+            </div>
+            <div class="text-xs text-center text-slate-400 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg">
+                💡 نصيحة: تأكد أن الملف يحتوي على صف رؤوس الأعمدة (Headers) لضمان دقة البيانات.
+            </div>
+        </div>
+
+        <div id="import-step-2" class="hidden space-y-4">
+            </div>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0');
+        modalContainer.querySelector('.modal-content').classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        // تحويل البيانات إلى JSON
+        importDataRaw = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        
+        if (importDataRaw.length === 0) {
+            showToast('الملف فارغ!', 'error');
+            return;
+        }
+
+        // عرض واجهة المطابقة
+        renderMappingUI();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function renderMappingUI() {
+    const fileHeaders = Object.keys(importDataRaw[0]);
+    const systemFields = [
+        { key: 'studentId', label: 'كود الطالب (مطلوب)', required: true },
+        { key: 'name', label: 'اسم الطالب بالكامل', required: true },
+        { key: 'firstName', label: 'الاسم الأول' },
+        { key: 'familyName', label: 'اسم العائلة' },
+        { key: 'gender', label: 'النوع (ذكر/أنثى)' },
+        { key: 'age', label: 'العمر' },
+        { key: 'guardianName', label: 'اسم ولي الأمر' },
+        { key: 'guardianPhone', label: 'هاتف ولي الأمر' },
+        { key: 'classId', label: 'معرف الفصل (اختياري)' }
+    ];
+
+    let mappingHTML = `
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-800 dark:text-white">مطابقة الأعمدة</h4>
+            <span class="text-xs bg-brand-100 text-brand-700 px-2 py-1 rounded-md font-bold">تم العثور على ${importDataRaw.length} سجل</span>
+        </div>
+        <div class="max-h-[300px] overflow-y-auto custom-scrollbar pr-2 space-y-3">
+    `;
+
+    systemFields.forEach(field => {
+        // محاولة تخمين العمود تلقائياً
+        const suggestedHeader = fileHeaders.find(h => h.includes(field.label) || h.toLowerCase().includes(field.key.toLowerCase())) || "";
+        
+        mappingHTML += `
+            <div class="grid grid-cols-12 gap-2 items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                <div class="col-span-5 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                    ${field.required ? '<span class="text-red-500">*</span>' : ''} ${field.label}
+                </div>
+                <div class="col-span-1 text-center text-slate-400">➜</div>
+                <div class="col-span-6">
+                    <select id="map-${field.key}" class="w-full text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-brand-500">
+                        <option value="">-- تجاهل --</option>
+                        ${fileHeaders.map(h => `<option value="${h}" ${h === suggestedHeader ? 'selected' : ''}>${h}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+        `;
+    });
+
+    mappingHTML += `
+        </div>
+        <div class="pt-4 flex gap-3">
+            <button onclick="processImportData()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg transition transform hover:scale-[1.02]">بدء الاستيراد</button>
+            <button onclick="openImportModal()" class="px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-300 transition">إلغاء</button>
+        </div>
+    `;
+
+    document.getElementById('import-step-1').classList.add('hidden');
+    const step2 = document.getElementById('import-step-2');
+    step2.innerHTML = mappingHTML;
+    step2.classList.remove('hidden');
+}
+
+async function processImportData() {
+    const studentIdHeader = document.getElementById('map-studentId').value;
+    const nameHeader = document.getElementById('map-name').value;
+
+    if (!studentIdHeader) {
+        showToast('خطأ: يجب تحديد عمود "كود الطالب" لإكمال العملية', 'error');
+        return;
+    }
+
+    const updates = {};
+    let successCount = 0;
+    let errorCount = 0;
+
+    importDataRaw.forEach(row => {
+        const studentId = String(row[studentIdHeader] || "").trim();
+        
+        // Validation: Student ID must be 8 chars (or adjust as needed)
+        if (!studentId || studentId.length !== 8) {
+            errorCount++;
+            return; // Skip invalid ID
+        }
+
+        // Map fields
+        const studentKey = studentId; // Use ID as key or generate push ID
+        
+        // استخراج البيانات بناءً على الـ Mapping
+        const extract = (key) => {
+            const header = document.getElementById(`map-${key}`).value;
+            return header ? String(row[header] || "").trim() : "";
+        };
+
+        const firstName = extract('firstName') || extract('name').split(' ')[0] || "Unknown";
+        
+        const newStudent = {
+            studentId: studentId,
+            name: extract('name') || "بدون اسم",
+            firstName: firstName,
+            secondName: "", // يمكن تحسين المنطق لفصل الاسم
+            familyName: extract('familyName') || "",
+            gender: extract('gender').toLowerCase().includes('أنثى') || extract('gender').toLowerCase().includes('female') ? 'female' : 'male',
+            age: extract('age') || 0,
+            guardianName: extract('guardianName') || "",
+            guardianPhone: extract('guardianPhone') || "",
+            classId: extract('classId') || "unassigned",
+            // إضافة القيم الافتراضية للفايربيس rules
+            photoUrl: "" 
+        };
+
+        updates[`school/students/${studentKey}`] = newStudent;
+        successCount++;
+    });
+
+    if (Object.keys(updates).length > 0) {
+        try {
+            await db.ref().update(updates);
+            closeModal();
+            showToast(`تم استيراد ${successCount} طالب بنجاح. (فشل ${errorCount})`, 'success');
+        } catch (err) {
+            console.error(err);
+            showToast('حدث خطأ أثناء الحفظ في قاعدة البيانات', 'error');
+        }
+    } else {
+        showToast('لم يتم العثور على بيانات صالحة للاستيراد', 'warning');
+    }
+}
+
+
+// ==========================================
+// وظائف التصدير المحدثة (PDF تصميم رسمي)
+// ==========================================
+// ==========================================
+// 1️⃣ دالة تجهيز البيانات (كما هي - لم يتم تغيير المنطق)
+// ==========================================
+async function prepareExportContext() {
+    try {
+        const [infoSnap, adminsSnap, settingsSnap] = await Promise.all([
+            db.ref('school/info').once('value'),
+            db.ref('admins').orderByChild('active').equalTo(true).once('value'),
+            db.ref('school/settings').once('value')
+        ]);
+
+        const info = infoSnap.val() || {};
+        const admins = adminsSnap.val() || {};
+        const settings = settingsSnap.val() || {};
+
+        let adminName = "مسؤول النظام";
+        Object.values(admins).forEach(admin => {
+            if (admin.role === 'super_admin') {
+                adminName = admin.name;
+            }
+        });
+
+        return {
+            school: {
+                name: info.schoolName || 'مدرسة غير محددة',
+                address: info.schoolAddress || '',
+                phone: info.schoolPhone || '',
+                principal: info.principalName || '..................',
+                logo: info.logoUrl || null
+            },
+            admin: {
+                name: adminName
+            },
+            settings: {
+                use24h: settings.USE_24_HOUR_FORMAT || false
+            },
+            generatedAt: new Date().toLocaleDateString('ar-EG', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            })
+        };
+
+    } catch (error) {
+        console.error("Error preparing export context:", error);
+        throw new Error("فشل في جلب بيانات المدرسة");
+    }
+}
+
+// ==========================================
+// 2️⃣ وظيفة التصدير (تصميم A4 رسمي وهيكلية جديدة)
+// ==========================================
+async function exportStudents(type) {
+    const students = Object.values(appState.students || {});
+    
+    if (students.length === 0) {
+        showToast('لا توجد بيانات للتصدير', 'warning');
+        return;
+    }
+
+    showToast('جاري تحضير الملف...', 'info');
+
+    try {
+        const context = await prepareExportContext();
+        
+        // تجهيز بيانات الجدول
+        const exportData = students.map((s, index) => ({
+            "م": index + 1,
+            "كود الطالب": s.studentId,
+            "الاسم الكامل": s.name,
+            "الفصل": appState.classes[s.classId]?.name || 'غير محدد',
+            "النوع": s.gender === 'male' ? 'ذكر' : 'أنثى',
+            "العمر": s.age || '-',
+            "ولي الأمر": s.guardianName,
+            "هاتف ولي الأمر": s.guardianPhone
+        }));
+
+        // ------------------------------------------
+        // تصدير Excel / CSV (لم يتم تغييره)
+        // ------------------------------------------
+        if (type === 'xls' || type === 'csv') {
+            const headerInfo = [
+                { "م": `المدرسة: ${context.school.name}` },
+                { "م": `تاريخ التقرير: ${context.generatedAt}` },
+                { "م": "" }
+            ];
+            
+            const finalData = [...headerInfo, ...exportData];
+            const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
+            const workbook = XLSX.utils.book_new();
+            
+            if(!workbook.Workbook) workbook.Workbook = {};
+            if(!workbook.Workbook.Views) workbook.Workbook.Views = [];
+            if(!workbook.Workbook.Views[0]) workbook.Workbook.Views[0] = {};
+            workbook.Workbook.Views[0].RTL = true;
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, "الطلاب");
+            const fileName = `Students_${new Date().toISOString().slice(0,10)}.${type === 'xls' ? 'xlsx' : 'csv'}`;
+            XLSX.writeFile(workbook, fileName);
+            showToast('تم التصدير بنجاح', 'success');
+        } 
+        
+        // ------------------------------------------
+        // تصدير PDF (إعادة تصميم الهيكل بالكامل - A4 Architect)
+        // ------------------------------------------
+        else if (type === 'pdf') {
+            
+            // 1. بناء صفوف جدول الطلاب
+            const tableRows = students.map((s, index) => {
+                const className = appState.classes[s.classId]?.name || 'غير محدد';
+                return `
+                    <tr class="data-row">
+                        <td class="text-center font-mono">${index + 1}</td>
+                        <td class="text-center font-mono bold">${s.studentId}</td>
+                        <td class="text-right padding-right bold">${s.name}</td>
+                        <td class="text-center">${s.age || '-'}</td>
+                        <td class="text-center">${s.gender === 'male' ? 'ذكر' : 'أنثى'}</td>
+                        <td class="text-right padding-right">
+                            <div class="guardian-name">${s.guardianName}</div>
+                            <div class="guardian-phone">${s.guardianPhone}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 2. تجهيز الشعار
+            const logoHtml = context.school.logo 
+                ? `<img src="${context.school.logo}" crossorigin="anonymous" class="school-logo">`
+                : `<div class="school-logo-placeholder">شعار</div>`;
+
+            // 3. بناء الهيكل (Main Layout Structure)
+            // نستخدم جدولاً كبيراً للهيكل لضمان تكرار الهيدر والفوتر في كل صفحة
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+                    
+                    /* إعدادات الصفحة */
+                    .print-wrapper {
+                        font-family: 'Tajawal', sans-serif;
+                        direction: rtl;
+                        width: 100%;
+                        color: #1f2937;
+                    }
+                    
+                    /* هيكل الجدول الرئيسي للتخطيط */
+                    table.layout-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        border: none;
+                    }
+                    
+                    /* تكرار الهيدر والفوتر في كل صفحة */
+                    thead.layout-header { display: table-header-group; }
+                    tfoot.layout-footer { display: table-footer-group; }
+                    
+                    /* تنسيق الهيدر العلوي */
+                    .header-container {
+                        padding-bottom: 10px;
+                        border-bottom: 2px solid #374151;
+                        margin-bottom: 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                    }
+                    .header-info { text-align: right; }
+                    .header-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+                    .school-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; color: #000; }
+                    .school-address { font-size: 11px; color: #4b5563; }
+                    .school-logo { height: 70px; width: auto; object-fit: contain; }
+                    .school-logo-placeholder { 
+                        width: 70px; height: 70px; border: 1px dashed #9ca3af; 
+                        display: flex; align-items: center; justify-content: center; font-size: 10px; 
+                    }
+
+                    /* تنسيق معلومات التقرير */
+                    .report-meta {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        background-color: #f9fafb;
+                        padding: 10px 15px;
+                        border-radius: 4px;
+                        border: 1px solid #e5e7eb;
+                        margin-bottom: 20px;
+                    }
+                    .report-title { font-size: 14px; font-weight: 700; color: #111827; margin: 0; }
+                    .report-date { font-size: 12px; font-weight: 600; color: #4b5563; }
+
+                    /* تنسيق جدول الطلاب */
+                    .students-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 11px;
+                        border: 1px solid #d1d5db;
+                    }
+                    .students-table th {
+                        background-color: #f3f4f6;
+                        color: #111827;
+                        font-weight: 800;
+                        padding: 10px 5px;
+                        border: 1px solid #d1d5db;
+                        text-align: center;
+                    }
+                    .students-table td {
+                        padding: 8px 5px;
+                        border: 1px solid #e5e7eb;
+                        vertical-align: middle;
+                    }
+                    .data-row:nth-child(even) { background-color: #fcfcfc; }
+                    
+                    /* تنسيق محتويات الخلايا */
+                    .font-mono { font-family: monospace, sans-serif; letter-spacing: 0.5px; }
+                    .bold { font-weight: 700; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    .padding-right { padding-right: 10px !important; }
+                    
+                    .guardian-name { font-weight: 700; font-size: 11px; margin-bottom: 2px; }
+                    .guardian-phone { font-family: monospace, sans-serif; font-size: 10px; color: #6b7280; direction: ltr; text-align: right; }
+
+                    /* تنسيق الفوتر */
+                    .footer-container {
+                        margin-top: 30px;
+                        padding-top: 10px;
+                        border-top: 1px solid #e5e7eb;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                    }
+                    .signature-box { text-align: center; width: 40%; }
+                    .signature-title { font-size: 12px; font-weight: 800; margin-bottom: 40px; color: #000; }
+                    .signature-line { 
+                        border-top: 1px dotted #9ca3af; 
+                        width: 80%; 
+                        margin: 0 auto; 
+                        padding-top: 5px;
+                    }
+                    .principal-name { font-size: 12px; font-weight: 700; color: #000; margin-bottom: 5px; }
+                    .page-number { font-size: 10px; color: #9ca3af; text-align: center; width: 100%; margin-top: 10px; }
+                </style>
+
+                <div class="print-wrapper">
+                    <table class="layout-table">
+                        
+                        <thead class="layout-header">
+                            <tr>
+                                <td>
+                                    <div class="header-container">
+                                        <div class="header-info">
+                                            <div class="header-title">وزارة التربية والتعليم</div>
+                                            <div class="school-name">مدرسة: ${context.school.name}</div>
+                                            <div class="school-address">${context.school.address}</div>
+                                        </div>
+                                        <div>
+                                            ${logoHtml}
+                                        </div>
+                                    </div>
+                                    <div style="height: 10px;"></div>
+                                </td>
+                            </tr>
+                        </thead>
+
+                        <tfoot class="layout-footer">
+                            <tr>
+                                <td>
+                                    <div style="height: 20px;"></div>
+                                    
+                                    <div class="footer-container">
+                                        <div class="signature-box">
+                                            <div class="signature-title">يعتمد مدير المراجعة</div>
+                                            <div class="signature-line">
+                                                <span style="font-size: 10px; color: #6b7280;">مسؤول النظام: ${context.admin.name}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="signature-box">
+                                            <div class="signature-title">يعتمد مدير المدرسة</div>
+                                            <div class="principal-name">أ/ ${context.school.principal}</div>
+                                            <div class="signature-line" style="border-top: 1px solid #000;">
+                                                <span style="font-size: 10px; color: #6b7280;">التوقيع</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-number">
+                                        تاريخ الطباعة: ${context.generatedAt}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="report-meta">
+                                        <div class="report-title">
+                                            بيانات الطلاب الموجودين على نظام الحضور والانصراف
+                                            <br>
+                                            <span style="font-weight: 400; font-size: 11px; margin-top: 2px; display:block;">للعام الدراسي الحالي والسابق</span>
+                                        </div>
+                                        <div class="report-date">${context.generatedAt}</div>
+                                    </div>
+
+                                    <table class="students-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%;">#</th>
+                                                <th style="width: 15%;">كود الطالب</th>
+                                                <th style="width: 25%;">اسم الطالب</th>
+                                                <th style="width: 10%;">العمر</th>
+                                                <th style="width: 10%;">النوع</th>
+                                                <th style="width: 35%;">بيانات ولي الأمر</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${tableRows}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10, // هوامش حقيقية 10 مم
+                filename: `Report_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true,
+                    logging: false 
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().from(printContent).set(opt).save();
+            showToast('تم تحميل PDF بنجاح', 'success');
+        }
+
+    } catch (err) {
+        console.error("Export Error:", err);
+        showToast('حدث خطأ أثناء التصدير', 'error');
+    }
+}
 </script>
 </body>
 </html>
