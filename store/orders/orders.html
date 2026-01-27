@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        secondary: '#64748b',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for the horizontal slider */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside
+        class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-all duration-300 hidden md:flex">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-6 border-b border-slate-100">
+            <div class="flex items-center gap-2 text-primary-600 font-bold text-xl">
+                <i class="ph ph-hexagon-fill text-2xl"></i>
+                <span>Sell77</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <!-- Active Link -->
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100">
+                <i class="ph ph-shopping-cart text-lg"></i>
+                <span class="font-semibold">Orders</span>
+                <span class="ml-auto bg-primary-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">124</span>
+            </a>
+        </nav>
+
+        <!-- User Profile (Bottom Sidebar) -->
+        <div class="p-4 border-t border-slate-100">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User"
+                    class="w-9 h-9 rounded-full ring-2 ring-white shadow-sm">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Brandoz</p>
+                    <p class="text-xs text-slate-500 truncate">Master Admin</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+
+        <!-- Header / Hero (Mobile toggle + Title + Actions) -->
+        <header
+            class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 z-10 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Orders Management</h1>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Search -->
+                <div class="relative hidden sm:block group">
+                    <i
+                        class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" placeholder="Search orders..."
+                        class="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all w-64 placeholder-slate-400">
+                </div>
+
+                <!-- Notification Bell -->
+                <button
+                    class="relative p-2 text-slate-500 hover:bg-slate-100 hover:text-primary-600 rounded-full transition-colors">
+                    <i class="ph ph-bell text-xl"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto bg-slate-50 scroll-smooth p-4 sm:p-6 lg:p-8" id="main-scroll-container">
+            <div class="max-w-7xl mx-auto space-y-8">
+
+                <!-- Analytics Section -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total Orders -->
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <i class="ph ph-shopping-bag text-xl"></i>
+                            </div>
+                            <span
+                                class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">Total Orders</h3>
+                        <p class="text-2xl font-bold text-slate-900 mt-1" id="stat-total">0</p>
+                    </div>
+
+                    <!-- Pending -->
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="p-3 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                                <i class="ph ph-clock text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">Pending</h3>
+                        <p class="text-2xl font-bold text-slate-900 mt-1" id="stat-pending">0</p>
+                    </div>
+
+                    <!-- Confirmed -->
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                <i class="ph ph-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">Confirmed</h3>
+                        <p class="text-2xl font-bold text-slate-900 mt-1" id="stat-confirmed">0</p>
+                    </div>
+
+                    <!-- Delivered -->
+                    <div
+                        class="bg-white p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                <i class="ph ph-package text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">Delivered</h3>
+                        <p class="text-2xl font-bold text-slate-900 mt-1" id="stat-delivered">0</p>
+                    </div>
+                </section>
+
+                <!-- Navigation Tabs (Slider) -->
+                <div class="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-sm pt-2 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <nav class="flex gap-2 overflow-x-auto hide-scroll pb-2 select-none" id="tabs-container">
+                        <!-- Tabs will be injected via JS -->
+                    </nav>
+                </div>
+
+                <!-- Orders Grid -->
+                <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
+                    <!-- Cards will be injected via JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal (Hidden by default) -->
+    <div id="order-modal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+
+        <!-- Modal Panel -->
+        <div class="absolute inset-y-0 right-0 w-full max-w-2xl bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col"
+            id="modal-panel">
+
+            <!-- Modal Header -->
+            <div class="h-16 px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        Order #<span id="modal-order-id"></span>
+                        <span id="modal-status-badge"
+                            class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"></span>
+                    </h2>
+                    <p class="text-xs text-slate-500" id="modal-date"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()"
+                        class="p-2 text-slate-400 hover:text-primary-600 hover:bg-white rounded-full transition-colors"
+                        title="Print Invoice">
+                        <i class="ph ph-printer text-xl"></i>
+                    </button>
+                    <button onclick="closeModal()"
+                        class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                        <i class="ph ph-x text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8">
+
+                <!-- 1. Customer & Address -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="flex items-start gap-4">
+                        <img id="modal-customer-img" src=""
+                            class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100 grayscale-0">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900" id="modal-customer-name"></h3>
+                            <a href="#" id="modal-customer-phone"
+                                class="text-sm text-primary-600 hover:underline block mt-0.5 font-medium"></a>
+                            <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                <i class="ph ph-map-pin"></i> <span id="modal-customer-city">Cairo, Egypt</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Shipping Address</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed" id="modal-address"></p>
+                    </div>
+                </section>
+
+                <!-- 2. Order Timeline -->
+                <section>
+                    <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ph ph-clock-counter-clockwise text-primary-500"></i> Order Timeline
+                    </h4>
+                    <div class="relative pl-4 border-l-2 border-slate-100 space-y-6" id="modal-timeline">
+                        <!-- Timeline items injected via JS -->
+                    </div>
+                </section>
+
+                <!-- 3. Products List -->
+                <section>
+                    <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ph ph-shopping-cart-simple text-primary-500"></i> Items
+                    </h4>
+                    <div class="space-y-3" id="modal-products">
+                        <!-- Products injected via JS -->
+                    </div>
+                </section>
+
+                <!-- 4. Payment Summary -->
+                <section class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-slate-500">
+                            <span>Subtotal</span>
+                            <span id="modal-subtotal" class="font-medium text-slate-700"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-500">
+                            <span>Tax (14%)</span>
+                            <span id="modal-tax" class="font-medium text-slate-700"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-500">
+                            <span>Shipping</span>
+                            <span id="modal-shipping" class="font-medium text-slate-700"></span>
+                        </div>
+                        <div class="border-t border-slate-200 my-2 pt-2 flex justify-between items-center">
+                            <span class="font-bold text-slate-800">Total</span>
+                            <span id="modal-total" class="text-lg font-bold text-primary-600"></span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button
+                    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+                    Edit Order
+                </button>
+                <button
+                    class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all">
+                    Generate Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // --- Animations ---
+        const animateEntrance = () => {
+            const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+            // Explicitly set initial visibility to avoid FOUC
+            gsap.set(["header", "#analytics-cards > div", "#tabs-container", "#orders-grid > div"], { autoAlpha: 1 });
+
+            tl.fromTo("header",
+                { y: -20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6 }
+            )
+                .fromTo("#analytics-cards > div",
+                    { y: 20, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.1 },
+                    "-=0.3"
+                )
+                .fromTo("#tabs-container",
+                    { x: -20, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.5 },
+                    "-=0.3"
+                )
+                .fromTo("#orders-grid > div",
+                    { y: 30, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, clearProps: "transform,opacity" },
+                    "-=0.2"
+                );
+        };
+
+        const animateFilter = () => {
+            // Animate grid items re-appearing
+            gsap.fromTo("#orders-grid > div",
+                { y: 20, opacity: 0, scale: 0.95 },
+                { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.05, ease: "back.out(1.7)", clearProps: "transform,opacity,scale" }
+            );
+        };
+
+        // --- Expanded Mock Data Generator ---
+        const generateOrders = (count) => {
+            const statuses = ['Pending', 'Confirmed', 'Packaging', 'Out for Delivery', 'Delivered', 'Returned', 'Failed', 'Canceled'];
+            const names = ['Yahya Adel', 'Sarah Miller', 'John Smith', 'Alice Johnson', 'Bob Wilson', 'Mohamed Ali', 'Fatima Hassan'];
+            const productsList = [
+                { name: 'Wireless Headphones', price: 120, img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&q=80' },
+                { name: 'Smart Watch Series 7', price: 350, img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150&q=80' },
+                { name: 'Premium Backpack', price: 85, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=150&q=80' },
+                { name: 'Mechanic Keyboard', price: 150, img: 'https://images.unsplash.com/photo-1587829741301-351d42868297?w=150&q=80' },
+                { name: 'Gaming Mouse', price: 60, img: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=150&q=80' }
+            ];
+            const streets = ['123 Main St, Downtown', '45 El-Tahrir St', 'Seaside Villa 4', '90th St, New Cairo'];
+
+            return Array.from({ length: count }, (_, i) => {
+                const numItems = Math.floor(Math.random() * 4) + 1;
+                const items = Array.from({ length: numItems }, () => {
+                    const prod = productsList[Math.floor(Math.random() * productsList.length)];
+                    return { ...prod, qty: Math.floor(Math.random() * 3) + 1 };
+                });
+
+                const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const tax = subtotal * 0.14;
+                const shipping = 20;
+
+                return {
+                    id: 100000 + i,
+                    customer: names[Math.floor(Math.random() * names.length)],
+                    phone: '+20115447' + Math.floor(1000 + Math.random() * 9000),
+                    city: ['Cairo', 'Alexandria', 'Giza', 'Mansoura'][Math.floor(Math.random() * 4)],
+                    address: streets[Math.floor(Math.random() * streets.length)] + ', Apt ' + Math.floor(Math.random() * 20),
+                    date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    payment: ['Cash on Delivery', 'Visa **4242', 'Vodafone Cash'][Math.floor(Math.random() * 3)],
+                    img: `https://i.pravatar.cc/150?u=${i + 10}`,
+                    items: items,
+                    costs: {
+                        subtotal: subtotal.toFixed(2),
+                        tax: tax.toFixed(2),
+                        shipping: shipping.toFixed(2),
+                        total: (subtotal + tax + shipping).toFixed(2)
+                    }
+                };
+            });
+        };
+
+        const allOrders = generateOrders(25);
+
+        // Status definition for tabs and colors
+        const statusConfig = {
+            'All': { color: 'slate', icon: 'ph-squares-four' },
+            'Pending': { color: 'amber', icon: 'ph-clock', bg: 'bg-amber-100', text: 'text-amber-700' },
+            'Confirmed': { color: 'blue', icon: 'ph-check-circle', bg: 'bg-blue-100', text: 'text-blue-700' },
+            'Packaging': { color: 'indigo', icon: 'ph-package', bg: 'bg-indigo-100', text: 'text-indigo-700' },
+            'Out for Delivery': { color: 'purple', icon: 'ph-truck', bg: 'bg-purple-100', text: 'text-purple-700' },
+            'Delivered': { color: 'emerald', icon: 'ph-check-fat', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+            'Returned': { color: 'orange', icon: 'ph-arrow-u-up-left', bg: 'bg-orange-100', text: 'text-orange-700' },
+            'Failed': { color: 'red', icon: 'ph-warning-circle', bg: 'bg-red-100', text: 'text-red-700' },
+            'Canceled': { color: 'gray', icon: 'ph-x-circle', bg: 'bg-slate-100', text: 'text-slate-600' },
+        };
+
+        let currentFilter = 'All';
+
+        // --- Core Functions ---
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = allOrders.length;
+            document.getElementById('stat-pending').innerText = allOrders.filter(o => o.status === 'Pending').length;
+            document.getElementById('stat-confirmed').innerText = allOrders.filter(o => o.status === 'Confirmed').length;
+            document.getElementById('stat-delivered').innerText = allOrders.filter(o => o.status === 'Delivered').length;
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+
+            Object.keys(statusConfig).forEach(status => {
+                const isActive = currentFilter === status;
+                const config = statusConfig[status];
+                const count = status === 'All' ? allOrders.length : allOrders.filter(o => o.status === status).length;
+
+                const btn = document.createElement('button');
+                btn.className = `whitespace-nowrap flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-200 border
+                    ${isActive
+                        ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/20'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-primary-300 hover:text-primary-600'}`;
+
+                btn.innerHTML = `
+                    <i class="ph ${config.icon} text-lg ${isActive ? 'text-white' : 'text-slate-400'}"></i>
+                    ${status}
+                    <span class="${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'} text-xs py-0.5 px-2 rounded-full ml-1">${count}</span>
+                `;
+
+                btn.onclick = () => {
+                    currentFilter = status;
+                    renderTabs();
+                    renderOrders();
+                    animateFilter();
+                };
+
+                container.appendChild(btn);
+            });
+        }
+
+        function renderOrders() {
+            const grid = document.getElementById('orders-grid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'All'
+                ? allOrders
+                : allOrders.filter(o => o.status === currentFilter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                        <i class="ph ph-magnifying-glass text-6xl mb-4 opacity-50"></i>
+                        <p class="text-lg font-medium">No orders found for this status.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(order => {
+                const config = statusConfig[order.status] || statusConfig['All'];
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-5 shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100/50 group flex flex-col h-full';
+
+                // Construct styles based on config if available, fallback to hardcoded helper
+                const badgeClass = `${config.bg} ${config.text}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Order ID</span>
+                            <div class="font-bold text-lg text-slate-800 flex items-center gap-1">
+                                #${order.id}
+                                <button class="text-slate-300 hover:text-primary-500 transition-colors" title="Copy ID" onclick="event.stopPropagation(); navigator.clipboard.writeText('${order.id}')">
+                                    <i class="ph ph-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
+                                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                ${order.status}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-xl">
+                        <img src="${order.img}" alt="${order.customer}" class="w-10 h-10 rounded-full object-cover ring-2 ring-white">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-slate-800 truncate">${order.customer}</h4>
+                            <a href="tel:${order.phone}" class="text-xs text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-1">
+                                <i class="ph ph-phone"></i> ${order.phone}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-sm mb-5 flex-1">
+                        <div>
+                            <p class="text-slate-400 text-xs">Date</p>
+                            <p class="font-medium text-slate-700">${order.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} <span class="text-xs text-slate-400">${order.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs">Payment</p>
+                            <p class="font-medium text-slate-700 flex items-center gap-1 truncate" title="${order.payment}">
+                                <i class="ph ph-credit-card text-slate-400"></i>
+                                ${order.payment}
+                            </p>
+                        </div>
+                        <div class="col-span-2 pt-2 border-t border-slate-100 mt-1 flex justify-between items-center">
+                            <p class="text-slate-400 text-xs font-semibold uppercase">Total (${order.items.length} Items)</p>
+                            <p class="text-lg font-bold text-primary-600">$${order.costs.total}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mt-auto">
+                        <button class="view-btn flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-medium text-sm hover:border-primary-500 hover:text-primary-600 transition-colors">
+                            <i class="ph ph-eye"></i> View
+                        </button>
+                        <button class="flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium text-sm hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all hover:-translate-y-0.5">
+                            <i class="ph ph-file-pdf"></i> Invoice
+                        </button>
+                    </div>
+                `;
+
+                // Add click event for "View" button - Now Navigates to full Details Page
+                card.querySelector('.view-btn').onclick = () => {
+                    window.location.href = `orders/details.html?id=${order.id}`;
+                };
+
+                grid.appendChild(card);
+            });
+        }
+
+        // --- Modal Interactions ---
+
+        function openModal(order) {
+            const modal = document.getElementById('order-modal');
+            const panel = document.getElementById('modal-panel');
+
+            // Populate Data
+            document.getElementById('modal-order-id').innerText = order.id;
+            document.getElementById('modal-date').innerText = order.date.toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' });
+
+            // Badge
+            const config = statusConfig[order.status];
+            const badge = document.getElementById('modal-status-badge');
+            badge.className = `text-xs px-2.5 py-1 rounded-full font-bold ${config.bg} ${config.text} border border-transparent`;
+            badge.innerText = order.status;
+
+            // Customer
+            document.getElementById('modal-customer-name').innerText = order.customer;
+            document.getElementById('modal-customer-img').src = order.img;
+            document.getElementById('modal-customer-phone').innerText = order.phone;
+            document.getElementById('modal-customer-city').innerText = order.city;
+            document.getElementById('modal-address').innerText = order.address;
+
+            // Products
+            const productsContainer = document.getElementById('modal-products');
+            productsContainer.innerHTML = '';
+            order.items.forEach(item => {
+                productsContainer.innerHTML += `
+                    <div class="flex items-center gap-4 py-2">
+                        <img src="${item.img}" class="w-12 h-12 rounded-lg object-cover bg-slate-100">
+                        <div class="flex-1">
+                            <h5 class="text-sm font-semibold text-slate-800">${item.name}</h5>
+                            <p class="text-xs text-slate-500">Qty: ${item.qty}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-slate-800">$${(item.price * item.qty).toFixed(2)}</p>
+                            <p class="text-xs text-slate-400">$${item.price} each</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Costs
+            document.getElementById('modal-subtotal').innerText = '$' + order.costs.subtotal;
+            document.getElementById('modal-tax').innerText = '$' + order.costs.tax;
+            document.getElementById('modal-shipping').innerText = '$' + order.costs.shipping;
+            document.getElementById('modal-total').innerText = '$' + order.costs.total;
+
+            // Timeline (Mock Logic)
+            const timeline = document.getElementById('modal-timeline');
+            timeline.innerHTML = '';
+
+            // Helper to create timeline item
+            const addEvent = (title, time, completed = true, current = false) => {
+                const dotClass = completed ? 'bg-primary-600 border-primary-100' : 'bg-slate-200 border-white';
+                const textClass = completed ? 'text-slate-800' : 'text-slate-400';
+
+                timeline.innerHTML += `
+                    <div class="relative">
+                        <div class="absolute -left-[21px] w-4 h-4 rounded-full border-2 ${current ? 'ring-2 ring-primary-100' : ''} ${dotClass} z-10"></div>
+                        <div class="${textClass}">
+                            <p class="text-sm font-bold">${title}</p>
+                            <p class="text-xs text-slate-500">${time}</p>
+                        </div>
+                    </div>
+                `;
+            };
+
+            // Generate timeline based on status
+            const baseDate = new Date(order.date);
+            addEvent('Order Placed', baseDate.toLocaleString(), true);
+
+            if (order.status !== 'Pending' && order.status !== 'Canceled') {
+                baseDate.setMinutes(baseDate.getMinutes() + 15);
+                addEvent('Payment Confirmed', baseDate.toLocaleString(), true);
+
+                baseDate.setHours(baseDate.getHours() + 2);
+                addEvent('Processing & Packaging', baseDate.toLocaleString(), true);
+            }
+
+            if (['Out for Delivery', 'Delivered'].includes(order.status)) {
+                baseDate.setHours(baseDate.getHours() + 24);
+                addEvent('Out for Delivery', baseDate.toLocaleString(), true);
+            }
+
+            if (order.status === 'Delivered') {
+                baseDate.setHours(baseDate.getHours() + 4);
+                addEvent('Order Delivered', baseDate.toLocaleString(), true, true);
+            } else if (order.status === 'Pending') {
+                addEvent('Processing', 'Pending...', false, true);
+            }
+
+            // Show Modal
+            modal.classList.remove('hidden');
+            // Little delay for transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                panel.classList.remove('translate-x-full');
+            }, 10);
+
+            document.body.style.overflow = 'hidden'; // Prevent body scroll
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('order-modal');
+            const panel = document.getElementById('modal-panel');
+
+            panel.classList.add('translate-x-full');
+            modal.classList.add('opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = ''; // Restore body scroll
+            }, 300);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            renderTabs();
+            renderOrders();
+
+            // Slider Drag Logic (same as before)
+            const slider = document.querySelector('#tabs-container');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => isDown = false);
+            slider.addEventListener('mouseup', () => isDown = false);
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+
+            // Trigger Entrance Animation
+            animateEntrance();
+        });
+
+    </script>
+</body>
+
+</html>
