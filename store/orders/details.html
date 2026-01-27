@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | Sell77</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <header
+        class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30">
+        <div class="flex items-center gap-4">
+            <a href="orders.html"
+                class="p-2 -ml-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors">
+                <i class="ph ph-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                Order <span class="text-slate-400">#</span><span id="page-order-id">Loading...</span>
+            </h1>
+            <span id="page-status-badge"
+                class="hidden sm:inline-block text-xs px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-600">
+                Loading...
+            </span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="window.print()"
+                class="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-medium text-sm hover:border-primary-500 hover:text-primary-600 transition-colors">
+                <i class="ph ph-printer text-lg"></i> Print
+            </button>
+            <button
+                class="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium text-sm hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all">
+                <i class="ph ph-download-simple text-lg"></i> <span class="hidden sm:inline">Invoice</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- Top Row: Customer & Overview -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Customer Card -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Customer Details</h3>
+                <div class="flex items-start gap-4">
+                    <img id="detail-customer-img" src=""
+                        class="w-14 h-14 rounded-full object-cover ring-4 ring-slate-50">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900" id="detail-customer-name"></h2>
+                        <div class="space-y-1 mt-1">
+                            <a href="#" id="detail-customer-phone"
+                                class="text-sm text-slate-500 hover:text-primary-600 flex items-center gap-1.5 transition-colors">
+                                <i class="ph ph-phone"></i> <span></span>
+                            </a>
+                            <a href="#"
+                                class="text-sm text-slate-500 hover:text-primary-600 flex items-center gap-1.5 transition-colors">
+                                <i class="ph ph-envelope"></i> <span>customer@example.com</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Shipping Address</h3>
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-slate-100 rounded-lg text-slate-500">
+                        <i class="ph ph-map-pin text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-900" id="detail-city"></p>
+                        <p class="text-sm text-slate-500 mt-1 leading-relaxed" id="detail-address"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Meta -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Payment & Status</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">Payment Method</span>
+                        <span class="text-sm font-medium text-slate-800 flex items-center gap-1">
+                            <i class="ph ph-credit-card text-slate-400"></i>
+                            <span id="detail-payment"></span>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">Order Date</span>
+                        <span class="text-sm font-medium text-slate-800" id="detail-date"></span>
+                    </div>
+                    <div class="pt-2">
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="bg-primary-500 h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                        <p class="text-xs text-center text-slate-400 mt-1.5">Processing...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Products -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Products Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800">Order Items</h3>
+                        <span
+                            class="text-xs font-medium text-slate-500 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm"
+                            id="detail-items-count">0 Items</span>
+                    </div>
+
+                    <div class="divide-y divide-slate-100" id="detail-products-list">
+                        <!-- Products injected via JS -->
+                    </div>
+
+                    <!-- Cost Breakdown -->
+                    <div class="bg-slate-50/50 p-6">
+                        <div class="ml-auto max-w-xs space-y-3">
+                            <div class="flex justify-between text-sm text-slate-500">
+                                <span>Subtotal</span>
+                                <span class="font-medium text-slate-700" id="detail-subtotal"></span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-500">
+                                <span>Tax (14%)</span>
+                                <span class="font-medium text-slate-700" id="detail-tax"></span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-500">
+                                <span>Shipping</span>
+                                <span class="font-medium text-slate-700" id="detail-shipping"></span>
+                            </div>
+                            <div class="border-t border-slate-200 pt-3 flex justify-between items-center">
+                                <span class="text-base font-bold text-slate-800">Total Amount</span>
+                                <span class="text-xl font-bold text-primary-600" id="detail-total"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Timeline & Notes -->
+            <div class="space-y-6">
+                <!-- Timeline -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-6">Order Activity</h3>
+                    <div class="relative pl-4 border-l-2 border-slate-100 space-y-8" id="detail-timeline">
+                        <!-- Timeline injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-4">Order Notes</h3>
+                    <textarea
+                        class="w-full text-sm text-slate-600 bg-slate-50 border-0 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 placeholder-slate-400 resize-none"
+                        rows="4" placeholder="Add a note to this order..."></textarea>
+                    <button
+                        class="mt-3 w-full py-2 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-lg hover:border-primary-500 hover:text-primary-600 transition-colors">
+                        Save Note
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Use the same mock generator logic for consistency, 
+        // normally this would fetch API("/orders/{id}")
+
+        const generateOrderById = (id) => {
+            const statuses = ['Pending', 'Confirmed', 'Packaging', 'Out for Delivery', 'Delivered', 'Returned', 'Failed', 'Canceled'];
+            const names = ['Yahya Adel', 'Sarah Miller', 'John Smith', 'Alice Johnson', 'Bob Wilson', 'Mohamed Ali', 'Fatima Hassan'];
+            const productsList = [
+                { name: 'Wireless Headphones', price: 120, img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&q=80', sku: 'AUDIO-001' },
+                { name: 'Smart Watch Series 7', price: 350, img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150&q=80', sku: 'TECH-102' },
+                { name: 'Premium Backpack', price: 85, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=150&q=80', sku: 'BAGS-992' },
+                { name: 'Mechanic Keyboard', price: 150, img: 'https://images.unsplash.com/photo-1587829741301-351d42868297?w=150&q=80', sku: 'PC-202' },
+                { name: 'Gaming Mouse', price: 60, img: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=150&q=80', sku: 'PC-205' }
+            ];
+            const streets = ['123 Main St, Downtown', '45 El-Tahrir St', 'Seaside Villa 4', '90th St, New Cairo'];
+
+            // Deterministic random based on ID (simplified)
+            const rand = (Math.sin(id) + 1) / 2;
+
+            const numItems = Math.floor(rand * 4) + 2;
+            const items = Array.from({ length: numItems }, (_, idx) => {
+                const pIndex = Math.floor((rand * 100 + idx) % productsList.length);
+                const prod = productsList[pIndex];
+                return { ...prod, qty: Math.floor((rand * 10) % 3) + 1 };
+            });
+
+            const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const tax = subtotal * 0.14;
+            const shipping = 20;
+
+            return {
+                id: id,
+                customer: names[Math.floor(rand * names.length)],
+                phone: '+20115447' + Math.floor(1000 + rand * 9000),
+                city: ['Cairo', 'Alexandria', 'Giza', 'Mansoura'][Math.floor(rand * 4)],
+                address: streets[Math.floor(rand * streets.length)] + ', Apt ' + Math.floor(rand * 20),
+                date: new Date(Date.now() - Math.floor(rand * 10000000000)),
+                status: statuses[Math.floor(rand * statuses.length)],
+                payment: ['Cash on Delivery', 'Visa **4242', 'Vodafone Cash'][Math.floor(rand * 3)],
+                img: `https://i.pravatar.cc/150?u=${id}`,
+                items: items,
+                costs: {
+                    subtotal: subtotal.toFixed(2),
+                    tax: tax.toFixed(2),
+                    shipping: shipping.toFixed(2),
+                    total: (subtotal + tax + shipping).toFixed(2)
+                }
+            };
+        };
+
+        // --- Render Page ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get ID from URL or default
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id') || '100009';
+
+            const order = generateOrderById(parseInt(orderId));
+
+            // Populate Page
+            document.getElementById('page-order-id').innerText = order.id;
+
+            const badge = document.getElementById('page-status-badge');
+            // Simplified status coloring matching orders.html logic
+            let badgeClass = 'bg-slate-100 text-slate-600';
+            if (order.status === 'Pending') badgeClass = 'bg-amber-100 text-amber-700';
+            else if (order.status === 'Confirmed') badgeClass = 'bg-blue-100 text-blue-700';
+            else if (order.status === 'Delivered') badgeClass = 'bg-emerald-100 text-emerald-700';
+            else if (order.status === 'Canceled') badgeClass = 'bg-gray-100 text-gray-700 line-through';
+
+            badge.className = `hidden sm:inline-block text-xs px-2.5 py-1 rounded-full font-bold ${badgeClass}`;
+            badge.innerText = order.status;
+
+            // Customer
+            document.getElementById('detail-customer-name').innerText = order.customer;
+            document.getElementById('detail-customer-img').src = order.img;
+            document.getElementById('detail-customer-phone').querySelector('span').innerText = order.phone;
+            document.getElementById('detail-city').innerText = order.city;
+            document.getElementById('detail-address').innerText = order.address;
+
+            // Meta
+            document.getElementById('detail-payment').innerText = order.payment;
+            document.getElementById('detail-date').innerText = order.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            // Costs
+            document.getElementById('detail-subtotal').innerText = '$' + order.costs.subtotal;
+            document.getElementById('detail-tax').innerText = '$' + order.costs.tax;
+            document.getElementById('detail-shipping').innerText = '$' + order.costs.shipping;
+            document.getElementById('detail-total').innerText = '$' + order.costs.total;
+
+            // Items
+            document.getElementById('detail-items-count').innerText = `${order.items.length} Items`;
+            const productsContainer = document.getElementById('detail-products-list');
+            productsContainer.innerHTML = '';
+
+            order.items.forEach(item => {
+                const productLink = `../products-details.html?id=${item.sku}`; // Simulated link
+                productsContainer.innerHTML += `
+                    <div class="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
+                        <a href="${productLink}" class="block shrink-0">
+                            <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover bg-slate-100 group-hover:scale-105 transition-transform">
+                        </a>
+                        <div class="flex-1 min-w-0">
+                            <a href="${productLink}" class="block">
+                                <h4 class="text-sm font-bold text-slate-800 truncate hover:text-primary-600 transition-colors">${item.name}</h4>
+                            </a>
+                            <p class="text-xs text-slate-400">SKU: ${item.sku}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs font-medium bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">x${item.qty}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-slate-800">$${(item.price * item.qty).toFixed(2)}</p>
+                            <p class="text-xs text-slate-400">$${item.price}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Timeline (Clone logic)
+            const timeline = document.getElementById('detail-timeline');
+            timeline.innerHTML = '';
+            const addEvent = (title, time, completed = true, current = false) => {
+                const dotClass = completed ? 'bg-primary-600 border-primary-100' : 'bg-slate-200 border-white';
+                const textClass = completed ? 'text-slate-800' : 'text-slate-400';
+
+                timeline.innerHTML += `
+                    <div class="relative pb-1 timeline-item opacity-0 transform translate-y-4">
+                        <div class="absolute -left-[21px] w-4 h-4 rounded-full border-2 ${current ? 'ring-2 ring-primary-100' : ''} ${dotClass} z-10 bg-white"></div>
+                        <div class="${textClass}">
+                            <p class="text-sm font-bold">${title}</p>
+                            <p class="text-xs text-slate-500">${time}</p>
+                        </div>
+                    </div>
+                `;
+            };
+
+            addEvent('Order Placed', order.date.toLocaleString(), true);
+            if (order.status !== 'Pending') addEvent('Payment Verified', 'Automatic', true);
+            if (order.status === 'Delivered') {
+                addEvent('Shipped', 'Via FedEx', true);
+                addEvent('Delivered', 'Delivered at Door', true, true);
+            } else {
+                addEvent('Processing', 'In Progress...', false, true);
+            }
+
+            // GSAP Animations
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            // Ensure elements are visible to start (handled by loop, but good to be safe)
+            gsap.set([".timeline-item", "header", ".grid > div"], { autoAlpha: 1 });
+
+            tl.fromTo("header",
+                { y: -20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6 }
+            )
+                .fromTo(".grid > div",
+                    { y: 30, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 },
+                    "-=0.3"
+                )
+                .fromTo(".timeline-item",
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, clearProps: "all" },
+                    "-=0.3"
+                );
+
+        });
+    </script>
+</body>
+
+</html>
