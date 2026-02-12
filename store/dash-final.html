@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Admin Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+
+    <!-- Chart.js -->
+    <!-- Cairo Font for Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- GSAP CDN -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        secondary: '#64748b',
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animations */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        :root {
+            --primary-500: #0ea5e9;
+            --primary-600: #0284c7;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        .dark {
+            --bg-main: #020617;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        /* New POS Styles */
+        .pos-arabic {
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        /* Bidirectional Font Handling */
+        [dir="rtl"] {
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        [dir="ltr"] {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .product-card,
+        .customer-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .product-card:hover,
+        .customer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .cat-pill.active {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal.open .modal-content {
+            transform: scale(1);
+        }
+
+        /* Input Styles */
+        input,
+        select,
+        textarea {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        input:focus {
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Dropdown Visibility */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            min-width: 12rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            animation: slideInUp 0.2s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Sidebar */
+        #mobile-sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 45;
+        }
+
+        #mobile-sidebar-backdrop.show {
+            display: block;
+        }
+
+        aside.mobile-open {
+            transform: translateX(0) !important;
+        }
+
+        /* Theme Animation */
+        .theme-transition * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-dark-950 text-slate-800 dark:text-slate-200 font-sans antialiased h-screen flex overflow-hidden theme-transition">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="main-sidebar"
+        class="w-64 bg-white dark:bg-dark-900 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 flex flex-col transition-all duration-300 fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:relative md:flex z-50">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2 text-primary-600 font-bold text-xl">
+                <i class="ph ph-hexagon-fill text-2xl"></i>
+                <span class="dark:text-white">Sell77</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <a onclick="switchView('dashboard')" id="nav-dashboard"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 shadow-sm ring-1 ring-primary-100 dark:ring-primary-900/30 transition-all font-semibold cursor-pointer">
+                <i class="ph ph-squares-four text-xl"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+
+            <a onclick="switchView('pos')" id="nav-pos"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-dark-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all font-medium cursor-pointer">
+                <i class="ph ph-shopping-cart text-xl"></i>
+                <span class="font-medium">POS System</span>
+            </a>
+
+            <!-- Order Management -->
+            <div class="pt-4 pb-2 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Order Management</div>
+
+            <a onclick="switchView('orders')" id="nav-orders"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-all font-medium cursor-pointer">
+                <i class="ph ph-package text-xl"></i>
+                <span class="font-medium flex-1">Orders</span>
+                <span class="bg-primary-100 text-primary-700 py-0.5 px-2 rounded-full text-xs font-bold">10</span>
+            </a>
+
+            <a href="#"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-all font-medium cursor-pointer opacity-70">
+                <i class="ph ph-receipt text-xl"></i>
+                <span class="font-medium">Refund Requests</span>
+            </a>
+
+            <!-- Product Management -->
+            <div class="pt-4 pb-2 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Product Management
+            </div>
+
+            <a href="#"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-all font-medium cursor-pointer opacity-70">
+                <i class="ph ph-tag text-xl"></i>
+                <span class="font-medium">Categories</span>
+            </a>
+
+            <a href="#"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-all font-medium cursor-pointer opacity-70">
+                <i class="ph ph-t-shirt text-xl"></i>
+                <span class="font-medium">Products</span>
+            </a>
+
+            <!-- Promotion -->
+            <div class="pt-4 pb-2 px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Promotion</div>
+
+            <a href="#"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-dark-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all font-medium cursor-pointer opacity-70">
+                <i class="ph ph-storefront text-xl"></i>
+                <span class="font-medium">Vendors</span>
+            </a>
+        </nav>
+
+        <!-- User Profile (Bottom Sidebar) -->
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User"
+                    class="w-9 h-9 rounded-full ring-2 ring-white dark:ring-dark-950 shadow-sm">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">Brandoz</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Master Admin</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+
+        <!-- Header / Hero (Mobile toggle + Title + Actions) -->
+        <header
+            class="h-16 bg-white/80 dark:bg-dark-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 z-40 sticky top-0 transition-colors">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileSidebar()"
+                    class="md:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-dark-800 rounded-lg">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight" id="page-title">Orders
+                    Management</h1>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-4">
+                <!-- Global Search -->
+                <div class="relative hidden lg:block group">
+                    <i
+                        class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" id="global-search-input" placeholder="Search..."
+                        oninput="handleGlobalSearch(this.value)"
+                        class="pl-10 pr-4 py-1.5 bg-slate-100 dark:bg-dark-800 border-none rounded-full text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-dark-700 transition-all w-48 xl:w-64 placeholder-slate-400 dark:placeholder-slate-500 font-medium dark:text-white">
+                </div>
+
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <!-- Language Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('lang-dropdown')"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-800 transition-colors font-bold text-xs">
+                            <img id="current-lang-flag"
+                                src="https://sell77.doobagency.com/public/assets/front-end/img/flags/eg.png"
+                                class="w-5 h-4 rounded-sm shadow-sm" alt="Arabic">
+                            <span id="current-lang-text" class="hidden sm:inline">العربية</span>
+                            <i class="ph ph-caret-down text-[10px]"></i>
+                        </button>
+                        <div id="lang-dropdown" class="dropdown-content">
+                            <div class="p-1">
+                                <a href="javascript:" onclick="changeLanguage('ar')"
+                                    class="flex items-center justify-end gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-800 text-slate-600 dark:text-slate-300 font-bold text-xs"
+                                    dir="rtl">
+                                    <img src="https://sell77.doobagency.com/public/assets/front-end/img/flags/eg.png"
+                                        class="w-5 h-4" alt="Arabic">
+                                    <span>العربية</span>
+                                </a>
+                                <a href="javascript:" onclick="changeLanguage('en')"
+                                    class="flex items-center justify-end gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-800 text-slate-600 dark:text-slate-300 font-bold text-xs"
+                                    dir="rtl">
+                                    <img src="https://sell77.doobagency.com/public/assets/front-end/img/flags/en.png"
+                                        class="w-5 h-4" alt="English">
+                                    <span>English</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block"></div>
+
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()"
+                        class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-800 hover:text-amber-500 rounded-lg transition-all"
+                        title="Toggle Theme">
+                        <i id="theme-icon" class="ph ph-moon text-xl"></i>
+                    </button>
+
+                    <!-- Web Icon -->
+                    <a href="https://sell77.doobagency.com" target="_blank"
+                        class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-800 hover:text-blue-600 rounded-lg transition-all"
+                        title="Website Home">
+                        <i class="ph ph-globe text-xl"></i>
+                    </a>
+
+                    <!-- Message Icon -->
+                    <a href="#"
+                        class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-800 hover:text-blue-600 rounded-lg transition-all relative"
+                        title="Messages">
+                        <i class="ph ph-chat-centered-text text-xl"></i>
+                        <span
+                            class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-dark-900"></span>
+                    </a>
+
+                    <!-- Notification Bell -->
+                    <button
+                        class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-800 hover:text-primary-600 rounded-lg transition-all relative">
+                        <i class="ph ph-bell text-xl"></i>
+                        <span
+                            class="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-white dark:ring-dark-900"></span>
+                    </button>
+
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('profile-dropdown')"
+                            class="flex items-center gap-3 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-dark-800 transition-all">
+                            <div class="hidden md:block text-right">
+                                <h5 class="text-xs font-bold text-slate-900 dark:text-white leading-tight">Brandoz</h5>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Master Admin</p>
+                            </div>
+                            <div
+                                class="w-9 h-9 rounded-full ring-2 ring-white dark:ring-dark-950 shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800">
+                                <img src="https://sell77.doobagency.com/storage/app/public/admin/2025-01-06-677b0921119b6.webp"
+                                    class="w-full h-full object-cover" alt="Profile">
+                            </div>
+                        </button>
+                        <div id="profile-dropdown" class="dropdown-content min-w-[14rem]">
+                            <div class="p-3 border-b border-slate-100 dark:border-slate-800">
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">Brandoz</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">test@test.com</p>
+                            </div>
+                            <div class="p-1">
+                                <a href="#"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-dark-800 text-slate-600 dark:text-slate-300 font-bold text-xs">
+                                    <i class="ph ph-user-gear text-lg"></i>
+                                    <span>إعدادات</span>
+                                </a>
+                                <a href="#"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-bold text-xs">
+                                    <i class="ph ph-sign-out text-lg"></i>
+                                    <span>تسجيل الخروج</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-dark-950 scroll-smooth p-4 sm:p-6 lg:p-8"
+            id="main-scroll-container">
+            <div class="max-auto mx-auto space-y-8 h-full">
+
+                <!-- =========================
+                     VIEW: DASHBOARD (Active Default)
+                     ========================= -->
+                <div id="view-dashboard" class="view-section active">
+                    <!-- 1. Header & Time Filter (Existing) -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Hello, Brandoz 👋</h2>
+                            <p class="text-slate-500 text-sm mt-1">Monitor your business analytics and statistics.</p>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 bg-white dark:bg-dark-900 p-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <button
+                                class="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Overall</button>
+                            <button
+                                class="px-3 py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:bg-slate-50 transition-colors">Today</button>
+                            <button
+                                class="px-3 py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:bg-slate-50 transition-colors">Month</button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Business Analytics (4 Cards - Row 1) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <!-- Total Orders -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                            <!-- Floating Decor -->
+                            <i
+                                class="ph ph-shopping-bag absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.05] group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="ph ph-shopping-bag text-2xl"></i>
+                                </div>
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-green-50 text-green-600 border border-green-100">
+                                    <i class="ph ph-trend-up"></i> +12%
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-1 relative z-10">10</h2>
+                            <h3 class="text-slate-500 dark:text-slate-400 text-sm font-semibold relative z-10">Total
+                                Orders</h3>
+                        </div>
+
+                        <!-- Total Stores -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                            <!-- Floating Decor -->
+                            <i
+                                class="ph ph-storefront absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.05] group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="ph ph-storefront text-2xl"></i>
+                                </div>
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                                    Active
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-1 relative z-10">4</h2>
+                            <h3 class="text-slate-500 text-sm font-semibold relative z-10">Total Stores</h3>
+                        </div>
+
+                        <!-- Total Products -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                            <!-- Floating Decor -->
+                            <i
+                                class="ph ph-package absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.05] group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="ph ph-package text-2xl"></i>
+                                </div>
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                                    in Stock
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-1 relative z-10">203</h2>
+                            <h3 class="text-slate-500 text-sm font-semibold relative z-10">Total Products</h3>
+                        </div>
+
+                        <!-- Total Customers -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                            <!-- Floating Decor -->
+                            <i
+                                class="ph ph-users absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.05] group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="ph ph-users text-2xl"></i>
+                                </div>
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-red-50 text-red-600 border border-red-100">
+                                    <i class="ph ph-trend-down"></i> -2%
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-1 relative z-10">8</h2>
+                            <h3 class="text-slate-500 text-sm font-semibold relative z-10">Total Customers</h3>
+                        </div>
+                    </div>
+
+                    <!-- 3. Order Status Grid (8 Small Cards - Floating Icons) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3 mb-8">
+                        <!-- Pending -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">9</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider relative z-10">Pending</span>
+                        </div>
+
+                        <!-- Confirmed -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-green-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center shadow-md shadow-green-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">1</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Confirmed</span>
+                        </div>
+
+                        <!-- Packaging -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-amber-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Packaging</span>
+                        </div>
+
+                        <!-- Out for Delivery -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-slate-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center shadow-md shadow-slate-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Out
+                                Delivery</span>
+                        </div>
+
+                        <!-- Delivered -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-purple-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Delivered</span>
+                        </div>
+
+                        <!-- Canceled -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center shadow-md shadow-red-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Canceled</span>
+                        </div>
+
+                        <!-- Returned -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-orange-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center shadow-md shadow-orange-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Returned</span>
+                        </div>
+
+                        <!-- Failed -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-500/30 mb-2 relative z-10 group-hover:scale-110 transition-transform">
+                                <span class="font-bold text-md">0</span>
+                            </div>
+                            <span
+                                class="text-[9px] uppercase font-bold text-slate-500 tracking-wider relative z-10">Failed</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Admin Wallet (Row 3) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- In-house Earning (Left) -->
+                        <div
+                            class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-center items-center text-center">
+                            <!-- Decor -->
+                            <div
+                                class="absolute top-0 right-0 w-40 h-40 bg-white opacity-[0.03] rounded-full blur-3xl -mr-10 -mt-10">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-32 h-32 bg-primary-500 opacity-[0.1] rounded-full blur-3xl -ml-10 -mb-10">
+                            </div>
+
+                            <img src="https://sell77.doobagency.com/public/assets/back-end/img/inhouse-earning.png"
+                                class="w-12 h-12 mb-3 invert opacity-80" style="filter: brightness(0) invert(1);">
+                            <h3 class="text-4xl font-bold mb-1">$0.00</h3>
+                            <span class="text-slate-400 uppercase tracking-wider text-xs">In-House Earning</span>
+                        </div>
+
+                        <!-- Breakdown Grid (Right) -->
+                        <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                            <!-- Commission -->
+                            <div
+                                class="bg-white dark:bg-dark-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:shadow-lg transition-all group">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                                        <i class="ph ph-hand-coins text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-black text-slate-800 dark:text-white">$0.00</h3>
+                                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                                            Commission</p>
+                                    </div>
+                                </div>
+                                <img src="https://sell77.doobagency.com/public/assets/back-end/img/ce.png"
+                                    class="w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity grayscale group-hover:grayscale-0">
+                            </div>
+                            <!-- Delivery Charge -->
+                            <div
+                                class="bg-white dark:bg-dark-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:shadow-lg transition-all group">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 text-white flex items-center justify-center shadow-md shadow-cyan-500/30 group-hover:scale-110 transition-transform">
+                                        <i class="ph ph-truck text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-black text-slate-800 dark:text-white">$0.00</h3>
+                                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                                            Delivery</p>
+                                    </div>
+                                </div>
+                                <img src="https://sell77.doobagency.com/public/assets/back-end/img/dce.png"
+                                    class="w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity grayscale group-hover:grayscale-0">
+                            </div>
+                            <!-- Tax -->
+                            <div
+                                class="bg-white dark:bg-dark-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:shadow-lg transition-all group">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center shadow-md shadow-slate-500/30 group-hover:scale-110 transition-transform">
+                                        <i class="ph ph-receipt text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-black text-slate-800 dark:text-white">$0.00</h3>
+                                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Tax</p>
+                                    </div>
+                                </div>
+                                <img src="https://sell77.doobagency.com/public/assets/back-end/img/ttc.png"
+                                    class="w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity grayscale group-hover:grayscale-0">
+                            </div>
+                            <!-- Pending -->
+                            <div
+                                class="bg-white dark:bg-dark-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:shadow-lg transition-all group">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                                        <i class="ph ph-hourglass text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-black text-slate-800 dark:text-white">$0.00</h3>
+                                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Pending
+                                        </p>
+                                    </div>
+                                </div>
+                                <img src="https://sell77.doobagency.com/public/assets/back-end/img/pa.png"
+                                    class="w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity grayscale group-hover:grayscale-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Charts (Row 4) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Order Stats Line Chart -->
+                        <div
+                            class="lg:col-span-2 bg-white dark:bg-dark-900 p-6 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800">
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center shadow-lg shadow-red-500/20">
+                                        <i class="ph ph-chart-line-up text-xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-slate-800 dark:text-white text-lg">Order Statistics</h3>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button
+                                        class="px-3 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-600 border border-red-100">Year</button>
+                                    <button
+                                        class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">Month</button>
+                                    <button
+                                        class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">Week</button>
+                                </div>
+                            </div>
+                            <div class="h-[300px] w-full relative">
+                                <canvas id="order-statistics-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- User Overview Pie Chart -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-6 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800 flex flex-col group hover:shadow-lg transition-all">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                    <i class="ph ph-chart-pie-slice text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white text-lg">User Overview</h3>
+                            </div>
+                            <div class="flex-1 relative flex items-center justify-center">
+                                <canvas id="user-overview-chart"></canvas>
+                                <div
+                                    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-3xl font-bold text-slate-800 dark:text-white">12</span>
+                                    <span class="text-xs text-slate-400 uppercase">Total User</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><span
+                                            class="w-3 h-3 rounded-full bg-blue-500"></span> Customer</span>
+                                    <span class="font-bold text-slate-800 dark:text-white">8</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><span
+                                            class="w-3 h-3 rounded-full bg-emerald-500"></span> Vendor</span>
+                                    <span class="font-bold text-slate-800 dark:text-white">4</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><span
+                                            class="w-3 h-3 rounded-full bg-amber-500"></span> Delivery Man</span>
+                                    <span class="font-bold text-slate-800 dark:text-white">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Earning Stats (Row 5) -->
+                    <div
+                        class="bg-white dark:bg-dark-900 p-6 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800 mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/20">
+                                    <i class="ph ph-currency-dollar text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white text-lg">Earning Statistics</h3>
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-3 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-600 border border-sky-100">Year</button>
+                                <button
+                                    class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">Month</button>
+                                <button
+                                    class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">Week</button>
+                            </div>
+                        </div>
+                        <div class="h-[250px] w-full relative">
+                            <canvas id="earning-statistics-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 7. Lists (Row 6) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12">
+                        <!-- Top Customer -->
+                        <div
+                            class="bg-white dark:bg-dark-900 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800 overflow-hidden group">
+                            <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                                    <i class="ph ph-crown text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white">Top Customer</h3>
+                            </div>
+                            <div class="divide-y divide-slate-50">
+                                <!-- Item 1 -->
+                                <div
+                                    class="flex items-center gap-4 p-4 hover:bg-slate-50/50 dark:hover:bg-dark-800/50 transition-colors relative">
+                                    <div
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 w-1 h-8 bg-amber-400 rounded-full opacity-0 hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <div class="relative">
+                                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/placeholder/user.png"
+                                            class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                                        <div
+                                            class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full text-[8px] flex items-center justify-center text-white font-bold ring-2 ring-white">
+                                            1</div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold text-slate-700 dark:text-gray-200">Yahya</h4>
+                                        <p class="text-[10px] text-slate-400">01154477890</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div
+                                            class="px-2 py-1 rounded-lg bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100">
+                                            8 Orders</div>
+                                    </div>
+                                </div>
+                                <!-- Item 2 -->
+                                <div
+                                    class="flex items-center gap-4 p-4 hover:bg-slate-50/50 dark:hover:bg-dark-800/50 transition-colors relative">
+                                    <div class="relative">
+                                        <img src="https://sell77.doobagency.com/public/assets/back-end/img/placeholder/user.png"
+                                            class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                                        <div
+                                            class="absolute -top-1 -right-1 w-4 h-4 bg-slate-400 rounded-full text-[8px] flex items-center justify-center text-white font-bold ring-2 ring-white">
+                                            2</div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold text-slate-700 dark:text-gray-200">Test</h4>
+                                        <p class="text-[10px] text-slate-400">012347623</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div
+                                            class="px-2 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
+                                            2 Orders</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Selling Store -->
+                        <div
+                            class="bg-white dark:bg-dark-900 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800 overflow-hidden group">
+                            <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                                    <i class="ph ph-storefront text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white">Top Stores</h3>
+                            </div>
+                            <div class="divide-y divide-slate-50">
+                                <!-- Amazon -->
+                                <div
+                                    class="flex items-center gap-4 p-4 hover:bg-slate-50/50 dark:hover:bg-dark-800/50 transition-colors">
+                                    <img src="https://sell77.doobagency.com/storage/app/public/shop/2025-01-07-677d3ac4ca7db.webp"
+                                        class="w-10 h-10 rounded-lg border border-slate-100 shadow-sm">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold text-slate-700">Amazon</h4>
+                                        <div class="flex items-center gap-1 text-[10px] text-slate-400"><i
+                                                class="ph ph-star-fill text-amber-400"></i> 4.9</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-black text-slate-800">$0.00</p>
+                                    </div>
+                                </div>
+                                <!-- 12151 -->
+                                <div
+                                    class="flex items-center gap-4 p-4 hover:bg-slate-50/50 dark:hover:bg-dark-800/50 transition-colors">
+                                    <img src="https://sell77.doobagency.com/storage/app/public/shop/2025-01-07-677d4685c9f19.webp"
+                                        class="w-10 h-10 rounded-lg border border-slate-100 shadow-sm">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold text-slate-700">12151</h4>
+                                        <div class="flex items-center gap-1 text-[10px] text-slate-400"><i
+                                                class="ph ph-star-fill text-amber-400"></i> 4.5</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-black text-slate-800">$0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Most Popular Products -->
+                        <div
+                            class="bg-white dark:bg-dark-900 rounded-2xl shadow-card border border-slate-100/50 dark:border-slate-800 overflow-hidden group">
+                            <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white shadow-lg shadow-red-500/20 group-hover:scale-110 transition-transform">
+                                    <i class="ph ph-fire text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white">Most Popular</h3>
+                            </div>
+                            <div class="p-4 grid grid-cols-2 gap-3">
+                                <!-- Product 1 -->
+                                <div
+                                    class="p-3 border border-slate-100 dark:border-slate-800 rounded-2xl text-center hover:shadow-lg transition-all cursor-pointer group hover:border-red-100 dark:hover:border-red-900/40 relative overflow-hidden bg-white dark:bg-dark-800">
+                                    <div class="absolute top-0 right-0 p-1.5 bg-red-50 rounded-bl-xl text-red-500">
+                                        <i class="ph ph-heart-fill"></i>
+                                    </div>
+                                    <img class="w-20 h-20 mx-auto rounded-xl mb-3 shadow-sm group-hover:scale-110 transition-transform object-cover"
+                                        src="https://sell77.doobagency.com/storage/app/public/product/thumbnail/2025-01-07-677d3da7494bb.webp">
+                                    <h6 class="text-xs font-bold text-slate-700 truncate mb-1">Camera Samsung</h6>
+                                    <div class="flex justify-center items-center gap-1 text-slate-400 text-[10px]"><i
+                                            class="ph ph-star-fill text-amber-400"></i> 4.8</div>
+                                </div>
+                                <!-- Product 2 -->
+                                <div
+                                    class="p-3 border border-slate-100 dark:border-slate-800 rounded-2xl text-center hover:shadow-lg transition-all cursor-pointer group hover:border-red-100 dark:hover:border-red-900/40 relative overflow-hidden bg-white dark:bg-dark-800">
+                                    <div class="absolute top-0 right-0 p-1.5 bg-red-50 rounded-bl-xl text-red-500">
+                                        <i class="ph ph-heart-fill"></i>
+                                    </div>
+                                    <img class="w-20 h-20 mx-auto rounded-xl mb-3 shadow-sm group-hover:scale-110 transition-transform object-cover"
+                                        src="https://sell77.doobagency.com/storage/app/public/product/thumbnail/2025-01-07-677d5490a6e0e.webp">
+                                    <h6 class="text-xs font-bold text-slate-700 truncate mb-1">Women's dress</h6>
+                                    <div class="flex justify-center items-center gap-1 text-slate-400 text-[10px]"><i
+                                            class="ph ph-star-fill text-amber-400"></i> 4.5</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+                     VIEW: ORDERS (Default)
+                     ========================= -->
+                <!-- =========================
+                     VIEW: ORDERS (Active Default removed)
+                     ========================= -->
+                <div id="view-orders" class="view-section">
+                    <!-- Analytics Section -->
+                    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Total Orders -->
+                        <!-- Total Orders -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800">
+                            <div class="flex justify-between items-start mb-4">
+                                <div
+                                    class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <i class="ph ph-shopping-bag text-xl"></i>
+                                </div>
+                                <span
+                                    class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">+12%</span>
+                            </div>
+                            <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Orders</h3>
+                            <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1" id="stat-total">0</p>
+                        </div>
+
+                        <!-- Pending -->
+                        <!-- Pending -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800">
+                            <div class="flex justify-between items-start mb-4">
+                                <div
+                                    class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-xl group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                                    <i class="ph ph-clock text-xl"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pending</h3>
+                            <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1" id="stat-pending">0</p>
+                        </div>
+
+                        <!-- Confirmed -->
+                        <!-- Confirmed -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800">
+                            <div class="flex justify-between items-start mb-4">
+                                <div
+                                    class="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                    <i class="ph ph-check-circle text-xl"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">Confirmed</h3>
+                            <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1" id="stat-confirmed">0</p>
+                        </div>
+
+                        <!-- Delivered -->
+                        <!-- Delivered -->
+                        <div
+                            class="bg-white dark:bg-dark-900 p-5 rounded-2xl shadow-card hover:shadow-soft transition-all duration-300 group cursor-default border border-slate-100 dark:border-slate-800">
+                            <div class="flex justify-between items-start mb-4">
+                                <div
+                                    class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                    <i class="ph ph-package text-xl"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">Delivered</h3>
+                            <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1" id="stat-delivered">0</p>
+                        </div>
+                    </section>
+
+                    <!-- Navigation Tabs (Slider) -->
+                    <div
+                        class="sticky top-0 z-20 bg-slate-50/95 dark:bg-dark-950/95 backdrop-blur-sm pt-2 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <nav class="flex gap-2 overflow-x-auto hide-scroll pb-2 select-none" id="tabs-container">
+                            <!-- Tabs injected via JS -->
+                        </nav>
+                    </div>
+
+                    <!-- Orders Grid -->
+                    <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
+                        <!-- Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- =========================
+                     VIEW: POS
+                     ========================= -->
+                <div id="view-pos" class="view-section h-full flex flex-col md:flex-row gap-6 pb-2 pos-arabic"
+                    dir="rtl">
+                    <!-- New POS Content from pos.html -->
+                    <div class="flex-1 flex flex-col h-full relative z-10">
+                        <!-- Header -->
+                        <header
+                            class="glass-panel z-20 px-6 py-4 flex justify-between items-center sticky top-0 shadow-sm mx-4 mt-4 rounded-2xl flex-wrap gap-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                                    <i class="fas fa-layer-group text-lg"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-xl font-bold text-gray-800 dark:text-white leading-tight">نقطة البيع
+                                    </h1>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">نظام إدارة المبيعات الذكي</p>
+                                </div>
+                            </div>
+                            <!-- Enhanced Search Bar -->
+                            <div
+                                class="flex gap-0 items-center w-full max-w-2xl bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                                <div
+                                    class="custom-select-wrapper border-l border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-dark-800 w-40 flex-shrink-0">
+                                    <select id="searchScope"
+                                        class="w-full h-full py-3 px-4 bg-transparent focus:outline-none text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer appearance-none">
+                                        <option value="product">📦 المنتجات</option>
+                                        <option value="category">🏷️ التصنيفات</option>
+                                        <option value="store">🏪 المتاجر</option>
+                                        <option value="customer">👥 العملاء</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1 relative">
+                                    <input type="text" id="searchInput" placeholder="بحث..."
+                                        class="w-full h-full py-3 px-4 focus:outline-none text-gray-700 dark:text-white placeholder-gray-400 bg-transparent">
+                                </div>
+                                <button class="px-5 text-gray-400 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-search text-lg"></i>
+                                </button>
+                            </div>
+                            <div class="hidden xl:block text-left" dir="ltr">
+                                <div id="clock" class="text-lg font-bold text-gray-800 dark:text-white">12:00</div>
+                                <div id="date" class="text-xs text-gray-500 dark:text-gray-400 font-medium">Jan 21, 2026
+                                </div>
+                            </div>
+                        </header>
+                        <!-- Categories Bar -->
+                        <div class="px-6 py-4 overflow-x-auto whitespace-nowrap hide-scroll flex gap-3 transition-all duration-300"
+                            id="categoriesContainer">
+                            <button
+                                class="cat-pill active px-6 py-2 rounded-full bg-white dark:bg-dark-900 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-slate-800 shadow-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-dark-800"
+                                onclick="filterCategory('all', this)">الكل</button>
+                            <button
+                                class="cat-pill px-6 py-2 rounded-full bg-white dark:bg-dark-900 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-slate-800 shadow-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-dark-800"
+                                onclick="filterCategory('fashion', this)">👗 أزياء</button>
+                            <button
+                                class="cat-pill px-6 py-2 rounded-full bg-white dark:bg-dark-900 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-slate-800 shadow-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-dark-800"
+                                onclick="filterCategory('electronics', this)">📱 إلكترونيات</button>
+                            <button
+                                class="cat-pill px-6 py-2 rounded-full bg-white dark:bg-dark-900 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-slate-800 shadow-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-dark-800"
+                                onclick="filterCategory('beauty', this)">💄 تجميل</button>
+                            <button
+                                class="cat-pill px-6 py-2 rounded-full bg-white dark:bg-dark-900 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-slate-800 shadow-sm font-semibold transition-all hover:bg-gray-50 dark:hover:bg-dark-800"
+                                onclick="filterCategory('home', this)">🏠 المنزل</button>
+                        </div>
+                        <!-- Grid Container -->
+                        <main class="flex-1 overflow-y-auto px-6 pb-24 relative" id="productsContainerWrapper">
+                            <div id="mainGrid"
+                                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+                            <div id="notFound"
+                                class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                <i class="fas fa-search text-6xl mb-4 opacity-50"></i>
+                                <p class="text-xl font-bold">لا توجد نتائج</p>
+                                <p class="text-sm">جرب كلمات بحث مختلفة</p>
+                            </div>
+                        </main>
+                    </div>
+                    <!-- Right Sidebar -->
+                    <aside
+                        class="w-[420px] bg-white dark:bg-dark-950 shadow-2xl z-30 flex flex-col h-full border-r border-gray-100 dark:border-slate-800 relative">
+                        <div class="p-6 bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="font-bold text-lg">الطلب الحالي</h2>
+                                    <span
+                                        class="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded">#ORD-8852</span>
+                                </div>
+                                <button onclick="clearCart()"
+                                    class="text-red-300 hover:text-red-100 hover:bg-white/10 p-2 rounded-lg transition-colors"
+                                    title="مسح السلة">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center bg-white/10 rounded-lg p-2 backdrop-blur-sm cursor-pointer hover:bg-white/20 transition-colors"
+                                onclick="switchToCustomerSearch()">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white ml-3">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs text-gray-300">العميل</p>
+                                    <p class="text-sm font-bold" id="selectedCustomerName">عميل نقدي</p>
+                                </div>
+                                <i class="fas fa-exchange-alt text-xs text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-dark-900/50 relative">
+                            <div id="emptyCartMessage"
+                                class="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                                <div
+                                    class="w-24 h-24 bg-gray-200 dark:bg-dark-800 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                                    <i class="fas fa-shopping-cart text-4xl text-gray-400 dark:text-gray-600"></i>
+                                </div>
+                                <p class="text-lg font-bold text-gray-500 dark:text-gray-400">السلة فارغة</p>
+                                <p class="text-sm">اختر منتجات لبدء البيع</p>
+                            </div>
+                            <div id="cartItemsContainer" class="space-y-3 hidden"></div>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-dark-950 p-6 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-20 border-t dark:border-slate-800">
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between text-gray-500 dark:text-gray-400 text-sm">
+                                    <span>المجموع الفرعي</span>
+                                    <span class="font-bold text-gray-800 dark:text-white" id="subTotal">0.00 ر.س</span>
+                                </div>
+                                <div class="flex justify-between text-gray-500 dark:text-gray-400 text-sm">
+                                    <span>الضريبة (15%)</span>
+                                    <span class="font-bold text-gray-800 dark:text-white" id="taxTotal">0.00 ر.س</span>
+                                </div>
+                                <div class="flex justify-between text-green-600 dark:text-green-500 text-sm cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 p-1 rounded transition-colors"
+                                    onclick="openModal('discountModal')">
+                                    <span class="flex items-center gap-1"><i class="fas fa-tag"></i> خصم</span>
+                                    <span class="font-bold" id="discountTotal">- 0.00 ر.س</span>
+                                </div>
+                                <div class="h-px bg-gray-200 dark:bg-dark-800 border-dashed my-2"></div>
+                                <div class="flex justify-between items-end">
+                                    <span class="font-bold text-xl text-gray-800 dark:text-white">الإجمالي</span>
+                                    <span class="font-black text-3xl text-blue-600 dark:text-blue-400"
+                                        id="grandTotal">0.00 ر.س</span>
+                                </div>
+                            </div>
+                            <button onclick="openCheckout()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4 font-bold text-lg shadow-lg shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-2 group">
+                                <span>إتمام الدفع</span>
+                                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                    </aside>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. Checkout Modal -->
+    <div id="checkoutModal"
+        class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pos-arabic"
+        dir="rtl">
+        <div class="modal-content bg-white dark:bg-dark-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+            <div
+                class="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-dark-800">
+                <h3 class="font-bold text-xl text-gray-800 dark:text-white"><i
+                        class="fas fa-wallet text-blue-600 dark:text-blue-400 ml-2"></i> الدفع</h3>
+                <button onclick="closeModal('checkoutModal')"
+                    class="text-gray-400 hover:text-red-500 transition-colors"><i
+                        class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <p class="text-gray-500 dark:text-gray-400 mb-1">المبلغ المستحق</p>
+                    <h2 class="text-4xl font-black text-gray-800 dark:text-white" id="modalTotalAmount">0.00 ر.س</h2>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <label class="cursor-pointer relative">
+                        <input type="radio" name="paymentType" value="cash" class="peer sr-only" checked
+                            onchange="togglePaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-gray-100 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all hover:bg-gray-50">
+                            <i class="fas fa-money-bill-wave text-2xl text-green-500 mb-2"></i>
+                            <div class="font-bold text-sm text-gray-700">نقدي</div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative">
+                        <input type="radio" name="paymentType" value="card" class="peer sr-only"
+                            onchange="togglePaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-gray-100 dark:border-slate-800 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 transition-all hover:bg-gray-50 dark:hover:bg-dark-800">
+                            <i class="fas fa-credit-card text-2xl text-purple-500 mb-2"></i>
+                            <div class="font-bold text-sm text-gray-700">بطاقة</div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative">
+                        <input type="radio" name="paymentType" value="qr" class="peer sr-only"
+                            onchange="togglePaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-gray-100 dark:border-slate-800 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 transition-all hover:bg-gray-50 dark:hover:bg-dark-800">
+                            <i class="fas fa-qrcode text-2xl text-gray-600 mb-2"></i>
+                            <div class="font-bold text-sm text-gray-700">QR Code</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Cash Input Area -->
+                <div id="cashInputSection"
+                    class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl mb-4 border border-gray-200 dark:border-slate-800">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">المبلغ
+                        المدفوع</label>
+                    <div class="relative">
+                        <input type="number" id="amountPaid"
+                            class="w-full text-left p-3 rounded-lg border border-gray-300 dark:border-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-xl font-bold bg-white dark:bg-dark-900 text-gray-800 dark:text-white"
+                            placeholder="0.00" oninput="calculateChange()">
+                        <span class="absolute left-4 top-3.5 text-gray-400 font-bold">SAR</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
+                        <span class="text-gray-600 font-medium">الباقي للعميل:</span>
+                        <span class="text-xl font-bold text-green-600" id="changeAmount">0.00 ر.س</span>
+                    </div>
+                </div>
+
+                <button onclick="processPayment()"
+                    class="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95">
+                    تأكيد واستلام الفاتورة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Discount Modal -->
+    <div id="discountModal"
+        class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pos-arabic"
+        dir="rtl">
+        <div class="modal-content bg-white dark:bg-dark-900 w-96 rounded-2xl shadow-xl">
+            <div class="p-5 border-b border-gray-100 dark:border-slate-800 flex justify-between">
+                <h3 class="font-bold text-lg text-gray-800 dark:text-white">إضافة خصم</h3>
+                <button onclick="closeModal('discountModal')"><i class="fas fa-times text-gray-400"></i></button>
+            </div>
+            <div class="p-5">
+                <div class="flex gap-2 mb-4">
+                    <button
+                        class="flex-1 py-2 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold"
+                        id="discTypePerc" onclick="setDiscountType('percent')">% نسبة</button>
+                    <button
+                        class="flex-1 py-2 rounded-lg border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-gray-400"
+                        id="discTypeFixed" onclick="setDiscountType('fixed')">$ مبلغ</button>
+                </div>
+                <input type="number" id="discountValue"
+                    class="w-full p-3 border border-gray-300 dark:border-slate-800 rounded-lg text-center text-xl font-bold mb-4 focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-dark-800 text-gray-800 dark:text-white"
+                    placeholder="0">
+                <button onclick="applyDiscount()"
+                    class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">تطبيق
+                    الخصم</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Success Overlay -->
+    <div id="successOverlay"
+        class="fixed inset-0 z-[60] bg-white dark:bg-dark-950 flex flex-col items-center justify-center hidden pos-arabic"
+        dir="rtl">
+        <div class="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-check text-6xl text-green-500 scale-0" id="successIcon"></i>
+        </div>
+        <h2 class="text-3xl font-black text-gray-800 dark:text-white mb-2 opacity-0" id="successTitle">تم الدفع بنجاح!
+        </h2>
+        <p class="text-gray-500 opacity-0" id="successSub">جاري طباعة الإيصال...</p>
+    </div>
+
+    <!-- =========================
+         GLOBAL MODALS
+         ========================= -->
+
+    <!-- Order Details Modal -->
+    <!-- Order Details Modal -->
+    <div id="order-modal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300" role="dialog"
+        aria-modal="true">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeOrderModal()">
+        </div>
+        <div class="absolute inset-y-0 right-0 w-full max-w-2xl bg-white dark:bg-dark-900 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col"
+            id="modal-panel">
+            <!-- Header -->
+            <div
+                class="h-16 px-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-dark-800/50">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        Order #<span id="modal-order-id"></span>
+                        <span id="modal-status-badge"
+                            class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"></span>
+                    </h2>
+                    <p class="text-xs text-slate-500" id="modal-date"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()"
+                        class="p-2 text-slate-400 hover:text-primary-600 hover:bg-white rounded-full transition-colors"><i
+                            class="ph ph-printer text-xl"></i></button>
+                    <button onclick="closeModal()"
+                        class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"><i
+                            class="ph ph-x text-xl"></i></button>
+                </div>
+            </div>
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8">
+                <!-- 1. Customer -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="flex items-start gap-4">
+                        <img id="modal-customer-img" src=""
+                            class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900" id="modal-customer-name"></h3>
+                            <a href="#" id="modal-customer-phone"
+                                class="text-sm text-primary-600 hover:underline block mt-0.5 font-medium"></a>
+                            <p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><i class="ph ph-map-pin"></i>
+                                <span id="modal-customer-city"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-slate-50 dark:bg-dark-800 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Shipping Address</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed" id="modal-address"></p>
+                    </div>
+                </section>
+                <!-- 2. Timeline -->
+                <section>
+                    <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><i
+                            class="ph ph-clock-counter-clockwise text-primary-500"></i> Order Timeline</h4>
+                    <div class="relative pl-4 border-l-2 border-slate-100 space-y-6" id="modal-timeline"></div>
+                </section>
+                <!-- 3. Items -->
+                <section>
+                    <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><i
+                            class="ph ph-shopping-cart-simple text-primary-500"></i> Items</h4>
+                    <div class="space-y-3" id="modal-products"></div>
+                </section>
+                <!-- 4. Summary -->
+                <section
+                    class="bg-slate-50 dark:bg-dark-800 rounded-xl p-5 border border-slate-100 dark:border-slate-800">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-slate-500"><span>Subtotal</span><span id="modal-subtotal"
+                                class="font-medium text-slate-700"></span></div>
+                        <div class="flex justify-between text-slate-500"><span>Tax (14%)</span><span id="modal-tax"
+                                class="font-medium text-slate-700"></span></div>
+                        <div class="flex justify-between text-slate-500"><span>Shipping</span><span id="modal-shipping"
+                                class="font-medium text-slate-700"></span></div>
+                        <div class="border-t border-slate-200 my-2 pt-2 flex justify-between items-center"><span
+                                class="font-bold text-slate-800">Total</span><span id="modal-total"
+                                class="text-lg font-bold text-primary-600"></span></div>
+                    </div>
+                </section>
+            </div>
+            <!-- Footer -->
+            <div
+                class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-dark-800 flex justify-end gap-3">
+                <button
+                    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">Edit
+                    Order</button>
+                <button
+                    class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all">Generate
+                    Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POS Checkout Modal -->
+    <div id="pos-checkout-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closePosCheckout()">
+        </div>
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative z-10 scale-95 transition-transform duration-300 pointer-events-auto"
+            id="pos-modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-xl text-slate-800"><i class="ph ph-wallet text-primary-600 mr-2"></i> Payment
+                </h3>
+                <button onclick="closePosCheckout()" class="text-slate-400 hover:text-red-500 transition-colors"><i
+                        class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <p class="text-slate-500 mb-1 text-sm">Amount Due</p>
+                    <h2 class="text-4xl font-black text-slate-800" id="pos-modal-total">$0.00</h2>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="paymentType" value="cash" class="peer sr-only" checked
+                            onchange="togglePosPaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-slate-100 text-center peer-checked:border-primary-500 peer-checked:bg-primary-50 transition-all hover:bg-slate-50">
+                            <i class="ph ph-money text-2xl text-emerald-500 mb-2"></i>
+                            <div class="font-bold text-sm text-slate-700">Cash</div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="paymentType" value="card" class="peer sr-only"
+                            onchange="togglePosPaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-slate-100 text-center peer-checked:border-primary-500 peer-checked:bg-primary-50 transition-all hover:bg-slate-50">
+                            <i class="ph ph-credit-card text-2xl text-purple-500 mb-2"></i>
+                            <div class="font-bold text-sm text-slate-700">Card</div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative group">
+                        <input type="radio" name="paymentType" value="qr" class="peer sr-only"
+                            onchange="togglePosPaymentInputs()">
+                        <div
+                            class="p-4 rounded-xl border-2 border-slate-100 text-center peer-checked:border-primary-500 peer-checked:bg-primary-50 transition-all hover:bg-slate-50">
+                            <i class="ph ph-qr-code text-2xl text-slate-600 mb-2"></i>
+                            <div class="font-bold text-sm text-slate-700">QR Code</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Cash Input -->
+                <div id="pos-cash-section" class="bg-slate-50 p-4 rounded-xl mb-4 border border-slate-200">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Amount Paid</label>
+                    <div class="relative">
+                        <input type="number" id="pos-amount-paid"
+                            class="w-full pl-3 pr-12 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:outline-none text-xl font-bold"
+                            placeholder="0.00" oninput="calculatePosChange()">
+                        <span class="absolute right-4 top-3.5 text-slate-400 font-bold">$</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-200">
+                        <span class="text-slate-600 font-medium">Change:</span>
+                        <span class="text-xl font-bold text-emerald-600" id="pos-change-amount">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="processPosPayment()"
+                    class="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                    Confirm Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // =========================
+        // GLOBAL STATE & NAV
+        // =========================
+        let currentView = 'dashboard'; // Default Dashboard
+
+        function switchView(view) {
+            currentView = view;
+
+            // Toggle Logic
+            document.querySelectorAll('.view-section').forEach(el => {
+                if (el.id === `view-${view}`) {
+                    el.style.display = view === 'pos' ? 'flex' : 'block'; // POS needs flexflex
+                    setTimeout(() => el.classList.add('active'), 10);
+                } else {
+                    el.classList.remove('active');
+                    setTimeout(() => el.style.display = 'none', 300);
+                }
+            });
+
+            // Nav Highlight
+            ['dashboard', 'orders', 'pos'].forEach(v => {
+                const btn = document.getElementById(`nav-${v}`);
+                if (v === view) {
+                    btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100 transition-all font-semibold";
+                } else {
+                    btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary-600 transition-all font-medium";
+                }
+            });
+
+            // Title Update
+            const titles = { 'dashboard': 'Admin Dashboard', 'orders': 'Orders Management', 'pos': 'Point of Sale' };
+            document.getElementById('page-title').innerText = titles[view];
+        }
+
+        // =========================
+        // VIEW: ORDERS LOGIC
+        // =========================
+        // --- Animations ---
+        const animateEntrance = () => {
+            // Basic Entrance for Tabs
+            gsap.fromTo("#tabs-container", { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5 });
+        };
+        const animateFilter = () => {
+            gsap.fromTo("#orders-grid > div", { y: 20, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.05, ease: "back.out(1.7)", clearProps: "transform,opacity,scale" });
+        };
+
+        // --- Mock Data ---
+        const generateOrders = (count) => {
+            const statuses = ['Pending', 'Confirmed', 'Packaging', 'Out for Delivery', 'Delivered', 'Returned', 'Failed', 'Canceled'];
+            const names = ['Yahya Adel', 'Sarah Miller', 'John Smith', 'Alice Johnson', 'Bob Wilson', 'Mohamed Ali', 'Fatima Hassan'];
+            const streets = ['123 Main St, Downtown', '45 El-Tahrir St', 'Seaside Villa 4', '90th St, New Cairo'];
+            return Array.from({ length: count }, (_, i) => {
+                const numItems = Math.floor(Math.random() * 4) + 1;
+                const items = Array.from({ length: numItems }, () => ({
+                    name: ['Wireless Headphones', 'Smart Watch Series 7', 'Premium Backpack', 'Mechanic Keyboard', 'Gaming Mouse'][Math.floor(Math.random() * 5)],
+                    price: [120, 350, 85, 150, 60][Math.floor(Math.random() * 5)],
+                    img: `https://images.unsplash.com/photo-${['1505740420928-5e560c06d30e', '1523275335684-37898b6baf30', '1553062407-98eeb64c6a62', '1587829741301-351d42868297', '1527864550417-7fd91fc51a46'][Math.floor(Math.random() * 5)]}?w=150&q=80`,
+                    qty: Math.floor(Math.random() * 3) + 1
+                }));
+                const subtotal = items.reduce((s, it) => s + (it.price * it.qty), 0);
+                return {
+                    id: 100000 + i,
+                    customer: names[Math.floor(Math.random() * names.length)],
+                    phone: '+20115447' + Math.floor(1000 + Math.random() * 9000),
+                    city: ['Cairo', 'Alexandria', 'Giza', 'Mansoura'][Math.floor(Math.random() * 4)],
+                    address: streets[Math.floor(Math.random() * streets.length)] + ', Apt ' + Math.floor(Math.random() * 20),
+                    date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    payment: ['Cash on Delivery', 'Visa **4242', 'Vodafone Cash'][Math.floor(Math.random() * 3)],
+                    img: `https://i.pravatar.cc/150?u=${i + 10}`,
+                    items: items,
+                    costs: { subtotal: subtotal.toFixed(2), tax: (subtotal * 0.14).toFixed(2), shipping: '20.00', total: (subtotal * 1.14 + 20).toFixed(2) }
+                };
+            });
+        };
+        const allOrders = generateOrders(25);
+        const statusConfig = {
+            'All': { color: 'slate', icon: 'ph-squares-four' },
+            'Pending': { color: 'amber', icon: 'ph-clock', bg: 'bg-amber-100', text: 'text-amber-700' },
+            'Confirmed': { color: 'blue', icon: 'ph-check-circle', bg: 'bg-blue-100', text: 'text-blue-700' },
+            'Packaging': { color: 'indigo', icon: 'ph-package', bg: 'bg-indigo-100', text: 'text-indigo-700' },
+            'Out for Delivery': { color: 'purple', icon: 'ph-truck', bg: 'bg-purple-100', text: 'text-purple-700' },
+            'Delivered': { color: 'emerald', icon: 'ph-check-fat', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+            'Returned': { color: 'orange', icon: 'ph-arrow-u-up-left', bg: 'bg-orange-100', text: 'text-orange-700' },
+            'Failed': { color: 'red', icon: 'ph-warning-circle', bg: 'bg-red-100', text: 'text-red-700' },
+            'Canceled': { color: 'gray', icon: 'ph-x-circle', bg: 'bg-slate-100', text: 'text-slate-600' },
+        };
+        let currentFilter = 'All';
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = allOrders.length;
+            document.getElementById('stat-pending').innerText = allOrders.filter(o => o.status === 'Pending').length;
+            document.getElementById('stat-confirmed').innerText = allOrders.filter(o => o.status === 'Confirmed').length;
+            document.getElementById('stat-delivered').innerText = allOrders.filter(o => o.status === 'Delivered').length;
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+            Object.keys(statusConfig).forEach(status => {
+                const isActive = currentFilter === status;
+                const config = statusConfig[status];
+                const count = status === 'All' ? allOrders.length : allOrders.filter(o => o.status === status).length;
+                const btn = document.createElement('button');
+                btn.className = `whitespace-nowrap flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-200 border ${isActive ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/20' : 'bg-white dark:bg-dark-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400'}`;
+                btn.innerHTML = `<i class="ph ${config.icon} text-lg ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}"></i>${status}<span class="${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-dark-800 text-slate-500 dark:text-slate-400'} text-xs py-0.5 px-2 rounded-full ml-1">${count}</span>`;
+                btn.onclick = () => { currentFilter = status; renderTabs(); renderOrders(); animateFilter(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderOrders() {
+            const grid = document.getElementById('orders-grid');
+            grid.innerHTML = '';
+            const filtered = currentFilter === 'All' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400"><i class="ph ph-magnifying-glass text-6xl mb-4 opacity-50"></i><p class="text-lg font-medium">No orders found.</p></div>`;
+                return;
+            }
+            filtered.forEach(order => {
+                const config = statusConfig[order.status] || statusConfig['All'];
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-dark-900 rounded-2xl p-5 shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100/50 dark:border-slate-800 group flex flex-col h-full searchable-item';
+                const badgeClass = `${config.bg} ${config.text}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div><span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Order ID</span><div class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-1">#${order.id}<i class="ph ph-copy text-slate-300 dark:text-slate-600 hover:text-primary-500 cursor-pointer text-sm"></i></div></div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>${order.status}</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4 p-3 bg-slate-50 dark:bg-dark-800 rounded-xl">
+                        <img src="${order.img}" class="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-dark-900">
+                        <div class="flex-1 min-w-0"><h4 class="text-sm font-bold text-slate-800 dark:text-white truncate">${order.customer}</h4><p class="text-xs text-slate-500 dark:text-slate-400">${order.phone}</p></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-sm mb-5 flex-1">
+                        <div><p class="text-slate-400 text-xs">Date</p><p class="font-medium text-slate-700">${order.date.toLocaleDateString()}</p></div>
+                        <div><p class="text-slate-400 text-xs">Payment</p><p class="font-medium text-slate-700 truncate">${order.payment}</p></div>
+                        <div class="col-span-2 pt-2 border-t border-slate-100 mt-1 flex justify-between"><p class="text-slate-400 text-xs font-semibold">TOTAL</p><p class="text-lg font-bold text-primary-600">$${order.costs.total}</p></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mt-auto">
+                        <button class="view-btn flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-medium text-sm hover:border-primary-500 hover:text-primary-600 transition-colors"><i class="ph ph-eye"></i> View</button>
+                        <button class="flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium text-sm hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all"><i class="ph ph-file-pdf"></i> Invoice</button>
+                    </div>
+                `;
+                card.querySelector('.view-btn').onclick = () => openOrderModal(order);
+                grid.appendChild(card);
+            });
+        }
+
+        function openOrderModal(order) {
+            const modal = document.getElementById('order-modal');
+            const panel = document.getElementById('modal-panel');
+            if (!modal || !panel) return;
+            document.getElementById('modal-order-id').innerText = order.id;
+            document.getElementById('modal-date').innerText = order.date.toLocaleString();
+            const config = statusConfig[order.status];
+            const badge = document.getElementById('modal-status-badge');
+            badge.className = `text-xs px-2.5 py-1 rounded-full font-bold ${config.bg} ${config.text}`;
+            badge.innerText = order.status;
+            document.getElementById('modal-customer-name').innerText = order.customer;
+            document.getElementById('modal-customer-img').src = order.img;
+            document.getElementById('modal-customer-city').innerText = order.city;
+            document.getElementById('modal-address').innerText = order.address;
+            const pCont = document.getElementById('modal-products'); pCont.innerHTML = '';
+            order.items.forEach(item => {
+                pCont.innerHTML += `<div class="flex items-center gap-4 py-2"><img src="${item.img}" class="w-12 h-12 rounded-lg bg-slate-100"><div class="flex-1"><h5 class="text-sm font-semibold">${item.name}</h5><p class="text-xs text-slate-500">Qty: ${item.qty}</p></div><div class="text-right"><p class="font-bold">$${(item.price * item.qty).toFixed(2)}</p></div></div>`;
+            });
+            document.getElementById('modal-total').innerText = '$' + order.costs.total;
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); panel.classList.remove('translate-x-full'); }, 10);
+        }
+
+        function closeOrderModal() {
+            const modal = document.getElementById('order-modal');
+            const panel = document.getElementById('modal-panel');
+            if (!modal || !panel) return;
+            panel.classList.add('translate-x-full'); modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // =========================
+        // INIT
+        // =========================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init Orders
+            updateStats();
+            renderTabs();
+            renderOrders();
+            animateEntrance();
+
+            initDashboard();
+
+            // Init POS
+            initPOS();
+
+            // Init AOS
+            AOS.init();
+        });
+
+        // =========================
+        // DASHBOARD LOGIC
+        // =========================
+        const appCharts = {};
+
+        function initDashboard() {
+            // Chart 1: Order Statistics (Line Chart)
+            const ctxOrder = document.getElementById('order-statistics-chart').getContext('2d');
+            const gradOrder = ctxOrder.createLinearGradient(0, 0, 0, 300);
+            gradOrder.addColorStop(0, 'rgba(239, 68, 68, 0.2)'); // Red-500
+            gradOrder.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+            appCharts.orderChart = new Chart(ctxOrder, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [5, 8, 3, 12, 15, 10, 8, 14, 20, 18, 25, 22],
+                        borderColor: '#ef4444',
+                        backgroundColor: gradOrder,
+                        tension: 0.4, fill: true, borderWidth: 3, pointRadius: 0, hoverPointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Chart 2: Earning Statistics (Line Chart - Blue)
+            const ctxEarn = document.getElementById('earning-statistics-chart').getContext('2d');
+            const gradEarn = ctxEarn.createLinearGradient(0, 0, 0, 250);
+            gradEarn.addColorStop(0, 'rgba(14, 165, 233, 0.2)'); // Sky-500
+            gradEarn.addColorStop(1, 'rgba(14, 165, 233, 0)');
+
+            appCharts.earnChart = new Chart(ctxEarn, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Earnings ($)',
+                        data: [1200, 1900, 1500, 2200, 2800, 2400, 3200, 3500, 2900, 3800, 4200, 4825],
+                        borderColor: '#0ea5e9',
+                        backgroundColor: gradEarn,
+                        tension: 0.4, fill: true, borderWidth: 3, pointRadius: 0, hoverPointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Chart 3: User Overview (Doughnut)
+            const ctxUser = document.getElementById('user-overview-chart').getContext('2d');
+            appCharts.userChart = new Chart(ctxUser, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Customer', 'Vendor', 'Delivery Man'],
+                    datasets: [{
+                        data: [8, 4, 0],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // =========================
+        // NEW POS LOGIC (Merged from pos.html)
+        // =========================
+        const products = [
+            { id: 203, name: "فستان كاروهات", price: 95.00, img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=300&q=80", cat: "fashion", store: "الفرع الرئيسي" },
+            { id: 202, name: "قميص بوهيمي", price: 120.00, img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&q=80", cat: "fashion", store: "مول العرب" },
+            { id: 201, name: "ثلاجة 4 أبواب", price: 4500.00, img: "https://images.unsplash.com/photo-1571175443880-49e1d58b794a?auto=format&fit=crop&w=300&q=80", cat: "home", store: "المتجر الإلكتروني" },
+            { id: 200, name: "أحمر شفاه جيلي", price: 58.00, img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=300&q=80", cat: "beauty", store: "الفرع الرئيسي" },
+            { id: 199, name: "ساعة ذكية T900", price: 165.00, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80", cat: "electronics", store: "مول العرب" },
+            { id: 198, name: "حقيبة جلدية", price: 340.00, img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80", cat: "fashion", store: "الفرع الرئيسي" },
+            { id: 197, name: "وعاء نباتات", price: 85.00, img: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=300&q=80", cat: "home", store: "المتجر الإلكتروني" },
+            { id: 196, name: "سماعات لاسلكية", price: 450.00, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80", cat: "electronics", store: "مول العرب" },
+            { id: 195, name: "قميص صيفي", price: 105.00, img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&q=80", cat: "fashion", store: "الفرع الرئيسي" },
+            { id: 194, name: "سيروم واقي شمس", price: 130.00, img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=300&q=80", cat: "beauty", store: "المتجر الإلكتروني" },
+        ];
+
+        const customers = [
+            { id: 1, name: "عميل نقدي", phone: "غير متاح", type: "افتراضي", img: null },
+            { id: 2, name: "أمير عادل", phone: "0551234567", type: "VIP", img: "A" },
+            { id: 3, name: "محمد جلال", phone: "0509876543", type: "دائم", img: "M" },
+            { id: 4, name: "سارة أحمد", phone: "0561122334", type: "جديد", img: "S" },
+            { id: 5, name: "خالد يوسف", phone: "0546677889", type: "VIP", img: "K" },
+            { id: 6, name: "منى علي", phone: "0599988776", type: "دائم", img: "Mo" },
+        ];
+
+        let posCart = [];
+        let posDiscount = 0;
+        let posDiscountType = 'percent';
+        let currentScope = 'product';
+
+        // --- INIT ---
+        function initPOS() {
+            renderProducts(products);
+            updateCartUI();
+            startPosClock();
+            setupSearchListeners();
+        }
+
+        function startPosClock() {
+            const update = () => {
+                const now = new Date();
+                const clockEl = document.getElementById('clock');
+                const dateEl = document.getElementById('date');
+                if (clockEl) clockEl.innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                if (dateEl) dateEl.innerText = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            };
+            setInterval(update, 1000);
+            update();
+        }
+
+        // --- SEARCH LOGIC ---
+        function setupSearchListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const searchScope = document.getElementById('searchScope');
+            const categoriesContainer = document.getElementById('categoriesContainer');
+
+            if (searchScope) {
+                searchScope.addEventListener('change', (e) => {
+                    currentScope = e.target.value;
+                    searchInput.value = '';
+                    if (currentScope === 'customer') {
+                        categoriesContainer.classList.add('opacity-50', 'pointer-events-none');
+                        renderCustomers(customers);
+                    } else {
+                        categoriesContainer.classList.remove('opacity-50', 'pointer-events-none');
+                        renderProducts(products);
+                    }
+                    const placeholders = {
+                        product: 'بحث عن منتج (اسم أو كود)...',
+                        category: 'بحث في التصنيفات...',
+                        store: 'بحث في المتاجر...',
+                        customer: 'بحث عن عميل (اسم أو هاتف)...'
+                    };
+                    searchInput.placeholder = placeholders[currentScope];
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    let filtered = [];
+                    if (currentScope === 'product') {
+                        filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.id.toString().includes(term));
+                        renderProducts(filtered);
+                    } else if (currentScope === 'category') {
+                        filtered = products.filter(p => p.cat.toLowerCase().includes(term));
+                        renderProducts(filtered);
+                    } else if (currentScope === 'store') {
+                        filtered = products.filter(p => p.store.toLowerCase().includes(term));
+                        renderProducts(filtered);
+                    } else if (currentScope === 'customer') {
+                        filtered = customers.filter(c => c.name.toLowerCase().includes(term) || c.phone.includes(term));
+                        renderCustomers(filtered);
+                    }
+                });
+            }
+        }
+
+        function switchToCustomerSearch() {
+            const searchScope = document.getElementById('searchScope');
+            const searchInput = document.getElementById('searchInput');
+            if (searchScope && searchInput) {
+                searchScope.value = 'customer';
+                searchScope.dispatchEvent(new Event('change'));
+                searchInput.focus();
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderProducts(list) {
+            const grid = document.getElementById('mainGrid');
+            const notFound = document.getElementById('notFound');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (list.length === 0) {
+                if (notFound) notFound.classList.remove('hidden');
+                return;
+            } else {
+                if (notFound) notFound.classList.add('hidden');
+            }
+
+            list.forEach((p, index) => {
+                const el = document.createElement('div');
+                el.className = 'product-card-wrapper searchable-item product-card bg-white dark:bg-dark-900 rounded-2xl p-3 cursor-pointer relative group border border-transparent hover:border-blue-100 dark:hover:border-primary-900 shadow-sm';
+                el.onclick = () => addToCart(p.id);
+                gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, delay: index * 0.03, duration: 0.3 });
+                el.innerHTML = `
+                    <div class="h-40 rounded-xl overflow-hidden relative mb-3">
+                        <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute top-2 left-2 bg-white/90 dark:bg-dark-900/90 backdrop-blur text-[10px] px-2 py-1 rounded-md shadow-sm font-bold text-gray-600 dark:text-gray-400">
+                            ${p.store}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white text-sm mb-1 line-clamp-1">${p.name}</h4>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-black text-lg">${p.price} <span class="text-xs font-normal">ر.س</span></span>
+                            <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        function renderCustomers(list) {
+            const grid = document.getElementById('mainGrid');
+            const notFound = document.getElementById('notFound');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (list.length === 0) {
+                if (notFound) notFound.classList.remove('hidden');
+                return;
+            } else {
+                if (notFound) notFound.classList.add('hidden');
+            }
+
+            list.forEach((c, index) => {
+                const el = document.createElement('div');
+                el.className = 'customer-card bg-white dark:bg-dark-900 rounded-2xl p-5 cursor-pointer border border-gray-100 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 flex flex-col items-center text-center shadow-sm relative overflow-hidden searchable-item';
+                el.onclick = () => selectCustomerFromSearch(c.name);
+                gsap.fromTo(el, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, delay: index * 0.05, duration: 0.3 });
+                const initial = c.img ? c.img : '<i class="fas fa-user"></i>';
+                const bgClass = c.type === 'VIP' ? 'bg-yellow-100 text-yellow-600' : 'bg-blue-100 text-blue-600';
+                el.innerHTML = `
+                    <div class="w-20 h-20 rounded-full ${bgClass} flex items-center justify-center text-2xl font-bold mb-4 shadow-inner">
+                        ${initial}
+                    </div>
+                    <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">${c.name}</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-3 dir-ltr">${c.phone}</p>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-300">${c.type}</span>
+                    <div class="absolute bottom-0 inset-x-0 h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        function selectCustomer(name) {
+            const el = document.getElementById('selectedCustomerName');
+            if (el) el.innerText = name;
+        }
+
+        function selectCustomerFromSearch(name) {
+            selectCustomer(name);
+            const searchScope = document.getElementById('searchScope');
+            searchScope.value = 'product';
+            searchScope.dispatchEvent(new Event('change'));
+        }
+
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.add('bg-white', 'dark:bg-dark-900', 'text-gray-600', 'dark:text-gray-300'));
+            btn.classList.remove('bg-white', 'dark:bg-dark-900', 'text-gray-600', 'dark:text-gray-300');
+            btn.classList.add('active', 'bg-blue-600', 'text-white');
+            if (currentScope === 'customer') {
+                const searchScope = document.getElementById('searchScope');
+                searchScope.value = 'product';
+                currentScope = 'product';
+            }
+            if (cat === 'all') renderProducts(products);
+            else renderProducts(products.filter(p => p.cat === cat));
+        }
+
+        // --- CART ---
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existing = posCart.find(item => item.id === id);
+            if (existing) existing.qty++;
+            else posCart.push({ ...product, qty: 1 });
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const emptyMsg = document.getElementById('emptyCartMessage');
+            if (!container || !emptyMsg) return;
+
+            if (posCart.length === 0) {
+                emptyMsg.style.display = 'flex';
+                container.style.display = 'none';
+                updateTotals();
+                return;
+            } else {
+                emptyMsg.style.display = 'none';
+                container.style.display = 'block';
+            }
+
+            container.innerHTML = posCart.map(item => `
+                <div class="flex items-center gap-3 bg-white dark:bg-dark-900 p-3 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm relative group hover:border-blue-200 dark:hover:border-primary-900 transition-colors">
+                    <img src="${item.img}" class="w-14 h-14 rounded-lg object-cover bg-gray-100 dark:bg-dark-800">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-bold text-gray-800 dark:text-white truncate">${item.name}</h4>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">${item.price} ر.س / وحدة</div>
+                    </div>
+                    <div class="flex items-center bg-gray-100 dark:bg-dark-800 rounded-lg p-1 h-8">
+                        <button onclick="changeQty(${item.id}, -1)" class="w-6 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-dark-700 rounded transition-colors"><i class="fas fa-minus text-[10px]"></i></button>
+                        <span class="w-6 text-center text-sm font-bold text-gray-800 dark:text-white">${item.qty}</span>
+                        <button onclick="changeQty(${item.id}, 1)" class="w-6 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-green-500 hover:bg-white dark:hover:bg-dark-700 rounded transition-colors"><i class="fas fa-plus text-[10px]"></i></button>
+                    </div>
+                    <div class="text-left w-16">
+                         <div class="font-bold text-gray-800 dark:text-white text-sm">${(item.price * item.qty).toFixed(0)}</div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="absolute -top-2 -left-2 bg-white dark:bg-dark-800 text-red-500 shadow-md w-6 h-6 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center border border-gray-100 dark:border-slate-800">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+            updateTotals();
+        }
+
+        function changeQty(id, delta) {
+            const item = posCart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) removeFromCart(id);
+                else updateCartUI();
+            }
+        }
+
+        function removeFromCart(id) {
+            posCart = posCart.filter(item => item.id !== id);
+            updateCartUI();
+        }
+
+        function clearCart() {
+            if (posCart.length > 0 && confirm('هل أنت متأكد من مسح السلة؟')) {
+                posCart = [];
+                posDiscount = 0;
+                updateCartUI();
+            }
+        }
+
+        function updateTotals() {
+            const subtotal = posCart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const tax = subtotal * 0.15;
+            let discountAmount = posDiscountType === 'percent' ? subtotal * (posDiscount / 100) : posDiscount;
+            const total = subtotal + tax - discountAmount;
+
+            document.getElementById('subTotal').innerText = subtotal.toFixed(2) + ' ر.س';
+            document.getElementById('taxTotal').innerText = tax.toFixed(2) + ' ر.س';
+            document.getElementById('discountTotal').innerText = '- ' + discountAmount.toFixed(2) + ' ر.س';
+            document.getElementById('grandTotal').innerText = total.toFixed(2) + ' ر.س';
+            document.getElementById('modalTotalAmount').innerText = total.toFixed(2) + ' ر.س';
+        }
+
+        // --- MODAL FUNCTIONS ---
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('hidden');
+                m.classList.add('open');
+                // GSAP Animation
+                const content = m.querySelector('.modal-content');
+                if (content) {
+                    gsap.fromTo(content,
+                        { scale: 0.8, opacity: 0 },
+                        { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)" }
+                    );
+                }
+                // For checkoutModal, handle payment inputs reset
+                if (id === 'checkoutModal' && typeof togglePaymentInputs === 'function') {
+                    setTimeout(togglePaymentInputs, 10);
+                }
+            }
+        }
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('open');
+                m.classList.add('hidden');
+            }
+        }
+
+        // --- DISCOUNT LOGIC ---
+        function setDiscountType(type) {
+            posDiscountType = type;
+            const btnPerc = document.getElementById('discTypePerc');
+            const btnFixed = document.getElementById('discTypeFixed');
+            if (type === 'percent') {
+                btnPerc.className = "flex-1 py-2 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold";
+                btnFixed.className = "flex-1 py-2 rounded-lg border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-gray-400";
+            } else {
+                btnFixed.className = "flex-1 py-2 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold";
+                btnPerc.className = "flex-1 py-2 rounded-lg border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-gray-400";
+            }
+        }
+
+        function applyDiscount() {
+            const val = parseFloat(document.getElementById('discountValue').value);
+            if (!isNaN(val)) {
+                posDiscount = val;
+                updateTotals();
+                closeModal('discountModal');
+            }
+        }
+
+        // --- CUSTOMER LOGIC ---
+        function selectCustomer(name) {
+            const nameEl = document.getElementById('selectedCustomerName');
+            if (nameEl) nameEl.innerText = name;
+        }
+
+        // --- CHECKOUT LOGIC ---
+        function openCheckout() {
+            if (posCart.length === 0) return alert("السلة فارغة!");
+            openModal('checkoutModal');
+            togglePaymentInputs();
+        }
+
+        function togglePaymentInputs() {
+            const type = document.querySelector('input[name="paymentType"]:checked').value;
+            const cashSection = document.getElementById('cashInputSection');
+            if (type === 'cash') {
+                cashSection.classList.remove('hidden');
+                setTimeout(() => document.getElementById('amountPaid').focus(), 100);
+            } else {
+                cashSection.classList.add('hidden');
+            }
+        }
+
+        function calculateChange() {
+            const total = parseFloat(document.getElementById('grandTotal').innerText.replace(' ر.س', ''));
+            const paid = parseFloat(document.getElementById('amountPaid').value);
+            const changeElement = document.getElementById('changeAmount');
+            if (!isNaN(paid) && paid >= total) {
+                changeElement.innerText = (paid - total).toFixed(2) + ' ر.س';
+                changeElement.classList.replace('text-red-500', 'text-green-600');
+            } else {
+                changeElement.innerText = '0.00 ر.س';
+                if (paid < total && paid > 0) changeElement.classList.replace('text-green-600', 'text-red-500');
+            }
+        }
+
+        function processPayment() {
+            const btn = event.currentTarget;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري المعالجة...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                closeModal('checkoutModal');
+                const overlay = document.getElementById('successOverlay');
+                overlay.classList.remove('hidden');
+                gsap.to("#successIcon", { scale: 1, duration: 0.5, ease: "back.out(1.7)" });
+                gsap.to(["#successTitle", "#successSub"], { opacity: 1, y: 0, stagger: 0.2, duration: 0.5 });
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    posCart = [];
+                    posDiscount = 0;
+                    updateCartUI();
+                    btn.innerHTML = 'تأكيد واستلام الفاتورة';
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 2000);
+            }, 1500);
+        }
+
+        // --- THEME & LANGUAGE INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme init
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-moon', 'ph-sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-sun', 'ph-moon');
+            }
+
+            // Language init
+            const savedLang = localStorage.getItem('lang') || 'ar';
+            changeLanguage(savedLang, false);
+        });
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+                icon.classList.replace('ph-sun', 'ph-moon');
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+                icon.classList.replace('ph-moon', 'ph-sun');
+            }
+            updateChartsTheme();
+        }
+
+        function updateChartsTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? '#334155' : '#f1f5f9';
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+
+            [appCharts.orderChart, appCharts.earnChart].forEach(chart => {
+                if (chart) {
+                    if (chart.options.scales.y) {
+                        chart.options.scales.y.grid.color = gridColor;
+                        chart.options.scales.y.ticks.color = textColor;
+                    }
+                    if (chart.options.scales.x) {
+                        chart.options.scales.x.ticks.color = textColor;
+                    }
+                    chart.update();
+                }
+            });
+            // Doughnut chart doesn't have scales usually, but we can update legend if needed
+        }
+
+        function changeLanguage(lang, reload = true) {
+            const html = document.documentElement;
+            const body = document.body;
+            const langFlag = document.getElementById('current-lang-flag');
+            const langText = document.getElementById('current-lang-text');
+
+            if (lang === 'ar') {
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                body.setAttribute('dir', 'rtl');
+                if (langFlag) langFlag.src = "https://sell77.doobagency.com/public/assets/front-end/img/flags/eg.png";
+                if (langText) langText.innerText = "العربية";
+            } else {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                body.setAttribute('dir', 'ltr');
+                if (langFlag) langFlag.src = "https://sell77.doobagency.com/public/assets/front-end/img/flags/en.png";
+                if (langText) langText.innerText = "English";
+            }
+
+            localStorage.setItem('lang', lang);
+            if (reload) {
+                // In a real app, you might change all UI text here.
+                // For now, we update the layout and persist.
+                document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+            }
+        }
+
+
+        // --- GLOBAL & REAL-TIME SEARCH ---
+        function handleGlobalSearch(query) {
+            const q = query.toLowerCase().trim();
+            const activeView = document.querySelector('.view-section.active');
+
+            if (!activeView) return;
+
+            // 1. If POS is active, filter products
+            if (activeView.id === 'view-pos') {
+                const productCards = document.querySelectorAll('#mainGrid .product-card-wrapper');
+                productCards.forEach(card => {
+                    const name = card.querySelector('h4').innerText.toLowerCase();
+                    const category = card.getAttribute('data-category')?.toLowerCase() || "";
+                    if (name.includes(q) || category.includes(q)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // 2. Filter anything else with text content (e.g., table rows, list items)
+            // This makes the search "Real" across the content
+            const searchables = activeView.querySelectorAll('tr, .searchable-item');
+            searchables.forEach(item => {
+                if (item.innerText.toLowerCase().includes(q)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // --- NAVBAR & MOBILE SIDEBAR ---
+        function toggleDropdown(id) {
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if (d.id !== id) d.classList.remove('show');
+            });
+            const dd = document.getElementById(id);
+            if (dd) dd.classList.toggle('show');
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.toggle('mobile-open');
+                backdrop.classList.toggle('show');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('.relative')) {
+                document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+            }
+        });
+    </script>
+</body>
+
+</html>
