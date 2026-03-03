@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="bZvgB6W1d1IMsvtDKszL2ld2NfbQfPOZeC4AeSn5">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/favicon-16x16.png">
+    <title>Montana SA | Premium Executive Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        premium: {
+                            base: '#0B0D17',
+                            surface: '#161B2E',
+                            accent: '#6366f1',
+                            secondary: '#10b981',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
+                        'inner-glass': 'inset 0 1px 1px rgba(255, 255, 255, 0.05)',
+                        'premium': '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                        '5xl': '3rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Core Support -->
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/css/icons/icomoon/styles.min.css"
+        rel="stylesheet">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/OverlayScrollbars.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
+
+    <style>
+        :root {
+            --accent: #6366f1;
+            --surface: #161B2E;
+            --bg: #0B0D17;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            color: #E2E8F0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Essential UI Components */
+        .glass-card {
+            background: rgba(22, 27, 46, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-item-active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 100%);
+            border-left: 4px solid var(--accent);
+            color: #FFF !important;
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Handling server-injected Bootstrap HTML */
+        /* We wrap these in a container and force-style them */
+        .bootstrap-override .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+        .bootstrap-override .text-muted {
+            color: #94A3B8 !important;
+        }
+
+        .bootstrap-override .text-default {
+            color: #CBD5E1 !important;
+        }
+
+        .bootstrap-override .font-weight-semibold {
+            font-weight: 600;
+        }
+
+        /* Select2 Premium Overrides */
+        .select2-container--default .select2-selection--single {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px !important;
+            height: 44px !important;
+            color: #FFF !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 42px !important;
+            color: #E2E8F0 !important;
+            padding-left: 15px !important;
+        }
+
+        .select2-dropdown {
+            background: #1e1e2d !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #E2E8F0 !important;
+        }
+
+        /* Animation Classes */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        /* Chart Tooltips */
+        .d3-tip {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+    </style>
+
+    <!-- Essential JS Libs -->
+    <script src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/main/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.10.2/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+    <script src="https://montana-sa.amir-adel.com/admin/assets/backend/js/jquery.overlayScrollbars.min.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/ui/moment/moment.min.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/main/bootstrap.bundle.min.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/pickers/daterangepicker.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/echarts/echarts.js"
+        defer></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/d3/d3.min.js"></script>
+    <script
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/d3/d3_tooltip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.js"></script>
+</head>
+
+<body class="antialiased">
+    <div class="flex min-h-screen">
+
+        <!-- Sidebar -->
+        <aside id="sidebar/main"
+            class="fixed lg:static w-72 h-screen z-50 bg-[#0F121F]/90 backdrop-blur-xl border-r border-white/5 transition-all duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto">
+            <div class="p-8 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <img src="https://montana-sa.amir-adel.com/admin/assets/home/logo.svg" class="w-6 h-6 invert"
+                            alt="Logo">
+                    </div>
+                    <span class="text-xl font-extrabold text-white tracking-tight">MONTANA</span>
+                </div>
+            </div>
+
+            <nav class="mt-4 px-4 space-y-1 pb-10">
+                <!-- Dashboard Section -->
+                <div class="text-[10px] uppercase font-bold text-gray-500 px-4 mb-2 tracking-widest">Main Console</div>
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/dashboard"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all group sidebar-item-active">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 text-indigo-400">
+                        <i class="icon-equalizer"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Real-time Dashboard</span>
+                </a>
+
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/stores"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all group">
+                    <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+                        <i class="icon-store2"></i>
+                    </div>
+                    <span class="font-semibold text-sm">All Stores</span>
+                </a>
+
+                <!-- Items & Menu -->
+                <div class="relative group/menu">
+                    <button
+                        class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all"
+                        onclick="toggleSub(this)">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                <i class="icon-stack-star"></i>
+                            </div>
+                            <span class="font-semibold text-sm">Items & Menu</span>
+                        </div>
+                        <i class="icon-arrow-down22 text-[10px] transition-transform"></i>
+                    </button>
+                    <div class="hidden ml-11 mt-1 space-y-1">
+                        <a href="..." class="block py-2 text-xs text-gray-500 hover:text-white">Addon Categories</a>
+                        <a href="..." class="block py-2 text-xs text-gray-500 hover:text-white">Addons</a>
+                        <a href="..." class="block py-2 text-xs text-gray-500 hover:text-white">Menu Categories</a>
+                    </div>
+                </div>
+
+                <div class="text-[10px] uppercase font-bold text-gray-500 px-4 mt-6 mb-2 tracking-widest">Users & Staff
+                </div>
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/users"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <i class="icon-users2"></i>
+                    </div>
+                    <span class="font-semibold text-sm">User Directory</span>
+                </a>
+
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/orders"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                        <i class="icon-basket"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Global Orders</span>
+                </a>
+
+                <div class="text-[10px] uppercase font-bold text-gray-500 px-4 mt-6 mb-2 tracking-widest">Growth</div>
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/promotions"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+                        <i class="icon-percent"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Promotions</span>
+                </a>
+
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/transactions"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <i class="icon-books"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Payouts & Wallet</span>
+                </a>
+
+                <div class="text-[10px] uppercase font-bold text-gray-500 px-4 mt-6 mb-2 tracking-widest">System</div>
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/settings"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-slate-500/10 flex items-center justify-center text-slate-400">
+                        <i class="icon-cog3"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Control Panel</span>
+                </a>
+            </nav>
+
+            <!-- Bottom Profile -->
+            <div class="absolute bottom-0 w-full p-6 border-t border-white/5 bg-[#0F121F]">
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        A</div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs font-bold text-white truncate uppercase">Systems Admin</p>
+                        <p class="text-[10px] text-gray-500 truncate">admin@montana.sa</p>
+                    </div>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/auth/logout"
+                        class="text-gray-500 hover:text-rose-500"><i class="icon-switch2"></i></a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 max-h-screen overflow-y-auto">
+            <!-- Header -->
+            <header
+                class="h-20 border-b border-white/5 bg-[#0B0D17]/80 backdrop-blur-lg sticky top-0 z-40 px-8 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button class="lg:hidden text-gray-400" onclick="toggleSidebar()"><i
+                            class="icon-menu7"></i></button>
+                    <div class="relative w-80">
+                        <i class="icon-search4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                        <input type="text" placeholder="Global search commands..."
+                            class="w-full bg-white/5 border border-white/5 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <!-- Zone Selector -->
+                    <div class="w-48">
+                        <select name="nav_select_zone" class="nav-select-zone">
+                            <option value="0">All Operating Zones</option>
+                            <option value="1">Alhamdaniah</option>
+                            <option value="2">Alsafa</option>
+                            <option value="3">Alsamer</option>
+                        </select>
+                    </div>
+
+                    <!-- Lang -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                            <i class="icon-earth text-lg"></i>
+                            <span class="text-xs font-bold">EN</span>
+                        </button>
+                    </div>
+
+                    <!-- Notifs -->
+                    <button
+                        class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:text-white">
+                        <i class="icon-bell2"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="p-8">
+                <!-- Top Row: Welcome & Date Filter -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Executive Dashboard</h2>
+                        <p class="text-gray-500 text-sm mt-1">Operational status for <span
+                                class="text-indigo-400 font-semibold" id="display-date-range">This Month</span></p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button
+                            class="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-white flex items-center space-x-2 hover:bg-white/10 transition-all daterange-ranges">
+                            <i class="icon-calendar22 text-indigo-400"></i>
+                            <span>Select Dates</span>
+                            <i class="icon-arrow-down22 text-[10px]"></i>
+                        </button>
+                        <button
+                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:scale-110 transition-all">
+                            <i class="icon-file-download2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid (Populated with default premium data) -->
+                <div id="dashboardStatsBlock" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <!-- Orders Stat -->
+                    <div class="glass-card p-6 rounded-[2rem] flex items-center space-x-5 hover:scale-[1.03] transition-all cursor-pointer group animate-slide-up"
+                        style="animation-delay: 0.1s">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg shadow-indigo-500/10">
+                            <i class="icon-basket text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Orders</p>
+                            <h3 class="text-2xl font-black text-white leading-tight">1,284</h3>
+                        </div>
+                    </div>
+                    <!-- Users Stat -->
+                    <div class="glass-card p-6 rounded-[2rem] flex items-center space-x-5 hover:scale-[1.03] transition-all cursor-pointer group animate-slide-up"
+                        style="animation-delay: 0.2s">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10">
+                            <i class="icon-users4 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Active Users</p>
+                            <h3 class="text-2xl font-black text-white leading-tight">8,432</h3>
+                        </div>
+                    </div>
+                    <!-- Stores Stat -->
+                    <div class="glass-card p-6 rounded-[2rem] flex items-center space-x-5 hover:scale-[1.03] transition-all cursor-pointer group animate-slide-up"
+                        style="animation-delay: 0.3s">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:bg-rose-500 group-hover:text-white transition-all shadow-lg shadow-rose-500/10">
+                            <i class="icon-store2 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Growth Stores</p>
+                            <h3 class="text-2xl font-black text-white leading-tight">156</h3>
+                        </div>
+                    </div>
+                    <!-- Earnings Stat -->
+                    <div class="glass-card p-6 rounded-[2rem] flex items-center space-x-5 hover:scale-[1.03] transition-all cursor-pointer group animate-slide-up"
+                        style="animation-delay: 0.4s">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-lg shadow-amber-500/10">
+                            <i class="icon-coin-dollar text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Earnings</p>
+                            <h3 class="text-2xl font-black text-white leading-tight">ر.س 42,850</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid Sortable -->
+                <div class="grid grid-cols-12 gap-8" id="sortable">
+
+                    <!-- Sales Analytics (Main Chart) -->
+                    <div class="col-span-12 lg:col-span-8 glass-card p-8 rounded-[2.5rem] relative overflow-hidden dashboard-block-movable"
+                        data-id="4">
+                        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Live
+                                        Traffic</span>
+                                </div>
+                                <h3 class="text-2xl font-extrabold text-white move-handle cursor-move">Global Sales
+                                    Trend</h3>
+                                <p class="text-gray-500 text-sm">Hourly transaction volume performance</p>
+                            </div>
+                            <div class="flex items-center space-x-8 mt-4 md:mt-0">
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase">Daily Goal</p>
+                                    <p class="text-lg font-bold text-white">ر.س 500</p>
+                                </div>
+                                <div class="w-px h-10 bg-white/5"></div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase">Achieved</p>
+                                    <p class="text-lg font-bold text-emerald-400" id="actual-revenue">ر.س 0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h-64 relative" id="hourly-sales-count">
+                            <!-- D3 Chart Injected Here -->
+                        </div>
+
+                        <!-- Progress Meta -->
+                        <div class="mt-8 pt-8 border-t border-white/5">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-400">Target Achievement Progress</span>
+                                <span class="text-xs font-bold text-indigo-400" id="target-percent">0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                <div id="target-progress-bar"
+                                    class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Distribution (Donut) -->
+                    <div class="col-span-12 lg:col-span-4 glass-card p-8 rounded-[2.5rem] flex flex-col dashboard-block-movable"
+                        data-id="7">
+                        <h3 class="text-xl font-bold text-white mb-8 move-handle cursor-move">Order Distribution</h3>
+                        <div class="flex-1 min-h-[300px]" id="basic_donut"></div>
+                        <div class="mt-4 grid grid-cols-2 gap-2">
+                            <div class="p-3 bg-white/5 rounded-xl border border-white/5 text-center">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase mb-1">Total</p>
+                                <p class="text-xl font-black text-white" id="total-orders-stat">--</p>
+                            </div>
+                            <div class="p-3 bg-white/5 rounded-xl border border-white/5 text-center">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase mb-1">Delivered</p>
+                                <p class="text-xl font-black text-emerald-500">356</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Panel -->
+                    <div class="col-span-12 lg:col-span-4 glass-card rounded-[2.5rem] overflow-hidden flex flex-col dashboard-block-movable"
+                        data-id="1">
+                        <div class="p-8 border-b border-white/5 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white move-handle cursor-move">Recent Flux</h3>
+                            <span
+                                class="text-[10px] font-black bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded">LIVE</span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto max-h-[500px] p-4 space-y-3 bootstrap-override"
+                            id="recentOrdersBlock">
+                            <!-- SAF-2139 -->
+                            <div
+                                class="p-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAF-2139"
+                                    class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white">#SAF-2139</p>
+                                            <p class="text-[10px] text-gray-500 font-bold uppercase">حي الصفا</p>
+                                            <p class="text-[10px] text-gray-400">ر.س16.1</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-[10px] font-black bg-rose-500/10 text-rose-500 px-2 py-1 rounded">Payment
+                                            Failed</span>
+                                        <p class="order-dashboard-time text-[10px] text-gray-600 mt-1 liveTimer"
+                                            title="2026-03-03 10:41:00">--</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <!-- SAF-2138 -->
+                            <div
+                                class="p-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAF-2138"
+                                    class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white">#SAF-2138</p>
+                                            <p class="text-[10px] text-gray-500 font-bold uppercase">حي الصفا</p>
+                                            <p class="text-[10px] text-gray-400">ر.س16.1</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-[10px] font-black bg-rose-500/10 text-rose-500 px-2 py-1 rounded">Payment
+                                            Failed</span>
+                                        <p class="order-dashboard-time text-[10px] text-gray-600 mt-1"
+                                            title="2026-03-02 02:28:56">1d 8h ago</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <!-- SAL-2136 -->
+                            <div
+                                class="p-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAL-2136"
+                                    class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/176426650405i7ZH1TzQ.jpg"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white">#SAL-2136</p>
+                                            <p class="text-[10px] text-gray-500 font-bold uppercase">حى السلامة</p>
+                                            <p class="text-[10px] text-gray-400">ر.س29.9</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-[10px] font-black bg-rose-500/10 text-rose-500 px-2 py-1 rounded">Payment
+                                            Failed</span>
+                                        <p class="text-md font-black text-white mt-1">ر.س29.9</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <a href="#"
+                            class="p-4 text-center text-xs font-bold text-gray-500 hover:text-white bg-white/5 transition-colors">Audit
+                            All Transaction History</a>
+                    </div>
+
+                    <!-- New Users Panel -->
+                    <div class="col-span-12 md:col-span-6 lg:col-span-4 glass-card rounded-[2.5rem] overflow-hidden flex flex-col dashboard-block-movable"
+                        data-id="2">
+                        <div class="p-8 border-b border-white/5">
+                            <h3 class="text-xl font-bold text-white move-handle cursor-move">New User Enrollments</h3>
+                        </div>
+                        <div class="flex-1 overflow-y-auto max-h-[500px] p-4 space-y-3 bootstrap-override"
+                            id="newUsersBlock">
+                            <!-- User 1 -->
+                            <div
+                                class="p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1632"
+                                    class="flex items-center space-x-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold uppercase">
+                                        ع</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-white">عفت</p>
+                                        <p class="text-[10px] text-gray-500">543128999</p>
+                                    </div>
+                                </a>
+                                <span class="text-[10px] font-black text-gray-400 uppercase">Customer</span>
+                            </div>
+                            <!-- User 2 -->
+                            <div
+                                class="p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1631"
+                                    class="flex items-center space-x-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold uppercase">
+                                        MS</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-white">Mohamed saeed</p>
+                                        <p class="text-[10px] text-gray-500">545403214</p>
+                                    </div>
+                                </a>
+                                <span class="text-[10px] font-black text-gray-400 uppercase">Customer</span>
+                            </div>
+                            <!-- User 3 -->
+                            <div
+                                class="p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1630"
+                                    class="flex items-center space-x-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-400 font-bold uppercase">
+                                        م</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-white">ممدوح سبحي</p>
+                                        <p class="text-[10px] text-gray-500">505620847</p>
+                                    </div>
+                                </a>
+                                <span class="text-[10px] font-black text-gray-400 uppercase">Customer</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Stores & Reports -->
+                    <div class="col-span-12 md:col-span-6 lg:col-span-4 glass-card p-8 rounded-[2.5rem] flex flex-col dashboard-block-movable"
+                        data-id="6">
+                        <h3 class="text-xl font-bold text-white mb-2 move-handle cursor-move text-indigo-400">Top
+                            Performing Stores</h3>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase mb-6" id="topStoreRangeLabel">(This
+                            Month)</p>
+                        <div id="topStoresDynamicList" class="space-y-4 bootstrap-override">
+                            <!-- Default Store 1 -->
+                            <div class="media items-center p-3 rounded-2xl hover:bg-white/5 transition-all flex">
+                                <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                    class="w-12 h-12 rounded-xl object-cover mr-3">
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-bold text-white mb-0">حي الصفا - فرع السلامة</h5>
+                                    <p class="text-[10px] text-gray-500">Sales: ر.س 12,450.00</p>
+                                </div>
+                                <div
+                                    class="text-[10px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded">
+                                    Top Store</div>
+                            </div>
+                            <!-- Default Store 2 -->
+                            <div class="media items-center p-3 rounded-2xl hover:bg-white/5 transition-all flex">
+                                <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/176426650405i7ZH1TzQ.jpg"
+                                    class="w-12 h-12 rounded-xl object-cover mr-3">
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-bold text-white mb-0">حى السلامة - فرع الصفا</h5>
+                                    <p class="text-[10px] text-gray-500">Sales: ر.س 8,920.00</p>
+                                </div>
+                                <div class="text-[10px] font-black bg-indigo-500/10 text-indigo-500 px-2 py-1 rounded">
+                                    Trending</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wallet & Performance -->
+                    <div class="col-span-12 md:col-span-6 lg:col-span-7 glass-card p-8 rounded-[2.5rem] dashboard-block-movable"
+                        data-id="3">
+                        <h3 class="text-xl font-bold text-white mb-6 move-handle cursor-move">Wallet Operations</h3>
+                        <div id="walletActivity" class="grid grid-cols-1 md:grid-cols-2 gap-4 bootstrap-override">
+                            <div class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[10px] font-bold text-emerald-400 uppercase">Credit (Cashback)</p>
+                                    <p class="text-sm font-black text-emerald-400">ر.س15.23</p>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Cashback addition from order SAL-2130</p>
+                                <p class="text-[10px] text-gray-600 mt-2">5 days ago</p>
+                            </div>
+                            <div class="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[10px] font-bold text-indigo-400 uppercase">Deposit</p>
+                                    <p class="text-sm font-black text-indigo-400">ر.س500.00</p>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Manual system credit</p>
+                                <p class="text-[10px] text-gray-600 mt-2">6 days ago</p>
+                            </div>
+                            <div class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[10px] font-bold text-emerald-400 uppercase">Credit</p>
+                                    <p class="text-sm font-black text-emerald-400">ر.س100.00</p>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">System automated deposit</p>
+                                <p class="text-[10px] text-gray-600 mt-2">6 days ago</p>
+                            </div>
+                            <div class="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[10px] font-bold text-rose-400 uppercase">Refund</p>
+                                    <p class="text-sm font-black text-rose-400">ر.س8.00</p>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Order cancellation SAF-2077</p>
+                                <p class="text-[10px] text-gray-600 mt-2">6 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="col-span-12 md:col-span-6 lg:col-span-5 glass-card p-8 rounded-[2.5rem] dashboard-block-movable"
+                        data-id="8">
+                        <h3 class="text-xl font-bold text-white mb-6 move-handle cursor-move">System Intelligence Notes
+                        </h3>
+                        <div class="relative mb-6">
+                            <input type="text" id="todo_data" placeholder="Log a quick reminder..."
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <i class="icon-plus22 absolute right-4 top-1/2 -translate-y-1/2 text-indigo-500"></i>
+                        </div>
+                        <ul id="filledTodoNotes" class="space-y-3 overflow-y-auto max-h-[300px] pr-2">
+                            <!-- JS will load from server -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Footer News -->
+                <div class="mt-8 glass-card p-10 rounded-[3rem] dashboard-block-movable" data-id="9">
+                    <div class="flex items-center space-x-2 mb-8">
+                        <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+                        <h3 class="text-2xl font-black text-white move-handle cursor-move uppercase tracking-tight">
+                            Industry Feed & System Alerts</h3>
+                    </div>
+                    <div id="foodomaaNews"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bootstrap-override">
+                        <!-- News injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hidden Logic Inputs -->
+    <input type="hidden" name="_token" value="bZvgB6W1d1IMsvtDKszL2ld2NfbQfPOZeC4AeSn5" id="token">
+
+    <!-- Premium Dashboard Controller -->
+    <script>
+        const PremiumUI = {
+            state: {
+                colors: {
+                    accent: '#6366f1',
+                    success: '#10b981',
+                    warning: '#f59e0b',
+                    danger: '#ef4444',
+                    muted: '#64748b'
+                }
+            },
+
+            init() {
+                this.initLayoutInteractions();
+                this.initCoreLogic();
+                this.loadInitialData();
+                this.setupSortable();
+
+                NProgress.configure({ showSpinner: false });
+                NProgress.start();
+                $(window).on('load', () => NProgress.done());
+            },
+
+            initLayoutInteractions() {
+                // Sidebar Toggle
+                window.toggleSidebar = () => $('#sidebar/main').toggleClass('-translate-x-full');
+
+                // Submenus
+                window.toggleSub = (btn) => {
+                    const $sub = $(btn).next();
+                    $sub.slideToggle(200);
+                    $(btn).find('.icon-arrow-down22').toggleClass('rotate-180');
+                }
+
+                // Smooth internal scroll for sidebar
+                $("#sidebar/main").overlayScrollbars({
+                    scrollbars: { visibility: "auto", autoHide: "leave", autoHideDelay: 500 }
+                });
+            },
+
+            initCoreLogic() {
+                // Select2
+                $('.nav-select-zone').select2({
+                    minimumResultsForSearch: -1,
+                    width: '100%'
+                }).on('change', (e) => {
+                    window.location.href = "https://montana-sa.amir-adel.com/admin/public/change-zone-scope/" + e.target.value;
+                });
+
+                // Date Picker
+                $('.daterange-ranges').daterangepicker({
+                    startDate: moment().startOf('month'),
+                    endDate: moment(),
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment()],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    },
+                    opens: 'left'
+                }, (start, end) => {
+                    const rangeLabel = start.format('MMMM D') + ' - ' + end.format('MMMM D, YYYY');
+                    $('#display-date-range').text(rangeLabel);
+                    $('#topStoreRangeLabel').text('(' + rangeLabel + ')');
+                    this.refreshDashboard(start, end);
+                });
+            },
+
+            loadInitialData() {
+                this.refreshDashboard(moment().startOf('month'), moment());
+                this.initCharts();
+                this.loadNews();
+                this.initTodoLogic();
+                this.startTimers();
+            },
+
+            refreshDashboard(start, end) {
+                const from = start.format('YYYY-MM-DD');
+                const to = end.format('YYYY-MM-DD');
+
+                // Animate skeletons
+                $('#dashboardStatsBlock').children().removeClass('hidden');
+
+                $.ajax({
+                    url: 'https://montana-sa.amir-adel.com/admin/public/admin/get-dashboard-stats',
+                    type: 'GET',
+                    data: { from, to },
+                    dataType: 'JSON'
+                }).done((data) => {
+                    this.renderStats(data.dashboardStats);
+                    $('#topStoresDynamicList').html(data.topStores);
+                    // Re-skin top stores with premium classes
+                    $('#topStoresDynamicList .media').addClass('items-center p-3 rounded-2xl hover:bg-white/5 transition-all');
+
+                    // Specific parsing for some UI elements
+                    this.extractOrderAndRevenueInfo(data.dashboardStats);
+                });
+            },
+
+            renderStats(html) {
+                const $raw = $('<div>').html(html);
+                const $target = $('#dashboardStatsBlock');
+                $target.empty();
+
+                const meta = [
+                    { label: 'Total Orders', icon: 'icon-basket', color: 'indigo' },
+                    { label: 'Active Users', icon: 'icon-users4', color: 'emerald' },
+                    { label: 'Growth Stores', icon: 'icon-store2', color: 'rose' },
+                    { label: 'Total Revenue', icon: 'icon-coin-dollar', color: 'amber' }
+                ];
+
+                $raw.find('.dashboard-display').each((i, el) => {
+                    const val = $(el).find('.dashboard-display-number').text();
+                    const info = meta[i] || { label: 'Metric', icon: 'icon-stats-growth', color: 'blue' };
+
+                    const card = `
+                        <div class="glass-card p-6 rounded-[2rem] flex items-center space-x-5 hover:scale-[1.03] transition-all cursor-pointer group animate-slide-up" style="animation-delay: ${i * 0.1}s">
+                            <div class="w-14 h-14 rounded-2xl bg-${info.color}-500/10 flex items-center justify-center text-${info.color}-400 group-hover:bg-${info.color}-500 group-hover:text-white transition-all shadow-lg shadow-${info.color}-500/10">
+                                <i class="${info.icon} text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">${info.label}</p>
+                                <h3 class="text-2xl font-black text-white leading-tight">${val}</h3>
+                            </div>
+                        </div>
+                    `;
+                    $target.append(card);
+                });
+            },
+
+            extractOrderAndRevenueInfo(statsHtml) {
+                // Some logic to update the small labels in charts
+                const $s = $('<div>').html(statsHtml);
+                const orderCount = $s.find('.dashboard-display-number').first().text();
+                $('#total-orders-stat').text(orderCount);
+            },
+
+            initCharts() {
+                // 1. ECharts Donut
+                require.config({ paths: { echarts: 'https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/echarts' } });
+                require(['echarts', 'echarts/chart/pie'], (ec) => {
+                    const myChart = ec.init(document.getElementById('basic_donut'));
+                    const option = {
+                        tooltip: { trigger: 'item', backgroundColor: 'rgba(15,23,42,0.9)', borderColor: 'rgba(255,255,255,0.1)', textStyle: { color: '#fff' } },
+                        series: [{
+                            type: 'pie', radius: ['60%', '85%'], center: ['50%', '50%'],
+                            itemStyle: { normal: { label: { show: false }, labelLine: { show: false } } },
+                            data: [
+                                { value: 2, name: 'Order Placed', itemStyle: { color: '#6366f1' } },
+                                { value: 182, name: 'Preparing Order', itemStyle: { color: '#10b981' } },
+                                { value: 356, name: 'Delivered', itemStyle: { color: '#3b82f6' } },
+                                { value: 48, name: 'Canceled', itemStyle: { color: '#f43f5e' } },
+                                { value: 2, name: 'Ready For Pick Up', itemStyle: { color: '#fbbf24' } },
+                                { value: 525, name: 'Payment Failed', itemStyle: { color: '#64748b' } }
+                            ]
+                        }]
+                    };
+                    myChart.setOption(option);
+                    $(window).on('resize', () => myChart.resize());
+                });
+
+                // 2. D3 Bar Chart
+                this.renderD3Bar("#hourly-sales-count");
+            },
+
+            renderD3Bar(selector) {
+                const data = [10, 15, 8, 25, 40, 50, 45, 30, 20, 15, 12, 18, 30, 45, 60, 55, 40, 35, 25, 20, 15, 10, 5, 2];
+                const $container = d3.select(selector);
+                const width = $container.node().getBoundingClientRect().width;
+                const height = 250;
+
+                const x = d3.scale.ordinal().rangeBands([0, width], 0.4).domain(d3.range(data.length));
+                const y = d3.scale.linear().range([0, height]).domain([0, d3.max(data)]);
+
+                const svg = $container.append('svg').attr('width', '100%').attr('height', height).append('g');
+
+                svg.selectAll('rect').data(data).enter().append('rect')
+                    .attr('x', (d, i) => x(i))
+                    .attr('y', height)
+                    .attr('width', x.rangeBand())
+                    .attr('height', 0)
+                    .attr('rx', 6)
+                    .attr('fill', '#6366f1')
+                    .transition().duration(1000).delay((d, i) => i * 30)
+                    .attr('y', d => height - y(d))
+                    .attr('height', d => y(d));
+
+                $(window).on('resize', () => {
+                    const newW = $container.node().getBoundingClientRect().width;
+                    x.rangeBands([0, newW], 0.4);
+                    svg.selectAll('rect').attr('x', (d, i) => x(i)).attr('width', x.rangeBand());
+                });
+            },
+
+            loadNews() {
+                $.ajax({
+                    url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/getFoodomaaNews",
+                    type: "GET",
+                    dataType: "json",
+                    success: (res) => {
+                        $('#foodomaaNews').html(res.data);
+                        // Styling hacks for news
+                        $('#foodomaaNews .card').addClass('bg-white/5 border-white/5 p-5 rounded-3xl hover:bg-white/10 transition-all');
+                        $('#foodomaaNews h5').addClass('text-white font-bold mb-2');
+                    }
+                });
+            },
+
+            initTodoLogic() {
+                $('#todo_data').on('keypress', (e) => {
+                    if (e.which == 13) {
+                        const val = $('#todo_data').val();
+                        $.ajax({
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/save-todo-note",
+                            type: "GET",
+                            data: { data: val, priority: "HIGH" },
+                            success: (res) => {
+                                $('#todo_data').val('');
+                                this.appendNote(val, res.data.id);
+                            }
+                        });
+                    }
+                });
+
+                $('body').on('click', '.deleteTodoNote', function () {
+                    if (confirm("Permanently archive this note?")) {
+                        const id = $(this).data('id');
+                        const $li = $(this).closest('li');
+                        $.ajax({
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/delete-todo-note",
+                            type: "GET",
+                            data: { id: id },
+                            success: () => $li.fadeOut()
+                        });
+                    }
+                });
+            },
+
+            appendNote(text, id) {
+                const li = `
+                    <li class="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl group hover:bg-white/10 transition-all">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                            <span class="text-sm text-gray-300">${text}</span>
+                        </div>
+                        <button class="deleteTodoNote opacity-0 group-hover:opacity-100 text-gray-500 hover:text-rose-500 transition-all" data-id="${id}">
+                            <i class="icon-trash"></i>
+                        </button>
+                    </li>
+                `;
+                $('#filledTodoNotes').prepend(li);
+            },
+
+            setupSortable() {
+                $('#sortable').sortable({
+                    animation: 400,
+                    handle: ".move-handle",
+                    ghostClass: 'opacity-50 overflow-hidden rounded-5xl border-2 border-indigo-500',
+                    store: {
+                        get: () => {
+                            const order = localStorage.getItem("admin_dashboard_v3_order");
+                            return order ? order.split('|') : [];
+                        },
+                        set: (s) => {
+                            localStorage.setItem("admin_dashboard_v3_order", s.toArray().join('|'));
+                        }
+                    }
+                });
+            },
+
+            startTimers() {
+                setInterval(() => {
+                    $('.liveTimer').each(function () {
+                        const start = new Date($(this).attr("title"));
+                        const diff = Math.round((new Date() - start) / 1000);
+                        const h = Math.floor(diff / 3600);
+                        const m = Math.floor((diff % 3600) / 60);
+                        const s = diff % 60;
+                        $(this).text(`${h}h ${m}m ${s}s`);
+                    });
+                }, 1000);
+            }
+        };
+
+        $(() => PremiumUI.init());
+    </script>
+</body>
+
+</html>
