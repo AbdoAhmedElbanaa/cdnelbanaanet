@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="rvik8UG5BAsv0qy9NHSD1cs8eBgXcb60fUjO7g2b">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/favicons/favicon-16x16.png">
+    <title>لوحة التحكم
+    </title>
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet"
+        type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/css/icons/icomoon/styles.min.css"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/bootstrap.min.css?v=3.5.0-BUILD-02"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/combined.min.css?v=3.5.0-BUILD-02"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/layout.min.css?v=3.5.0-BUILD-02"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/components.min.css?v=3.5.0-BUILD-02"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/colors.min.css" rel="stylesheet"
+        type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/css/extras/animate.min.css"
+        rel="stylesheet" type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/backend-custom.css?v=3.5.0-BUILD-02"
+        rel="stylesheet" type="text/css">
+    <link type="text/css" href="https://montana-sa.amir-adel.com/admin/assets/backend/css/OverlayScrollbars.min.css"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css">
+    <!-- /global stylesheets -->
+
+
+    <!-- Core JS files -->
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/main/jquery.min.js">
+        </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.10.2/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+
+
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/js/jquery.overlayScrollbars.min.js">
+        </script>
+
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets//js/plugins/ui/moment/moment.min.js">
+        </script>
+
+
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/main/bootstrap.bundle.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/loaders/blockui.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/ui/slinky.min.js">
+        </script>
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/ui/sticky.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/buttons/spin.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/buttons/ladda.min.js">
+        </script>
+
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/notifications/jgrowl.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/forms/selects/select2.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/forms/styling/uniform.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/forms/styling/switchery.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/pickers/color/spectrum.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/editors/summernote/summernote.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/pickers/daterangepicker.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/uploaders/dropzone.min.js">
+        </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-106310733-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'UA-106310733-1'); gtag('evaluation', window.location.hostname);
+    </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/tables/datatables/datatables.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/tables/datatables/extensions/fixed_columns.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/tables/datatables/extensions/col_reorder.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/tables/datatables/extensions/buttons.min.js">
+        </script>
+
+
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/echarts/echarts.js"
+        defer></script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/d3/d3.min.js">
+        </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/d3/d3_tooltip.js">
+        </script>
+
+    <script type="text/javascript" src="https://montana-sa.amir-adel.com/admin/assets/backend/js/app.js">
+    </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/js/navbar-sticky.js"></script>
+    <script type="text/javascript" src="https://montana-sa.amir-adel.com/admin/assets/backend/js/printThis.js">
+    </script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/js/jquery-alphanum.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.js"></script>
+    <script type="text/javascript"
+        src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/pickers/daterangepicker.js">
+        </script>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
+
+    <!-- /theme JS files -->
+    <style>
+        #nprogress .bar {
+            background: #fff !important;
+        }
+
+        #nprogress .peg {
+            box-shadow: 0 0 10px #fff, 0 0 5px #fff;
+        }
+
+        #nprogress .spinner-icon {
+            border-top-color: #fff;
+            border-left-color: #fff;
+        }
+    </style>
+
+    <style>
+        #settings &gt;
+        ul &gt;
+
+        li {
+            text-align: center;
+        }
+
+        #settings &gt;
+        ul &gt;
+
+        li+li {
+            margin-left: .6rem;
+        }
+
+        #settings &gt;
+        ul &gt;
+        li &gt;
+
+        a {
+            display: grid;
+        }
+    </style>
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/bootstrap-rtl.min.css" rel="stylesheet"
+        type="text/css">
+    <link href="https://montana-sa.amir-adel.com/admin/assets/backend/css/custom-rtl.css" rel="stylesheet"
+        type="text/css">
+
+</head>
+
+<body>
+    <link href="/assets/css/amir.css" rel="stylesheet" type="text/css">
+
+    <style>
+        #dark-nav .dropdown-item.active {
+            background-color: #0a4368;
+        }
+
+        .extra-menu {
+            min-width: 500px
+        }
+
+        @media screen and (max-width:767px) {
+            .extra-menu {
+                min-width: auto
+            }
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        /* MG CODE */
+        #mg-nav {
+            flex-wrap: nowrap;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+
+        #mg-nav>div:first-child {
+            justify-content: space-between;
+        }
+
+        #mg-nav>ul {
+            position: fixed;
+            background: #fff;
+            gap: 0.3rem;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1;
+            transform: translateY(100%);
+            transition: 0.3s ease-out;
+        }
+
+        #mg-nav>ul.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0%);
+        }
+
+        #mg-nav li>a {
+            color: #0b4368;
+            border-radius: 4px;
+            padding: 0.6rem 1.2rem;
+            /*justify-content: center;*/
+        }
+
+        #mg-nav li:not(.dropdown-user).active>a {
+            background: #0b4368;
+            color: #fff;
+        }
+
+        #mg-nav li:not(.dropdown-user):has(div) {
+            border-bottom: 1px solid #eee;
+        }
+
+        #mg-nav li:not(.dropdown-user).active>a,
+        #mg-nav li:hover>a {
+            color: #fff;
+            background-color: #0b4368;
+        }
+
+        #mg-nav li:not(.dropdown-user):has(div).active>a {
+            background-color: #ffcd00;
+        }
+
+        #mg-nav li:not(.dropdown-user):has(div)>div {
+            border-left: 1px solid #eee;
+            max-height: 0;
+            --margin-y: 0;
+            margin: var(--margin-y) 2rem;
+            overflow: hidden;
+            transition: 0.3s ease-out;
+        }
+
+        #mg-nav li:not(.dropdown-user).active>div {
+            max-height: var(--sh, 25vh);
+            --margin-y: 0.3rem;
+            /*overflow: auto;*/
+        }
+
+        #mg-nav a.dropdown-toggle::after {
+            margin-left: auto;
+        }
+
+        #mg-nav ul.active+.dismisser {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #0002;
+        }
+
+        #mg-nav .dropdown-item:hover {
+            background-color: #0001;
+        }
+
+        #mg-nav .dropdown-item.active {
+            background-color: #0b4368;
+        }
+
+
+        body>.page-content {
+            border-top: 1px solid #eee;
+            border-left: 1px solid #ddd;
+        }
+
+        .dashboard-display,
+        .dashboard-block-movable>div {
+            border: 1px solid #eee;
+        }
+
+        @media (min-width: 1407px) {
+            body {
+                display: grid;
+                grid-template-columns: 300px calc(-315px + 100vw);
+                grid-template-rows: max-content 1fr;
+            }
+
+            .navbar-dark .navbar-nav-link {
+                color: #18181B !important;
+            }
+
+            #dark-nav {
+                background-color: #fff;
+                border-left: 1px solid #ddd;
+            }
+
+            #mg-nav {
+                grid-row: 1 / span 2;
+                background: transparent;
+                display: flex;
+                flex-direction: column;
+                justify-content: start;
+                gap: 1.5rem;
+                max-height: 100vh;
+            }
+
+            #mg-nav>div:first-child {
+                background: transparent;
+            }
+
+            #mg-nav>div:first-child>button {
+                display: none;
+            }
+
+            #mg-nav>ul {
+                height: -webkit-fill-available;
+                position: static;
+                transform: none;
+                opacity: 1;
+                visibility: visible;
+                background: transparent;
+                padding: 0 !important;
+                max-width: 100%;
+            }
+
+            #mg-nav li:not(.dropdown-user) {
+                border-bottom: 1px solid #eee;
+            }
+
+            #mg-nav .li.active>a {
+                background-color: #0b4368;
+            }
+        }
+    </style>
+
+
+    <div id="dark-nav" class="navbar navbar-expand-md m-xl-0">
+        <div class="d-lg-flex d-none">
+            <button class="navbar-toggler dropdown-toggle" type="button" data-toggle="collapse"
+                data-target="#navbar-mobile">
+                <span>admin</span>
+
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" id="navbar-mobile">
+
+                <a href="#" class="dropdown-item dropdown-toggle" data-toggle="dropdown" style="color: #184369">
+                    <span><i class="icon-earth"></i></span>
+                </a>
+                <div class="dropdown-menu">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/locale/ar" class="dropdown-item  active "
+                        style="text-transform: uppercase;"> ar</a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/locale/en" class="dropdown-item "
+                        style="text-transform: uppercase;"> en</a>
+                </div>
+
+                <a href="https://montana-sa.amir-adel.com/admin/public/auth/logout" class="dropdown-item"><i
+                        class="icon-switch2"></i>
+                    تسجيل الخروج</a>
+
+            </div>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+
+                <li class="nav-item nav-zone-selection">
+                    <select name="nav_select_zone" class="nav-select-zone">
+                        <option value="0"> All Zones
+                        </option>
+                        <option value="1">
+                            Alhamdaniah</option>
+                        <option value="2">
+                            Alsafa</option>
+                        <option value="3">
+                            Alsamer</option>
+                        <option value="4">
+                            Alrehab</option>
+                        <option value="5">
+                            Alsanabel</option>
+                        <option value="6">
+                            AlWaha</option>
+                        <option value="7">
+                            Alsulaimaniyah</option>
+                        <option value="8">
+                            AlNuzha</option>
+                        <option value="9">
+                            Al Salama</option>
+                        <option value="10">
+                            Alyagoot</option>
+                    </select>
+                </li>
+
+                <script>
+                    $('.nav-select-zone').select2();
+                    $('select[name="nav_select_zone"]').on('change', (event) => {
+                        let url = "https://montana-sa.amir-adel.com/admin/public/change-zone-scope/" + event.target.value;
+                        //delete datatable filters
+                        var savedDatatables = findLocalItems("DataTables_");
+                        if (savedDatatables.length > 0) {
+                            console.log("Cleaning keys");
+                            $.each(savedDatatables, function (indexInArray, valueOfElement) {
+                                localStorage.removeItem(valueOfElement.key);
+                            });
+                        }
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 500);
+                    });
+                </script>
+
+                <li class="nav-item dropdown-user">
+                    <a href="#" class="navbar-nav-link d-flex align-items-center dropdown-toggle" data-toggle="dropdown"
+                        style="color: #184369">
+                        <span><i class="icon-earth mx-2"></i></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a href="https://montana-sa.amir-adel.com/admin/public/locale/ar" class="dropdown-item  active "
+                            style="text-transform: uppercase;"> ar</a>
+                        <a href="https://montana-sa.amir-adel.com/admin/public/locale/en" class="dropdown-item "
+                            style="text-transform: uppercase;"> en</a>
+                    </div>
+                </li>
+
+
+
+                <li class="nav-item dropdown-user">
+                    <a href="#" class="navbar-nav-link d-flex align-items-center dropdown-toggle" data-toggle="dropdown"
+                        style="color: #184369">
+                        <span>admin</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a href="https://montana-sa.amir-adel.com/admin/public/profile" class="dropdown-item"><i
+                                class="icon-users2"></i>
+                            الملف الشخصي</a>
+                        <a href="https://montana-sa.amir-adel.com/admin/public/auth/logout" class="dropdown-item"><i
+                                class="icon-switch2"></i>
+                            تسجيل الخروج</a>
+
+                    </div>
+                </li>
+
+
+
+            </ul>
+        </div>
+    </div>
+
+
+    <div id="mg-nav" class="navbar py-2" style="">
+        <div class="d-flex w-100">
+            <a href="https://montana-sa.amir-adel.com/admin/public"
+                style="height: 48px;flex-grow: 1;text-align: center;">
+                <img src="https://montana-sa.amir-adel.com/admin/assets/home/logo.svg"
+                    style="max-height: 48px; margin: 0 auto;" alt="logo" />
+            </a>
+            <button type="button" class="btn navbar-brand-md">
+                <i class="icon-unfold mr-2"></i>
+                Navigation
+            </button>
+        </div>
+
+        <ul class="d-flex flex-column list-unstyled m-0 p-3 px-md-5">
+            <li class="nav-item">
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/dashboard" class="navbar-nav-link">
+                    <i class="icon-equalizer mr-2"></i>
+                    لوحة التحكم
+                    <!--<img src="https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/images/dashboard-logo.png"-->
+                    <!--    alt="Dashboard">-->
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/stores" class="navbar-nav-link ">
+                    <i class="icon-store2 mr-2"></i>
+                    المتاجر
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="navbar-nav-link  dropdown-toggle">
+                    <i class="icon-stack-star mr-2"></i>
+                    العناصر والقائمة
+                </a>
+                <div class="">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/addoncategories"
+                        class="dropdown-item ">
+                        <i class="icon-tree6 mr-2"></i>
+                        فئات الإضافات
+                    </a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/addons" class="dropdown-item ">
+                        <i class="icon-list2 mr-2"></i>
+                        الوظائف الإضافية
+                    </a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/itemcategories" class="dropdown-item ">
+                        <i class="icon-grid52 mr-2"></i>
+                        فئات القائمة
+                    </a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/items" class="dropdown-item ">
+                        <i class="icon-grid mr-2"></i>
+                        العناصر
+                    </a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="navbar-nav-link dropdown-toggle  ">
+                    <i class="icon-users2 mr-2"></i>
+                    المستخدمون
+                </a>
+
+                <div class="">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/users" class="dropdown-item "> <i
+                            class="icon-users4 mr-2"></i> جميع المستخدمين</a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/customers" class="dropdown-item "> <i
+                            class="icon-user mr-2"></i> العملاء</a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/manage-store-owners"
+                        class="dropdown-item "> <i class="icon-user-tie mr-2"></i> أصحاب المتاجر</a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/manage-delivery-guys"
+                        class="dropdown-item "> <i class="icon-truck mr-2"></i> عمال التوصيل</a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/staffs" class="dropdown-item "> <i
+                            class="icon-collaboration mr-2"></i> الموظفون</a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/orders" class="navbar-nav-link ">
+                    <i class="icon-basket mr-2"></i>
+                    الطلبات
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="navbar-nav-link dropdown-toggle  ">
+                    <i class="icon-percent mr-2"></i>
+                    العروض الترويجية
+                </a>
+                <div class="">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/sliders" class="dropdown-item ">
+                        <i class="icon-image2 mr-2"></i>
+                        شرائح العروض الترويجية
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/store-category-slider"
+                        class="dropdown-item ">
+                        <i class="icon-grid52 mr-2"></i>
+                        شرائح فئات المتاجر
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/coupons" class="dropdown-item ">
+                        <i class="icon-price-tags2 mr-2"></i>
+                        القسائم
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/cash-back" class="dropdown-item ">
+                        <i class="icon-price-tags2 mr-2"></i>
+                        استرداد نقدي
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/pages" class="dropdown-item ">
+                        <i class="icon-files-empty mr-2"></i>
+                        الصفحات
+                    </a>
+
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/notifications" class="dropdown-item ">
+                        <i class="icon-bubble-dots4 mr-2"></i>
+                        إرسال إشعارات فورية
+                    </a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="navbar-nav-link dropdown-toggle  ">
+                    <i class="icon-books mr-2"></i>
+                    المعاملات
+                </a>
+                <div class="">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/store-payouts" class="dropdown-item ">
+                        <i class="icon-piggy-bank mr-2"></i>
+                        مدفوعات المتجر
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/delivery-collections"
+                        class="dropdown-item ">
+                        <i class="icon-cash3 mr-2"></i>
+                        تحصيلات التوصيل
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/delivery-collection-logs"
+                        class="dropdown-item ">
+                        <i class="icon-database-time2 mr-2"></i>
+                        سجلات تحصيل التوصيل
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/wallet/transactions"
+                        class="dropdown-item ">
+                        <i class="icon-transmission mr-2"></i>
+                        معاملات المحفظة
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/reports/top-items"
+                        class="dropdown-item ">
+                        <i class="icon-graph mr-2"></i>
+                        التقارير
+                    </a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a href="https://montana-sa.amir-adel.com/admin/public/admin/modules" class="navbar-nav-link ">
+                    <i class="icon-stars mr-2"></i>
+                    الوحدات النمطية
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="navbar-nav-link dropdown-toggle ">
+                    <i class="icon-briefcase mr-2"></i>
+                    Job List
+                </a>
+
+                <div>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/jobs" class="dropdown-item  ">
+                        <i class="icon-user-tie mr-2"></i>
+                        الوظائف
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/applay-job" class="dropdown-item  ">
+                        <i class="icon-vcard mr-2"></i>
+                        المتقدمين للوظائف
+                    </a>
+                </div>
+            </li>
+            <!--<li class="nav-item">-->
+            <!--            <a href="https://montana-sa.amir-adel.com/admin/public/admin/applay-job"-->
+            <!--                class="navbar-nav-link ">-->
+            <!--                <i class="icon-basket mr-2"></i>-->
+            <!--                admin.-->
+            <!--            </a>-->
+            <!--        </li>-->
+
+
+            <li class="nav-item">
+                <a class="navbar-nav-link dropdown-toggle  ">
+                    <i class="icon-cog3 mr-2"></i>
+                    الاعدادات
+                </a>
+                <div class="">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/zones" class="dropdown-item ">
+                        <i class="icon-location4 mr-2"></i>
+                        المناطق <span
+                            class="badge badge-flat border-grey-800 text-danger text-capitalize ml-1 float-right">جديد</span>
+                    </a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/popular-geo-locations"
+                        class="dropdown-item ">
+                        <i class="icon-location3 mr-2"></i>
+                        المواقع الجغرافية الشائعة
+                    </a>
+                    <hr class="my-2">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/settings?#generalSettings"
+                        class="dropdown-item ">
+                        <i class="icon-gear mr-2"></i>
+                        جميع الإعدادات
+                    </a>
+                    <hr class="my-2">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/admin/store/schedule" class="dropdown-item ">
+                        <i class="icon-gear mr-2"></i>
+                        جدول المطاعم
+                    </a>
+                </div>
+            </li>
+
+
+            <!-- MG ===========-->
+            <li class="dropdown-user nav-item position-relative mt-3 mt-xl-auto">
+                <a href="#" data-toggle="dropdown" class="navbar-nav-link d-flex align-items-center dropdown-toggle"
+                    style="border-radius: 6px; border: 1px solid #eee; text-transform: capitalize; gap: 1rem;">
+
+                    <i class="icon-user" style="font-size: large;"></i>
+
+                    <div class="d-flex flex-column" style="font-size: smaller; line-height: 1.4;">
+                        <span class="p-0" style="font-weight: bolder;">admin</span>
+                        <span class="p-0 text-muted">admin@montana.sa</span>
+                    </div>
+                </a>
+                <div class="dropdown-menu" style="left: 1rem;right: 1rem;top: unset;bottom: 100%;">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/profile" class="dropdown-item"><i
+                            class="icon-users2"></i>
+                        الملف الشخصي</a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/auth/logout" class="dropdown-item"><i
+                            class="icon-switch2"></i>
+                        تسجيل الخروج</a>
+                </div>
+            </li>
+
+            <li class="dropdown-user nav-item position-relative d-xl-none" style="margin-top: auto">
+                <a href="#" data-toggle="dropdown" class="navbar-nav-link d-flex align-items-center dropdown-toggle"
+                    style="border-radius: 6px; border: 1px solid #eee; text-transform: capitalize; gap: 1rem;">
+
+                    <span><i class="icon-earth"></i></span>
+
+                    <div class="d-flex flex-column" style="font-size: smaller; line-height: 1.4;">
+                        <span class="p-0" style="font-weight: bolder;">Languages</span>
+                        <span class="p-0 text-muted">ar</span>
+                    </div>
+                </a>
+                <div class="dropdown-menu" style="left: 1rem;right: 1rem;top: unset;bottom: 100%;">
+                    <a href="https://montana-sa.amir-adel.com/admin/public/locale/ar" class="dropdown-item  active "
+                        style="text-transform: uppercase;"> ar</a>
+                    <a href="https://montana-sa.amir-adel.com/admin/public/locale/en" class="dropdown-item "
+                        style="text-transform: uppercase;"> en</a>
+                </div>
+            </li>
+            <!---->
+        </ul>
+
+        <div class="dismisser position-fixed"></div>
+    </div>
+
+
+
+    <script>
+        const body = document.body;
+        const navbar = document.getElementById("mg-nav"),
+            navList = navbar.querySelector("ul"),
+            dismisser = navbar.querySelector(".dismisser"),
+            toggleBtn = navbar.querySelector("button");
+
+
+        dismisser.onclick = () => navList.classList.remove("active");
+        toggleBtn.onclick = () => navList.classList.toggle("active");
+
+        try {
+            navbar.querySelector("li:has(.navbar-nav-link.active)").classList.add("active");
+        } catch { }
+
+
+
+        navbar.querySelectorAll("li").forEach(btn => {
+            const dropdownList = btn.querySelector("div");
+
+            dropdownList && dropdownList.style.setProperty("--sh", dropdownList.scrollHeight + "px");
+
+            btn.addEventListener("click", () => {
+                const wasActive = dropdownList && btn.classList.contains("active");
+                navbar.querySelectorAll("li.active").forEach(li => li.classList.remove("active"));
+                wasActive || btn.classList.add("active");
+            }, true)
+        })
+
+        window.addEventListener("DOMContentLoaded", () => {
+            document.querySelector(".page-content").classList.remove("container");
+        })
+    </script>
+
+    <script type="text/text">
+
+const body = document.body,
+    navbarParent = document.querySelector(".navbar-sticky");
+
+  
+    
+    if (window.innerWidth <= 1407) navbarParent.classList.remove("d-none");
+    
+
+window.addEventListener("DOMContentLoaded", ()=> {
+    const targetLink = document.querySelector("#navbar-navigation li:has(.navbar-nav-link.active)");
+    targetLink && targetLink.classList.add("active");
+
+    const headNavbar = document.querySelector("#dark-nav"),
+        navbar = document.getElementById("navbar-navigation"),
+        navLogo = navbar.querySelector(".nav-logo"),
+        pageContent = document.querySelector(".page-content"),
+        pageTitle = document.querySelector(".page-content h3"),
+        titlePlaceholder = document.getElementById("page-title");
+        
+        pageContent.classList.remove("container");
+        
+    if (window.innerWidth < 1407) return;
+        headNavbar.style = "background: #fff; border-left: 1px solid #ddd";
+        
+        if (pageTitle && titlePlaceholder) {
+            titlePlaceholder.textContent = pageTitle.textContent;
+            pageTitle.textContent = "";
+        }
+        
+        navLogo && navLogo.classList.remove("d-none");
+        
+        
+        headNavbar.style.gridColumnStart = 2;
+        document.querySelectorAll("#navbar-navigation > ul > .dropdown > .dropdown-menu").forEach(e=> (e.className = "_dropdown-menu"));
+        body.replaceChild(navbar, navbarParent);
+        Object.assign(body.style, {display: 'grid', gridTemplateColumns: '250px calc(-265px + 100vw)', gridTemplateRows: 'max-content 1fr'});
+        
+        navbar.className = "align-items-start collapse d-flex flex-column m-0 navbar-collapse p-2"
+        Object.assign(navbar.style, {
+            position: 'sticky',
+            top: '0px',
+            gridRow: '1 / span 2',
+            gap: "1rem"
+        });
+        
+        // 2024/9/23
+        function removeActive (){
+        const activeLis = document.querySelectorAll("#navbar-navigation .nav-item");
+            Array.from(activeLis).forEach(a => a.classList.remove("active"));
+        }
+        
+        navbar.querySelectorAll("ul > li").forEach(li => {
+          const hr = document.createElement("hr"),
+            dropdownMenu = li.querySelector("._dropdown-menu");
+            
+            li.after(hr);
+            
+            if (dropdownMenu) {
+                li.after(dropdownMenu);
+                dropdownMenu.style = "--SH:" + dropdownMenu.scrollHeight +"px;"
+                li.addEventListener("click", ()=> {
+                    const isActive = li.classList.contains("active");
+                    removeActive();
+                    isActive || li.classList.add("active");
+                });
+            }
+            
+        })
+});
+</script>
+
+    <div class="page-content container pt-0">
+        <div class="content-wrapper">
+            <style>
+                .chart-container {
+                    overflow: hidden;
+                }
+
+                .chart-container.has-scroll {
+                    overflow: hidden;
+                }
+            </style>
+            <div class="content mb-5">
+
+                <div class="d-flex justify-content-between mt-4 mb-0">
+                    <div>
+                        <h3><b>لوحة التحكم</b></h3>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-action-secondary daterange-ranges">
+                            <i class="icon-calendar22 position-left mr-1"></i> <span></span> <b class="caret"></b>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+                <div class="row" id="dashboardStatsBlock">
+                    <div class="col-6 col-xl-3 mb-2 mt-2">
+                        <div class="col-xl-12 dashboard-display p-3">
+                            <a class="block block-link-shadow text-left text-default" href="javascript:void(0)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="dashboard-display-number">--</div>
+                                        <div class="font-size-sm text-uppercase text-muted">الطلبات</div>
+                                    </div>
+                                    <div class="d-none d-sm-block">
+                                        <div class="dashboard-display-icon-block block-bg-1">
+                                            <i class="dashboard-display-icon icon-spinner2 spinner color-purple"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-3 mb-2 mt-2">
+                        <div class="col-xl-12 dashboard-display p-3">
+                            <a class="block block-link-shadow text-left text-default" href="javascript:void(0)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="dashboard-display-number">--</div>
+                                        <div class="font-size-sm text-uppercase text-muted">المستخدمون</div>
+                                    </div>
+                                    <div class="d-none d-sm-block">
+                                        <div class="dashboard-display-icon-block block-bg-2">
+                                            <i class="dashboard-display-icon icon-spinner2 spinner color-cyan"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-3 mb-2 mt-2">
+                        <div class="col-xl-12 dashboard-display p-3">
+                            <a class="block block-link-shadow text-left text-default" href="javascript:void(0)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="dashboard-display-number">--</div>
+                                        <div class="font-size-sm text-uppercase text-muted">المتاجر</div>
+                                    </div>
+                                    <div class="d-none d-sm-block">
+                                        <div class="dashboard-display-icon-block block-bg-3">
+                                            <i class="dashboard-display-icon icon-spinner2 spinner color-red"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-3 mb-2 mt-2">
+                        <div class="col-xl-12 dashboard-display p-3">
+                            <a class="block block-link-shadow text-left text-default" href="javascript:void(0)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="dashboard-display-number">--</div>
+                                        <div class="font-size-sm text-uppercase text-muted">الأرباح</div>
+                                    </div>
+                                    <div class="d-none d-sm-block">
+                                        <div class="dashboard-display-icon-block block-bg-4">
+                                            <i class="dashboard-display-icon icon-spinner2 spinner color-green"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row hidden" id="sortable">
+                    <div class="col-xl-4 dashboard-block-movable" data-id="1">
+                        <div class="dashboard-recent-orders-block mt-2 p-3">
+                            <h4 style="color: #000;font-weight: 500;" class="move-handle">الطلبات الأخيرة</h4>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/NUZ-2140"
+                                    data-popup="tooltip" data-placement="right" title="حي النزهة">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-8 border-grey-800">
+                                            Awaiting Payment
+                                        </span>
+                                        <br>
+                                        <p class="liveTimer mt-1 text-center min-fit-content order-dashboard-time small"
+                                            title="2026-03-04 01:34:33"><i
+                                                class="icon-spinner10 spinner position-left"></i>
+                                        </p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266644uqoLX5amfZ.jpg"
+                                                alt="حي النزهة" height="45" width="45" style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حي النزهة</strong></span>
+                                            <br>
+                                            <span class="small">#NUZ-2140 -
+                                                ر.س304.75</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAF-2139"
+                                    data-popup="tooltip" data-placement="right" title="حي الصفا">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-9 border-grey-800">
+                                            Payment Failed
+                                        </span>
+                                        <br>
+                                        <p class="order-dashboard-time min-fit-content mt-1 small"><b>فشل في: </b>
+                                            ثانية 46</p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                                alt="حي الصفا" height="45" width="45" style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حي الصفا</strong></span>
+                                            <br>
+                                            <span class="small">#SAF-2139 -
+                                                ر.س16.1</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAF-2138"
+                                    data-popup="tooltip" data-placement="right" title="حي الصفا">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-9 border-grey-800">
+                                            Payment Failed
+                                        </span>
+                                        <br>
+                                        <p class="order-dashboard-time min-fit-content mt-1 small"><b>فشل في: </b>
+                                            يوم ساعات 8 دقيقة 12 ثوان 4</p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                                alt="حي الصفا" height="45" width="45" style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حي الصفا</strong></span>
+                                            <br>
+                                            <span class="small">#SAF-2138 -
+                                                ر.س16.1</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAF-2137"
+                                    data-popup="tooltip" data-placement="right" title="حي الصفا">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-9 border-grey-800">
+                                            Payment Failed
+                                        </span>
+                                        <br>
+                                        <p class="order-dashboard-time min-fit-content mt-1 small"><b>فشل في: </b>
+                                            يوم ساعات 8 دقيقة 13 ثانية 41</p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/1764266659rLsW9R8owM.jpg"
+                                                alt="حي الصفا" height="45" width="45" style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حي الصفا</strong></span>
+                                            <br>
+                                            <span class="small">#SAF-2137 -
+                                                ر.س16.1</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAL-2136"
+                                    data-popup="tooltip" data-placement="right" title="حى السلامة">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-9 border-grey-800">
+                                            Payment Failed
+                                        </span>
+                                        <br>
+                                        <p class="order-dashboard-time min-fit-content mt-1 small"><b>فشل في: </b>
+                                            يوم ساعة 14 دقيقة 16 ثانية 46</p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/176426650405i7ZH1TzQ.jpg"
+                                                alt="حى السلامة" height="45" width="45"
+                                                style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حى السلامة</strong></span>
+                                            <br>
+                                            <span class="small">#SAL-2136 -
+                                                ر.س29.9</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="recent-order-card p-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/order/SAL-2135"
+                                    data-popup="tooltip" data-placement="right" title="حى السلامة">
+                                    <div class=" float-right text-right">
+                                        <span class="badge order-badge badge-color-9 border-grey-800">
+                                            Payment Failed
+                                        </span>
+                                        <br>
+                                        <p class="order-dashboard-time min-fit-content mt-1 small"><b>فشل في: </b>
+                                            يوم ساعة 14 دقيقة 22 ثانية 19</p>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div>
+                                            <img src="https://montana-sa.amir-adel.com/admin/assets/img/restaurants/176426650405i7ZH1TzQ.jpg"
+                                                alt="حى السلامة" height="45" width="45"
+                                                style="border-radius: 0.275rem;">
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>حى السلامة</strong></span>
+                                            <br>
+                                            <span class="small">#SAL-2135 -
+                                                ر.س37.95</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 dashboard-block-movable" data-id="2">
+                        <div class="dashboard-new-users-block mt-2 p-3">
+                            <h4 style="color: #000;font-weight: 500;" class="move-handle">التسجيلات الجديدة</h4>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1635">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-5">
+
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>عفت</strong> <span class="small">-
+                                                    543128999
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1634">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-2">
+                                            RA
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>Rozan Alqahtani</strong> <span class="small">-
+                                                    569443337
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1633">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-6">
+
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>عبدالعزيز</strong> <span class="small">-
+                                                    509208758
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1632">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-2">
+
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>مروج الحربي</strong> <span class="small">-
+                                                    537716009
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1631">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-3">
+                                            MS
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>Mohamed saeed</strong> <span class="small">-
+                                                    545403214
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="new-users px-0 py-2 mb-1">
+                                <a href="https://montana-sa.amir-adel.com/admin/public/admin/user/edit/1630">
+                                    <div class="float-right">
+                                        <span class="badge badge-flat border-grey-800 text-default text-capitalize"
+                                            style="border-radius: 2px;">
+                                            Customer
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="first-letter-icon custom-bg-8">
+
+                                        </div>
+                                        <div class="ml-2">
+                                            <span><strong>ممدوح سبحي</strong> <span class="small">-
+                                                    505620847
+                                                </span> </span><br>
+                                            <span class="small">منذ شهرين</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 dashboard-block-movable" data-id="3">
+                        <div class="card mt-2 p-3 position-relative">
+                            <h4 style="color: #000;font-weight: 500;" class="move-handle">معاملات المحفظة</h4>
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">تم اضافة 15.2375 ال محفظتك كاش باك من الطلب رقم
+                                        SAL-2130 <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س15.23
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">... <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س500.00
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">... <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س100.00
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">Refund for order cancellation.SAF-2077 <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س8.00
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">Refund for order cancellation.SAF-2078 <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س8.05
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between single-transaction py-2">
+                                    <div class="small w-100 text-dark">... <br>
+                                        <span class="small text-default"> منذ أسبوع</span>
+                                    </div>
+                                    <div class="small font-weight-semibold  text-success ">
+                                        ر.س100.00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 dashboard-block-movable" data-id="4">
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col font-weight-semibold move-handle">
+                                        إنجاز هدف اليوم
+                                    </div>
+                                    <div class="col col-auto">
+                                        <span class="text-success font-weight-semibold">0%</span>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2" style="height: 10px; border-radius: 25px;">
+                                    <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated"
+                                        style="width: 0%"></div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col">
+                                        <div class="mt-4">
+                                            <h6 class="mb-1">الإيرادات المستهدفة</h6>
+                                            <h4 class="mb-0 font-weight-semibold">
+                                                ر.س500
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div class="col col-auto">
+                                        <div class="mt-4">
+                                            <h6 class="mb-1">الإيرادات الفعلية</h6>
+                                            <h4 class="mb-0 font-weight-semibold">
+                                                ر.س0</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-2" style="background-image: linear-gradient(90deg,#5b73e8,#44c4fa);">
+                            <div class="card-body">
+                                <h4 class="font-weight-semibold text-center mb-1 text-white move-handle">0
+                                    admin.Sales Today</h4>
+                                <p class="text-success-600 small text-center mb-3 text-white"
+                                    style="padding: 5px; background-color: rgb(0 0 0 / 16%); font-weight: 500; border-radius: 2px;">
+                                    <i class="icon-stats-growth2 mr-1"></i>0%
+                                    مقارنة
+                                    بالأمس (as of 12:28 PM)
+                                </p>
+                                <div id="hourly-sales-count" class="mt-2" style="margin-bottom: -20px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 dashboard-block-movable" data-id="5">
+                        <div class="dashboard-latest-reviews mt-2 p-3">
+                            <h4 style="color: #000;font-weight: 500;" class="move-handle">أحدث المراجعات</h4>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 dashboard-block-movable" data-id="6">
+                        <div class="dashboard-top-stores mt-2 p-3 position-relative">
+                            <div class="mb-2">
+                                <h4 style="color: #000;font-weight: 500;" class="move-handle mb-0">أفضل المتاجر</h4>
+                                <p class="topStoreFromTo small mb-0" style="font-size: 10px">(هذا الشهر)</p>
+                            </div>
+                            <div id="topStoresDynamicList"></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 d-none d-md-block dashboard-block-movable" data-id="7">
+                        <div class="card mt-2 move-handle">
+                            <div class="card-body">
+                                <div class="chart-container has-scroll">
+                                    <div class="chart has-fixed-height has-minimum-width" id="basic_donut"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 dashboard-block-movable" data-id="8">
+                        <div class="dashboard-todoNotes mt-2 p-3 position-relative"
+                            style="max-height: 504px; overflow-y: scroll;">
+                            <div>
+                                <h4 style="color: #000;font-weight: 500;" class="move-handle">الملاحظات</h4>
+                                <input type="text" id="todo_data" placeholder="Add a note here..." class="mt-2 mb-1">
+                                <ul id="filledTodoNotes" class="mt-2 m-0">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 dashboard-block-movable" data-id="9">
+                        <div class="card mt-2 p-3 position-relative" id="foodomaaNews">
+                            <div class="card-body">
+                                <div class="text-center"><i class="icon-spinner2 spinner"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="_token" value="rvik8UG5BAsv0qy9NHSD1cs8eBgXcb60fUjO7g2b" id="token">
+
+        <script>
+            function init() {
+
+                $(".dashboard-todoNotes").overlayScrollbars({
+                    scrollbars: {
+                        visibility: "auto",
+                        autoHide: "leave",
+                        autoHideDelay: 500
+                    }
+                });
+
+                $('#todo_data').keypress(function (event) {
+                    var keycode = (event.keyCode ? event.keyCode : event.which);
+                    if (keycode == '13') {
+                        var todo_data = $('#todo_data').val();
+                        $.ajax({
+                            type: "get",
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/save-todo-note",
+                            data: { "data": todo_data, "priority": "HIGH" },
+                            dataType: "json",
+                            success: function (response) {
+                                console.log(response.data.id);
+                                $('#todo_data').val("");
+                                $('#filledTodoNotes').prepend("<li class='d-flex justify-content-between px-0 todoSingleLi'><div class='mr-3'>" + todo_data + " </div><div class='deleteTodoNote btn btn-sm btn-default cursor-pointer rounded h-100' data-id='" + response.data.id + "'><i class='icon-cross3 text-warning'></i></div></li>")
+                            }
+                        });
+                    }
+                });
+
+                $('body').on("click", ".deleteTodoNote", function (e) {
+                    e.preventDefault();
+
+                    if (confirm("Confirm delete?") == true) {
+                        var todoNoteId = $(this).attr('data-id');
+                        var li = $(this).parent();
+                        $.ajax({
+                            type: "get",
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/delete-todo-note",
+                            data: { "id": todoNoteId },
+                            dataType: "json",
+                            success: function (response) {
+                                li.remove();
+                            }
+                        });
+                    }
+
+                });
+
+                timer = setInterval(updateClock, 1000);
+
+                var newDate = new Date();
+                var newStamp = newDate.getTime();
+
+                var timer;
+
+                function updateClock() {
+
+                    $('.liveTimer').each(function (index, el) {
+                        var orderCreatedData = $(this).attr("title");
+                        var startDateTime = new Date(orderCreatedData);
+                        var startStamp = startDateTime.getTime();
+
+
+                        newDate = new Date();
+                        newStamp = newDate.getTime();
+                        var diff = Math.round((newStamp - startStamp) / 1000);
+
+                        var d = Math.floor(diff / (24 * 60 * 60));
+                        diff = diff - (d * 24 * 60 * 60);
+                        var h = Math.floor(diff / (60 * 60));
+                        diff = diff - (h * 60 * 60);
+                        var m = Math.floor(diff / (60));
+                        diff = diff - (m * 60);
+                        var s = diff;
+                        var checkDay = d > 0 ? true : false;
+                        var checkHour = h > 0 ? true : false;
+                        var checkMin = m > 0 ? true : false;
+                        var checkSec = s > 0 ? true : false;
+                        var formattedTime = checkDay ? d + " day" : "";
+                        formattedTime += checkHour ? " " + h + " hr" : "";
+                        formattedTime += checkMin ? " " + m + " min" : "";
+                        formattedTime += checkSec ? " " + s + " sec" : "";
+
+                        $(this).text(formattedTime);
+                    });
+                }
+
+                require.config({
+                    paths: {
+                        echarts: 'https://montana-sa.amir-adel.com/admin/assets/backend/global_assets/js/plugins/visualization/echarts'
+                    }
+                });
+
+                require(
+                    [
+                        'echarts',
+                        'echarts/theme/limitless',
+                        'echarts/chart/pie',
+                        'echarts/chart/funnel',
+                    ],
+
+                    function (ec, limitless) {
+
+                        var basic_donut = ec.init(document.getElementById('basic_donut'), limitless);
+
+                        basic_donut_options = {
+
+                            // Add title
+                            title: {
+                                text: 'Overview Of Order Statuses',
+                                subtext: 'Of all orders till 2026-03-05',
+                                x: 'center'
+                            },
+
+                            // Add legend
+                            legend: {
+                                show: true,
+                                orient: 'vertical',
+                                x: 'left',
+                                data: ['Order Placed', 'Preparing Order', 'Delivery Guy Assigned', 'Order Picked Up', 'Delivered', 'Canceled', 'Ready For Pick Up', 'Awaiting Payment', 'Payment Failed', 'Scheduled Order', 'Confirmed Order']
+                            },
+
+                            // Display toolbox
+                            toolbox: {
+                                show: false,
+                            },
+
+                            // Enable drag recalculate
+                            calculable: false,
+
+                            // Add series
+                            series: [
+                                {
+                                    name: 'Orders',
+                                    type: 'pie',
+                                    radius: ['50%', '70%'],
+                                    center: ['50%', '58%'],
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true
+                                            },
+                                            labelLine: {
+                                                show: true
+                                            }
+                                        },
+                                        emphasis: {
+                                            label: {
+                                                show: true,
+                                                formatter: '{b}' + '\n\n' + '{c} ({d}%)',
+                                                position: 'center',
+                                                textStyle: {
+                                                    fontSize: '17',
+                                                    fontWeight: '500'
+                                                }
+                                            }
+                                        }
+                                    },
+
+                                    data: [{ value: 2, name: 'Order Placed' }, { value: 182, name: 'Preparing Order' }, { value: 356, name: 'Delivered' }, { value: 48, name: 'Canceled' }, { value: 2, name: 'Ready For Pick Up' }, { value: 1, name: 'Awaiting Payment' }, { value: 525, name: 'Payment Failed' },]
+                                }
+                            ]
+                        };
+
+                        basic_donut.setOption(basic_donut_options);
+
+                        window.onresize = function () {
+                            setTimeout(function () {
+                                basic_donut.resize();
+                            }, 200);
+                        }
+
+                    }
+                );
+
+                $('.select').select2({
+                    minimumResultsForSearch: -1
+                });
+                //dateranger picker
+                // Initialize with options
+                $('.daterange-ranges').daterangepicker({
+                    startDate: moment().startOf('month'),
+                    endDate: moment().endOf('month'),
+                    minDate: '01/01/2020',
+                    maxDate: moment().format('MM-DD-YYYY'),
+                    dateLimit: {
+                        'months': 48,
+                    },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment()],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    },
+                    opens: 'left',
+                    applyClass: 'btn-small bg-primary',
+                    cancelClass: 'btn-small btn-default',
+                    autoApply: true,
+                },
+                    function (start, end) {
+                        var fromToDate = start.format('MMMM D, YYYY') + ' &nbsp; - &nbsp; ' + end.format('MMMM D, YYYY');
+                        $('.daterange-ranges span').html(fromToDate);
+                        $('.topStoreFromTo').html('(' + fromToDate + ')');
+                        //ajax processing
+                        $('.dashboard-display-icon').each(function (index, el) {
+                            $(this).removeClass('icon-stats-growth2 icon-users4 icon-store2 icon-coin-dollar').addClass('icon-spinner2 spinner')
+                        });
+                        let from = start.format('YYYY-MM-DD')
+                        let to = end.format('YYYY-MM-DD')
+                        $.ajax({
+                            url: 'https://montana-sa.amir-adel.com/admin/public/admin/get-dashboard-stats',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: {
+                                from: from,
+                                to: to
+                            },
+                        })
+                            .done(function (data) {
+                                $('#dashboardStatsBlock').html(data.dashboardStats);
+                                $('#topStoresDynamicList').html(data.topStores);
+                                $('[data-toggle="tooltip"]').tooltip();
+                            })
+                            .fail(function () {
+                                console.log("error");
+                            })
+                    }
+                );
+
+                // Display date format
+                // $('.daterange-ranges span').html(moment().format('MMMM D, YYYY'));
+                $('.daterange-ranges span').html("This Month")
+                $('.daterange-ranges').on('show.daterangepicker', function (ev, picker) {
+                    $('body').addClass("daterange-blur");
+                });
+                $('.daterange-ranges').on('hide.daterangepicker', function (ev, picker) {
+                    $('body').removeClass("daterange-blur");
+                });
+
+                //onload
+                $.ajax({
+                    url: 'https://montana-sa.amir-adel.com/admin/public/admin/get-dashboard-stats',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        from: moment().startOf('month').format('YYYY-MM-DD'),
+                        to: moment().format('YYYY-MM-DD'),
+                    },
+                })
+                    .done(function (data) {
+                        $('#dashboardStatsBlock').html(data.dashboardStats);
+                        $('#topStoresDynamicList').html(data.topStores);
+                        $('[data-toggle="tooltip"]').tooltip();
+                    })
+                    .fail(function () {
+                        console.log("error");
+                    })
+
+
+                generateBarChart("#hourly-sales-count", 24, 40, true, "elastic", 1200, 50, "#ffffff", "hours");
+
+                function generateBarChart(element, barQty, height, animate, easing, duration, delay, color, tooltip) {
+                    var bardata = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+                    var d3Container = d3.select(element),
+                        width = d3Container.node().getBoundingClientRect().width;
+
+                    var x = d3.scale.ordinal()
+                        .rangeBands([0, width], 0.3)
+
+                    var y = d3.scale.linear()
+                        .range([0, height]);
+
+                    x.domain(d3.range(0, bardata.length))
+
+                    y.domain([0, d3.max(bardata)])
+
+                    var container = d3Container.append('svg');
+
+                    var svg = container
+                        .attr('width', width)
+                        .attr('height', height)
+                        .append('g');
+
+                    var bars = svg.selectAll('rect')
+                        .data(bardata)
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'd3-random-bars')
+                        .attr('width', x.rangeBand())
+                        .attr('x', function (d, i) {
+                            return x(i);
+                        })
+                        .style('fill', color);
+
+                    var tip = d3.tip()
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0]);
+
+                    bars.call(tip)
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide);
+
+                    if (tooltip == "hours") {
+                        tip.html(function (d, i) {
+                            return "<div class='text-center'>" +
+                                "<h6 class='no-margin mb-0'>" + d + " Sales </h6>" +
+                                "<div class='text-size-small mt-2'>at " + i + ":00" + "</div>" +
+                                "</div>"
+                        });
+                    }
+
+                    if (animate) {
+                        withAnimation();
+                    } else {
+                        withoutAnimation();
+                    }
+
+                    function withAnimation() {
+                        bars
+                            .attr('height', 0)
+                            .attr('y', height)
+                            .transition()
+                            .attr('height', function (d) {
+                                return y(d);
+                            })
+                            .attr('y', function (d) {
+                                return height - y(d);
+                            })
+                            .delay(function (d, i) {
+                                return i * delay;
+                            })
+                            .duration(duration)
+                            .ease(easing);
+                    }
+
+                    function withoutAnimation() {
+                        bars
+                            .attr('height', function (d) {
+                                return y(d);
+                            })
+                            .attr('y', function (d) {
+                                return height - y(d);
+                            })
+                    }
+
+                    $(window).on('resize', barsResize);
+                    $(document).on('click', '.sidebar-control', barsResize);
+
+                    function barsResize() {
+                        console.log("called");
+                        width = d3Container.node().getBoundingClientRect().width;
+                        container.attr("width", width);
+                        svg.attr("width", width);
+                        x.rangeBands([0, width], 0.3);
+                        svg.selectAll('.d3-random-bars')
+                            .attr('width', x.rangeBand())
+                            .attr('x', function (d, i) {
+                                return x(i);
+                            });
+                    }
+
+
+                    var sortable = $('#sortable').sortable({
+                        animation: 350,
+                        easing: "cubic-bezier(0.42, 0, 0.58, 1.0)",
+                        handle: ".move-handle",
+                        onUpdate: function (evt) {
+                            let newSortOrder = {};
+                            $('.dashboard-block-movable').each(function () {
+                                newSortOrder[$(this).index()] = $(this).data('id');
+                            });
+                        },
+                        store: {
+                            get: function (sortable) {
+                                var order = localStorage.getItem("admin_dashboard_custom_order");
+                                $('#sortable').removeClass("hidden");
+                                barsResize();
+                                return order ? order.split('|') : [];
+                            },
+                            set: function (sortable) {
+                                var order = sortable.toArray();
+                                localStorage.setItem("admin_dashboard_custom_order", order.join('|'));
+                            }
+                        }
+                    });
+
+
+                    $.ajax({
+                        type: "GET",
+                        url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/getFoodomaaNews",
+                        dataType: "json",
+                        success: function (response) {
+                            $('#foodomaaNews').html(response.data);
+                        }
+                    });
+
+                    $('body').on("click", ".foodomaaSingleNews", function (e) {
+                        var self = $(this).parents('.foodomaaSingleNewsBlock');
+
+                        var id = $(this).attr("data-id");
+                        var token = $('#token').val();
+
+                        $.ajax({
+                            type: "POST",
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/makeFoodomaaNewsRead",
+                            data: { _token: token, id: id },
+                            dataType: "json",
+                            success: function (response) {
+                                self.removeClass("newsNotRead").addClass("newsRead");
+
+                                if (!response.was_already_read) {
+                                    var currentCount = $('#nonReadCounter').html();
+                                    currentCount = parseInt(currentCount);
+                                    if (currentCount > 1) {
+                                        $('#nonReadCounter').html(currentCount - 1);
+                                    } else {
+                                        $('#nonReadCounter').remove();
+                                    }
+                                    console.log("here");
+                                    $('#foodomaaLatestNewsBlock').remove();
+                                }
+                            }
+                        });
+                    });
+
+                    $('body').on("click", ".closeFoodomaaLatestNewsBlock", function (e) {
+                        $('#foodomaaLatestNewsBlock').remove();
+                        var id = $(this).attr("data-id");
+                        var token = $('#token').val();
+                        $.ajax({
+                            type: "POST",
+                            url: "https://montana-sa.amir-adel.com/admin/public/admin/dashboard/makeFoodomaaNewsRead",
+                            data: { _token: token, id: id },
+                            dataType: "json",
+                            success: function (response) {
+                                console.log(response);
+                            }
+                        });
+                    });
+                }
+            }
+
+            $(function () {
+                init();
+            });
+
+        </script>
+    </div>
+    </div>
+    <script>
+        NProgress.configure({ showSpinner: true, minimum: 0.2 });
+        NProgress.start();
+        window.onload = function () { NProgress.done(); }
+    </script>
+    <script>
+        function findLocalItems(query) {
+            var i, results = [];
+            for (i in localStorage) {
+                if (localStorage.hasOwnProperty(i)) {
+                    if (i.match(query) || (!query && typeof i === 'string')) {
+                        value = JSON.parse(localStorage.getItem(i));
+                        results.push({ key: i, val: value });
+                    }
+                }
+            }
+            return results;
+        }
+        $(function () {
+            $('form').submit(function () {
+                $(this).find(':input[type=submit]').prop('disabled', true);
+            });
+            $('.note-codable').on('blur', function () {
+                var codeviewHtml = $(this).val();
+                var $summernoteTextarea = $(this).closest('.note-editor').siblings('textarea');
+                $summernoteTextarea.val(codeviewHtml);
+            });
+        });
+    </script>
+</body>
+
+</html>
