@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Info - {{APP_NAME}}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+
+    --bg:#090C14;
+    --card:#0F1624;
+    --card2:#0D1320;
+
+    --text:#EEF2FF;
+    --sub:#7DA7E8;
+
+    --border:#1C2540;
+    --row:#111828;
+
+    --success-bg:rgba(74,222,128,.07);
+    --success-border:rgba(74,222,128,.18);
+    --success-text:#4ADE80;
+
+    --firebase-bg:rgba(255,163,47,.06);
+    --firebase-border:rgba(255,163,47,.2);
+
+    --firebase-title:#d97706;
+    --firebase-key:#92661a;
+    --firebase-value:#f59e0b;
+
+    --badge-blue-bg:rgba(96,165,250,.1);
+    --badge-blue-text:#60A5FA;
+
+    --badge-orange-bg:rgba(251,146,60,.1);
+    --badge-orange-text:#FB923C;
+
+    --badge-green-bg:rgba(74,222,128,.1);
+    --badge-green-text:#4ADE80;
+
+    --chip-bg:rgba(48,80,140,.15);
+    --chip-border:rgba(48,80,140,.25);
+    --chip-text:#5A80B8;
+
+    --footer:#243050;
+}
+
+body.light{
+
+    --bg:#EEF4FF;
+    --card:#FFFFFF;
+    --card2:#F8FAFF;
+
+    --text:#111827;
+    --sub:#2563EB;
+
+    --border:#D7E3FF;
+    --row:#E6EEFF;
+
+    --success-bg:#ECFDF3;
+    --success-border:#B7E4C7;
+    --success-text:#15803D;
+
+    --firebase-bg:#FFF7ED;
+    --firebase-border:#FED7AA;
+
+    --firebase-title:#C2410C;
+    --firebase-key:#9A3412;
+    --firebase-value:#EA580C;
+
+    --badge-blue-bg:#DBEAFE;
+    --badge-blue-text:#2563EB;
+
+    --badge-orange-bg:#FFEDD5;
+    --badge-orange-text:#EA580C;
+
+    --badge-green-bg:#DCFCE7;
+    --badge-green-text:#16A34A;
+
+    --chip-bg:#E0EAFF;
+    --chip-border:#C7D7FE;
+    --chip-text:#315CCF;
+
+    --footer:#64748B;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:var(--bg);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    padding:36px 16px;
+    overflow-x:hidden;
+    transition:.35s ease;
+}
+
+/* Floating Background */
+
+.floating{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    z-index:0;
+    pointer-events:none;
+}
+
+.float-icon{
+    position:absolute;
+    opacity:.06;
+    animation:floatUp linear infinite;
+}
+
+.float-icon svg{
+    width:50px;
+    height:50px;
+}
+
+@keyframes floatUp{
+    from{
+        transform:translateY(110vh) rotate(0deg);
+    }
+    to{
+        transform:translateY(-150px) rotate(360deg);
+    }
+}
+
+/* Actions */
+
+.top-actions{
+    position:fixed;
+    top:18px;
+    right:18px;
+    z-index:10;
+    display:flex;
+    gap:10px;
+}
+
+.theme-btn,
+.pdf-btn{
+    border:none;
+    border-radius:12px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:600;
+    color:white;
+    transition:.25s ease;
+}
+
+.theme-btn{
+    background:#3b82f6;
+}
+
+.theme-btn:hover{
+    transform:translateY(-2px);
+}
+
+.pdf-btn{
+    background:#10b981;
+}
+
+.pdf-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* Card */
+
+.card{
+    position:relative;
+    z-index:2;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:24px;
+    width:100%;
+    max-width:540px;
+    overflow:hidden;
+    box-shadow:0 32px 80px rgba(0,0,0,.4);
+    backdrop-filter:blur(18px);
+}
+
+/* Header */
+
+.header{
+    padding:24px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    border-bottom:1px solid var(--border);
+    background:var(--card2);
+}
+
+.icon{
+    width:66px;
+    height:66px;
+    border-radius:16px;
+    background:linear-gradient(145deg,#1FBCFD 0%,#0065C5 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 8px 28px rgba(31,188,253,.2);
+}
+
+.icon svg{
+    width:38px;
+    height:38px;
+}
+
+.htext h1{
+    color:var(--text);
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:4px;
+}
+
+.pkg{
+    color:var(--sub);
+    font-size:11px;
+    font-family:'Cascadia Code','Courier New',monospace;
+    margin-bottom:9px;
+    word-break:break-all;
+    line-height:1.5;
+}
+
+.fl-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(83,199,241,.09);
+    border:1px solid rgba(83,199,241,.22);
+    border-radius:20px;
+    padding:4px 12px;
+    font-size:11px;
+    color:#53C7F1;
+    font-weight:500;
+}
+
+/* Success */
+
+.success-banner{
+    margin:16px 20px 0;
+    background:var(--success-bg);
+    border:1px solid var(--success-border);
+    border-radius:12px;
+    padding:11px 16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.success-banner p{
+    color:var(--success-text);
+    font-size:12.5px;
+    font-weight:500;
+}
+
+/* Firebase */
+
+.firebase-box{
+    margin:14px 20px 0;
+    background:var(--firebase-bg);
+    border:1px solid var(--firebase-border);
+    border-radius:12px;
+    padding:14px 16px;
+}
+
+.firebase-box .fb-title{
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--firebase-title);
+    text-transform:uppercase;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.firebase-box .fb-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:5px 0;
+    border-bottom:1px solid var(--row);
+    gap:12px;
+}
+
+.firebase-box .fb-row:last-child{
+    border-bottom:none;
+}
+
+.firebase-box .fb-key{
+    font-size:12px;
+    color:var(--firebase-key);
+    white-space:nowrap;
+}
+
+.firebase-box .fb-val{
+    font-family:'Cascadia Code','Courier New',monospace;
+    font-size:10px;
+    color:var(--firebase-value);
+    word-break:break-all;
+    text-align:right;
+}
+
+/* Sections */
+
+.section{
+    padding:15px 20px;
+    border-bottom:1px solid var(--row);
+}
+
+.section:last-of-type{
+    border-bottom:none;
+}
+
+.slabel{
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:var(--sub);
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+.row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    padding:7px 0;
+    border-bottom:1px solid var(--row);
+    gap:16px;
+}
+
+.row:last-child{
+    border-bottom:none;
+}
+
+.rk{
+    font-size:12.5px;
+    color:var(--sub);
+    white-space:nowrap;
+}
+
+.rv{
+    font-size:12.5px;
+    color:var(--text);
+    font-weight:500;
+    text-align:right;
+    word-break:break-all;
+}
+
+.rv.mono{
+    font-family:'Cascadia Code','Courier New',monospace;
+    font-size:10px;
+    color:var(--sub);
+    letter-spacing:.02em;
+    word-break:break-all;
+}
+
+/* Badges */
+
+.badge{
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.bg{
+    background:var(--badge-green-bg);
+    color:var(--badge-green-text);
+}
+
+.bo{
+    background:var(--badge-orange-bg);
+    color:var(--badge-orange-text);
+}
+
+.bb{
+    background:var(--badge-blue-bg);
+    color:var(--badge-blue-text);
+}
+
+/* Permissions */
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding-top:2px;
+}
+
+.chip{
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:11px;
+    background:var(--chip-bg);
+    color:var(--chip-text);
+    border:1px solid var(--chip-border);
+}
+
+/* Footer */
+
+.footer{
+    padding:12px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-top:1px solid var(--row);
+}
+
+.footer p{
+    font-size:10.5px;
+    color:var(--footer);
+}
+</style>
+</head>
+<body>
+  <div class="floating" id="floating"></div>
+
+<div class="top-actions">
+    <button class="theme-btn" onclick="toggleTheme()">
+        Toggle Theme
+    </button>
+
+    <button class="pdf-btn" onclick="downloadPDF()">
+        Export PDF
+    </button>
+</div>
+<div class="card">
+
+<div class="header">
+  
+   <div class="icon">
+     <svg viewBox="0 0 48 48" fill="none">
+       <path d="M24 4L4 24l8 8L24 20l12 12 8-8z" fill="#54C5F8"/>
+       <path d="M24 20L12 32l8 8 4-4 4 4 8-8z" fill="#01579B"/>
+       <path d="M12 32l4 4 4-4-4-4z" fill="#29B6F6"/>
+     </svg>
+   </div>
+   <div class="htext">
+     <h1>{{APP_NAME}}</h1>
+     <div class="pkg">{{PACKAGE_NAME}}</div>
+     <div class="fl-badge">
+       <svg viewBox="0 0 48 48" width="12" height="12" fill="none">
+         <path d="M24 4L4 24l8 8L24 20l12 12 8-8z" fill="#54C5F8"/>
+         <path d="M24 20L12 32l8 8 4-4 4 4 8-8z" fill="#01579B"/>
+         <path d="M12 32l4 4 4-4-4-4z" fill="#29B6F6"/>
+       </svg>
+       Built with Flutter {{FLUTTER_VER}}
+     </div>
+   </div>
+</div>
+
+<div class="success-banner">
+   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5">
+     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+   </svg>
+   <p>Build Successful  -  {{BUILD_DATE}} at {{BUILD_TIME}}</p>
+</div>
+
+<div class="firebase-box">
+   <div class="fb-title">
+     <svg width="14" height="14" viewBox="0 0 32 32" fill="#f59e0b"><path d="M19.62 11.558l-3.203 2.98-2.972-5.995-1.538 3.214L6 6l9.734 18.406L26 6z"/></svg>
+     Firebase Fingerprints
+   </div>
+   <div class="fb-row"><span class="fb-key">SHA-1</span><span class="fb-val">{{FIREBASE_SHA1}}</span></div>
+   <div class="fb-row"><span class="fb-key">SHA-256</span><span class="fb-val">{{FIREBASE_SHA256}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">App Info</div>
+<div class="row"><span class="rk">Package Name</span><span class="rv mono">{{PACKAGE_NAME}}</span></div>
+<div class="row"><span class="rk">Version Name</span><span class="rv">{{APP_VERSION}}</span></div>
+<div class="row"><span class="rk">Version Code</span><span class="rv">{{APP_VERSION_CODE}}</span></div>
+<div class="row"><span class="rk">Platform</span><span class="rv"><span class="badge bg">Android</span></span></div>
+<div class="row"><span class="rk">APK Size</span><span class="rv">{{APK_SIZE}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Build Details</div>
+<div class="row"><span class="rk">Framework</span><span class="rv">Flutter {{FLUTTER_VER}}</span></div>
+<div class="row"><span class="rk">Dart SDK</span><span class="rv">{{DART_VER}}</span></div>
+<div class="row"><span class="rk">Gradle Type</span><span class="rv"><span class="badge bb">{{GRADLE_TYPE}}</span></span></div>
+<div class="row"><span class="rk">Compile SDK</span><span class="rv">API {{COMPILE_SDK}}</span></div>
+<div class="row"><span class="rk">Min SDK</span><span class="rv">API {{MIN_SDK}}</span></div>
+<div class="row"><span class="rk">Target SDK</span><span class="rv">API {{TARGET_SDK}}</span></div>
+<div class="row"><span class="rk">Build Type</span><span class="rv"><span class="badge bo">Release</span></span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Signing Info</div>
+<div class="row"><span class="rk">Signature</span><span class="rv"><span class="badge bg">{{SIGNING_LABEL}}</span></span></div>
+<div class="row"><span class="rk">Key Alias</span><span class="rv mono">{{KEY_ALIAS}}</span></div>
+<div class="row"><span class="rk">Keystore File</span><span class="rv mono">{{KEY_STORE_FILE}}</span></div>
+<div class="row"><span class="rk">APK SHA-256</span><span class="rv mono">{{APK_SHA256}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Permissions ({{PERM_COUNT}})</div>
+<div class="chips">{{PERMISSIONS_HTML}}</div>
+</div>
+
+<div class="footer">
+   <p>Generated {{BUILD_DATE}} at {{BUILD_TIME}}</p>
+   <p>{{APP_NAME}} v{{APP_VERSION}} (Release)</p>
+</div>
+
+</div>
+<script>
+
+function toggleTheme(){
+    document.body.classList.toggle("light");
+}
+
+function createFloatingIcons(){
+
+    const container = document.getElementById("floating");
+
+    for(let i=0;i<25;i++){
+
+        const div = document.createElement("div");
+        div.className = "float-icon";
+
+        div.style.left = Math.random()*100 + "vw";
+        div.style.animationDuration = (10 + Math.random()*20) + "s";
+        div.style.animationDelay = Math.random()*5 + "s";
+
+        div.innerHTML = `
+        <svg viewBox="0 0 48 48" fill="none">
+            <path d="M24 4L4 24l8 8L24 20l12 12 8-8z" fill="#54C5F8"/>
+            <path d="M24 20L12 32l8 8 4-4 4 4 8-8z" fill="#01579B"/>
+        </svg>
+        `;
+
+        container.appendChild(div);
+    }
+}
+
+async function downloadPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const card = document.querySelector(".card");
+
+    const canvas = await html2canvas(card,{
+        scale:2,
+        backgroundColor:null
+    });
+
+    const img = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+        orientation:"portrait",
+        unit:"px",
+        format:[canvas.width,canvas.height]
+    });
+
+    pdf.addImage(
+        img,
+        "PNG",
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    pdf.save("app-info-card.pdf");
+}
+
+createFloatingIcons();
+
+</script>
+</body></html>>
