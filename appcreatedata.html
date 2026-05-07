@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Info - {{APP_NAME}}</title>
+
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+   <div class="icon">
+     <svg viewBox="0 0 48 48" fill="none">
+       <path d="M24 4L4 24l8 8L24 20l12 12 8-8z" fill="#54C5F8"/>
+       <path d="M24 20L12 32l8 8 4-4 4 4 8-8z" fill="#01579B"/>
+       <path d="M12 32l4 4 4-4-4-4z" fill="#29B6F6"/>
+     </svg>
+   </div>
+   <div class="htext">
+     <h1>{{APP_NAME}}</h1>
+     <div class="pkg">{{PACKAGE_NAME}}</div>
+     <div class="fl-badge">
+       <svg viewBox="0 0 48 48" width="12" height="12" fill="none">
+         <path d="M24 4L4 24l8 8L24 20l12 12 8-8z" fill="#54C5F8"/>
+         <path d="M24 20L12 32l8 8 4-4 4 4 8-8z" fill="#01579B"/>
+         <path d="M12 32l4 4 4-4-4-4z" fill="#29B6F6"/>
+       </svg>
+       Built with Flutter {{FLUTTER_VER}}
+     </div>
+   </div>
+</div>
+
+<div class="success-banner">
+   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5">
+     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+   </svg>
+   <p>Build Successful  -  {{BUILD_DATE}} at {{BUILD_TIME}}</p>
+</div>
+
+<div class="firebase-box">
+   <div class="fb-title">
+     <svg width="14" height="14" viewBox="0 0 32 32" fill="#f59e0b"><path d="M19.62 11.558l-3.203 2.98-2.972-5.995-1.538 3.214L6 6l9.734 18.406L26 6z"/></svg>
+     Firebase Fingerprints
+   </div>
+   <div class="fb-row"><span class="fb-key">SHA-1</span><span class="fb-val">{{FIREBASE_SHA1}}</span></div>
+   <div class="fb-row"><span class="fb-key">SHA-256</span><span class="fb-val">{{FIREBASE_SHA256}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">App Info</div>
+<div class="row"><span class="rk">Package Name</span><span class="rv mono">{{PACKAGE_NAME}}</span></div>
+<div class="row"><span class="rk">Version Name</span><span class="rv">{{APP_VERSION}}</span></div>
+<div class="row"><span class="rk">Version Code</span><span class="rv">{{APP_VERSION_CODE}}</span></div>
+<div class="row"><span class="rk">Platform</span><span class="rv"><span class="badge bg">Android</span></span></div>
+<div class="row"><span class="rk">APK Size</span><span class="rv">{{APK_SIZE}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Build Details</div>
+<div class="row"><span class="rk">Framework</span><span class="rv">Flutter {{FLUTTER_VER}}</span></div>
+<div class="row"><span class="rk">Dart SDK</span><span class="rv">{{DART_VER}}</span></div>
+<div class="row"><span class="rk">Gradle Type</span><span class="rv"><span class="badge bb">{{GRADLE_TYPE}}</span></span></div>
+<div class="row"><span class="rk">Compile SDK</span><span class="rv">API {{COMPILE_SDK}}</span></div>
+<div class="row"><span class="rk">Min SDK</span><span class="rv">API {{MIN_SDK}}</span></div>
+<div class="row"><span class="rk">Target SDK</span><span class="rv">API {{TARGET_SDK}}</span></div>
+<div class="row"><span class="rk">Build Type</span><span class="rv"><span class="badge bo">Release</span></span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Signing Info</div>
+<div class="row"><span class="rk">Signature</span><span class="rv"><span class="badge bg">{{SIGNING_LABEL}}</span></span></div>
+<div class="row"><span class="rk">Key Alias</span><span class="rv mono">{{KEY_ALIAS}}</span></div>
+<div class="row"><span class="rk">Keystore File</span><span class="rv mono">{{KEY_STORE_FILE}}</span></div>
+<div class="row"><span class="rk">APK SHA-256</span><span class="rv mono">{{APK_SHA256}}</span></div>
+</div>
+
+<div class="section">
+<div class="slabel">Permissions ({{PERM_COUNT}})</div>
+<div class="chips">{{PERMISSIONS_HTML}}</div>
+</div>
+
+<div class="footer">
+   <p>Generated {{BUILD_DATE}} at {{BUILD_TIME}}</p>
+   <p>{{APP_NAME}} v{{APP_VERSION}} (Release)</p>
+</div>
+
+</div>
+</body></html>
